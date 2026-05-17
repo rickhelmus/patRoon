@@ -376,18 +376,41 @@ setMethod("generateCompoundsSIRIUS", "featureGroupsSet", function(fGroups, MSPea
 #' @export
 compoundsSIRIUS6 <- setClass("compoundsSIRIUS6", contains = "compounds")
 
+startSIRIUS <- function(path)
+{
+    checkPackage("RSirius", "sirius-ms/sirius-client-openAPI", ghSubDir = "client-api_r/generated")
+    
+    sdk <- RSirius::SiriusSDK$new()
+    # UNDONE: make this configurable?
+    # UNDONE: somehow default to a new SIRIUS instance? May make more sense for unattended processing?
+    # SIRIUSAPI <- sdk$attach_or_start_sirius()
+    SIRIUSAPI <- sdk$attach_to_sirius()
+    shutdownSIR <- FALSE
+    if (is.null(SIRIUSAPI))
+    {
+        SIRIUSAPI <- sdk$start_sirius(sirius_path = SIRIUSPath)
+        shutdownSIR <- TRUE
+    }
+    withr::defer_parent({
+        tryCatch({
+            if (shutdownSIR)
+                sdk$shutdown_sirius()
+        }, error = function(e) NULL)
+    })
+    
+    return(SIRIUSAPI)
+}
+
 # UNDONE
 generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
-                                      ..., adduct = NULL, minIMSSpecSim = 0, projectPath = NULL, runMode = "execute",
-                                      SIRIUSAPI = NULL, SIRIUSPath = NULL, verbose = TRUE)
+                                      ..., adduct = NULL, config = NULL, minIMSSpecSim = 0, projectPath = NULL,
+                                      runMode = "execute", SIRIUSAPI = NULL, SIRIUSPath = NULL, verbose = TRUE)
 {
-    # UNDONE: check which options to put back and how to configure them
     # UNDONE: error handling for SIRIUS API calls
     # UNDONE: handle login
     # UNDONE: add fingerprints
     # UNDONE: handle IMSSpecSims
     # UNDONE: add database column --> once links are fixed and once configs are defined
-    # SDK/API opts: SDK remote address, attach or new instance, path for new instance, port for new instance, shutdown?
     # UNDONE: replace SIRIUSPath by patRoonExt
     
     checkPackage("RSirius", "sirius-ms/sirius-client-openAPI", ghSubDir = "client-api_r/generated")
@@ -395,6 +418,7 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     assertSpecSimParams(specSimParams, add = ac)
+    checkmate::assertR6(config, null.ok = TRUE, add = ac)
     checkmate::assertNumber(minIMSSpecSim, lower = 0, finite = TRUE, add = ac)
     checkmate::assert(
         checkmate::checkPathForOutput(projectPath, overwrite = TRUE, extension = "sirius"),
@@ -405,6 +429,9 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
     checkmate::assertClass(SIRIUSAPI, "rsirius_api", null.ok = TRUE, add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
+    
+    if (runMode == "read" && (is.null(projectPath) || !file.exists(projectPath)))
+        stop("projectPath must be provided and exist when runMode is 'read'", call. = FALSE)
     
     if (length(fGroups) == 0)
         return(compoundsSIRIUS6(algorithm = "sirius6"))
@@ -417,26 +444,7 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
     projectID <- if (!is.null(projectPath) && length(names(projectPath) > 0)) names(projectPath)[1] else "patRoonProjectID"
 
     if (is.null(SIRIUSAPI))
-    {
-        sdk <- RSirius::SiriusSDK$new()
-        # UNDONE: make this configurable?
-        # UNDONE: somehow default to a new SIRIUS instance? May make more sense for unattended processing?
-        # SIRIUSAPI <- sdk$attach_or_start_sirius()
-        SIRIUSAPI <- sdk$attach_to_sirius()
-        shutdownSIR <- FALSE
-        if (is.null(SIRIUSAPI))
-        {
-            SIRIUSAPI <- sdk$start_sirius(sirius_path = SIRIUSPath)
-            shutdownSIR <- TRUE
-        }
-        on.exit({
-            tryCatch({
-                SIRIUSAPI$projects_api$CloseProject(projectID)
-                if (shutdownSIR)
-                    sdk$shutdown_sirius()
-            }, error = function(e) NULL)
-        }, add = TRUE)
-    }
+        SIRIUSAPI <- startSIRIUS(SIRIUSPath)
     
     projectPath <- if (is.null(projectPath))
         tempfile("patRoonSIRIUS", fileext = ".sirius")
@@ -480,26 +488,23 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
         
         SIRIUSAPI$features_api$AddAlignedFeatures(project_id = projectID, SIRFeatList)
         
-        # UNDONE: make this somehow configurable
-        jobConfig <- SIRIUSAPI$jobs_api$GetDefaultJobConfig(include_config_map = FALSE)
-        jobConfig$spectraSearchParams$enabled <- FALSE
-        jobConfig$formulaIdParams$enabled <- TRUE
-        jobConfig$structureDbSearchParams$enabled <- TRUE
-        jobConfig$canopusParams$enabled <- TRUE # fails if disabled...
-        jobConfig$msNovelistParams$enabled <- FALSE
+        if (is.null(config))
+            config <- getSIRIUSConfig(SIRIUSAPI = SIRIUSAPI, SIRIUSPath = SIRIUSPath)
+        config$spectraSearchParams$enabled <- FALSE
+        config$formulaIdParams$enabled <- TRUE
+        config$structureDbSearchParams$enabled <- TRUE
+        config$canopusParams$enabled <- TRUE # fails if disabled...
+        config$msNovelistParams$enabled <- FALSE
         
         printf("Running SIRIUS job...\n")
-        job <- SIRIUSAPI$jobs_api$StartJob(projectID, jobConfig)
+        job <- SIRIUSAPI$jobs_api$StartJob(projectID, config)
         
-        getJobProg <- function() SIRIUSAPI$jobs_api$GetJob(projectID, job$id)$progress
-        
-        jp <- getJobProg()
         # NOTE: maxProgress can change during the job execution, so we normalize the current progress to it at each update
         prog <- openProgBar(0, 1)
         while (!jp$state %in% c("CANCELED", "FAILED", "DONE"))
         {
             Sys.sleep(1)
-            jp <- getJobProg()
+            jp <- SIRIUSAPI$jobs_api$GetJob(projectID, job$id)$progress
             setTxtProgressBar(prog, jp$currentProgress / jp$maxProgress)
         }
         setTxtProgressBar(prog, 1)
@@ -581,4 +586,43 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
                            algorithm = "sirius6", MSPeakLists = MSPeakLists, specSimParams = specSimParams,
                            IMSSpecSims = getIMSFeatAnnSpecSims(MSPeakLists, fGroups, minIMSSpecSim, specSimParams),
                            gNames = names(fGroups)))
+}
+
+#' @export
+getSIRIUSConfig <- function(config = NULL, import = NULL, SIRIUSAPI = NULL, SIRIUSPath = NULL)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assert(
+        checkmate::checkString(config, min.chars = 1),
+        checkmate::checkList(config),
+        checkmate::checkScalarNA(config),
+        checkmate::checkNull(config),
+        .var.name = "config", add = ac
+    )
+    if (!is.null(import))
+        checkmate::assertFileExists(import, add = ac)
+    checkmate::assertClass(SIRIUSAPI, "rsirius_api", null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (!is.null(config) && !is.null(import))
+        stop("Only one of 'config' and 'import' can be provided.", call. = FALSE)
+    
+    if (is.null(SIRIUSAPI))
+        SIRIUSAPI <- startSIRIUS(SIRIUSPath)
+
+    if (!is.null(config) && is.na(config))
+        return(unlist(SIRIUSAPI$jobs_api$GetJobConfigNames()))
+
+    if (!is.null(import))
+    {
+        config <- RSirius::JobSubmission$new()
+        config$validateJSON(import)
+        config$fromJSON(import)
+    }
+    else if (is.null(config))
+        config <- SIRIUSAPI$jobs_api$GetDefaultJobConfig(include_config_map = FALSE)
+    else if (is.character(config))
+        config <- SIRIUSAPI$jobs_api$GetJobConfig(config)
+
+    return(config)
 }

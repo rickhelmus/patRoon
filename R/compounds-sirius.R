@@ -448,6 +448,7 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
     # UNDONE: replace SIRIUSPath by patRoonExt
     # UNDONE: caching
     # UNDONE: doc that logging in means accepting terms?
+    # UNDONE: properly set adducts (are spaces needed?)
     
     checkPackage("RSirius", "sirius-ms/sirius-client-openAPI", ghSubDir = "client-api_r/generated")
     
@@ -521,7 +522,6 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
                 !any(MSPeakLists[[fg]][["MS"]]$precursor))
                 return(NULL)
             plmz <- MSPeakLists[[fg]]$MS[precursor == TRUE]$mz
-            # UNDONE: properly set adducts (are spaces needed?)
             RSirius::FeatureImport$new(externalFeatureId = fg, ionMass = plmz, detectedAdducts = list("[M+Na]+"),
                                        charge = 1L, mergedMs1 = makeSIRSpec(MSPeakLists[[fg]]$MS, 1L, plmz),
                                        ms2Spectra = list(makeSIRSpec(MSPeakLists[[fg]]$MSMS, 2L, plmz)))
@@ -546,10 +546,12 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
         
         # NOTE: maxProgress can change during the job execution, so we normalize the current progress to it at each update
         prog <- openProgBar(0, 1)
-        while (!jp$state %in% c("CANCELED", "FAILED", "DONE"))
+        repeat
         {
             Sys.sleep(1)
             jp <- SIRIUSAPI$jobs_api$GetJob(projectID, job$id)$progress
+            if (jp$state %in% c("CANCELED", "FAILED", "DONE"))
+                break
             setTxtProgressBar(prog, jp$currentProgress / jp$maxProgress)
         }
         setTxtProgressBar(prog, 1)

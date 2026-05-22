@@ -394,3 +394,126 @@ setMethod("generateFormulasSIRIUS", "featureGroupsSet", function(fGroups, MSPeak
                         setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,
                         setAvgSpecificScores = setAvgSpecificScores, setArgs = sa)
 })
+
+# UNDONE: docs, class name
+#' @export
+formulasSIRIUS6 <- setClass("formulasSIRIUS6", contains = "formulas")
+
+# UNDONE
+generateFormulasSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+                                     adduct = NULL, config = NULL, login = "check", alwaysLogin = FALSE,
+                                     calculateFeatures = FALSE, featThreshold = 0, featThresholdAnn = 0.75,
+                                     minIMSSpecSim = 0, projectPath = NULL, runMode = "execute", SIRIUSAPI = NULL,
+                                     SIRIUSPath = NULL, verbose = TRUE)
+{
+    # UNDONE: see generateCompoundsSIRIUS60()
+    # UNDONE: feature formulas
+    # UNDONE: check why isotopeScore is always zero
+    
+    checkPackage("RSirius", "sirius-ms/sirius-client-openAPI", ghSubDir = "client-api_r/generated")
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
+    assertSpecSimParams(specSimParams, add = ac)
+    checkmate::assertR6(config, null.ok = TRUE, add = ac)
+    assertSIRIUSLogin(login, add = ac)
+    checkmate::assertFlag(alwaysLogin, add = ac)
+    checkmate::assertFlag(calculateFeatures, add = ac)
+    aapply(checkmate::assertNumber, . ~ featThreshold + featThresholdAnn + minIMSSpecSim,
+           lower = 0, upper = 1, finite = TRUE, fixed = list(add = ac))
+    checkmate::assert(
+        checkmate::checkPathForOutput(projectPath, overwrite = TRUE, extension = "sirius"),
+        checkmate::checkNull(projectPath),
+        .var.name = "projectPath", add = ac
+    )
+    checkmate::assertChoice(runMode, c("execute", "read"), add = ac)
+    checkmate::assertClass(SIRIUSAPI, "rsirius_api", null.ok = TRUE, add = ac)
+    checkmate::assertFlag(verbose, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (length(fGroups) == 0)
+        return(formulasSIRIUS6(algorithm = "sirius6"))
+    
+    adduct <- checkAndToAdduct(adduct, fGroups)
+    
+    IMSSpecSims <- getIMSFeatAnnSpecSims(MSPeakLists, fGroups, minIMSSpecSim, specSimParams)
+    
+    if (verbose)
+        printf("Processing %d feature groups with SIRIUS...\n", length(fGroups))
+    
+    if (is.null(SIRIUSAPI))
+        SIRIUSAPI <- startSIRIUS(SIRIUSPath)
+    
+    doSIRIUS60Login(login, alwaysLogin, SIRIUSAPI)
+    projectID <- openSIRIUSProject(projectPath, SIRIUSAPI, runMode)
+    
+    db <- openCacheDBScope()
+    baseHash <- makeHash(specSimParams, adduct, config, minIMSSpecSim)
+    
+    # UNDONE: make util, use also in SIR compounds, MetFrag and GenForm?
+    doFGroup <- function(grp)
+    {
+        if (!is.null(IMSSpecSims) && grp %chin% IMSSpecSims$group)
+            return(FALSE)
+        if (is.null(MSPeakLists[[grp]][["MS"]]) || is.null(MSPeakLists[[grp]][["MSMS"]]) ||
+            !any(MSPeakLists[[grp]][["MS"]]$precursor))
+            return(FALSE)
+        return(TRUE)
+    }
+    
+    gNamesTBD <- names(fGroups)[sapply(names(fGroups), doFGroup)]
+    fgAdd <- getFGroupAdducts(gNamesTBD, annotations(fGroups)[match(gNamesTBD, group)], adduct, "sirius")
+    hashes <- sapply(gNamesTBD, function(g)
+    {
+        makeHash(baseHash, fgAdd$grpAdductsChr[[g]], MSPeakLists[[g]]$MS[precursor == TRUE]$mz, MSPeakLists[[g]]$MSMS)
+    })
+    cachedData <- pruneList(setNames(loadCacheData("formulasSIRIUS", hashes, dbArg = db, simplify = FALSE), gNamesTBD))
+    gNamesTBD <- setdiff(gNamesTBD, names(cachedData))
+    
+    formTabs <- list()
+    if (length(gNamesTBD) > 0)
+    {
+        SIRFeatListImp <- runSIRIUS60(runMode, gNamesTBD, MSPeakLists, fgAdd, SIRIUSAPI, projectID, config,
+                                      formulasOnly = TRUE)
+        
+        formTabs <- sapply(SIRFeatListImp, function(fi)
+        {
+            tab <- getSIRIUSFormulaCandidates(projectID, SIRIUSAPI, fi$alignedFeatureId)
+            if (nrow(tab) == 0)
+                return(data.table()) # return empty table instead of NULL so it stills get cached
+            
+            fragInfos <- getSIRIUSFragInfos(projectID, SIRIUSAPI, fi$alignedFeatureId, tab$formulaId,
+                                            MSPeakLists[[fi$externalFeatureId]]$MSMS)
+            set(tab, j = "fragInfo", value = fragInfos)
+            set(tab, j = "explainedPeaks", value = sapply(tab$fragInfo, nrow))
+            
+            tab <- removeDTColumnsIfPresent(tab, "formulaId")
+            return(tab)
+        }, simplify = FALSE)
+        
+        saveCacheDataList("formulasSIRIUS", formTabs, hashes[names(formTabs)], dbArg = db)
+        formTabs <- pruneList(formTabs, checkZeroRows = TRUE)
+    }
+    
+    # remove empties after, so we're not trying to re-annotate them
+    cachedData <- pruneList(cachedData, checkZeroRows = TRUE)
+    if (length(cachedData) > 0)
+    {
+        formTabs <- c(formTabs, cachedData)
+        formTabs <- formTabs[intersect(names(fGroups), names(formTabs))] # ensure same order as fGroup
+    }
+    
+    scRanges <- sapply(formTabs, \(ct) list(score = range(ct$score)), simplify = FALSE)
+    
+    if (verbose)
+    {
+        ngrp <- length(formTabs)
+        printf("Assigned %d formulas to %d feature groups (%.2f%%).\n", sum(sapply(formTabs, nrow)),
+               ngrp, if (length(fGroups) == 0) 0 else ngrp * 100 / length(fGroups))
+    }
+    
+    return(formulasSIRIUS6(groupAnnotations = formTabs, scoreTypes = "score", scoreRanges = scRanges,
+                            algorithm = "sirius6", MSPeakLists = MSPeakLists, specSimParams = specSimParams,
+                            IMSSpecSims = IMSSpecSims, gNames = names(fGroups)))
+}
+

@@ -325,6 +325,10 @@ setMethod("delete", "featuresPiek", function(obj, i = NULL, j = NULL, ...)
 #'     still have MS/MS data as their \emph{m/z} could still fall within the MS/MS isolation window. The effective
 #'     window used will never exceed the instrumental isolation window. Setting \code{mzIsoWindow=Inf} will always use
 #'     instrumental windows.
+#'     
+#'     \strong{NOTE}: Sometimes the isolation windows are not exported and cannot be deduced automatically (e.g. Agilent
+#'     data). In that case, the \code{mzIsoWindow} parameter is used as the isolation window and therefore needs to be
+#'     set to a finite value.
 #'
 #'     \item \code{mobWindow} The mobility tolerance window to match DDA MS/MS precursors in IMS workflows. Used for
 #'     pre-filtering EICs and the final features. To match DDA precursor data, the measured mobility range of the
@@ -510,18 +514,32 @@ findFeaturesPiek <- function(analysisInfo, genEICParams = getPiekEICParams(),
                     setDT(getIMSIsolationInfo(backend))
                 else
                     setDT(getMSMetadata(backend, 2))
-                
-                # reduce m/z tolerance if needed
-                if (!is.finite(genEICParams$mzIsoWindow))
+
+                # special case: data does not contain isolation windows (e.g. Agilent)
+                if (all(MS2Info$isolationRangeMin == 0) && all(MS2Info$isolationRangeMax == 0))
+                {
+                    if (!is.finite(genEICParams$mzIsoWindow))
+                    {
+                        stop("The MS/MS data does not contain isolation window information, so mzIsoWindow must be set ",
+                             "to a finite value to specify the m/z tolerance for matching MS/MS precursors.",
+                             call. = FALSE)
+                    }
+                    else
+                        MS2Info[, c("mzmin", "mzmax") := .(precursorMZ - genEICParams$mzIsoWindow,
+                                                           precursorMZ + genEICParams$mzIsoWindow)]
+                }
+                else if (!is.finite(genEICParams$mzIsoWindow))
                 {
                     MS2Info[, c("mzmin", "mzmax") := .(precursorMZ - isolationRangeMin,
                                                        precursorMZ + isolationRangeMax)]
                 }
                 else
                 {
+                    # reduce m/z tolerance if needed
                     MS2Info[, c("mzmin", "mzmax") := .(precursorMZ - pmin(genEICParams$mzIsoWindow, isolationRangeMin),
                                                        precursorMZ + pmin(genEICParams$mzIsoWindow, isolationRangeMax))]
                 }
+                
                 MS2Info <- MS2Info[TIC >= genEICParams$minTIC]
                 if (IMS)
                 {

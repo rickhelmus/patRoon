@@ -40,7 +40,10 @@ time). If \code{NULL} all spectra from a feature will be taken into account. Low
   }
 
   If no isolation was applied to record MS/MS data (\emph{e.g.} data-independent MS/MS), then all MS/MS spectra will
-  be always be selected.}
+  be always be selected.
+  
+  \strong{NOTE}: Sometimes the isolation windows are not exported and cannot be deduced automatically (e.g. Agilent
+  data). In that case, \code{fixedIsolationWidth} needs to be set to a numeric or \code{NA} value.}
 
 \item{topMost}{Only extract MS peak lists from a maximum of \code{topMost} features with highest intensity. If
 \code{NULL} all features will be used.}

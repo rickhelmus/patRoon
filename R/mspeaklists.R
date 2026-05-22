@@ -924,6 +924,9 @@ setMethod("spectrumSimilarityIMS", "MSPeakLists", function(obj, fGroups, doFGrou
 #'
 #'   If no isolation was applied to record MS/MS data (\emph{e.g.} data-independent MS/MS), then all MS/MS spectra will
 #'   be always be selected.
+#'   
+#'   \strong{NOTE}: Sometimes the isolation windows are not exported and cannot be deduced automatically (e.g. Agilent
+#'   data). In that case, \code{fixedIsolationWidth} needs to be set to a numeric or \code{NA} value.
 #' @param topMost Only extract MS peak lists from a maximum of \code{topMost} features with highest intensity. If
 #'   \code{NULL} all features will be used.
 #' @param avgFeatParams Parameters used for averaging MS peak lists of individual features. Analogous to
@@ -1065,6 +1068,15 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRTWindo
         }
         
         openMSReadBackend(backend, path)
+        
+        MSMD2 <- getMSMetadata(backend, 2)
+        # eg Agilent data does not always export isolation windows :-(
+        if (isFALSE(fixedIsolationWidth) && all(MSMD2$isolationRangeMin == 0) && all(MSMD2$isolationRangeMax == 0))
+        {
+            stop(sprintf("No isolation window information found in MS/MS metadata for analysis '%s'. ", ana),
+                         "Please set fixedIsolationWidth to a numeric value or NA.", call. = FALSE)
+        }
+        
         msplMS <- getMSPL(backend, ft, avgFeatParamsMS, 1)
         msplMSMS <- getMSPL(backend, ft, avgFeatParamsMSMS, 2)
 

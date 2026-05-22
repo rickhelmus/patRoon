@@ -2,9 +2,9 @@
 % Please edit documentation in R/generics.R, R/feature_groups.R,
 %   R/feature_groups-set.R, R/feature_groups-bruker.R,
 %   R/feature_groups-envimass.R, R/feature_groups-greedy.R,
-%   R/feature_groups-ims.R, R/feature_groups-kpic2.R, R/feature_groups-openms.R,
-%   R/feature_groups-sirius.R, R/feature_groups-table.R,
-%   R/feature_groups-xcms.R, R/feature_groups-xcms3.R
+%   R/feature_groups-ims.R, R/feature_groups-kpic2.R,
+%   R/feature_groups-openms.R, R/feature_groups-sirius.R,
+%   R/feature_groups-table.R, R/feature_groups-xcms.R, R/feature_groups-xcms3.R
 \docType{class}
 \name{featureGroups-class}
 \alias{featureGroups-class}

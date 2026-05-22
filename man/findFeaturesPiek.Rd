@@ -279,6 +279,10 @@ The \code{piek} algorithm extends and improves on the simple and fast feature de
     still have MS/MS data as their \emph{m/z} could still fall within the MS/MS isolation window. The effective
     window used will never exceed the instrumental isolation window. Setting \code{mzIsoWindow=Inf} will always use
     instrumental windows.
+    
+    \strong{NOTE}: Sometimes the isolation windows are not exported and cannot be deduced automatically (e.g. Agilent
+    data). In that case, the \code{mzIsoWindow} parameter is used as the isolation window and therefore needs to be
+    set to a finite value.
 
     \item \code{mobWindow} The mobility tolerance window to match DDA MS/MS precursors in IMS workflows. Used for
     pre-filtering EICs and the final features. To match DDA precursor data, the measured mobility range of the

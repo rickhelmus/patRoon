@@ -877,6 +877,8 @@ The `fixedIsolationWidth` argument configures the selection of MS/MS spectra for
 * a number (e.g. `1`): a fixed value tolerance is used for the precursor selection _m/z_. This can e.g. be used to limit the spectra selection to precursors with a close _m/z_ to that of the feature value. _NOTE_: it is recommended to allow some tolerance, as the recorded precursor _m/z_ values often slightly deviate from the feature _m/z_ values.
 * `NA`: no precursor _m/z_ matching is performed and all MS/MS spectra recorded close to the retention time of the feature are considered for averaging. This is automatically done for 'classical' DIA data without precursor information (i.e. not SWATH).
 
+> **_NOTE_**: In some cases the isolation windows cannot be determined automatically from the raw data (e.g. Agilent Q-TOF data). In this case `fixedIsolationWidth` should be set to the desired isolation width manually to a numeric or `NA` value. An error will be thrown if `fixedIsolationWidth = FALSE` and the isolation windows cannot be determined.
+
 See `?generateMSPeakLists` for further details.
 
 ### Formulae

@@ -306,6 +306,7 @@ setMethod("initMSReadBackend", "Rcpp_MSReadBackendMem", function(backend, genMob
         hd[polarity == 0, polarity := -1] # 0 is negative mode for mzR
         setnames(hd, c("isolationWindowLowerOffset", "isolationWindowUpperOffset"),
                  c("isolationRangeMin", "isolationRangeMax"))
+        setnafill(hd, fill = 0, cols = c("isolationRangeMin", "isolationRangeMax"))
         
         cols <- c("scan", "time", "TIC", "BPC", "polarity")
         

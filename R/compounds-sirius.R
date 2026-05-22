@@ -446,7 +446,6 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
     # UNDONE: add database column --> once links are fixed and once configs are defined
     # UNDONE: replace SIRIUSPath by patRoonExt
     # UNDONE: doc that login means accepting terms?
-    # UNDONE: properly set adducts (are spaces needed?)
     # UNDONE: ensure/force that the right steps are enabled in config
     
     checkPackage("RSirius", "sirius-ms/sirius-client-openAPI", ghSubDir = "client-api_r/generated")
@@ -500,7 +499,12 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
         unlink(projectPath)
         SIRIUSAPI$projects_api$CreateProject(projectID, projectPath)
     }
-
+    
+    withr::defer({
+        tryCatch({
+            SIRIUSAPI$projects_api$CloseProject(projectID)
+        }, error = function(e) NULL)
+    })
     
     makeSIRSpec <- function(pl, lev, pmz)
     {
@@ -526,8 +530,10 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
     
     gNamesTBD <- names(fGroups)[sapply(names(fGroups), doFGroup)]
     fgAdd <- getFGroupAdducts(gNamesTBD, annotations(fGroups)[match(gNamesTBD, group)], adduct, "sirius")
-    hashes <- sapply(gNamesTBD,
-                     \(g) makeHash(baseHash, fgAdd[[g]], MSPeakLists[[g]]$MS[precursor == TRUE]$mz, MSPeakLists[[g]]$MSMS))
+    hashes <- sapply(gNamesTBD, function(g)
+    {
+        makeHash(baseHash, fgAdd$grpAdductsChr[[g]], MSPeakLists[[g]]$MS[precursor == TRUE]$mz, MSPeakLists[[g]]$MSMS)
+    })
     cachedData <- pruneList(setNames(loadCacheData("compoundsSIRIUS", hashes, dbArg = db, simplify = FALSE), gNamesTBD))
     gNamesTBD <- setdiff(gNamesTBD, names(cachedData))
 
@@ -539,8 +545,11 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
             SIRFeatList <- sapply(gNamesTBD, function(fg)
             {
                 plmz <- MSPeakLists[[fg]]$MS[precursor == TRUE]$mz
-                RSirius::FeatureImport$new(externalFeatureId = fg, ionMass = plmz, detectedAdducts = list("[M+Na]+"),
-                                           charge = 1L, mergedMs1 = makeSIRSpec(MSPeakLists[[fg]]$MS, 1L, plmz),
+                # UNDONE: charge can be set, but only charge 1 is supported by SIRIUS docs? (https://v6.docs.sirius-ms.io/adducts/)
+                # charge = fgAdd$grpAdducts[[g]]@charge
+                RSirius::FeatureImport$new(externalFeatureId = fg, ionMass = plmz,
+                                           detectedAdducts = list(fgAdd$grpAdductsChr[[fg]]), charge = 1L,
+                                           mergedMs1 = makeSIRSpec(MSPeakLists[[fg]]$MS, 1L, plmz),
                                            ms2Spectra = list(makeSIRSpec(MSPeakLists[[fg]]$MSMS, 2L, plmz)))
             }, simplify = FALSE)
             
@@ -574,9 +583,6 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
         SIRFeatListImp <- SIRIUSAPI$features_api$GetAlignedFeatures(projectID)
         names(SIRFeatListImp) <- sapply(SIRFeatListImp, \(f) if (is.null(f$externalFeatureId)) NA_character_ else f$externalFeatureId)
         SIRFeatListImp <- SIRFeatListImp[intersect(names(fGroups), names(SIRFeatListImp))] # sync and only keep relevant
-        
-        if (length(SIRFeatListImp) == 0)
-            return(compoundsSIRIUS6(algorithm = "sirius6"))
         
         compTabs <- sapply(SIRFeatListImp, function(fi)
         {

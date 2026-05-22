@@ -442,10 +442,9 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
 {
     # UNDONE: error handling for SIRIUS API calls
     # UNDONE: add fingerprints
-    # UNDONE: handle IMSSpecSims: test and add to hash
+    # UNDONE: handle IMSSpecSims: test (including caching)
     # UNDONE: add database column --> once links are fixed and once configs are defined
     # UNDONE: replace SIRIUSPath by patRoonExt
-    # UNDONE: caching
     # UNDONE: doc that login means accepting terms?
     # UNDONE: properly set adducts (are spaces needed?)
     # UNDONE: ensure/force that the right steps are enabled in config
@@ -517,10 +516,10 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
     
     doFGroup <- function(grp)
     {
-        if (!is.null(IMSSpecSims) && fg %chin% IMSSpecSims$group)
+        if (!is.null(IMSSpecSims) && grp %chin% IMSSpecSims$group)
             return(FALSE)
-        if (is.null(MSPeakLists[[fg]][["MS"]]) || is.null(MSPeakLists[[fg]][["MSMS"]]) ||
-            !any(MSPeakLists[[fg]][["MS"]]$precursor))
+        if (is.null(MSPeakLists[[grp]][["MS"]]) || is.null(MSPeakLists[[grp]][["MSMS"]]) ||
+            !any(MSPeakLists[[grp]][["MS"]]$precursor))
             return(FALSE)
         return(TRUE)
     }
@@ -528,10 +527,11 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
     gNamesTBD <- names(fGroups)[sapply(names(fGroups), doFGroup)]
     fgAdd <- getFGroupAdducts(gNamesTBD, annotations(fGroups)[match(gNamesTBD, group)], adduct, "sirius")
     hashes <- sapply(gNamesTBD,
-                     \(g) makeHash(baseHash, fgAdd[[g]], MSPeakLists[[g]][precursor == TRUE]$mz, MSPeakLists[[fg]]$MSMS))
+                     \(g) makeHash(baseHash, fgAdd[[g]], MSPeakLists[[g]]$MS[precursor == TRUE]$mz, MSPeakLists[[g]]$MSMS))
     cachedData <- pruneList(setNames(loadCacheData("compoundsSIRIUS", hashes, dbArg = db, simplify = FALSE), gNamesTBD))
     gNamesTBD <- setdiff(gNamesTBD, names(cachedData))
 
+    compTabs <- list()
     if (length(gNamesTBD) > 0)
     {
         if (runMode == "execute")
@@ -584,7 +584,7 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
             structCands <- SIRIUSAPI$features_api$GetStructureCandidates(projectID, fi$alignedFeatureId,
                                                                          opt_fields = c("dbLinks", "libraryMatches"))
             if (length(structCands) == 0)
-                return(NULL)
+                return(data.table()) # return empty table instead of NULL so it stills get cached
             tab <- rbindlist(lapply(structCands, \(sc) sc$toList()), fill = TRUE)
             setnames(tab, c("inchiKey", "smiles", "structureName", "xlogP", "molecularFormula", "csiScore"),
                      c("InChIKey1", "SMILES", "compoundName", "XlogP", "neutral_formula", "score"), skip_absent = TRUE)
@@ -624,10 +624,18 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
             tab <- removeDTColumnsIfPresent(tab, "formulaId")
             return(tab)
         }, simplify = FALSE)
+        
+        saveCacheDataList("compoundsSIRIUS", compTabs, hashes[names(compTabs)], dbArg = db)
         compTabs <- pruneList(compTabs, checkZeroRows = TRUE)
     }
     
-    
+    # remove empties after, so we're not trying to re-annotate them
+    cachedData <- pruneList(cachedData, checkZeroRows = TRUE)
+    if (length(cachedData) > 0)
+    {
+        compTabs <- c(compTabs, cachedData)
+        compTabs <- compTabs[intersect(names(fGroups), names(compTabs))] # ensure same order as fGroup
+    }
     
     scRanges <- sapply(compTabs, \(ct) list(score = range(ct$score)), simplify = FALSE)
     

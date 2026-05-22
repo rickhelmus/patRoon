@@ -462,7 +462,7 @@ openSIRIUSProject <- function(projectPath, SIRIUSAPI, runMode)
     return(projectID)
 }
 
-runSIRIUS60 <- function(runMode, gNames, MSPeakLists, fgAdd, SIRIUSAPI, projectID, config)
+runSIRIUS60 <- function(runMode, gNames, MSPeakLists, fgAdd, SIRIUSAPI, projectID, config, formulasOnly)
 {
     if (runMode == "execute")
     {
@@ -492,8 +492,8 @@ runSIRIUS60 <- function(runMode, gNames, MSPeakLists, fgAdd, SIRIUSAPI, projectI
             config <- getSIRIUSConfig(SIRIUSAPI = SIRIUSAPI, SIRIUSPath = SIRIUSPath, login = FALSE) # NOTE: should already be logged in
         config$spectraSearchParams$enabled <- FALSE
         config$formulaIdParams$enabled <- TRUE
-        config$structureDbSearchParams$enabled <- TRUE
-        config$canopusParams$enabled <- TRUE # fails if disabled...
+        config$structureDbSearchParams$enabled <- !formulasOnly
+        config$canopusParams$enabled <- !formulasOnly # NOTE: must be enabled for compounds
         config$msNovelistParams$enabled <- FALSE
         
         printf("Running SIRIUS job...\n")
@@ -523,6 +523,8 @@ runSIRIUS60 <- function(runMode, gNames, MSPeakLists, fgAdd, SIRIUSAPI, projectI
 getSIRIUSFormulaCandidates <- function(projectID, SIRIUSAPI, SIRFeatID)
 {
     formCands <- SIRIUSAPI$features_api$GetFormulaCandidates(projectID, SIRFeatID)
+    if (length(formCands) == 0)
+        return(data.table())
     tab <- rbindlist(lapply(formCands, \(fc) fc$toList()), fill = TRUE)
     setnames(tab, c("molecularFormula", "siriusScore", "siriusScoreNormalized"),
              c("neutral_formula", "score", "scoreNormalized"), skip_absent = TRUE)
@@ -539,8 +541,13 @@ getSIRIUSFragInfos <- function(projectID, SIRIUSAPI, SIRFeatID, SIRFormIDs, PLMS
                                        gsub(" ", "", as$spectrumAnnotation$adduct))
         rbindlist(lapply(as$peaks, function(p)
         {
-            if (!p$peakAnnotation$isValid()) # no annotations
-                return(NULL)
+            if (is.null(p$peakAnnotation) || !p$peakAnnotation$isValid()) # no annotations
+            {
+                return(data.table(mz = numeric(0), ion_formula_mz = character(0), formula_SIR = character(0),
+                                  adduct = character(0), error_mz = numeric(0), error_ppm = numeric(0),
+                                  PLID = numeric(0), ion_formula = character(0), neutral_loss = character(0)))
+            }
+            
             anns <- data.table(mz = p$mz, ion_formula_mz = p$peakAnnotation$exactMass,
                                formula_SIR = p$peakAnnotation$molecularFormula,
                                adduct = gsub(" ", "", p$peakAnnotation$adduct),
@@ -571,7 +578,7 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
     # UNDONE: add database column --> once links are fixed and once configs are defined
     # UNDONE: replace SIRIUSPath by patRoonExt
     # UNDONE: doc that login means accepting terms?
-    # UNDONE: ensure/force that the right steps are enabled in config
+    # UNDONE: move utils
     
     checkPackage("RSirius", "sirius-ms/sirius-client-openAPI", ghSubDir = "client-api_r/generated")
     
@@ -633,7 +640,8 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
     compTabs <- list()
     if (length(gNamesTBD) > 0)
     {
-        SIRFeatListImp <- runSIRIUS60(runMode, gNamesTBD, MSPeakLists, fgAdd, SIRIUSAPI, projectID, config)
+        SIRFeatListImp <- runSIRIUS60(runMode, gNamesTBD, MSPeakLists, fgAdd, SIRIUSAPI, projectID, config,
+                                      formulasOnly = FALSE)
         
         compTabs <- sapply(SIRFeatListImp, function(fi)
         {

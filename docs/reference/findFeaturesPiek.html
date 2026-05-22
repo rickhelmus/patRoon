@@ -336,7 +336,10 @@ ISSN 1097-0231, <a href="https://doi.org/10.1002/rcm.9206" class="external-link"
     values for <code>mzIsoWindow</code> allows to include features that were not specifically targeted by DDA, but may
     still have MS/MS data as their <em>m/z</em> could still fall within the MS/MS isolation window. The effective
     window used will never exceed the instrumental isolation window. Setting <code>mzIsoWindow=Inf</code> will always use
-    instrumental windows.</p></li>
+    instrumental windows.</p>
+<p><strong>NOTE</strong>: Sometimes the isolation windows are not exported and cannot be deduced automatically (e.g. Agilent
+    data). In that case, the <code>mzIsoWindow</code> parameter is used as the isolation window and therefore needs to be
+    set to a finite value.</p></li>
 <li><p><code>mobWindow</code> The mobility tolerance window to match DDA MS/MS precursors in IMS workflows. Used for
     pre-filtering EICs and the final features. To match DDA precursor data, the measured mobility range of the
     corresponding MS/MS data is used as the mobility window. This window is then adjusted to be at least +/-

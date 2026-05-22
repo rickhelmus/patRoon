@@ -135,7 +135,9 @@ time). If <code>NULL</code> all spectra from a feature will be taken into accoun
 <li><p>A numeric value: select the spectra that were recorded for the feature m/z within this tolerance window (+/-
   precursor m/z).</p></li>
 </ul><p>If no isolation was applied to record MS/MS data (<em>e.g.</em> data-independent MS/MS), then all MS/MS spectra will
-  be always be selected.</p></dd>
+  be always be selected.</p>
+<p><strong>NOTE</strong>: Sometimes the isolation windows are not exported and cannot be deduced automatically (e.g. Agilent
+  data). In that case, <code>fixedIsolationWidth</code> needs to be set to a numeric or <code>NA</code> value.</p></dd>
 
 
 <dt id="arg-topmost">topMost<a class="anchor" aria-label="anchor" href="#arg-topmost"></a></dt>

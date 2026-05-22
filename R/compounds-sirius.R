@@ -441,7 +441,6 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
                                       runMode = "execute", SIRIUSAPI = NULL, SIRIUSPath = NULL, verbose = TRUE)
 {
     # UNDONE: error handling for SIRIUS API calls
-    # UNDONE: handle login --> do for getSIRConfig()
     # UNDONE: add fingerprints
     # UNDONE: handle IMSSpecSims: test and add to hash
     # UNDONE: add database column --> once links are fixed and once configs are defined
@@ -635,7 +634,8 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
 }
 
 #' @export
-getSIRIUSConfig <- function(config = NULL, import = NULL, SIRIUSAPI = NULL, SIRIUSPath = NULL)
+getSIRIUSConfig <- function(config = NULL, import = NULL, login = "check", alwaysLogin = FALSE, SIRIUSAPI = NULL,
+                            SIRIUSPath = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assert(
@@ -647,6 +647,8 @@ getSIRIUSConfig <- function(config = NULL, import = NULL, SIRIUSAPI = NULL, SIRI
     )
     if (!is.null(import))
         checkmate::assertFileExists(import, add = ac)
+    assertSIRIUSLogin(login, add = ac)
+    checkmate::assertFlag(alwaysLogin, add = ac)
     checkmate::assertClass(SIRIUSAPI, "rsirius_api", null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -655,6 +657,8 @@ getSIRIUSConfig <- function(config = NULL, import = NULL, SIRIUSAPI = NULL, SIRI
     
     if (is.null(SIRIUSAPI))
         SIRIUSAPI <- startSIRIUS(SIRIUSPath)
+    
+    doSIRIUS60Login(login, alwaysLogin, SIRIUSAPI)
 
     if (!is.null(config) && is.na(config))
         return(unlist(SIRIUSAPI$jobs_api$GetJobConfigNames()))

@@ -421,7 +421,7 @@ startSIRIUS <- function(path)
     shutdownSIR <- FALSE
     if (is.null(SIRIUSAPI))
     {
-        SIRIUSAPI <- sdk$start_sirius(sirius_path = SIRIUSPath)
+        SIRIUSAPI <- sdk$start_sirius(sirius_path = path)
         shutdownSIR <- TRUE
     }
     withr::defer_parent({

@@ -520,6 +520,15 @@ runSIRIUS60 <- function(runMode, gNames, MSPeakLists, fgAdd, SIRIUSAPI, projectI
     return(SIRFeatListImp)
 }
 
+getSIRIUSFormulaCandidates <- function(projectID, SIRIUSAPI, SIRFeatID)
+{
+    formCands <- SIRIUSAPI$features_api$GetFormulaCandidates(projectID, SIRFeatID)
+    tab <- rbindlist(lapply(formCands, \(fc) fc$toList()), fill = TRUE)
+    setnames(tab, c("molecularFormula", "siriusScore", "siriusScoreNormalized"),
+             c("neutral_formula", "score", "scoreNormalized"), skip_absent = TRUE)
+    return(tab)
+}
+
 getSIRIUSFragInfos <- function(projectID, SIRIUSAPI, SIRFeatID, SIRFormIDs, PLMS2)
 {
     # NOTE: there may be duplicate formIDs --> only query unique ones and then expand to all SIRFormIDs
@@ -638,6 +647,14 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
                      c("InChIKey1", "SMILES", "compoundName", "XlogP", "neutral_formula", "score"), skip_absent = TRUE)
             # UNDONE: add InChI and InChIKey?
             
+            # add in formula info
+            formCands <- getSIRIUSFormulaCandidates(projectID, SIRIUSAPI, fi$alignedFeatureId)
+            formCands <- removeDTColumnsIfPresent(formCands, c("adduct", "neutral_formula"))
+            colsRename <- setdiff(names(formCands), "formulaId")
+            setnames(formCands, colsRename, paste0("formula_", colsRename))
+            tab <- merge(tab, formCands, by = "formulaId", sort = FALSE)
+            
+            # NOTE: frag info for SIRIUS is only available from formula candidates(!)
             fragInfos <- getSIRIUSFragInfos(projectID, SIRIUSAPI, fi$alignedFeatureId, tab$formulaId,
                                             MSPeakLists[[fi$externalFeatureId]]$MSMS)
             set(tab, j = "fragInfo", value = fragInfos)

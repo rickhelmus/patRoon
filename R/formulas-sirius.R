@@ -408,8 +408,7 @@ generateFormulasSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getDe
 {
     # UNDONE: see generateCompoundsSIRIUS60()
     # UNDONE: feature formulas
-    # UNDONE: check why isotopeScore is always zero
-    
+
     checkPackage("RSirius", "sirius-ms/sirius-client-openAPI", ghSubDir = "client-api_r/generated")
     
     ac <- checkmate::makeAssertCollection()

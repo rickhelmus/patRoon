@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-doSIRIUS60Login <- function(login, force, SIRIUSAPI)
+doSIRIUSLogin <- function(login, force, SIRIUSAPI)
 {
     if (isFALSE(login))
         return(invisible(NULL)) # no need to do anything
@@ -138,8 +138,8 @@ getSIRIUSFragInfos <- function(projectID, SIRIUSAPI, SIRFeatID, SIRFormIDs, PLMS
     return(fragInfos[SIRFormIDs])
 }
 
-runSIRIUS60 <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUSAPI, SIRIUSPath, projectPath, config,
-                        login, alwaysLogin, formulasOnly, calculateFeatures, cacheName)
+runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUSAPI, SIRIUSPath, projectPath, config,
+                      login, alwaysLogin, formulasOnly, calculateFeatures, cacheName)
 {
     doFGroup <- function(grp, ana = NULL)
     {
@@ -204,7 +204,7 @@ runSIRIUS60 <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRI
         if (is.null(SIRIUSAPI))
             SIRIUSAPI <- startSIRIUS(SIRIUSPath)
         
-        doSIRIUS60Login(login, alwaysLogin, SIRIUSAPI)
+        doSIRIUSLogin(login, alwaysLogin, SIRIUSAPI)
         projectID <- openSIRIUSProject(projectPath, SIRIUSAPI, runMode)
         
         if (runMode == "execute")

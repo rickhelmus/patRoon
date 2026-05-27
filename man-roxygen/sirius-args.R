@@ -14,8 +14,8 @@
 #' 
 #'   See the \href{https://v6.docs.sirius-ms.io/account-and-license/}{SIRIUS website} and \pkg{patRoon} handbook for
 #'   more information.
-#' @param config An \R6 \code{RSirius::JobSubmission} configuration object, typically obtained with
-#'   \code{getSIRIUSConfig()}. If \code{NULL}, the default \command{SIRIUS} configuration is used.
+#' @param config A \code{RSirius::JobSubmission} configuration object, typically obtained with
+#'   \code{\link{getSIRIUSConfig}}. If \code{NULL}, the default \command{SIRIUS} configuration is used.
 #' @param runMode,projectPath Whether to execute a \command{SIRIUS} processing job (\code{runMode="execute"}) or load
 #'   results from an existing \command{SIRIUS} project (\code{runMode"read"}). If \code{runMode="execute"} then
 #'   \code{projectPath} can be \code{NULL} and a temporary project will be used, otherwise \code{projectPath} must point
@@ -31,6 +31,11 @@
 #'   connection will be started automatically.
 #' @param SIRIUSPath The full path to the \command{SIRIUS} command-line interface executable. Only used when
 #'   \code{SIRIUSAPI} is not provided.
+#'
+#' @section SIRIUS 6 functionality: The interface to \command{SIRIUS 6} is still in development and may be extended in
+#'   the future. There is a vast amount of functionality available, which will require quite some effort to support all.
+#'   However, the current functionality in \pkg{patRoon} is mostly equal to what was supported with previous
+#'   \command{SIRIUS} releases. Any feedback on the inclusion of specific functionality is welcome!
 #'
 #' @references \insertRef{Hoffmann2021}{patRoon} \cr\cr \insertRef{Dhrkop2020}{patRoon} \cr\cr
 #'   \insertRef{Dhrkop2019}{patRoon} \cr\cr \insertRef{Duhrkop2015}{patRoon} \cr\cr

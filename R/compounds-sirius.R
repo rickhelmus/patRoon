@@ -28,104 +28,6 @@ NULL
 compoundsSIRIUS <- setClass("compoundsSIRIUS", slots = c(fingerprints = "list"),
                             contains = "compounds")
 
-processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, topMost)
-{
-    resultPath <- getSiriusResultPath(outPath, msFName)
-    results <- scRanges <- fingerprints <- data.table()
-    
-    if (length(resultPath) != 0) # zero for no results
-    {
-        summary <- file.path(resultPath, "structure_candidates.tsv")
-        summaryForms <- file.path(resultPath, "formula_candidates.tsv")
-        if (file.exists(summary) && file.exists(summaryForms))
-        {
-            results <- fread(summary)
-            results <- unifySirNames(results)
-            resultsForm <- fread(summaryForms)
-            
-            # NOTE: so far SIRIUS only has one score
-            if (nrow(results) > 0)
-                scRanges <- list(score = range(results$score))
-            
-            # manually sort results: SIRIUS seems to sometimes randomly order results with equal scores
-            # NOTE: do this before topMost filter step below to ensure proper filtering
-            setorderv(results, c("score", "identifier"), order = c(-1, 1))
-            
-            if (!is.null(topMost))
-            {
-                if (nrow(results) > topMost)
-                    results <- results[seq_len(topMost)] # results should already be sorted on score
-            }
-            
-            # identifiers to characters, as they sometimes are and sometimes aren't depending on if multiple are present
-            results[, identifier := as.character(identifier)]
-            
-            # NOTE: fragment info is based on SIRIUS results, ie from formula
-            # prediction and not by compounds! Hence, results are the same for
-            # candidates with the same formula.
-            fragFiles <- patRoon:::getAndPrepareSIRIUSResFiles(resultPath, "spectra", "tsv")
-            for (ff in fragFiles)
-            {
-                fragInfo <- fread(ff)
-                fragInfo[, ionization := gsub(" ", "", ionization)]
-                fragInfo[, PLID := sapply(mz, function(omz) MSMS[which.min(abs(omz - mz))]$ID)]
-                
-                # it is quite a journey to see find the relevant fragment files, especially with non-standard adducts...
-                # 1. figure out, from the file name, to which formula candidate it belongs to
-                # 2. but, the formula that is part of the file name is some strange half-neutralized form
-                # 3. so dig in the formula summary file to which ionized formula this should belong to by looking at the 'precursorFormula' column
-                fragFileFormName <- getFormulaFromSIRIUSResFile(ff, "tsv")
-                fragFileFormNameNeutral <- resultsForm[match(fragFileFormName, precursorFormula)]$molecularFormula
-
-                wh <- which(results$neutral_formula %in% fragFileFormNameNeutral)
-                
-                # Remove zero intensity peaks that aren't actually present in the peak list. These seem to be precursor
-                # peaks, taking into account the various adduct forms of SIRIUS...
-                fragInfo <- fragInfo[intensity != 0]
-                
-                fragInfo[, c("rel.intensity", "exactmass", "intensity") := NULL]
-                
-                if (length(wh) > 0)
-                {
-                    # sirius neutralizes fragments, make them ion again
-                    if (!is.null(fragInfo[["implicitAdduct"]]))
-                        ionImpAdducts <- ifelse(nzchar(fragInfo$implicitAdduct),
-                                                mapply(paste0("+", fragInfo$implicitAdduct, "]"), fragInfo$ionization,
-                                                       FUN = sub, MoreArgs = list(pattern = "\\]")),
-                                                fragInfo$ionization)
-                    else
-                        ionImpAdducts <- fragInfo$ionization
-                    setnames(fragInfo, "formula", "formula_SIR")
-                    fragInfo[, ion_formula := mapply(formula_SIR, ionImpAdducts, FUN = calculateIonFormula)]
-                    
-                    ionform <- calculateIonFormula(results$neutral_formula[wh[1]], adduct)
-                    fragInfo[, neutral_loss := sapply(ion_formula, subtractFormula, formula1 = ionform)]
-                    
-                    set(results, wh, "fragInfo", list(list(fragInfo)))
-                    set(results, wh, "explainedPeaks", nrow(fragInfo))
-                }
-            }
-            
-            if (is.null(results[["fragInfo"]]))
-            {
-                # warning(sprintf("no fragment info for %s", cmd$gName))
-                results[, fragInfo := list(rep(list(data.table(mz = numeric(0), ion_formula = character(0),
-                                                               neutral_loss = character(0),  score = numeric(0),
-                                                               PLID = numeric(0))),
-                                               nrow(results)))]
-                results[, explainedPeaks := 0]
-            }
-            results[, database := database][]
-        }
-        
-        if (nrow(results) > 0)
-            fingerprints <- loadSIRIUSFingerprints(resultPath, results$neutral_formula, adduct)
-    }
-    
-    ret <- list(comptab = results, scRanges = scRanges, fingerprints = fingerprints)
-    return(ret)
-}
-
 
 #' @rdname compounds-class
 #' @export
@@ -150,6 +52,12 @@ setMethod("predictRespFactors", "compoundsSIRIUS", function(obj, fGroups, calibr
     aapply(assertConcUnit, . ~ concUnit + calibConcUnit, fixed = list(add = ac))
     checkmate::assertChoice(type, c("FP", "SMILES", "both"), add = ac)
     checkmate::reportAssertions(ac)
+    
+    if (type != "SMILES")
+    {
+        stop("predictRespFactors() with SIRIUS fingerprints is not working, since MS2Quant is incompatible with SIRIUS 6.0",
+             call. = FALSE)
+    }
     
     if (type == "SMILES" || type == "both")
         obj <- callNextMethod(obj, fGroups = fGroups, calibrants = calibrants, eluent = eluent,
@@ -199,6 +107,12 @@ setMethod("predictTox", "compoundsSIRIUS", function(obj, type = "FP", LC50Mode =
     checkmate::assertChoice(LC50Mode, c("static", "flow"), add = ac)
     assertConcUnit(concUnit, add = ac)
     checkmate::reportAssertions(ac)
+    
+    if (type != "SMILES")
+    {
+        stop("predictTox() with SIRIUS fingerprints is not working, since MS2Tox is incompatible with SIRIUS 6.0",
+             call. = FALSE)
+    }
     
     if (type == "SMILES" || type == "both")
         obj <- callNextMethod(obj, LC50Mode = LC50Mode, concUnit = concUnit, updateScore = FALSE, scoreWeight = 1)
@@ -276,111 +190,10 @@ setMethod("predictTox", "compoundsSIRIUS", function(obj, type = "FP", LC50Mode =
 #' @export
 setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLists,
                                                                specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
-                                                               relMzDev = defaultLim("mz", "narrow_rel"), adduct = NULL,
-                                                               projectPath = NULL, elements = "CHNOP",
-                                                               profile = "qtof", formulaDatabase = NULL,
-                                                               fingerIDDatabase = "pubchem", noise = NULL,
-                                                               cores = NULL, topMost = 100, topMostFormulas = 5,
-                                                               login = "check", alwaysLogin = FALSE,
-                                                               extraOptsGeneral = NULL,
-                                                               extraOptsFormula = NULL, minIMSSpecSim = 0,
-                                                               verbose = TRUE, splitBatches = FALSE, dryRun = FALSE)
-{
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertClass(fGroups, "featureGroups", add = ac)
-    checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
-    assertSpecSimParams(specSimParams, add = ac)
-    checkmate::assertNumber(relMzDev, lower = 0, finite = TRUE, add = ac)
-    checkmate::assertString(projectPath, null.ok = TRUE, add = ac)
-    aapply(checkmate::assertString, . ~ elements + profile + fingerIDDatabase, fixed = list(add = ac))
-    aapply(checkmate::assertString, . ~ formulaDatabase + fingerIDDatabase, null.ok = TRUE, fixed = list(add = ac))
-    checkmate::assertNumber(noise, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
-    checkmate::assertCount(cores, positive = TRUE, null.ok = TRUE, add = ac)
-    aapply(checkmate::assertCount, . ~ topMost + topMostFormulas, positive = TRUE, fixed = list(add = ac))
-    assertSIRIUSLogin(login, add = ac)
-    checkmate::assertFlag(alwaysLogin, add = ac)
-    aapply(checkmate::assertCharacter, . ~ extraOptsGeneral + extraOptsFormula, null.ok = TRUE, fixed = list(add = ac))
-    checkmate::assertNumber(minIMSSpecSim, lower = 0, finite = TRUE, add = ac)
-    checkmate::assertFlag(verbose, add = ac)
-    checkmate::assertFlag(splitBatches, add = ac)
-    checkmate::assertFlag(dryRun, add = ac)
-    checkmate::reportAssertions(ac)
-
-    if (length(fGroups) == 0)
-        return(compoundsSIRIUS(algorithm = "sirius"))
-    
-    if (!is.null(projectPath))
-        projectPath <- normalizePath(projectPath, mustWork = FALSE)
-    
-    adduct <- checkAndToAdduct(adduct, fGroups)
-    if (is.null(fingerIDDatabase))
-        fingerIDDatabase <- if (!is.null(formulaDatabase)) formulaDatabase else "pubchem"
-
-    IMSSpecSims <- getIMSFeatAnnSpecSims(MSPeakLists, fGroups, minIMSSpecSim, specSimParams)
-    
-    gCount <- length(fGroups)
-    printf("Processing %d feature groups with SIRIUS+CSI:FingerID...\n", gCount)
-    
-    results <- doSIRIUS(fGroups, MSPeakLists, FALSE, profile, adduct, relMzDev, elements,
-                        formulaDatabase, noise, cores, "structure", fingerIDDatabase, topMostFormulas, projectPath,
-                        login, alwaysLogin, extraOptsGeneral, extraOptsFormula, IMSSpecSims, NULL, verbose,
-                        "compoundsSIRIUS", patRoon:::processSIRIUSCompounds, list(database = fingerIDDatabase,
-                                                                                  topMost = topMost),
-                        splitBatches, dryRun)
-    
-    # prune empty/NULL results
-    if (length(results) > 0)
-        results <- results[sapply(results, function(r) !is.null(r$comptab) && nrow(r$comptab) > 0, USE.NAMES = FALSE)]
-    
-    if (verbose)
-    {
-        printf("-------\n")
-        ngrp <- length(results)
-        printf("Assigned %d compounds to %d feature groups (%.2f%%).\n", sum(unlist(lapply(results, function(r) nrow(r$comptab)))),
-               ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
-    }
-
-    ret <- compoundsSIRIUS(groupAnnotations = lapply(results, "[[", "comptab"), scoreTypes = "score",
-                           scoreRanges = lapply(results, "[[", "scRanges"),
-                           fingerprints = pruneList(lapply(results, "[[", "fingerprints"), checkZeroRows = TRUE),
-                           algorithm = "sirius", MSPeakLists = MSPeakLists, specSimParams = specSimParams,
-                           IMSSpecSims = IMSSpecSims, gNames = names(fGroups))
-    
-    if (!is.null(IMSSpecSims))
-    {
-        mss <- IMSSpecSims[ims_precursor_group %chin% names(ret@fingerprints)]
-        if (nrow(mss) > 0)
-            ret@fingerprints[mss$group] <- copy(ret@fingerprints[mss$ims_precursor_group])
-    }
-    
-    return(ret)
-})
-
-#' @template featAnnSets-gen_args
-#' @rdname generateCompoundsSIRIUS
-#' @export
-setMethod("generateCompoundsSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists,
-                                                                  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
-                                                                  relMzDev = defaultLim("mz", "narrow_rel"), adduct = NULL,
-                                                                  projectPath = NULL, ..., setThreshold = 0,
-                                                                  setThresholdAnn = 0, setAvgSpecificScores = FALSE)
-{
-    checkmate::assertCharacter(projectPath, len = length(sets(fGroups)), null.ok = TRUE)
-    sa <- if (!is.null(projectPath)) lapply(projectPath, function(p) list(projectPath = p)) else list()
-    generateCompoundsSet(fGroups, MSPeakLists, specSimParams, adduct, generateCompoundsSIRIUS, relMzDev = relMzDev, ...,
-                         setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,
-                         setAvgSpecificScores = setAvgSpecificScores, setArgs = sa)
-})
-
-# UNDONE: docs, class name
-#' @export
-compoundsSIRIUS6 <- setClass("compoundsSIRIUS6", contains = "compounds")
-
-# UNDONE
-generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
-                                      adduct = NULL, config = NULL, login = "check", alwaysLogin = FALSE,
-                                      minIMSSpecSim = 0, projectPath = NULL, runMode = "execute", SIRIUSAPI = NULL,
-                                      SIRIUSPath = NULL, verbose = TRUE)
+                                                               adduct = NULL, config = NULL, login = "check",
+                                                               alwaysLogin = FALSE, minIMSSpecSim = 0,
+                                                               projectPath = NULL, runMode = "execute", SIRIUSAPI = NULL,
+                                                               SIRIUSPath = NULL, verbose = TRUE)
 {
     # UNDONE: error handling for SIRIUS API calls
     # UNDONE: add fingerprints
@@ -388,7 +201,6 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
     # UNDONE: add database column --> once links are fixed and once configs are defined
     # UNDONE: replace SIRIUSPath by patRoonExt
     # UNDONE: doc that login means accepting terms?
-    # UNDONE: move utils
     
     checkPackage("RSirius", "sirius-ms/sirius-client-openAPI", ghSubDir = "client-api_r/generated")
     
@@ -419,9 +231,9 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
     if (verbose)
         printf("Processing %d feature groups with SIRIUS+CSI:FingerID...\n", length(fGroups))
 
-    SIRResults <- runSIRIUS60(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUSAPI, SIRIUSPath, projectPath,
-                              config, login, alwaysLogin, formulasOnly = FALSE, calculateFeatures = FALSE,
-                              cacheName = "compoundsSIRIUS")    
+    SIRResults <- runSIRIUS(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUSAPI, SIRIUSPath, projectPath,
+                            config, login, alwaysLogin, formulasOnly = FALSE, calculateFeatures = FALSE,
+                            cacheName = "compoundsSIRIUS")    
 
     prepRes <- function(res)
     {
@@ -450,10 +262,28 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
                ngrp, if (length(fGroups) == 0) 0 else ngrp * 100 / length(fGroups))
     }
     
-    return(compoundsSIRIUS6(groupAnnotations = compTabs, scoreTypes = "score", scoreRanges = scRanges,
-                           algorithm = "sirius6", MSPeakLists = MSPeakLists, specSimParams = specSimParams,
+    return(compoundsSIRIUS(groupAnnotations = compTabs, scoreTypes = "score", scoreRanges = scRanges,
+                           algorithm = "sirius", MSPeakLists = MSPeakLists, specSimParams = specSimParams,
                            IMSSpecSims = IMSSpecSims, gNames = names(fGroups)))
-}
+})
+
+#' @template featAnnSets-gen_args
+#' @rdname generateCompoundsSIRIUS
+#' @export
+setMethod("generateCompoundsSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists,
+                                                                  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+                                                                  adduct = NULL, config = NULL, login = "check",
+                                                                  alwaysLogin = FALSE, minIMSSpecSim = 0,
+                                                                  projectPath = NULL, ..., setThreshold = 0,
+                                                                  setThresholdAnn = 0, setAvgSpecificScores = FALSE)
+{
+    checkmate::assertCharacter(projectPath, len = length(sets(fGroups)), null.ok = TRUE)
+    sa <- if (!is.null(projectPath)) lapply(projectPath, function(p) list(projectPath = p)) else list()
+    generateCompoundsSet(fGroups, MSPeakLists, specSimParams, adduct, generateCompoundsSIRIUS, config = config,
+                         login = login, alwaysLogin = alwaysLogin, minIMSSpecSim = minIMSSpecSim, ...,
+                         setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,
+                         setAvgSpecificScores = setAvgSpecificScores, setArgs = sa)
+})
 
 #' @export
 getSIRIUSConfig <- function(config = NULL, import = NULL, login = "check", alwaysLogin = FALSE, SIRIUSAPI = NULL,
@@ -480,7 +310,7 @@ getSIRIUSConfig <- function(config = NULL, import = NULL, login = "check", alway
     if (is.null(SIRIUSAPI))
         SIRIUSAPI <- startSIRIUS(SIRIUSPath)
     
-    doSIRIUS60Login(login, alwaysLogin, SIRIUSAPI)
+    doSIRIUSLogin(login, alwaysLogin, SIRIUSAPI)
 
     if (!is.null(config) && is.na(config))
         return(unlist(SIRIUSAPI$jobs_api$GetJobConfigNames()))

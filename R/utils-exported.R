@@ -1959,6 +1959,27 @@ genIDLevelRulesFile <- function(out, inLevels = NULL, exLevels = NULL)
     invisible(NULL)
 }
 
+#' Obtain a SIRIUS job configuration
+#'
+#' This function obtains a \link[RSirius]{JobSubmission} configuration object for use with
+#' \code{\link{generateFormulasSIRIUS}} and \code{\link{generateCompoundsSIRIUS}}.
+#' 
+#' The function can return the server default configuration, fetch a named configuration, import a configuration from a
+#' JSON file, or use a provided configuration object/list. If needed, the SIRIUS API is started automatically and a
+#' login can be performed. There are \emph{many} configuration options available in \command{SIRIUS}. It is probably
+#' easiest to explore and configure them through the \command{SIRIUS} GUI, and save or export the configuration profile.
+#'
+#' @param config A configuration specification. Use \code{NULL} to obtain the server default,
+#'   a \code{character} string to fetch a named configuration, \code{NA} to list available
+#'   configuration names, or a \code{list} / \code{RSirius::JobSubmission} object to use directly.
+#' @param import Path to a JSON file to import the configuration from, \emph{e.g.} exported from the \command{SIRIUS}
+#'   GUI. Cannot be used together with \code{config}.
+#' 
+#' @inheritParams generateCompoundsSIRIUS
+#'
+#' @return A \code{RSirius::JobSubmission} object with the job configuration, or a \code{character}
+#'   vector of configuration names when \code{config = NA}.
+#'
 #' @export
 getSIRIUSConfig <- function(config = NULL, import = NULL, login = "check", alwaysLogin = FALSE, SIRIUSAPI = NULL,
                             SIRIUSPath = NULL)

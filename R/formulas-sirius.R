@@ -407,7 +407,6 @@ generateFormulasSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getDe
                                      SIRIUSPath = NULL, verbose = TRUE)
 {
     # UNDONE: see generateCompoundsSIRIUS60()
-    # UNDONE: feature formulas
 
     checkPackage("RSirius", "sirius-ms/sirius-client-openAPI", ghSubDir = "client-api_r/generated")
     
@@ -440,67 +439,29 @@ generateFormulasSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getDe
     if (verbose)
         printf("Processing %d feature groups with SIRIUS...\n", length(fGroups))
     
-    if (is.null(SIRIUSAPI))
-        SIRIUSAPI <- startSIRIUS(SIRIUSPath)
+    SIRResults <- runSIRIUS60(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUSAPI, SIRIUSPath, projectPath,
+                              config, login, alwaysLogin, formulasOnly = TRUE, calculateFeatures = calculateFeatures,
+                              cacheName = "formulasSIRIUS")
     
-    doSIRIUS60Login(login, alwaysLogin, SIRIUSAPI)
-    projectID <- openSIRIUSProject(projectPath, SIRIUSAPI, runMode)
-    
-    db <- openCacheDBScope()
-    baseHash <- makeHash(specSimParams, adduct, config, minIMSSpecSim)
-    
-    # UNDONE: make util, use also in SIR compounds, MetFrag and GenForm?
-    doFGroup <- function(grp)
+    prepRes <- function(res)
     {
-        if (!is.null(IMSSpecSims) && grp %chin% IMSSpecSims$group)
-            return(FALSE)
-        if (is.null(MSPeakLists[[grp]][["MS"]]) || is.null(MSPeakLists[[grp]][["MSMS"]]) ||
-            !any(MSPeakLists[[grp]][["MS"]]$precursor))
-            return(FALSE)
-        return(TRUE)
+        tab <- res$formCands
+        if (nrow(tab) == 0)
+            return(NULL)
+        tab <- removeDTColumnsIfPresent(tab, "formulaId")
+        return(tab)
     }
     
-    gNamesTBD <- names(fGroups)[sapply(names(fGroups), doFGroup)]
-    fgAdd <- getFGroupAdducts(gNamesTBD, annotations(fGroups)[match(gNamesTBD, group)], adduct, "sirius")
-    hashes <- sapply(gNamesTBD, function(g)
+    featForms <- list()
+    if (calculateFeatures)
     {
-        makeHash(baseHash, fgAdd$grpAdductsChr[[g]], MSPeakLists[[g]]$MS[precursor == TRUE]$mz, MSPeakLists[[g]]$MSMS)
-    })
-    cachedData <- pruneList(setNames(loadCacheData("formulasSIRIUS", hashes, dbArg = db, simplify = FALSE), gNamesTBD))
-    gNamesTBD <- setdiff(gNamesTBD, names(cachedData))
-    
-    formTabs <- list()
-    if (length(gNamesTBD) > 0)
-    {
-        SIRFeatListImp <- runSIRIUS60(runMode, gNamesTBD, MSPeakLists, fgAdd, SIRIUSAPI, projectID, config,
-                                      formulasOnly = TRUE)
-        
-        formTabs <- sapply(SIRFeatListImp, function(fi)
-        {
-            tab <- getSIRIUSFormulaCandidates(projectID, SIRIUSAPI, fi$alignedFeatureId)
-            if (nrow(tab) == 0)
-                return(data.table()) # return empty table instead of NULL so it stills get cached
-            
-            fragInfos <- getSIRIUSFragInfos(projectID, SIRIUSAPI, fi$alignedFeatureId, tab$formulaId,
-                                            MSPeakLists[[fi$externalFeatureId]]$MSMS)
-            set(tab, j = "fragInfo", value = fragInfos)
-            set(tab, j = "explainedPeaks", value = sapply(tab$fragInfo, nrow))
-            
-            tab <- removeDTColumnsIfPresent(tab, "formulaId")
-            return(tab)
-        }, simplify = FALSE)
-        
-        saveCacheDataList("formulasSIRIUS", formTabs, hashes[names(formTabs)], dbArg = db)
-        formTabs <- pruneList(formTabs, checkZeroRows = TRUE)
+        featForms <- pruneList(sapply(SIRResults, \(x) lapply(x, prepRes), simplify = FALSE))
+        formTabs <- generateGroupFormulasByConsensus(featForms,
+                                                     lapply(groupFeatIndex(fGroups), function(x) sum(x > 0)),
+                                                     featThreshold, featThresholdAnn, names(fGroups))
     }
-    
-    # remove empties after, so we're not trying to re-annotate them
-    cachedData <- pruneList(cachedData, checkZeroRows = TRUE)
-    if (length(cachedData) > 0)
-    {
-        formTabs <- c(formTabs, cachedData)
-        formTabs <- formTabs[intersect(names(fGroups), names(formTabs))] # ensure same order as fGroup
-    }
+    else
+        formTabs <- pruneList(sapply(SIRResults, prepRes, simplify = FALSE))
     
     scRanges <- sapply(formTabs, \(ct) list(score = range(ct$score)), simplify = FALSE)
     
@@ -511,8 +472,8 @@ generateFormulasSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getDe
                ngrp, if (length(fGroups) == 0) 0 else ngrp * 100 / length(fGroups))
     }
     
-    return(formulasSIRIUS6(groupAnnotations = formTabs, scoreTypes = "score", scoreRanges = scRanges,
-                            algorithm = "sirius6", MSPeakLists = MSPeakLists, specSimParams = specSimParams,
-                            IMSSpecSims = IMSSpecSims, gNames = names(fGroups)))
+    return(formulasSIRIUS6(groupAnnotations = formTabs, featureFormulas = featForms, scoreTypes = "score",
+                           scoreRanges = scRanges, algorithm = "sirius6", MSPeakLists = MSPeakLists,
+                           specSimParams = specSimParams, IMSSpecSims = IMSSpecSims, gNames = names(fGroups)))
 }
 

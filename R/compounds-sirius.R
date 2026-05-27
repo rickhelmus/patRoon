@@ -462,8 +462,8 @@ openSIRIUSProject <- function(projectPath, SIRIUSAPI, runMode)
     return(projectID)
 }
 
-runSIRIUS60 <- function(runMode, gNames, MSPeakLists, fgAdd, SIRIUSAPI, projectID, config, formulasOnly,
-                        calculateFeatures)
+runSIRIUS60 <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUSAPI, SIRIUSPath, projectPath, config,
+                        login, alwaysLogin, formulasOnly, calculateFeatures, cacheName)
 {
     doFGroup <- function(grp, ana = NULL)
     {
@@ -480,177 +480,196 @@ runSIRIUS60 <- function(runMode, gNames, MSPeakLists, fgAdd, SIRIUSAPI, projectI
     
     gNamesTBD <- names(fGroups)[sapply(names(fGroups), doFGroup)]
     fgAdd <- getFGroupAdducts(gNamesTBD, annotations(fGroups)[match(gNamesTBD, group)], adduct, "sirius")
-    hashes <- sapply(gNamesTBD, function(g)
-    {
-        makeHash(baseHash, fgAdd$grpAdductsChr[[g]], MSPeakLists[[g]]$MS[precursor == TRUE]$mz, MSPeakLists[[g]]$MSMS)
-    })
-    cachedData <- pruneList(setNames(loadCacheData("compoundsSIRIUS", hashes, dbArg = db, simplify = FALSE), gNamesTBD))
-    gNamesTBD <- setdiff(gNamesTBD, names(cachedData))
     
-    if (runMode == "execute")
-    {
-        makeSIRSpec <- function(pl, lev, pmz)
-        {
-            peaks <- Map(pl$mz, pl$intensity, f = RSirius::SimplePeak$new)
-            ret <- RSirius::BasicSpectrum$new(msLevel = lev, peaks = peaks)
-            if (lev > 1)
-                ret$precursorMz = pmz
-            return(ret)
-        }
-        addSIRFeature <- function(id, pl, add)
-        {
-            plmz <- pl$MS[precursor == TRUE]$mz
-            # UNDONE: charge can be set, but only charge 1 is supported by SIRIUS docs? (https://v6.docs.sirius-ms.io/adducts/)
-            # charge = fgAdd$grpAdducts[[g]]@charge
-            RSirius::FeatureImport$new(externalFeatureId = id, ionMass = plmz,
-                                       detectedAdducts = list(add), charge = 1L,
-                                       mergedMs1 = makeSIRSpec(pl$MS, 1L, plmz),
-                                       ms2Spectra = list(makeSIRSpec(pl$MSMS, 2L, plmz)))
-        }
-
-        SIRFeatList <- if (calculateFeatures)
-        {
-            sfeats <- sapply(gNames, function(fg)
-            {
-                sapply(analyses(fGroups), function(ana)
-                {
-                    if (doFGroup(fg, ana))
-                        addSIRFeature(paste0(fg, "_", ana), MSPeakLists[[ana, fg]], fgAdd$grpAdductsChr[[fg]])
-                }, simplify = FALSE)
-            }, simplify = FALSE)
-            unlist(sfeats, recursive = FALSE)
-        }
-        else
-        {
-            sapply(gNames, \(fg) addSIRFeature(fg, MSPeakLists[[fg]], fgAdd$grpAdductsChr[[fg]]), simplify = FALSE)
-        }
-        
-        # SIRFeatList <- sapply(gNames, function(fg)
-        # {
-        #     plmz <- MSPeakLists[[fg]]$MS[precursor == TRUE]$mz
-        #     # UNDONE: charge can be set, but only charge 1 is supported by SIRIUS docs? (https://v6.docs.sirius-ms.io/adducts/)
-        #     # charge = fgAdd$grpAdducts[[g]]@charge
-        #     RSirius::FeatureImport$new(externalFeatureId = fg, ionMass = plmz,
-        #                                detectedAdducts = list(fgAdd$grpAdductsChr[[fg]]), charge = 1L,
-        #                                mergedMs1 = makeSIRSpec(MSPeakLists[[fg]]$MS, 1L, plmz),
-        #                                ms2Spectra = list(makeSIRSpec(MSPeakLists[[fg]]$MSMS, 2L, plmz)))
-        # }, simplify = FALSE)
-        
-        SIRIUSAPI$features_api$AddAlignedFeatures(project_id = projectID, SIRFeatList)
-        
-        if (is.null(config))
-            config <- getSIRIUSConfig(SIRIUSAPI = SIRIUSAPI, SIRIUSPath = SIRIUSPath, login = FALSE) # NOTE: should already be logged in
-        config$spectraSearchParams$enabled <- FALSE
-        config$formulaIdParams$enabled <- TRUE
-        config$structureDbSearchParams$enabled <- !formulasOnly
-        config$canopusParams$enabled <- !formulasOnly # NOTE: must be enabled for compounds
-        config$msNovelistParams$enabled <- FALSE
-        
-        printf("Running SIRIUS job...\n")
-        job <- SIRIUSAPI$jobs_api$StartJob(projectID, config)
-        
-        # NOTE: maxProgress can change during the job execution, so we normalize the current progress to it at each update
-        prog <- openProgBar(0, 1)
-        repeat
-        {
-            Sys.sleep(1)
-            jp <- SIRIUSAPI$jobs_api$GetJob(projectID, job$id)$progress
-            if (jp$state %in% c("CANCELED", "FAILED", "DONE"))
-                break
-            setTxtProgressBar(prog, jp$currentProgress / jp$maxProgress)
-        }
-        setTxtProgressBar(prog, 1)
-        close(prog)
-    }
-    
-    # UNDONE: finish caching, simple processing of SIR results: load forms, compounds (if present) and fragInfos and store as list
-    
-    SIRFeatListImp <- SIRIUSAPI$features_api$GetAlignedFeatures(projectID)
-    names(SIRFeatListImp) <- sapply(SIRFeatListImp, \(f) if (is.null(f$externalFeatureId)) NA_character_ else f$externalFeatureId)
-    
-    getResFromFeat <- function(sirFeat)
-    {
-        ret <- list()
-        
-        ret$formCands <- getSIRIUSFormulaCandidates(projectID, SIRIUSAPI, sirFeat$alignedFeatureId)
-        # NOTE: frag info for SIRIUS is only available from formula candidates(!)
-        # UNDONE: get correct MSPL if calculateFeatures==T
-        ret$fragInfos <- getSIRIUSFragInfos(projectID, SIRIUSAPI, sirFeat$alignedFeatureId, ret$formCands$formulaId,
-                                            MSPeakLists[[sirFeat$externalFeatureId]]$MSMS)
-        
-        if (!formulasOnly)
-        {
-            # BUG: opt_fields doesn't seem to do anything
-             ret$structCands <- SIRIUSAPI$features_api$GetStructureCandidates(projectID, sirFeat$alignedFeatureId,
-                                                                             opt_fields = c("dbLinks", "libraryMatches"))
-             ret$structCands <- rbindlist(lapply(structCands, \(sc) sc$toList()), fill = TRUE)
-             setnames(ret$structCands, c("inchiKey", "smiles", "structureName", "xlogP", "molecularFormula", "csiScore"),
-                      c("InChIKey1", "SMILES", "compoundName", "XlogP", "neutral_formula", "score"), skip_absent = TRUE)
-             # UNDONE: add InChI and InChIKey?
-        }
-        
-        return(ret)
-    }
-    
-    results <- sapply(gNames, function(grp)
-    {
-        if (calculateFeatures)
-        {
-            
-        }
-        else
-        {
-            
-        }
-    }, simplify = FALSE)
-    
-    compTabs <- sapply(SIRFeatListImp, function(fi)
-    {
-        # BUG: opt_fields doesn't seem to do anything
-        structCands <- SIRIUSAPI$features_api$GetStructureCandidates(projectID, fi$alignedFeatureId,
-                                                                     opt_fields = c("dbLinks", "libraryMatches"))
-        if (length(structCands) == 0)
-            return(data.table()) # return empty table instead of NULL so it stills get cached
-        tab <- rbindlist(lapply(structCands, \(sc) sc$toList()), fill = TRUE)
-        setnames(tab, c("inchiKey", "smiles", "structureName", "xlogP", "molecularFormula", "csiScore"),
-                 c("InChIKey1", "SMILES", "compoundName", "XlogP", "neutral_formula", "score"), skip_absent = TRUE)
-        # UNDONE: add InChI and InChIKey?
-        
-        # add in formula info
-        formCands <- getSIRIUSFormulaCandidates(projectID, SIRIUSAPI, fi$alignedFeatureId)
-        formCands <- removeDTColumnsIfPresent(formCands, c("adduct", "neutral_formula"))
-        colsRename <- setdiff(names(formCands), "formulaId")
-        setnames(formCands, colsRename, paste0("formula_", colsRename))
-        tab <- merge(tab, formCands, by = "formulaId", sort = FALSE)
-        
-        # NOTE: frag info for SIRIUS is only available from formula candidates(!)
-        fragInfos <- getSIRIUSFragInfos(projectID, SIRIUSAPI, fi$alignedFeatureId, tab$formulaId,
-                                        MSPeakLists[[fi$externalFeatureId]]$MSMS)
-        set(tab, j = "fragInfo", value = fragInfos)
-        set(tab, j = "explainedPeaks", value = sapply(tab$fragInfo, nrow))
-        
-        tab <- removeDTColumnsIfPresent(tab, "formulaId")
-        return(tab)
-    }, simplify = FALSE)
-    
+    hashes <- cachedData <- NULL
     if (calculateFeatures)
     {
-        SIRFeatListImp <- sapply(names(fGroups), function(fg)
+        hashes <- pruneList(sapply(analyses(fGroups), function(ana)
         {
-            sapply(analyses(fGroups), function(ana)
+            anaHashes <- sapply(gNamesTBD, function(g)
             {
-                featID <- paste0(fg, "_", ana)
-                if (featID %in% names(SIRFeatListImp))
-                    return(SIRFeatListImp[[featID]])
-                else
-                    return(NULL)
-            }, simplify = FALSE)
-        }, simplify = FALSE)
+                if (!doFGroup(g, ana))
+                    return(NA_character_)
+                makeHash(baseHash, fgAdd$grpAdductsChr[[g]], MSPeakLists[[ana, g]]$MS[precursor == TRUE]$mz, MSPeakLists[[ana, g]]$MSMS)
+            })
+            anaHashes <- anaHashes[!is.na(anaHashes)]
+        }, simplify = FALSE), checkEmptyElements = TRUE)
+        
+        cachedData <- pruneList(sapply(analyses(fGroups), function(ana)
+        {
+            pruneList(setNames(loadCacheData(cacheName, hashes[[ana]], dbArg = db, simplify = FALSE), names(hashes[[ana]])))
+        }, simplify = FALSE), checkEmptyElements = TRUE)
+        
+        # update groups to be done: if at least one ana/fgroup pair is NULL then it needs to be done
+        gNamesTBD <- sapply(gNamesTBD, function(g)
+        {
+            for (ana in analyses(fGroups))
+            {
+                if (is.null(hashes[[ana]][[g]]) || !is.null(cachedData[[ana]][[g]]))
+                    return(NA_character_)
+            }
+            return(g)
+        })
+        gNamesTBD <- gNamesTBD[!is.na(gNamesTBD)]
+    }
+    else
+    {
+        hashes <- sapply(gNamesTBD, function(g)
+        {
+            makeHash(baseHash, fgAdd$grpAdductsChr[[g]], MSPeakLists[[g]]$MS[precursor == TRUE]$mz, MSPeakLists[[g]]$MSMS)
+        })
+        cachedData <- pruneList(setNames(loadCacheData(cacheName, hashes, dbArg = db, simplify = FALSE), gNamesTBD))
+        gNamesTBD <- setdiff(gNamesTBD, names(cachedData))
     }
     
-    SIRFeatListImp <- SIRFeatListImp[intersect(gNames, names(SIRFeatListImp))] # sync and only keep relevant
+    results <- list()
+    if (length(gNamesTBD) > 0)
+    {
+        if (is.null(SIRIUSAPI))
+            SIRIUSAPI <- startSIRIUS(SIRIUSPath)
+        
+        doSIRIUS60Login(login, alwaysLogin, SIRIUSAPI)
+        projectID <- openSIRIUSProject(projectPath, SIRIUSAPI, runMode)
+        
+        if (runMode == "execute")
+        {
+            makeSIRSpec <- function(pl, lev, pmz)
+            {
+                peaks <- Map(pl$mz, pl$intensity, f = RSirius::SimplePeak$new)
+                ret <- RSirius::BasicSpectrum$new(msLevel = lev, peaks = peaks)
+                if (lev > 1)
+                    ret$precursorMz = pmz
+                return(ret)
+            }
+            addSIRFeature <- function(id, pl, add)
+            {
+                plmz <- pl$MS[precursor == TRUE]$mz
+                # UNDONE: charge can be set, but only charge 1 is supported by SIRIUS docs? (https://v6.docs.sirius-ms.io/adducts/)
+                # charge = fgAdd$grpAdducts[[g]]@charge
+                RSirius::FeatureImport$new(externalFeatureId = id, ionMass = plmz,
+                                           detectedAdducts = list(add), charge = 1L,
+                                           mergedMs1 = makeSIRSpec(pl$MS, 1L, plmz),
+                                           ms2Spectra = list(makeSIRSpec(pl$MSMS, 2L, plmz)))
+            }
+            
+            SIRFeatList <- if (calculateFeatures)
+            {
+                sfeats <- sapply(analyses(fGroups), function(ana)
+                {
+                    pruneList(sapply(gNamesTBD, function(fg)
+                    {
+                        if (is.null(cachedData[[ana]][[fg]]) && doFGroup(fg, ana))
+                            addSIRFeature(paste0(ana, "_", fg), MSPeakLists[[ana, fg]], fgAdd$grpAdductsChr[[fg]])
+                    }, simplify = FALSE))
+                }, simplify = FALSE)
+                unlist(sfeats, recursive = FALSE)
+            }
+            else
+            {
+                sapply(gNamesTBD,
+                       \(fg) addSIRFeature(fg, MSPeakLists[[fg]], fgAdd$grpAdductsChr[[fg]]), simplify = FALSE)
+            }
+            
+            stopifnot(length(SIRFeatList) > 0)
+            
+            SIRIUSAPI$features_api$AddAlignedFeatures(project_id = projectID, SIRFeatList)
+            
+            if (is.null(config))
+                config <- getSIRIUSConfig(SIRIUSAPI = SIRIUSAPI, SIRIUSPath = SIRIUSPath, login = FALSE) # NOTE: should already be logged in
+            config$spectraSearchParams$enabled <- FALSE
+            config$formulaIdParams$enabled <- TRUE
+            config$structureDbSearchParams$enabled <- !formulasOnly
+            config$canopusParams$enabled <- !formulasOnly # NOTE: must be enabled for compounds
+            config$msNovelistParams$enabled <- FALSE
+            
+            printf("Running SIRIUS job...\n")
+            job <- SIRIUSAPI$jobs_api$StartJob(projectID, config)
+            
+            # NOTE: maxProgress can change during the job execution, so we normalize the current progress to it at each update
+            prog <- openProgBar(0, 1)
+            repeat
+            {
+                Sys.sleep(1)
+                jp <- SIRIUSAPI$jobs_api$GetJob(projectID, job$id)$progress
+                if (jp$state %in% c("CANCELED", "FAILED", "DONE"))
+                    break
+                setTxtProgressBar(prog, jp$currentProgress / jp$maxProgress)
+            }
+            setTxtProgressBar(prog, 1)
+            close(prog)
+        }
+        
+        SIRFeatListImp <- SIRIUSAPI$features_api$GetAlignedFeatures(projectID)
+        names(SIRFeatListImp) <- sapply(SIRFeatListImp, \(f) if (is.null(f$externalFeatureId)) NA_character_ else f$externalFeatureId)
+        
+        getResFromFeat <- function(sirFeat, PLMS2)
+        {
+            ret <- list()
+            
+            ret$formCands <- getSIRIUSFormulaCandidates(projectID, SIRIUSAPI, sirFeat$alignedFeatureId)
+            # NOTE: frag info for SIRIUS is only available from formula candidates(!)
+            fragInfos <- getSIRIUSFragInfos(projectID, SIRIUSAPI, sirFeat$alignedFeatureId, ret$formCands$formulaId, PLMS2)
+            set(ret$formCands, j = "fragInfo", value = fragInfos[ret$formCands$formulaId])
+            set(ret$formCands, j = "explainedPeaks", value = sapply(ret$formCands$fragInfo, nrow))
+            
+            if (!formulasOnly)
+            {
+                # BUG: opt_fields doesn't seem to do anything
+                ret$structCands <- SIRIUSAPI$features_api$GetStructureCandidates(projectID, sirFeat$alignedFeatureId,
+                                                                                 opt_fields = c("dbLinks", "libraryMatches"))
+                ret$structCands <- rbindlist(lapply(ret$structCands, \(sc) sc$toList()), fill = TRUE)
+                setnames(ret$structCands, c("inchiKey", "smiles", "structureName", "xlogP", "molecularFormula", "csiScore"),
+                         c("InChIKey1", "SMILES", "compoundName", "XlogP", "neutral_formula", "score"), skip_absent = TRUE)
+                # UNDONE: add InChI and InChIKey?
+            }
+            
+            return(ret)
+        }
+        
+        if (calculateFeatures)
+        {
+            results <- sapply(analyses(fGroups), function(ana)
+            {
+                ret <- pruneList(sapply(gNamesTBD, function(grp)
+                {
+                    featID <- paste0(ana, "_", grp)
+                    if (is.null(SIRFeatListImp[[featID]]))
+                        return(NULL)
+                    return(getResFromFeat(SIRFeatListImp[[featID]], MSPeakLists[[ana, grp]]$MSMS))
+                }, simplify = FALSE))
+                saveCacheDataList(cacheName, ret, hashes[[ana]][names(ret)], dbArg = db)
+                return(ret)
+            }, simplify = FALSE)
+        }
+        else
+        {
+            results <- pruneList(sapply(gNamesTBD, function(grp)
+            {
+                # NOTE: check if feature is present: already done by doFGroup(), but may be removed if we're importing data
+                if (is.null(SIRFeatListImp[[grp]]))
+                    return(NULL)
+                getResFromFeat(SIRFeatListImp[[grp]], MSPeakLists[[grp]]$MSMS)
+            }, simplify = FALSE))
+            saveCacheDataList(cacheName, results, hashes[names(results)], dbArg = db)
+        }
+    }
     
-    return(SIRFeatListImp)
+    # add cached data
+    if (calculateFeatures)
+    {
+        for (ana in names(cachedData))
+        {
+            results[[ana]] <- c(cachedData[[ana]], results[[ana]])
+            results[[ana]] <- results[[ana]][intersect(names(fGroups), names(results[[ana]]))]
+        }
+    }
+    else
+    {
+        results <- c(cachedData, results)
+        results <- results[intersect(names(fGroups), names(results))]
+    }
+    
+    return(results)
 }
 
 getSIRIUSFormulaCandidates <- function(projectID, SIRIUSAPI, SIRFeatID)
@@ -666,6 +685,9 @@ getSIRIUSFormulaCandidates <- function(projectID, SIRIUSAPI, SIRFeatID)
 
 getSIRIUSFragInfos <- function(projectID, SIRIUSAPI, SIRFeatID, SIRFormIDs, PLMS2)
 {
+    # HACK: no PL IDs (yet) for feature specific peak lists
+    hasPLID <- !is.null(PLMS2[["ID"]])
+    
     # NOTE: there may be duplicate formIDs --> only query unique ones and then expand to all SIRFormIDs
     fragInfos <- sapply(unique(SIRFormIDs), function(fid)
     {
@@ -678,7 +700,8 @@ getSIRIUSFragInfos <- function(projectID, SIRIUSAPI, SIRFeatID, SIRFormIDs, PLMS
             {
                 return(data.table(mz = numeric(0), ion_formula_mz = character(0), formula_SIR = character(0),
                                   adduct = character(0), error_mz = numeric(0), error_ppm = numeric(0),
-                                  PLID = numeric(0), ion_formula = character(0), neutral_loss = character(0)))
+                                  PLID = if (hasPLID) numeric(0), ion_formula = character(0),
+                                  neutral_loss = character(0)))
             }
             
             anns <- data.table(mz = p$mz, ion_formula_mz = p$peakAnnotation$exactMass,
@@ -686,8 +709,8 @@ getSIRIUSFragInfos <- function(projectID, SIRIUSAPI, SIRFeatID, SIRFormIDs, PLMS
                                adduct = gsub(" ", "", p$peakAnnotation$adduct),
                                error_mz = p$peakAnnotation$massDeviationMz,
                                error_ppm = p$peakAnnotation$massDeviationPpm)
-            # add MSPL ID
-            anns[, PLID := PLMS2[which.min(abs(p$mz - mz))]$ID]
+            if (hasPLID)
+                anns[, PLID := PLMS2[which.min(abs(p$mz - mz))]$ID]
             
             # SIRIUS neutralizes fragments, make them ion again
             anns[, ion_formula := mapply(formula_SIR, adduct, FUN = calculateIonFormula)]
@@ -741,82 +764,29 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
     
     if (verbose)
         printf("Processing %d feature groups with SIRIUS+CSI:FingerID...\n", length(fGroups))
-    
-    if (is.null(SIRIUSAPI))
-        SIRIUSAPI <- startSIRIUS(SIRIUSPath)
-    
-    doSIRIUS60Login(login, alwaysLogin, SIRIUSAPI)
-    projectID <- openSIRIUSProject(projectPath, SIRIUSAPI, runMode)
-    
-    db <- openCacheDBScope()
-    baseHash <- makeHash(specSimParams, adduct, config, minIMSSpecSim)
-    
-    doFGroup <- function(grp)
-    {
-        if (!is.null(IMSSpecSims) && grp %chin% IMSSpecSims$group)
-            return(FALSE)
-        if (is.null(MSPeakLists[[grp]][["MS"]]) || is.null(MSPeakLists[[grp]][["MSMS"]]) ||
-            !any(MSPeakLists[[grp]][["MS"]]$precursor))
-            return(FALSE)
-        return(TRUE)
-    }
-    
-    gNamesTBD <- names(fGroups)[sapply(names(fGroups), doFGroup)]
-    fgAdd <- getFGroupAdducts(gNamesTBD, annotations(fGroups)[match(gNamesTBD, group)], adduct, "sirius")
-    hashes <- sapply(gNamesTBD, function(g)
-    {
-        makeHash(baseHash, fgAdd$grpAdductsChr[[g]], MSPeakLists[[g]]$MS[precursor == TRUE]$mz, MSPeakLists[[g]]$MSMS)
-    })
-    cachedData <- pruneList(setNames(loadCacheData("compoundsSIRIUS", hashes, dbArg = db, simplify = FALSE), gNamesTBD))
-    gNamesTBD <- setdiff(gNamesTBD, names(cachedData))
 
-    compTabs <- list()
-    if (length(gNamesTBD) > 0)
+    SIRResults <- runSIRIUS60(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUSAPI, SIRIUSPath, projectPath,
+                              config, login, alwaysLogin, formulasOnly = FALSE, calculateFeatures = FALSE,
+                              cacheName = "compoundsSIRIUS")    
+
+    prepRes <- function(res)
     {
-        SIRFeatListImp <- runSIRIUS60(runMode, gNamesTBD, MSPeakLists, fgAdd, SIRIUSAPI, projectID, config,
-                                      formulasOnly = FALSE, calculateFeatures = FALSE)
+        tab <- res$structCands
+        if (nrow(tab) == 0)
+            return(NULL)
         
-        compTabs <- sapply(SIRFeatListImp, function(fi)
-        {
-            # BUG: opt_fields doesn't seem to do anything
-            structCands <- SIRIUSAPI$features_api$GetStructureCandidates(projectID, fi$alignedFeatureId,
-                                                                         opt_fields = c("dbLinks", "libraryMatches"))
-            if (length(structCands) == 0)
-                return(data.table()) # return empty table instead of NULL so it stills get cached
-            tab <- rbindlist(lapply(structCands, \(sc) sc$toList()), fill = TRUE)
-            setnames(tab, c("inchiKey", "smiles", "structureName", "xlogP", "molecularFormula", "csiScore"),
-                     c("InChIKey1", "SMILES", "compoundName", "XlogP", "neutral_formula", "score"), skip_absent = TRUE)
-            # UNDONE: add InChI and InChIKey?
-            
-            # add in formula info
-            formCands <- getSIRIUSFormulaCandidates(projectID, SIRIUSAPI, fi$alignedFeatureId)
-            formCands <- removeDTColumnsIfPresent(formCands, c("adduct", "neutral_formula"))
-            colsRename <- setdiff(names(formCands), "formulaId")
-            setnames(formCands, colsRename, paste0("formula_", colsRename))
-            tab <- merge(tab, formCands, by = "formulaId", sort = FALSE)
-            
-            # NOTE: frag info for SIRIUS is only available from formula candidates(!)
-            fragInfos <- getSIRIUSFragInfos(projectID, SIRIUSAPI, fi$alignedFeatureId, tab$formulaId,
-                                            MSPeakLists[[fi$externalFeatureId]]$MSMS)
-            set(tab, j = "fragInfo", value = fragInfos)
-            set(tab, j = "explainedPeaks", value = sapply(tab$fragInfo, nrow))
-            
-            tab <- removeDTColumnsIfPresent(tab, "formulaId")
-            return(tab)
-        }, simplify = FALSE)
+        # add in formula info
+        colsRename <- setdiff(names(res$formCands), c("formulaId", "fragInfo", "explainedPeaks"))
+        setnames(res$formCands, colsRename, paste0("formula_", colsRename))
+        tab <- merge(tab, res$formCands, by = "formulaId", sort = FALSE)
         
-        saveCacheDataList("compoundsSIRIUS", compTabs, hashes[names(compTabs)], dbArg = db)
-        compTabs <- pruneList(compTabs, checkZeroRows = TRUE)
+        tab <- removeDTColumnsIfPresent(tab, "formulaId")
+        
+        return(tab)
     }
     
-    # remove empties after, so we're not trying to re-annotate them
-    cachedData <- pruneList(cachedData, checkZeroRows = TRUE)
-    if (length(cachedData) > 0)
-    {
-        compTabs <- c(compTabs, cachedData)
-        compTabs <- compTabs[intersect(names(fGroups), names(compTabs))] # ensure same order as fGroup
-    }
-    
+    compTabs <- pruneList(sapply(SIRResults, prepRes, simplify = FALSE))
+
     scRanges <- sapply(compTabs, \(ct) list(score = range(ct$score)), simplify = FALSE)
     
     if (verbose)

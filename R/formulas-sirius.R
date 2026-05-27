@@ -17,7 +17,9 @@ NULL
 #' @slot fingerprints A \code{list} with for each feature group result a \code{data.table} containing fingerprints
 #'   obtained with \command{CSI:FingerID}. Will be empty unless the \code{getFingerprints} argument to
 #'   \code{\link{generateFormulasSIRIUS}} was set to \code{TRUE}.
+#'   \strong{NOTE:} not yet implemented.
 #' @slot MS2QuantMeta Metadata from \pkg{MS2Quant} filled in by \code{predictRespFactors}.
+#'   \strong{NOTE:} not yet implemented.
 #'
 #' @templateVar class formulasSIRIUS
 #' @template class-hierarchy
@@ -145,7 +147,6 @@ setMethod("predictTox", "formulasSIRIUS", function(obj, LC50Mode = "static", con
 #'   are used by the \code{\link{predictTox}} and \code{\link{predictRespFactors}} methods.
 #' @param verbose If \code{TRUE} then more output is shown in the terminal.
 #'
-#' @template sirius_form-args
 #' @templateVar ident FALSE
 #' @template sirius-args
 #' @template adduct-arg

@@ -2,143 +2,18 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-#' @include main.R
-
-getSiriusBin <- function()
-{
-    # NOTE: this seems to fluctuate every other SIRIUS version...
-    return("sirius")
-}
-
-isSIRIUS5 <- function()
-{
-    out <- executeCommand(patRoon:::getExtDepPath("sirius"), "--version", stdout = TRUE, stderr = TRUE)
-    return(any(grepl("SIRIUS 5\\.", out)))
-}
-
-getSIRIUSCmpName <- function() "unknownCompound"
-
-getSiriusResultPath <- function(outPath, msFName)
-{
-    # format is resultno_specname_compoundname, older versions start with 1, newer with 0
-    msFName <- basename(tools::file_path_sans_ext(msFName))
-    return(list.files(outPath, pattern = sprintf("[0-9]+\\Q_%s_%s\\E", msFName, getSIRIUSCmpName()), full.names = TRUE))
-}
-
-getAndPrepareSIRIUSResFiles <- function(resultPath, subDir, ext)
-{
-    spPath <- file.path(resultPath, subDir)
-    if (file.exists(spPath) && !file.info(spPath, extra_cols = FALSE)$isdir)
-    {
-        # NOTE: SIRIUS 5 packs most result files --> unzip them
-        exDir <- paste0(spPath, "-unz")
-        unzip(spPath, exdir = exDir)
-        spPath <- exDir
-    }
-    
-    pat <- paste0("([A-Za-z0-9]+).*\\.", ext)
-    return(list.files(spPath, full.names = TRUE, pattern = pat))
-}
-
-getFormulaFromSIRIUSResFile <- function(ffile, ext)
-{
-    pat <- paste0("([A-Za-z0-9]+).*\\.", ext)
-    return(gsub(pat, "\\1", basename(ffile)))
-}
-
-loadSIRIUSFingerprints <- function(resultPath, formulas, adduct)
-{
-    fingerprints <- data.table()
-    if (file.exists(file.path(resultPath, "fingerprints")))
-    {
-        fpFiles <- getAndPrepareSIRIUSResFiles(resultPath, "fingerprints", "fpt")
-        fpForms <- getFormulaFromSIRIUSResFile(fpFiles, "fpt")
-        # obtain neutral formula of FP results from candidate list
-        formCandidates <- fread(file.path(resultPath, "formula_candidates.tsv"))
-        fpForms <- formCandidates[match(fpForms, precursorFormula)]$molecularFormula
-        for (i in seq_along(fpFiles))
-        {
-            if (fpForms[i] %chin% formulas) # only consider FPs of candidates
-                fingerprints[, (fpForms[i]) := fread(fpFiles[i])]
-        }
-        # add absoluteIndices
-        fpMD <- file.path(resultPath, "..", if (adduct@charge > 0) "csi_fingerid.tsv" else "csi_fingerid_neg.tsv")
-        fingerprints[, absoluteIndex := fread(file.path(fpMD), select = "absoluteIndex")[[1]]]
-    }
-    return(fingerprints)
-}
-
-makeSirMSFile <- function(plistMS, plistMSMS, parentMZ, adduct, out)
-{
-    msFile <- file(out, "w")
-
-    writeMeta <- function(var, data) cat(sprintf(">%s %s\n", var, data), file = msFile)
-
-    writeMeta("compound", getSIRIUSCmpName())
-    writeMeta("parentmass", parentMZ)
-    writeMeta("ionization", as.character(adduct, format = "sirius"))
-
-    cat(">ms1peaks\n", file = msFile)
-    write.table(plistMS[, c("mz", "intensity")], msFile, row.names = FALSE, col.names = FALSE)
-
-    cat("\n>ms2peaks\n", file = msFile)
-    write.table(plistMSMS[, c("mz", "intensity")], msFile, row.names = FALSE, col.names = FALSE)
-
-    close(msFile)
-}
-
-unifySirNames <- function(sir)
-{
-    unNames <- c(# MonoisotopicMass = "neutralMass", UNDONE
-                 smiles = "SMILES",
-                 inchikey2D = "InChIKey1",
-                 inchi = "InChI",
-                 pubchemids = "identifier",
-                 PubChemNumberPatents = "numberPatents",
-                 score = "score",
-                 molecularFormula = "neutral_formula",
-                 xlogp = "XlogP",
-                 name = "compoundName",
-                 links = "libraryLinks",
-                 
-                 # some names were changed in 4.4 and new columns were added
-                 # UNDONE: there is also a compound_identifications.csv file with slightly different columns, use that?
-                 formulaRank = "formulaRank",
-                 InChI = "InChI",
-                 InChIkey2D = "InChIKey1",
-                 "CSI:FingerIDScore" = "score",
-                 TreeIsotopeScore = "SIR_formulaScore" # UNDONE: better name?
-                 )
-
-    unNames <- unNames[names(unNames) %in% names(sir)] # filter out missing
-    setnames(sir, names(unNames), unNames)
-
-    return(sir[, unNames, with = FALSE]) # filter out any other columns
-}
-
-hasSIRIUSLogin <- function()
-{
-    out <- system2(getExtDepPath("sirius"), c("login", "--show"), stdout = TRUE, stderr = FALSE)
-    notLoggedIn <- any(out == "Not logged in.")
-    isLoggedIn <- any(grepl("^Logged in as:", out))
-    if (notLoggedIn == isLoggedIn)
-    {
-        warning("Could not determine if SIRIUS is currently logged in", call. = FALSE)
-        return(FALSE)
-    }
-    return(isLoggedIn)
-}
-
-doSIRIUSLogin <- function(login, force)
+doSIRIUS60Login <- function(login, force, SIRIUSAPI)
 {
     if (isFALSE(login))
         return(invisible(NULL)) # no need to do anything
     
-    if (force || !hasSIRIUSLogin())
+    isLoggedIn <- SIRIUSAPI$login_and_account_api$IsLoggedIn()
+    
+    if (length(login) == 1 && login == "check" && !isLoggedIn)
+        stop("There is no active SIRIUS login. Please consult the SIRIUS documentation and patRoon handbook for details.")
+    
+    else if (force || !isLoggedIn)
     {
-        if (length(login) == 1 && login == "check")
-            stop("There is no active SIRIUS login. Please consult the SIRIUS documentation and patRoon handbook for details.")
-        
         if (length(login) == 1 && login == "interactive")
         {
             if (!interactive())
@@ -153,288 +28,326 @@ doSIRIUSLogin <- function(login, force)
             stop("Please provide the username of your SIRIUS account", call. = FALSE)
         if (!"password" %in% names(login) || !nzchar(login["password"]))
             stop("Please provide the password of your SIRIUS account", call. = FALSE)
-
-        # NOTE: processx::run() is used as it allows correctly setting the environment, which doesn't seem to work very well
-        # with base::system2()
-        runv <- processx::run(getExtDepPath("sirius"), c("login", "--user-env=SIRUSER", "--password-env=SIRPW"),
-                              env = c("current", SIRUSER = login[["username"]], SIRPW = login[["password"]]))
-
-        if ((!is.na(runv$status) && runv$status != 0) || !grepl("Login successful!", runv$stdout))
-        {
-            cat(runv$stderr)
-            stop("Failed to perform a SIRIUS login! See error output above for details.", call. = FALSE)
-        }
+        
+        SIRCreds <- RSirius::AccountCredentials$new(username = login["username"], password = login["password"])
+        SIRIUSAPI$login_and_account_api$Login(accept_terms = TRUE, account_credentials = SIRCreds)
     }
     invisible(NULL)
 }
 
-SIRMPFinishHandler <- function(cmd)
+startSIRIUS <- function(path)
 {
-    if (tools::file_ext(cmd$outPath) == "sirius")
+    checkPackage("RSirius", "sirius-ms/sirius-client-openAPI", ghSubDir = "client-api_r/generated")
+    
+    sdk <- RSirius::SiriusSDK$new()
+    # UNDONE: make this configurable?
+    # UNDONE: somehow default to a new SIRIUS instance? May make more sense for unattended processing?
+    # SIRIUSAPI <- sdk$attach_or_start_sirius()
+    SIRIUSAPI <- sdk$attach_to_sirius()
+    shutdownSIR <- FALSE
+    if (is.null(SIRIUSAPI))
     {
-        # project directory was zipped, unzip to temp directory and process that instead
-        uzpath <- tempfile()
-        unzip(cmd$outPath, exdir = uzpath)
-        cmd$outPath <- uzpath
+        SIRIUSAPI <- sdk$start_sirius(sirius_path = path)
+        shutdownSIR <- TRUE
     }
-    
-    pArgs <- list(adduct = cmd$adduct)
-    if (!is.null(cmd[["processArgs"]]))
-        pArgs <- c(pArgs, cmd$processArgs)
-    res <- mapply(cmd$msFNames, cmd$MSMSPL, SIMPLIFY = FALSE,
-                  FUN = function(n, m) do.call(cmd$processFunc, c(list(outPath = cmd$outPath, msFName = n, MSMS = m), pArgs)))
-    return(res)
-}
-
-SIRMPPrepareHandler <- function(cmd)
-{
-    command <- patRoon:::getExtDepPath("sirius")
-    
-    # UNDONE: it seems we would only need to log in once per worker, is this adding a lot of overhead?
-    doSIRIUSLogin(cmd$login, cmd$alwaysLogin)
-
-    inPath <- tempfile("sirius_in")
-    outPath <- if (is.null(cmd[["projectPath"]])) tempfile("sirius_out") else cmd$projectPath
-    # unlink(outPath, TRUE) # start with fresh output directory (otherwise previous results are combined)
-    stopifnot(!file.exists(inPath) || !file.exists(outPath))
-    dir.create(inPath)
-    
-    msFNames <- mapply(cmd$precMZs, cmd$MSPL, cmd$MSMSPL, cmd$resNames, FUN = function(pmz, mspl, msmspl, n)
-    {
-        ret <- file.path(inPath, paste0(n, ".ms"))
-        patRoon:::makeSirMSFile(mspl, msmspl, pmz, cmd$adduct, ret)
-        return(ret)
+    withr::defer_parent({
+        tryCatch({
+            if (shutdownSIR)
+                sdk$shutdown_sirius()
+        }, error = function(e) NULL)
     })
     
-    bArgs <- character()
-    if (!cmd$dryRun)
-        bArgs <- c("-i", inPath)
-    bArgs <- c(bArgs, "-o", outPath, cmd$args)
-    
-    return(utils::modifyList(cmd, list(command = command, args = bArgs, outPath = outPath, msFNames = msFNames)))
+    return(SIRIUSAPI)
 }
 
-runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, adducts, adductsChr, ppmMax, elements,
-                      database, noise, cores, withFingerID, fingerIDDatabase, topMost, projectPath, login, alwaysLogin,
-                      extraOptsGeneral, extraOptsFormula, verbose, processFunc, processArgs, splitBatches, dryRun)
+openSIRIUSProject <- function(projectPath, SIRIUSAPI, runMode)
 {
-    mainArgs <- character()
-    if (!is.null(cores))
-        mainArgs <- c("--cores", cores)
-    if (!is.null(extraOptsGeneral))
-        mainArgs <- c(mainArgs, extraOptsGeneral)
-    if (dryRun)
-        mainArgs <- c(mainArgs, "--no-project-check") # internal option, see https://github.com/boecker-lab/sirius/issues/42
+    if (runMode == "read" && (is.null(projectPath) || !file.exists(projectPath)))
+        stop("projectPath must be provided and exist when runMode is 'read'", call. = FALSE)
     
-    formArgs <- c("formula",
-                  "-p", profile,
-                  "-e", elements,
-                  "--ppm-max", ppmMax,
-                  "-c", topMost)
+    projectID <- if (!is.null(projectPath) && length(names(projectPath) > 0)) names(projectPath)[1] else "patRoonProjectID"
+    projectPath <- if (is.null(projectPath))
+        tempfile("patRoonSIRIUS", fileext = ".sirius")
+    else
+        normalizePath(projectPath, mustWork = FALSE, winslash = "/")
     
-    if (!is.null(database))
-        formArgs <- c(formArgs, "-d", database)
-    if (!is.null(noise))
-        formArgs <- c(formArgs, "-n", noise)
-    if (!is.null(extraOptsFormula))
-        formArgs <- c(formArgs, extraOptsFormula)
+    if (file.exists(projectPath) && runMode == "read")
+        SIRIUSAPI$projects_api$OpenProject(projectID, projectPath)
+    else
+    {
+        unlink(projectPath)
+        SIRIUSAPI$projects_api$CreateProject(projectID, projectPath)
+    }
+    
+    withr::defer_parent({
+        tryCatch({
+            SIRIUSAPI$projects_api$CloseProject(projectID)
+        }, error = function(e) NULL)
+    })
+    
+    return(projectID)
+}
 
-    isV5 <- isSIRIUS5() # UNDONE: what if SIRUS is only available on the workers?
-    cmpArgs <- character()
-    if (withFingerID != "none")
-    {
-        if (withFingerID == "fingerprint")
-        {
-            if (!isV5)
-                stop("Can only obtain fingerprints with SIRIUS5", call. = FALSE)    
-            cmpArgs <- "fingerprint"
-        }
-        else
-        {
-            cmpArgs <- if (isV5)
-                c("fingerprint", "structure", "--database", fingerIDDatabase)
-            else
-                c("structure", "--database", fingerIDDatabase)
-        }
-    }
+getSIRIUSFormulaCandidates <- function(projectID, SIRIUSAPI, SIRFeatID)
+{
+    formCands <- SIRIUSAPI$features_api$GetFormulaCandidates(projectID, SIRFeatID)
+    if (length(formCands) == 0)
+        return(data.table())
+    tab <- rbindlist(lapply(formCands, \(fc) fc$toList()), fill = TRUE)
+    setnames(tab, c("molecularFormula", "siriusScore", "siriusScoreNormalized", "isotopeScore"),
+             c("neutral_formula", "score", "scoreNormalized", "isoScore"), skip_absent = TRUE)
+    return(tab)
+}
+
+getSIRIUSFragInfos <- function(projectID, SIRIUSAPI, SIRFeatID, SIRFormIDs, PLMS2)
+{
+    # HACK: no PL IDs (yet) for feature specific peak lists
+    hasPLID <- !is.null(PLMS2[["ID"]])
     
-    batchn <- 1
-    if (splitBatches) 
+    # NOTE: there may be duplicate formIDs --> only query unique ones and then expand to all SIRFormIDs
+    fragInfos <- sapply(unique(SIRFormIDs), function(fid)
     {
-        mpm <- getOption("patRoon.MP.method", "classic")
-        batchn <- if (mpm == "classic") getOption("patRoon.MP.maxProcs") else future::nbrOfWorkers()
-    }
-    
-    # perform SIRIUS batches per adduct: we cannot specify multiple adducts per run
-    retAdduct <- sapply(unique(adductsChr), function(addChr)
-    {
-        doWhich <- which(adductsChr == addChr)
-        batches <- splitInNBatches(doWhich, batchn)
-        add <- adducts[[match(addChr, adductsChr)]]
-        
-        printf("Annotating %d features with adduct %s...\n", length(doWhich), addChr)
-        
-        cmdQueue <- lapply(seq_along(batches), function(bi)
+        as <- SIRIUSAPI$features_api$GetFormulaAnnotatedSpectrum(projectID, SIRFeatID, fid)
+        ionform <- calculateIonFormula(as$spectrumAnnotation$molecularFormula,
+                                       gsub(" ", "", as$spectrumAnnotation$adduct))
+        rbindlist(lapply(as$peaks, function(p)
         {
-            batch <- batches[[bi]]
-            fArgs <- c(formArgs, "-i", addChr)
-            allArgs <- c(mainArgs, fArgs, cmpArgs)
-            if (isV5)
-                allArgs <- c(allArgs, "write-summaries")
-            return(list(args = allArgs, precMZs = precursorMZs[batch], MSPL = MSPLists[batch],
-                        MSMSPL = MSMSPLists[batch], adduct = add, projectPath = projectPath, login = login,
-                        alwaysLogin = alwaysLogin, verbose = verbose, resNames = resNames[batch],
-                        processFunc = processFunc, processArgs = processArgs, dryRun = dryRun,
-                        logFile = paste0("sirius-batch_", bi, "-", addChr, ".txt")))
-        })
-        
-        singular <- length(cmdQueue) == 1
-        ret <- executeMultiProcess(cmdQueue, finishHandler = SIRMPFinishHandler,
-                                   prepareHandler = SIRMPPrepareHandler, printOutput = verbose && singular,
-                                   printError = verbose && singular, showProgress = !singular,
-                                   logSubDir = paste0("sirius_", if (withFingerID == "structure") "compounds" else "formulas"))
-        
-        return(setNames(unlist(ret, recursive = FALSE, use.names = FALSE), resNames[doWhich]))
+            if (is.null(p$peakAnnotation) || !p$peakAnnotation$isValid()) # no annotations
+            {
+                return(data.table(mz = numeric(0), ion_formula_mz = character(0), formula_SIR = character(0),
+                                  adduct = character(0), error_mz = numeric(0), error_ppm = numeric(0),
+                                  PLID = if (hasPLID) numeric(0), ion_formula = character(0),
+                                  neutral_loss = character(0)))
+            }
+            
+            anns <- data.table(mz = p$mz, ion_formula_mz = p$peakAnnotation$exactMass,
+                               formula_SIR = p$peakAnnotation$molecularFormula,
+                               adduct = gsub(" ", "", p$peakAnnotation$adduct),
+                               error_mz = p$peakAnnotation$massDeviationMz,
+                               error_ppm = p$peakAnnotation$massDeviationPpm)
+            if (hasPLID)
+                anns[, PLID := PLMS2[which.min(abs(p$mz - mz))]$ID]
+            
+            # SIRIUS neutralizes fragments, make them ion again
+            anns[, ion_formula := mapply(formula_SIR, adduct, FUN = calculateIonFormula)]
+            anns[, neutral_loss := sapply(ion_formula, subtractFormula, formula1 = ionform)]
+            return(anns)
+        }))
     }, simplify = FALSE)
     
-    results <- Reduce(modifyList, retAdduct) # remove adduct dimension
-    results <- results[resNames] # and re-order
-    return(results)
+    return(fragInfos[SIRFormIDs])
 }
 
-doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev, elements,
-                     database, noise, cores, withFingerID, fingerIDDatabase, topMost, projectPath, login, alwaysLogin,
-                     extraOptsGeneral, extraOptsFormula, IMSSpecSims, IMSSpecSimsAna, verbose, cacheName, processFunc,
-                     processArgs, splitBatches, dryRun)
+runSIRIUS60 <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUSAPI, SIRIUSPath, projectPath, config,
+                        login, alwaysLogin, formulasOnly, calculateFeatures, cacheName)
 {
-    if (length(MSPeakLists) == 0)
-        return(list())
-    
-    # only do relevant feature groups
-    MSPeakLists <- MSPeakLists[, intersect(names(fGroups), groupNames(MSPeakLists))]
-    if (length(MSPeakLists) == 0)
-        return(list())
-    
-    cacheDB <- openCacheDBScope() # open manually so caching code doesn't need to on each R/W access
-    baseHash <- makeHash(profile, relMzDev, elements, database, noise,
-                         withFingerID, fingerIDDatabase, topMost, extraOptsGeneral,
-                         extraOptsFormula, processArgs)
-    setHash <- makeHash(MSPeakLists, baseHash, doFeatures, IMSSpecSims, IMSSpecSimsAna)
-    cachedSet <- loadCacheSet(cacheName, setHash, cacheDB)
-    
-    if (doFeatures)
+    doFGroup <- function(grp, ana = NULL)
     {
-        pLists <- peakLists(MSPeakLists)
-        flattenedPLists <- unlist(pLists, recursive = FALSE)
-        # assign a short name as SIRIUS seems to truncate long IDs
-        names(flattenedPLists) <- paste0("flat", seq_along(flattenedPLists))
-        
-        # important: assign before flattenedPLists subset steps below
-        flPLMeta <- data.table(name = names(flattenedPLists),
-                               group = unlist(lapply(pLists, names), use.names = FALSE),
-                               analysis = rep(names(pLists), times = lengths(pLists)))
-        
-        # ensure only present features are done
-        ftind <- groupFeatIndex(fGroups)
-        flPLMeta <- flPLMeta[mapply(group, analysis, FUN = function(grp, ana)
+        if (!is.null(IMSSpecSims) && grp %chin% IMSSpecSims$group)
+            return(FALSE)
+        pl <- if (!is.null(ana)) MSPeakLists[[ana, grp]] else MSPeakLists[[grp]]
+        if (is.null(pl[["MS"]]) || is.null(pl[["MSMS"]]) || !any(pl[["MS"]]$precursor))
+            return(FALSE)
+        return(TRUE)
+    }
+    
+    db <- openCacheDBScope()
+    baseHash <- makeHash(config, formulasOnly, calculateFeatures)
+    
+    gNamesTBD <- names(fGroups)[sapply(names(fGroups), doFGroup)]
+    fgAdd <- getFGroupAdducts(gNamesTBD, annotations(fGroups)[match(gNamesTBD, group)], adduct, "sirius")
+    
+    hashes <- cachedData <- NULL
+    if (calculateFeatures)
+    {
+        hashes <- pruneList(sapply(analyses(fGroups), function(ana)
         {
-            anai <- match(ana, analyses(fGroups))
-            return(!is.na(anai) && ftind[[grp]][anai] != 0)
-        })]
-
-        if (!is.null(IMSSpecSimsAna))
-        {
-            flPLMeta[IMSSpecSimsAna, keep := FALSE, on = c("group", "analysis")]
-            flPLMeta <- flPLMeta[is.na(keep)][, keep := NULL]
-        }
+            anaHashes <- sapply(gNamesTBD, function(g)
+            {
+                if (!doFGroup(g, ana))
+                    return(NA_character_)
+                makeHash(baseHash, fgAdd$grpAdductsChr[[g]], MSPeakLists[[ana, g]]$MS[precursor == TRUE]$mz, MSPeakLists[[ana, g]]$MSMS)
+            })
+            anaHashes <- anaHashes[!is.na(anaHashes)]
+        }, simplify = FALSE), checkEmptyElements = TRUE)
         
-        flattenedPLists <- flattenedPLists[flPLMeta$name]
+        cachedData <- pruneList(sapply(analyses(fGroups), function(ana)
+        {
+            pruneList(setNames(loadCacheData(cacheName, hashes[[ana]], dbArg = db, simplify = FALSE), names(hashes[[ana]])))
+        }, simplify = FALSE), checkEmptyElements = TRUE)
+        
+        # update groups to be done: if at least one ana/fgroup pair is NULL then it needs to be done
+        gNamesTBD <- sapply(gNamesTBD, function(g)
+        {
+            for (ana in analyses(fGroups))
+            {
+                if (is.null(hashes[[ana]][[g]]) || !is.null(cachedData[[ana]][[g]]))
+                    return(NA_character_)
+            }
+            return(g)
+        })
+        gNamesTBD <- gNamesTBD[!is.na(gNamesTBD)]
     }
     else
     {
-        flattenedPLists <- averagedPeakLists(MSPeakLists)
-        if (!is.null(IMSSpecSims))
-            flattenedPLists <- flattenedPLists[!names(flattenedPLists) %chin% IMSSpecSims$group]
-        flPLMeta <- data.table(name = names(flattenedPLists), group = names(flattenedPLists))
+        hashes <- sapply(gNamesTBD, function(g)
+        {
+            makeHash(baseHash, fgAdd$grpAdductsChr[[g]], MSPeakLists[[g]]$MS[precursor == TRUE]$mz, MSPeakLists[[g]]$MSMS)
+        })
+        cachedData <- pruneList(setNames(loadCacheData(cacheName, hashes, dbArg = db, simplify = FALSE), gNamesTBD))
+        gNamesTBD <- setdiff(gNamesTBD, names(cachedData))
     }
     
-    validPL <- function(pl) !is.null(pl[["MS"]]) && !is.null(pl[["MSMS"]]) && any(pl[["MS"]]$precursor)
-    flattenedPLists <- flattenedPLists[sapply(flattenedPLists, validPL)]
-    flPLMeta <- flPLMeta[name %in% names(flattenedPLists)]
-    
-    gNamesTBD <- unique(flPLMeta$group)
-    fgAdd <- getFGroupAdducts(gNamesTBD, annotations(fGroups)[match(gNamesTBD, group)], adduct, "sirius")
-    
-    flPLMeta[, c("adduct", "adductChr") := .(fgAdd$grpAdducts[group], fgAdd$grpAdductsChr[group])]
-    
-    flPLMeta[, hash := mapply(flattenedPLists, flPLMeta$adductChr, FUN = makeHash, MoreArgs = list(baseHash))]
-    if (is.null(cachedSet))
-        saveCacheSet(cacheName, flPLMeta$hash, setHash, cacheDB)
-    
-    if (length(flattenedPLists) > 0)        
+    results <- list()
+    if (length(gNamesTBD) > 0)
     {
-        cachedResults <- pruneList(sapply(flPLMeta$hash, function(h)
-        {
-            res <- NULL
-            if (!is.null(cachedSet))
-                res <- cachedSet[[h]]
-            if (is.null(res))
-                res <- loadCacheData(cacheName, h, cacheDB)
-            return(res)
-        }, simplify = FALSE))
+        if (is.null(SIRIUSAPI))
+            SIRIUSAPI <- startSIRIUS(SIRIUSPath)
         
-        flPLMeta[, cached := hash %in% names(cachedResults)]
-        doWhich <- which(!flPLMeta$cached)
+        doSIRIUS60Login(login, alwaysLogin, SIRIUSAPI)
+        projectID <- openSIRIUSProject(projectPath, SIRIUSAPI, runMode)
         
-        if (length(doWhich) > 0)
+        if (runMode == "execute")
         {
-            doPLists <- flattenedPLists[doWhich]
-            plmzs <- lapply(doPLists, function(pl) pl[["MS"]][precursor == TRUE, mz])
-            mspls <- lapply(doPLists, "[[", "MS")
-            msmspls <- lapply(doPLists, "[[", "MSMS")
-            allResults <- runSIRIUS(plmzs, mspls, msmspls, flPLMeta$name[doWhich], profile, flPLMeta$adduct[doWhich],
-                                    flPLMeta$adductChr[doWhich], relMzDev, elements, database, noise, cores,
-                                    withFingerID, fingerIDDatabase, topMost, projectPath, login, alwaysLogin,
-                                    extraOptsGeneral, extraOptsFormula, verbose, processFunc, processArgs, splitBatches,
-                                    dryRun)
-        }
-        else
-            allResults <- list()
-        
-        mergeCachedGroupResults <- function(meta, res)
-        {
-            if (length(cachedResults) > 0)
+            makeSIRSpec <- function(pl, lev, pmz)
             {
-                metaCached <- meta[cached == TRUE]
-                res <- c(res, setNames(cachedResults[metaCached$hash], metaCached$group))
-                res <- res[intersect(meta$group, names(res))] # ensure correct order
+                peaks <- Map(pl$mz, pl$intensity, f = RSirius::SimplePeak$new)
+                ret <- RSirius::BasicSpectrum$new(msLevel = lev, peaks = peaks)
+                if (lev > 1)
+                    ret$precursorMz = pmz
+                return(ret)
             }
-            return(res)
+            addSIRFeature <- function(id, pl, add)
+            {
+                plmz <- pl$MS[precursor == TRUE]$mz
+                # UNDONE: charge can be set, but only charge 1 is supported by SIRIUS docs? (https://v6.docs.sirius-ms.io/adducts/)
+                # charge = fgAdd$grpAdducts[[g]]@charge
+                RSirius::FeatureImport$new(externalFeatureId = id, ionMass = plmz,
+                                           detectedAdducts = list(add), charge = 1L,
+                                           mergedMs1 = makeSIRSpec(pl$MS, 1L, plmz),
+                                           ms2Spectra = list(makeSIRSpec(pl$MSMS, 2L, plmz)))
+            }
+            
+            SIRFeatList <- if (calculateFeatures)
+            {
+                sfeats <- sapply(analyses(fGroups), function(ana)
+                {
+                    pruneList(sapply(gNamesTBD, function(fg)
+                    {
+                        if (is.null(cachedData[[ana]][[fg]]) && doFGroup(fg, ana))
+                            addSIRFeature(paste0(ana, "_", fg), MSPeakLists[[ana, fg]], fgAdd$grpAdductsChr[[fg]])
+                    }, simplify = FALSE))
+                }, simplify = FALSE)
+                unlist(sfeats, recursive = FALSE)
+            }
+            else
+            {
+                sapply(gNamesTBD,
+                       \(fg) addSIRFeature(fg, MSPeakLists[[fg]], fgAdd$grpAdductsChr[[fg]]), simplify = FALSE)
+            }
+            
+            stopifnot(length(SIRFeatList) > 0)
+            
+            SIRIUSAPI$features_api$AddAlignedFeatures(project_id = projectID, SIRFeatList)
+            
+            if (is.null(config))
+                config <- getSIRIUSConfig(SIRIUSAPI = SIRIUSAPI, SIRIUSPath = SIRIUSPath, login = FALSE) # NOTE: should already be logged in
+            config$spectraSearchParams$enabled <- FALSE
+            config$formulaIdParams$enabled <- TRUE
+            config$structureDbSearchParams$enabled <- !formulasOnly
+            config$canopusParams$enabled <- !formulasOnly # NOTE: must be enabled for compounds
+            config$msNovelistParams$enabled <- FALSE
+            
+            printf("Running SIRIUS job...\n")
+            job <- SIRIUSAPI$jobs_api$StartJob(projectID, config)
+            
+            # NOTE: maxProgress can change during the job execution, so we normalize the current progress to it at each update
+            prog <- openProgBar(0, 1)
+            repeat
+            {
+                Sys.sleep(1)
+                jp <- SIRIUSAPI$jobs_api$GetJob(projectID, job$id)$progress
+                if (jp$state %in% c("CANCELED", "FAILED", "DONE"))
+                    break
+                setTxtProgressBar(prog, jp$currentProgress / jp$maxProgress)
+            }
+            setTxtProgressBar(prog, 1)
+            close(prog)
         }
         
-        if (doFeatures)
+        SIRFeatListImp <- SIRIUSAPI$features_api$GetAlignedFeatures(projectID)
+        names(SIRFeatListImp) <- sapply(SIRFeatListImp, \(f) if (is.null(f$externalFeatureId)) NA_character_ else f$externalFeatureId)
+        
+        getResFromFeat <- function(sirFeat, PLMS2)
         {
-            ret <- sapply(unique(flPLMeta$analysis), function(ana)
+            ret <- list()
+            
+            ret$formCands <- getSIRIUSFormulaCandidates(projectID, SIRIUSAPI, sirFeat$alignedFeatureId)
+            # NOTE: frag info for SIRIUS is only available from formula candidates(!)
+            fragInfos <- getSIRIUSFragInfos(projectID, SIRIUSAPI, sirFeat$alignedFeatureId, ret$formCands$formulaId, PLMS2)
+            set(ret$formCands, j = "fragInfo", value = fragInfos[ret$formCands$formulaId])
+            set(ret$formCands, j = "explainedPeaks", value = sapply(ret$formCands$fragInfo, nrow))
+            
+            if (!formulasOnly)
             {
-                meta <- flPLMeta[analysis == ana]
-                metaNotCached <- meta[cached == FALSE]
-                res <- setNames(allResults[metaNotCached$name], metaNotCached$group)
-                res <- mergeCachedGroupResults(meta, res)
-                return(res)
+                # BUG: opt_fields doesn't seem to do anything
+                ret$structCands <- SIRIUSAPI$features_api$GetStructureCandidates(projectID, sirFeat$alignedFeatureId,
+                                                                                 opt_fields = c("dbLinks", "libraryMatches"))
+                ret$structCands <- rbindlist(lapply(ret$structCands, \(sc) sc$toList()), fill = TRUE)
+                setnames(ret$structCands, c("inchiKey", "smiles", "structureName", "xlogP", "molecularFormula", "csiScore"),
+                         c("InChIKey1", "SMILES", "compoundName", "XlogP", "neutral_formula", "score"), skip_absent = TRUE)
+                # UNDONE: add InChI and InChIKey?
+            }
+            
+            return(ret)
+        }
+        
+        if (calculateFeatures)
+        {
+            results <- sapply(analyses(fGroups), function(ana)
+            {
+                ret <- pruneList(sapply(gNamesTBD, function(grp)
+                {
+                    featID <- paste0(ana, "_", grp)
+                    if (is.null(SIRFeatListImp[[featID]]))
+                        return(NULL)
+                    return(getResFromFeat(SIRFeatListImp[[featID]], MSPeakLists[[ana, grp]]$MSMS))
+                }, simplify = FALSE))
+                saveCacheDataList(cacheName, ret, hashes[[ana]][names(ret)], dbArg = db)
+                return(ret)
             }, simplify = FALSE)
         }
         else
-            ret <- mergeCachedGroupResults(flPLMeta, allResults)
-        
-        metaNotCached <- flPLMeta[cached == FALSE]
-        for (i in seq_len(nrow(metaNotCached)))
-            saveCacheData(cacheName, allResults[[metaNotCached$name[i]]], metaNotCached$hash[i], cacheDB)
+        {
+            results <- pruneList(sapply(gNamesTBD, function(grp)
+            {
+                # NOTE: check if feature is present: already done by doFGroup(), but may be removed if we're importing data
+                if (is.null(SIRFeatListImp[[grp]]))
+                    return(NULL)
+                getResFromFeat(SIRFeatListImp[[grp]], MSPeakLists[[grp]]$MSMS)
+            }, simplify = FALSE))
+            saveCacheDataList(cacheName, results, hashes[names(results)], dbArg = db)
+        }
+    }
+    
+    # add cached data
+    if (calculateFeatures)
+    {
+        for (ana in names(cachedData))
+        {
+            results[[ana]] <- c(cachedData[[ana]], results[[ana]])
+            results[[ana]] <- results[[ana]][intersect(names(fGroups), names(results[[ana]]))]
+        }
     }
     else
-        ret <- list()
+    {
+        results <- c(cachedData, results)
+        results <- results[intersect(names(fGroups), names(results))]
+    }
     
-    return(ret)
+    return(results)
 }
+
 
 getMS2QTFPs <- function(featAnnSIR)
 {

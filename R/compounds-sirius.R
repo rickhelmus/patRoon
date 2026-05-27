@@ -16,6 +16,7 @@ NULL
 #'
 #' @slot fingerprints A \code{list} with for each feature group result a \code{data.table} containing fingerprints
 #'   obtained with \command{CSI:FingerID}.
+#'   \strong{NOTE:} not yet implemented.
 #'
 #' @templateVar class compoundsSIRIUS
 #' @template class-hierarchy
@@ -149,8 +150,7 @@ setMethod("predictTox", "compoundsSIRIUS", function(obj, type = "FP", LC50Mode =
 
 #' Compound annotation with SIRIUS
 #'
-#' Uses \href{https://bio.informatik.uni-jena.de/software/sirius/}{SIRIUS} in combination with
-#' \href{https://www.csi-fingerid.uni-jena.de/}{CSI:FingerID} for compound annotation.
+#' Uses \href{https://bright-giant.com/sirius-features/}{SIRIUS} for compound annotation.
 #'
 #' @templateVar algo SIRIUS
 #' @templateVar do generate compound candidates
@@ -159,20 +159,14 @@ setMethod("predictTox", "compoundsSIRIUS", function(obj, type = "FP", LC50Mode =
 #' @template algo_generator
 #'
 #' @details Similar to \code{\link{generateFormulasSIRIUS}}, candidate formulae are generated with SIRIUS. These results
-#'   are then fed to CSI:FingerID to acquire candidate structures. Candidate formulae without any assigned structure
-#'   will be removed (unlike \code{\link{generateFormulasSIRIUS}}). This method requires the availability of MS/MS data,
-#'   and feature groups without it will be ignored.
+#'   are then fed to \command{CSI:FingerID} to acquire candidate structures. Candidate formulae without any assigned
+#'   structure will be removed (unlike \code{\link{generateFormulasSIRIUS}}). This method requires the availability of
+#'   MS/MS data, and feature groups without will be ignored.
 #'
-#' @param fingerIDDatabase Database specifically used for \command{CSI:FingerID}. If \code{NULL}, the value of the
-#'   \code{formulaDatabase} parameter will be used or \code{"pubchem"} when that is also \code{NULL}. Sets the
-#'   \option{--fingerid-db} option.
-#' @param topMostFormulas Do not return more than this number of candidate formulae. Note that only compounds for these
-#'   formulae will be searched. Sets the \option{--candidates} commandline option.
 #' @param verbose If \code{TRUE} then more output is shown in the terminal.
 #'
 #' @templateVar ident TRUE
 #' @template sirius-args
-#' @template sirius_form-args
 #' @template adduct-arg
 #' @template comp_algo-args
 #' @template specSimParams_annSim-arg
@@ -181,9 +175,6 @@ setMethod("predictTox", "compoundsSIRIUS", function(obj, type = "FP", LC50Mode =
 #' @inheritParams generateCompounds
 #'
 #' @return A \code{\link{compoundsSIRIUS}} object.
-#'
-#' @templateVar what \code{generateCompoundsSIRIUS}
-#' @template uses-multiProc
 #'
 #' @templateVar what generateCompoundsSIRIUS
 #' @template main-rd-method

@@ -11,6 +11,4 @@
 #' @param absAlignMzDev When the group formula annotation consensus is made from feature annotations, the \emph{m/z}
 #'   values of annotated MS/MS fragments may slightly deviate from those of the corresponding group MS/MS peak list. The
 #'   \code{absAlignMzDev} argument specifies the maximum \emph{m/z} window used to re-align the mass peaks.
-#' <%= if (algo != "bruker") "@param topMost Only keep this number of candidates (per feature group) with highest
-#'   score." %> <%= if (algo == "sirius") "Sets the \\option{--candidates} command line option." %>
 #' @param \dots \setsWF Further arguments passed to the non-sets workflow method.

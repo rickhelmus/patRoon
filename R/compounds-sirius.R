@@ -165,7 +165,6 @@ setMethod("predictTox", "compoundsSIRIUS", function(obj, type = "FP", LC50Mode =
 #'
 #' @param verbose If \code{TRUE} then more output is shown in the terminal.
 #'
-#' @templateVar ident TRUE
 #' @template sirius-args
 #' @template adduct-arg
 #' @template comp_algo-args
@@ -192,6 +191,7 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
     # UNDONE: add database column --> once links are fixed and once configs are defined
     # UNDONE: replace SIRIUSPath by patRoonExt
     # UNDONE: doc that login means accepting terms?
+    # UNDONE: re-add topMost argument
     
     checkPackage("RSirius", "sirius-ms/sirius-client-openAPI", ghSubDir = "client-api_r/generated")
     

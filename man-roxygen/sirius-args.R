@@ -14,10 +14,23 @@
 #' 
 #'   See the \href{https://v6.docs.sirius-ms.io/account-and-license/}{SIRIUS website} and \pkg{patRoon} handbook for
 #'   more information.
-#' @param projectPath These are mainly for internal purposes. \code{projectPath} sets the output directory for
-#'   the \command{SIRIUS} output (a temporary directory if \code{NULL}).
-#'   
+#' @param config An \R6 \code{RSirius::JobSubmission} configuration object, typically obtained with
+#'   \code{getSIRIUSConfig()}. If \code{NULL}, the default \command{SIRIUS} configuration is used.
+#' @param runMode,projectPath Whether to execute a \command{SIRIUS} processing job (\code{runMode="execute"}) or load
+#'   results from an existing \command{SIRIUS} project (\code{runMode"read"}). If \code{runMode="execute"} then
+#'   \code{projectPath} can be \code{NULL} and a temporary project will be used, otherwise \code{projectPath} must point
+#'   to an existing project.
+#'
+#'   \strong{NOTE:} if \code{runMode="execute"} then any existing project at \code{projectPath} will be removed.
+#'
+#'   \strong{NOTE:} This is primarily intended for internal purposes, but may be of interest to e.g. re-import SIRIUS
+#'   results.
+#'
 #'   \setsWF \code{projectPath} should be a \code{character} specifying the paths for each set.
+#' @param SIRIUSAPI An \code{rsirius_api} object for connecting to the \command{SIRIUS} API. If \code{NULL}, a new
+#'   connection will be started automatically.
+#' @param SIRIUSPath The full path to the \command{SIRIUS} command-line interface executable. Only used when
+#'   \code{SIRIUSAPI} is not provided.
 #'
 #' @references \insertRef{Hoffmann2021}{patRoon} \cr\cr \insertRef{Dhrkop2020}{patRoon} \cr\cr
 #'   \insertRef{Dhrkop2019}{patRoon} \cr\cr \insertRef{Duhrkop2015}{patRoon} \cr\cr

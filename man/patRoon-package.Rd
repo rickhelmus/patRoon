@@ -95,6 +95,11 @@ Useful links:
 \author{
 \strong{Maintainer}: Rick Helmus \email{r.helmus@uva.nl} (\href{https://orcid.org/0000-0001-9401-3133}{ORCID})
 
+Authors:
+\itemize{
+  \item Rick Helmus \email{r.helmus@uva.nl} (\href{https://orcid.org/0000-0001-9401-3133}{ORCID})
+}
+
 Other contributors:
 \itemize{
   \item Olaf Brock (\href{https://orcid.org/0000-0003-4727-8459}{ORCID}) [contributor]

@@ -138,16 +138,10 @@ setMethod("predictTox", "formulasSIRIUS", function(obj, LC50Mode = "static", con
 #' @templateVar algoParam sirius
 #' @template algo_generator
 #'
-#' @details Similarity of measured and theoretical isotopic patterns will be used for scoring candidates. Note that
-#'   \command{SIRIUS} requires availability of MS/MS data.
+#' @details Note that \command{SIRIUS} requires availability of MS/MS data.
 #'
-#' @param getFingerprints Set to \code{TRUE} to load \command{SIRIUS-CSI:FingerID} MS/MS fingerprints for the formula
-#'   candidates. This is currently only supported with \code{calculateFeatures=FALSE} to avoid heavy server traffic. The
-#'   fingerprints are stored in the \code{fingerprints} slot of the returned \code{\link{formulasSIRIUS}} object, and
-#'   are used by the \code{\link{predictTox}} and \code{\link{predictRespFactors}} methods.
-#' @param verbose If \code{TRUE} then more output is shown in the terminal.
+#' @param verbose If \code{TRUE} then more output is shown.
 #'
-#' @templateVar ident FALSE
 #' @template sirius-args
 #' @template adduct-arg
 #' @templateVar algo sirius
@@ -157,9 +151,6 @@ setMethod("predictTox", "formulasSIRIUS", function(obj, LC50Mode = "static", con
 #' @inheritParams generateFormulas
 #'
 #' @return A \code{\link{formulasSIRIUS}} object.
-#'
-#' @templateVar what \code{generateFormulasSIRIUS}
-#' @template uses-multiProc
 #'
 #' @templateVar what generateFormulasSIRIUS
 #' @template main-rd-method
@@ -174,6 +165,7 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
                                                               verbose = TRUE)
 {
     # UNDONE: see generateCompoundsSIRIUS()
+    # UNDONE: re-add setFormulaPLID() and absAlignMzDev arg
     # UNDONE: optionally load fingerprints
 
     checkPackage("RSirius", "sirius-ms/sirius-client-openAPI", ghSubDir = "client-api_r/generated")

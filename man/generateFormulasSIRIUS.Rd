@@ -12,36 +12,33 @@ generateFormulasSIRIUS(fGroups, ...)
   fGroups,
   MSPeakLists,
   specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
-  relMzDev = defaultLim("mz", "narrow_rel"),
   adduct = NULL,
-  projectPath = NULL,
-  elements = "CHNOP",
-  profile = "qtof",
-  database = NULL,
-  noise = NULL,
-  cores = NULL,
-  getFingerprints = FALSE,
-  topMost = 100,
-  login = FALSE,
+  config = NULL,
+  login = "check",
   alwaysLogin = FALSE,
-  extraOptsGeneral = NULL,
-  extraOptsFormula = NULL,
   calculateFeatures = FALSE,
   featThreshold = 0,
   featThresholdAnn = 0.75,
-  absAlignMzDev = defaultLim("mz", "narrow"),
   minIMSSpecSim = 0,
-  verbose = TRUE,
-  splitBatches = FALSE,
-  dryRun = FALSE
+  projectPath = NULL,
+  runMode = "execute",
+  SIRIUSAPI = NULL,
+  SIRIUSPath = NULL,
+  verbose = TRUE
 )
 
 \S4method{generateFormulasSIRIUS}{featureGroupsSet}(
   fGroups,
   MSPeakLists,
   specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
-  relMzDev = defaultLim("mz", "narrow_rel"),
   adduct = NULL,
+  config = NULL,
+  login = "check",
+  alwaysLogin = FALSE,
+  calculateFeatures = FALSE,
+  featThreshold = 0,
+  featThresholdAnn = 0.75,
+  minIMSSpecSim = 0,
   projectPath = NULL,
   ...,
   setThreshold = 0,
@@ -62,9 +59,6 @@ remaining feature groups in the subset are considered.}
 \link[=id-conf]{annotation similarity}. See the \link[=specSimParams]{spectral similarity parameters} documentation
 for more details.}
 
-\item{relMzDev}{Maximum relative deviation between the measured and candidate formula \emph{m/z} values (in ppm).
-Sets the \option{--ppm-max} command line option.}
-
 \item{adduct}{An \code{\link{adduct}} object (or something that can be converted to it with \code{\link{as.adduct}}).
   Examples: \code{"[M-H]-"}, \code{"[M+Na]+"}. If the \code{featureGroups} object has
   adduct annotations then these are used if \code{adducts=NULL}.
@@ -72,38 +66,8 @@ Sets the \option{--ppm-max} command line option.}
   \setsWF The \code{adduct} argument is not supported for sets workflows, since the
   adduct annotations will then always be used.}
 
-\item{projectPath, dryRun}{These are mainly for internal purposes. \code{projectPath} sets the output directory for
-the \command{SIRIUS} output (a temporary directory if \code{NULL}). If \code{dryRun} is \code{TRUE} then no
-computations are done and only the results from \code{projectPath} are processed.
-
-\setsWF \code{projectPath} should be a \code{character} specifying the paths for each set.}
-
-\item{elements}{Elements to be considered for formulae calculation. This will heavily affects the number of
-candidates! Always try to work with a minimal set by excluding elements you don't expect. The minimum/maximum
-number of elements can also be specified, for example: a value of \code{"C[5]H[10-15]O"} will only consider
-formulae with up to five carbon atoms, between ten and fifteen hydrogen atoms and any amount of oxygen atoms. Sets
-the \option{--elements} command line  option.}
-
-\item{profile}{Name of the configuration profile, for example: \option{"qtof"}, \option{"orbitrap"},
-\option{"fticr"}. Sets the \option{--profile} commandline option.}
-
-\item{database}{If not \code{NULL}, use a database for retrieval of formula
-candidates. Possible values are: \option{"pubchem"}, \option{"bio"}, \option{"kegg"}, \option{"hmdb"}. Sets the
-\option{--database} commandline option.}
-
-\item{noise}{Median intensity of the noise (\code{NULL} ignores this parameter). Sets the \option{--noise}
-commandline option.}
-
-\item{cores}{The number of cores \command{SIRIUS} will use. If \code{NULL} then the default of all cores will be
-used.}
-
-\item{getFingerprints}{Set to \code{TRUE} to load \command{SIRIUS-CSI:FingerID} MS/MS fingerprints for the formula
-candidates. This is currently only supported with \code{calculateFeatures=FALSE} to avoid heavy server traffic. The
-fingerprints are stored in the \code{fingerprints} slot of the returned \code{\link{formulasSIRIUS}} object, and
-are used by the \code{\link{predictTox}} and \code{\link{predictRespFactors}} methods.}
-
-\item{topMost}{Only keep this number of candidates (per feature group) with highest
-score. Sets the \option{--candidates} command line option.}
+\item{config}{An \R6 \code{RSirius::JobSubmission} configuration object, typically obtained with
+\code{getSIRIUSConfig()}. If \code{NULL}, the default \command{SIRIUS} configuration is used.}
 
 \item{login, alwaysLogin}{Specifies if and how account logging of SIRIUS should be handled:
 
@@ -119,14 +83,8 @@ score. Sets the \option{--candidates} command line option.}
   
   if \code{alwaysLogin=TRUE} then a login is always performed, otherwise only if SIRIUS reports no active login.
 
-  See the \href{https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/}{SIRIUS website} and
-  \pkg{patRoon} handbook for more information.}
-
-\item{extraOptsGeneral, extraOptsFormula}{a \code{character} vector with any extra commandline parameters for
-\command{SIRIUS}. For \command{SIRIUS} versions \code{<4.4} there is no distinction between general and formula
-options. Otherwise commandline options specified in \code{extraOptsGeneral} are added prior to the \code{formula}
-command, while options specified in \code{extraOptsFormula} are added in afterwards. See the \command{SIRIUS}
-manual for more details. Set to \code{NULL} to ignore.}
+  See the \href{https://v6.docs.sirius-ms.io/account-and-license/}{SIRIUS website} and \pkg{patRoon} handbook for
+  more information.}
 
 \item{calculateFeatures}{If \code{TRUE} fomulae are first calculated for all features
 prior to feature group assignment (see \verb{Candidate assignment} in \code{\link{generateFormulas}}).}
@@ -141,10 +99,6 @@ annotations inside a feature group. @param topMost Only keep this number of cand
 (per feature group) with highest score. Sets the \option{--candidates} command line
 option.}
 
-\item{absAlignMzDev}{When the group formula annotation consensus is made from feature annotations, the \emph{m/z}
-values of annotated MS/MS fragments may slightly deviate from those of the corresponding group MS/MS peak list. The
-\code{absAlignMzDev} argument specifies the maximum \emph{m/z} window used to re-align the mass peaks.}
-
 \item{minIMSSpecSim}{\IMSWF If the spectrum similarity of an IMS feature group compared to its IMS precursor (see
 \code{\link[=assignMobilities_feat]{assignMobilities}}) is at least this value, then the IMS feature group will not
 be subjected to the annotation algorithm and all feature annotation properties will be copied from its precursor.
@@ -153,12 +107,25 @@ feature annotation process. All scorings, annotation similarities etc. are copie
 fragment annotations are also copied (\code{fragInfo} result column), however, these are adjusted based on the peak
 list data of the IMS feature group.}
 
-\item{verbose}{If \code{TRUE} then more output is shown in the terminal.}
+\item{runMode, projectPath}{Whether to execute a \command{SIRIUS} processing job (\code{runMode="execute"}) or load
+  results from an existing \command{SIRIUS} project (\code{runMode"read"}). If \code{runMode="execute"} then
+  \code{projectPath} can be \code{NULL} and a temporary project will be used, otherwise \code{projectPath} must point
+  to an existing project.
 
-\item{splitBatches}{If \code{TRUE} then the calculations done by \command{SIRIUS} will be evenly split over multiple
-\command{SIRIUS} calls (which may be run in parallel depending on the \link[=patRoon-package]{set package
-options}). If \code{splitBatches=FALSE} then all feature calculations are performed from a single \command{SIRIUS}
-execution, which is often the fastest if calculations are performed on a single computer.}
+  \strong{NOTE:} if \code{runMode="execute"} then any existing project at \code{projectPath} will be removed.
+
+  \strong{NOTE:} This is primarily intended for internal purposes, but may be of interest to e.g. re-import SIRIUS
+  results.
+
+  \setsWF \code{projectPath} should be a \code{character} specifying the paths for each set.}
+
+\item{SIRIUSAPI}{An \code{rsirius_api} object for connecting to the \command{SIRIUS} API. If \code{NULL}, a new
+connection will be started automatically.}
+
+\item{SIRIUSPath}{The full path to the \command{SIRIUS} command-line interface executable. Only used when
+\code{SIRIUSAPI} is not provided.}
+
+\item{verbose}{If \code{TRUE} then more output is shown.}
 
 \item{setThreshold}{\setsWF Minimum abundance for a candidate among all sets (\samp{0-1}). For instance, a value of
 \samp{1} means that the candidate needs to be present in all the set data.}
@@ -168,6 +135,10 @@ annotations for the feature group of the candidate.}
 
 \item{setAvgSpecificScores}{\setsWF If \code{TRUE} then set specific scorings (\emph{e.g.} MS/MS match) are also
 averaged.}
+
+\item{absAlignMzDev}{When the group formula annotation consensus is made from feature annotations, the \emph{m/z}
+values of annotated MS/MS fragments may slightly deviate from those of the corresponding group MS/MS peak list. The
+\code{absAlignMzDev} argument specifies the maximum \emph{m/z} window used to re-align the mass peaks.}
 }
 \value{
 A \code{\link{formulasSIRIUS}} object.
@@ -179,24 +150,11 @@ Uses \href{https://bio.informatik.uni-jena.de/software/sirius/}{SIRIUS} to gener
 This function uses sirius to generate formula candidates. This function is called when calling \code{generateFormulas} with
   \code{algorithm="sirius"}.
 
-Similarity of measured and theoretical isotopic patterns will be used for scoring candidates. Note that
-  \command{SIRIUS} requires availability of MS/MS data.
+Note that \command{SIRIUS} requires availability of MS/MS data.
 }
-\note{
-For annotations performed with \command{SIRIUS} it is often the fastest to keep the default
-  \code{splitBatches=FALSE}. In this case, all \command{SIRIUS} output will be printed to the terminal (unless
-  \code{verbose=FALSE} or \option{patRoon.MP.method="future"}). Furthermore, please note that only annotations to be
-  performed for the same adduct are grouped in a single batch execution.
-}
-\section{Parallelization}{
- generateFormulasSIRIUS uses multiprocessing to parallelize
-  computations. Please see the parallelization section in the handbook for
-  more details and \link[=patRoon-package]{patRoon options} for configuration
-  options.
-}
-
 \references{
-\insertRef{Dhrkop2019}{patRoon} \cr\cr \insertRef{Duhrkop2015}{patRoon} \cr\cr
+\insertRef{Hoffmann2021}{patRoon} \cr\cr \insertRef{Dhrkop2020}{patRoon} \cr\cr
+  \insertRef{Dhrkop2019}{patRoon} \cr\cr \insertRef{Duhrkop2015}{patRoon} \cr\cr
   \insertRef{Duhrkop2015-2}{patRoon} \cr\cr \insertRef{Bcker2008}{patRoon}
 }
 \seealso{

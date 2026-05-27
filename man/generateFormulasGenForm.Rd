@@ -133,8 +133,7 @@ default parameters or \code{FALSE} for no isolation (\emph{e.g.} when you alread
 exceeded a warning is emitted and the command is terminated. See the notes section for more information on the need
 of timeouts.}
 
-\item{topMost}{Only keep this number of candidates (per feature group) with highest
-score.}
+\item{topMost}{Only keep this number of candidates (per feature group) with highest score.}
 
 \item{batchSize}{Maximum number of \command{GenForm} commands that should be run sequentially in each parallel
 process. Combining commands with short runtimes (such as \command{GenForm}) can significantly increase parallel

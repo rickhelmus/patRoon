@@ -66,8 +66,8 @@ for more details.}
   \setsWF The \code{adduct} argument is not supported for sets workflows, since the
   adduct annotations will then always be used.}
 
-\item{config}{An \R6 \code{RSirius::JobSubmission} configuration object, typically obtained with
-\code{getSIRIUSConfig()}. If \code{NULL}, the default \command{SIRIUS} configuration is used.}
+\item{config}{A \code{RSirius::JobSubmission} configuration object, typically obtained with
+\code{\link{getSIRIUSConfig}}. If \code{NULL}, the default \command{SIRIUS} configuration is used.}
 
 \item{login, alwaysLogin}{Specifies if and how account logging of SIRIUS should be handled:
 
@@ -152,6 +152,13 @@ This function uses sirius to generate formula candidates. This function is calle
 
 Note that \command{SIRIUS} requires availability of MS/MS data.
 }
+\section{SIRIUS 6 functionality}{
+ The interface to \command{SIRIUS 6} is still in development and may be extended in
+  the future. There is a vast amount of functionality available, which will require quite some effort to support all.
+  However, the current functionality in \pkg{patRoon} is mostly equal to what was supported with previous
+  \command{SIRIUS} releases. Any feedback on the inclusion of specific functionality is welcome!
+}
+
 \references{
 \insertRef{Hoffmann2021}{patRoon} \cr\cr \insertRef{Dhrkop2020}{patRoon} \cr\cr
   \insertRef{Dhrkop2019}{patRoon} \cr\cr \insertRef{Duhrkop2015}{patRoon} \cr\cr

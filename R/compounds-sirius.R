@@ -16,7 +16,6 @@ NULL
 #'
 #' @slot fingerprints A \code{list} with for each feature group result a \code{data.table} containing fingerprints
 #'   obtained with \command{CSI:FingerID}.
-#'   \strong{NOTE:} not yet implemented.
 #'
 #' @templateVar class compoundsSIRIUS
 #' @template class-hierarchy
@@ -186,7 +185,6 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
                                                                SIRIUSPath = NULL, verbose = TRUE)
 {
     # UNDONE: error handling for SIRIUS API calls
-    # UNDONE: add fingerprints
     # UNDONE: handle IMSSpecSims: test (including caching)
     # UNDONE: add database column --> once links are fixed and once configs are defined
     # UNDONE: replace SIRIUSPath by patRoonExt
@@ -224,7 +222,7 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
 
     SIRResults <- runSIRIUS(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUSAPI, SIRIUSPath, projectPath,
                             config, login, alwaysLogin, formulasOnly = FALSE, calculateFeatures = FALSE,
-                            cacheName = "compoundsSIRIUS", topMostStructures = topMost)    
+                            cacheName = "compoundsSIRIUS", getFingerprints = TRUE, topMostStructures = topMost)    
 
     prepRes <- function(res)
     {
@@ -243,6 +241,8 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
     }
     
     compTabs <- pruneList(sapply(SIRResults, prepRes, simplify = FALSE))
+    fingerprints <- sapply(SIRResults, \(res) res$fingerprints, simplify = FALSE)
+    fingerprints <- fingerprints[names(compTabs)]
 
     scRanges <- sapply(compTabs, \(ct) list(score = range(ct$score)), simplify = FALSE)
     
@@ -253,9 +253,18 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
                ngrp, if (length(fGroups) == 0) 0 else ngrp * 100 / length(fGroups))
     }
     
-    return(compoundsSIRIUS(groupAnnotations = compTabs, scoreTypes = "score", scoreRanges = scRanges,
+    ret <- compoundsSIRIUS(groupAnnotations = compTabs, scoreTypes = "score", scoreRanges = scRanges,
                            algorithm = "sirius", MSPeakLists = MSPeakLists, specSimParams = specSimParams,
-                           IMSSpecSims = IMSSpecSims, gNames = names(fGroups)))
+                           IMSSpecSims = IMSSpecSims, gNames = names(fGroups), fingerprints = fingerprints)
+    
+    if (!is.null(IMSSpecSims))
+    {
+        mss <- IMSSpecSims[ims_precursor_group %chin% names(ret@fingerprints)]
+        if (nrow(mss) > 0)
+            ret@fingerprints[mss$group] <- copy(ret@fingerprints[mss$ims_precursor_group])
+    }
+    
+    return(ret)
 })
 
 #' @template featAnnSets-gen_args

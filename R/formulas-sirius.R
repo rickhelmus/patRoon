@@ -17,7 +17,6 @@ NULL
 #' @slot fingerprints A \code{list} with for each feature group result a \code{data.table} containing fingerprints
 #'   obtained with \command{CSI:FingerID}. Will be empty unless the \code{getFingerprints} argument to
 #'   \code{\link{generateFormulasSIRIUS}} was set to \code{TRUE}.
-#'   \strong{NOTE:} not yet implemented.
 #' @slot MS2QuantMeta Metadata from \pkg{MS2Quant} filled in by \code{predictRespFactors}.
 #'   \strong{NOTE:} not yet implemented.
 #'
@@ -157,9 +156,10 @@ setMethod("predictTox", "formulasSIRIUS", function(obj, LC50Mode = "static", con
 #' @export
 setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLists,
                                                               specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
-                                                              adduct = NULL, config = NULL, login = "check",
-                                                              alwaysLogin = FALSE, calculateFeatures = FALSE,
-                                                              featThreshold = 0, featThresholdAnn = 0.75,
+                                                              adduct = NULL, config = NULL, getFingerprints = FALSE,
+                                                              login = "check", alwaysLogin = FALSE,
+                                                              calculateFeatures = FALSE, featThreshold = 0,
+                                                              featThresholdAnn = 0.75,
                                                               absAlignMzDev = defaultLim("mz", "narrow"),
                                                               minIMSSpecSim = 0, projectPath = NULL,
                                                               runMode = "execute", SIRIUSAPI = NULL, SIRIUSPath = NULL,
@@ -175,8 +175,8 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertR6(config, null.ok = TRUE, add = ac)
     assertSIRIUSLogin(login, add = ac)
-    checkmate::assertFlag(alwaysLogin, add = ac)
-    checkmate::assertFlag(calculateFeatures, add = ac)
+    aapply(checkmate::assertFlag, . ~  alwaysLogin + calculateFeatures + getFingerprints + verbose,
+           fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ featThreshold + featThresholdAnn + absAlignMzDev + minIMSSpecSim,
            lower = 0, upper = 1, finite = TRUE, fixed = list(add = ac))
     checkmate::assert(
@@ -186,8 +186,10 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     )
     checkmate::assertChoice(runMode, c("execute", "read"), add = ac)
     checkmate::assertClass(SIRIUSAPI, "rsirius_api", null.ok = TRUE, add = ac)
-    checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
+    
+    if (getFingerprints && calculateFeatures)
+        stop("Fingerprints can currently only be loaded if calculateFeatures is set to FALSE", call. = FALSE)
     
     if (length(fGroups) == 0)
         return(formulasSIRIUS6(algorithm = "sirius6"))
@@ -201,7 +203,7 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     
     SIRResults <- runSIRIUS(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUSAPI, SIRIUSPath, projectPath,
                             config, login, alwaysLogin, formulasOnly = TRUE, calculateFeatures = calculateFeatures,
-                            cacheName = "formulasSIRIUS")
+                            cacheName = "formulasSIRIUS", getFingerprints = getFingerprints)
     
     prepRes <- function(res)
     {
@@ -223,6 +225,8 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     else
         groupFormulas <- pruneList(sapply(SIRResults, prepRes, simplify = FALSE))
     
+    fingerprints <- if (getFingerprints) sapply(SIRResults, \(res) res$fingerprints, simplify = FALSE) else list()
+    
     # NOTE: this will overwrite prior PLID assignments from getSIRIUSFragInfos()
     # UNDONE: harmonize PLID assignment between formulae and compounds?
     groupFormulas <- setFormulaPLID(groupFormulas, MSPeakLists, absAlignMzDev)
@@ -234,9 +238,18 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
                ngrp, if (length(fGroups) == 0) 0 else ngrp * 100 / length(fGroups))
     }
     
-    return(formulasSIRIUS(groupAnnotations = groupFormulas, featureFormulas = featFormulas, algorithm = "sirius",
+    ret <- formulasSIRIUS(groupAnnotations = groupFormulas, featureFormulas = featFormulas, algorithm = "sirius",
                           MSPeakLists = MSPeakLists, specSimParams = specSimParams, IMSSpecSims = IMSSpecSims,
-                          gNames = names(fGroups)))
+                          gNames = names(fGroups), fingerprints = fingerprints)
+    
+    if (getFingerprints && !is.null(IMSSpecSims))
+    {
+        mss <- IMSSpecSims[ims_precursor_group %chin% names(ret@fingerprints)]
+        if (nrow(mss) > 0)
+            ret@fingerprints[mss$group] <- copy(ret@fingerprints[mss$ims_precursor_group])
+    }
+    
+    return(ret)
 })
 
 #' @template featAnnSets-gen_args

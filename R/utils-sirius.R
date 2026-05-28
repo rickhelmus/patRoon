@@ -138,8 +138,27 @@ getSIRIUSFragInfos <- function(projectID, SIRIUSAPI, SIRFeatID, SIRFormIDs, PLMS
     return(fragInfos[SIRFormIDs])
 }
 
+getSIRIUSFingerprints <- function(projectID, SIRIUSAPI, SIRFeatID, SIRFormIDs, fingerIDData)
+{
+    fps <- data.table()
+    for (fid in unique(SIRFormIDs))
+    {
+        # NOTE: GetFingerprintPrediction() throws an error if there are not FPs, so we use GetFormulaCandidate() with
+        # opt_fields instead, which returns NULL if there are no FPs
+        formC <- SIRIUSAPI$features_api$GetFormulaCandidate(projectID, SIRFeatID, fid, opt_fields = "predictedFingerprint")
+        if (!is.null(formC$predictedFingerprint))
+            set(fps, j = formC$molecularFormula, value = unlist(formC$predictedFingerprint))
+    }
+    
+    if (nrow(fps) > 0)
+        fps <- cbind(fps, fingerIDData)
+
+    return(fps)
+}
+
 runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUSAPI, SIRIUSPath, projectPath, config,
-                      login, alwaysLogin, formulasOnly, calculateFeatures, cacheName, topMostStructures = NULL)
+                      login, alwaysLogin, formulasOnly, calculateFeatures, cacheName, getFingerprints,
+                      topMostStructures = NULL)
 {
     doFGroup <- function(grp, ana = NULL)
     {
@@ -152,7 +171,7 @@ runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUS
     }
     
     db <- openCacheDBScope()
-    baseHash <- makeHash(config, formulasOnly, calculateFeatures, topMostStructures)
+    baseHash <- makeHash(config, formulasOnly, calculateFeatures, getFingerprints, topMostStructures)
     
     gNamesTBD <- names(fGroups)[sapply(names(fGroups), doFGroup)]
     fgAdd <- getFGroupAdducts(gNamesTBD, annotations(fGroups)[match(gNamesTBD, group)], adduct, "sirius")
@@ -254,6 +273,7 @@ runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUS
                 config <- getSIRIUSConfig(SIRIUSAPI = SIRIUSAPI, SIRIUSPath = SIRIUSPath, login = FALSE) # NOTE: should already be logged in
             config$spectraSearchParams$enabled <- FALSE
             config$formulaIdParams$enabled <- TRUE
+            config$fingerprintPredictionParams$enabled <- getFingerprints
             config$structureDbSearchParams$enabled <- !formulasOnly
             config$canopusParams$enabled <- !formulasOnly # NOTE: must be enabled for compounds
             config$msNovelistParams$enabled <- FALSE
@@ -278,6 +298,10 @@ runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUS
         SIRFeatListImp <- SIRIUSAPI$features_api$GetAlignedFeatures(projectID)
         names(SIRFeatListImp) <- sapply(SIRFeatListImp, \(f) if (is.null(f$externalFeatureId)) NA_character_ else f$externalFeatureId)
         
+        # UNDONE: this sometimes fails, why?
+        fingerIDData <- tryCatch(SIRIUSAPI$projects_api$GetFingerIdData(projectID, charge = 1L),
+                                 error = \(...) data.table())
+        
         getResFromFeat <- function(sirFeat, PLMS2)
         {
             ret <- list()
@@ -300,11 +324,28 @@ runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUS
                 setnames(ret$structCands, c("inchiKey", "smiles", "structureName", "xlogP", "molecularFormula", "csiScore"),
                          c("InChIKey1", "SMILES", "compoundName", "XlogP", "neutral_formula", "score"), skip_absent = TRUE)
                 # UNDONE: add InChI and InChIKey?
+                
+                ret$fingerprints <- if (getFingerprints && nrow(ret$structCands) > 0)
+                {
+                    # only get fingerprints for relavant formulae
+                    getSIRIUSFingerprints(projectID, SIRIUSAPI, sirFeat$alignedFeatureId, ret$structCands$formulaId,
+                                          fingerIDData)
+                }
+                else
+                    data.table()
+                
+            }
+            else if (getFingerprints)
+            {
+                # get ALL fingerprints
+                ret$fingerprints <- getSIRIUSFingerprints(projectID, SIRIUSAPI, sirFeat$alignedFeatureId,
+                                                          ret$formCands$formulaId, fingerIDData)
             }
             
             return(ret)
         }
         
+        # UNDONE: report progress
         if (calculateFeatures)
         {
             results <- sapply(analyses(fGroups), function(ana)

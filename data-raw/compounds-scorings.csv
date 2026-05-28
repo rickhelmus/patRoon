@@ -1,67 +1,67 @@
-name,metfrag,sirius,database,suspect_list,default,description
-score,Score,score,,FALSE,TRUE,Overall score
-fragScore,FragmenterScore,,,FALSE,TRUE,In-silico MS/MS score
-metFusionScore,OfflineMetFusionScore,,,FALSE,FALSE,
-individualMoNAScore,OfflineIndividualMoNAScore,,,FALSE,TRUE,
-numberPatents,PubChemNumberPatents,PubChemNumberPatents,pubchem,FALSE,TRUE,Not reported anymore by SIRIUS?
-numberPatents,Patent_Count,,pubchemlite,FALSE,TRUE,
-pubMedReferences,PubChemNumberPubMedReferences,,pubchem,FALSE,TRUE,
-pubMedReferences,ChemSpiderNumberPubMedReferences,,chemspider,FALSE,TRUE,
-pubMedReferences,NUMBER_OF_PUBMED_ARTICLES,,comptox,FALSE,TRUE,
-pubMedReferences,PubMed_Count,,pubchemlite,FALSE,TRUE,
-extReferenceCount,ChemSpiderNumberExternalReferences,,chemspider,FALSE,TRUE,
-dataSourceCount,ChemSpiderDataSourceCount,,chemspider,FALSE,TRUE,
-referenceCount,ChemSpiderReferenceCount,,chemspider,FALSE,TRUE,
-RSCCount,ChemSpiderRSCCount,,chemspider,FALSE,TRUE,
-formulaScore,,,,FALSE,FALSE,Match with formula explanation: see addFormulaScoring()
-RF_SMILES,,,,FALSE,FALSE,Response factor predicted from SMILES: see predictRespFactor()
-RF_SIRFP,,,,FALSE,FALSE,Response factor predicted from SIRIUS fingerprints: see predictRespFactor()
-LC50_SMILES,,,,FALSE,FALSE,LC50 predicted from SMILES: see predictTox()
-LC50_SIRFP,,,,FALSE,FALSE,LC50 predicted from SIRIUS fingerprints: see predictTox()
-smartsInclusionScore,SmartsSubstructureInclusionScore,,,FALSE,FALSE,
-smartsExclusionScore,SmartsSubstructureExclusionScore,,,FALSE,FALSE,
-suspectListScore,SuspectListScore,,,FALSE,FALSE,Hit in custom suspect list file (set with ScoreSuspectLists in extraOpts)
-retentionTimeScore,RetentionTimeScore,,,FALSE,FALSE,How well retention time matches predicted value. Training file is set by RetentionTimeTrainingFile in extraOpts.
-CPDATCount,CPDAT_COUNT,,comptox,FALSE,TRUE,
-TOXCASTActive,TOXCAST_PERCENT_ACTIVE,,comptox,FALSE,TRUE,
-dataSources,DATA_SOURCES,,comptox,FALSE,TRUE,
-pubChemDataSources,PUBCHEM_DATA_SOURCES,,comptox,FALSE,TRUE,
-EXPOCASTPredExpo,EXPOCAST_MEDIAN_EXPOSURE_PREDICTION_MG/KG-BW/DAY,,comptox,FALSE,TRUE,
-ECOTOX,ECOTOX,,comptox,TRUE,TRUE,
-NORMANSUSDAT,NORMANSUSDAT,,comptox,TRUE,TRUE,
-MASSBANKEU,MASSBANKEU,,comptox,TRUE,TRUE,
-TOX21SL,TOX21SL,,comptox,TRUE,TRUE,
-TOXCAST,TOXCAST,,comptox,TRUE,TRUE,
-KEMIMARKET,KEMIMARKET,,comptox,TRUE,TRUE,
-MZCLOUD,MZCLOUD,,comptox,TRUE,TRUE,
-pubMedNeuro,PubMedNeuro,,comptox,FALSE,TRUE,Smoking metadata
-CIGARETTES,CIGARETTES,,comptox,TRUE,TRUE,Smoking metadata
-INDOORCT16,INDOORCT16,,comptox,TRUE,TRUE,Smoking metadata
-SRM2585DUST,SRM2585DUST,,comptox,TRUE,TRUE,Smoking metadata
-SLTCHEMDB,SLTCHEMDB,,comptox,TRUE,TRUE,Smoking metadata
-THSMOKE,THSMOKE,,comptox,TRUE,TRUE,Smoking metadata
-ITNANTIBIOTIC,ITNANTIBIOTIC,,comptox,TRUE,TRUE,Wastewater metadata
-STOFFIDENT,STOFFIDENT,,comptox,TRUE,TRUE,Wastewater metadata
-KEMIMARKET_EXPO,KEMIMARKET_EXPO,,comptox,TRUE,TRUE,Wastewater metadata
-KEMIMARKET_HAZ,KEMIMARKET_HAZ,,comptox,TRUE,TRUE,Wastewater metadata
-REACH2017,REACH2017,,comptox,TRUE,TRUE,Wastewater metadata
-KEMIWW_WDUIndex,KEMIWW_WDUIndex,,comptox,TRUE,TRUE,Wastewater metadata
-KEMIWW_StpSE,KEMIWW_StpSE,,comptox,TRUE,TRUE,Wastewater metadata
-KEMIWW_SEHitsOverDL,KEMIWW_SEHitsOverDL,,comptox,TRUE,TRUE,Wastewater metadata
-ZINC15PHARMA,ZINC15PHARMA,,comptox,TRUE,TRUE,Wastewater metadata
-PFASMASTER,PFASMASTER,,comptox,TRUE,TRUE,Wastewater metadata
-peakFingerprintScore,AutomatedPeakFingerprintAnnotationScore,,,FALSE,FALSE,
-lossFingerprintScore,AutomatedLossFingerprintAnnotationScore,,,FALSE,FALSE,
-agroChemInfo,AgroChemInfo,,pubchemlite,FALSE,FALSE,
-bioPathway,BioPathway,,pubchemlite,FALSE,FALSE,
-drugMedicInfo,DrugMedicInfo,,pubchemlite,FALSE,FALSE,
-foodRelated,FoodRelated,,pubchemlite,FALSE,FALSE,
-pharmacoInfo,PharmacoInfo,,pubchemlite,FALSE,FALSE,
-safetyInfo,SafetyInfo,,pubchemlite,FALSE,FALSE,
-toxicityInfo,ToxicityInfo,,pubchemlite,FALSE,FALSE,
-knownUse,KnownUse,,pubchemlite,FALSE,FALSE,
-disorderDisease,DisorderDisease,,pubchemlite,FALSE,FALSE,
-identification,Identification,,pubchemlite,FALSE,FALSE,
-annoTypeCount,AnnoTypeCount,,pubchemlite,FALSE,TRUE,
-annotHitCount,AnnotHitCount,,pubchemlite,FALSE,TRUE,From OECD PFAS DB
-libMatch,,,,FALSE,TRUE,Spectral match with library
+name,metfrag,database,suspect_list,default,description
+score,Score,,FALSE,TRUE,Overall score
+fragScore,FragmenterScore,,FALSE,TRUE,In-silico MS/MS score
+metFusionScore,OfflineMetFusionScore,,FALSE,FALSE,
+individualMoNAScore,OfflineIndividualMoNAScore,,FALSE,TRUE,
+numberPatents,PubChemNumberPatents,pubchem,FALSE,TRUE,
+numberPatents,Patent_Count,pubchemlite,FALSE,TRUE,
+pubMedReferences,PubChemNumberPubMedReferences,pubchem,FALSE,TRUE,
+pubMedReferences,ChemSpiderNumberPubMedReferences,chemspider,FALSE,TRUE,
+pubMedReferences,NUMBER_OF_PUBMED_ARTICLES,comptox,FALSE,TRUE,
+pubMedReferences,PubMed_Count,pubchemlite,FALSE,TRUE,
+extReferenceCount,ChemSpiderNumberExternalReferences,chemspider,FALSE,TRUE,
+dataSourceCount,ChemSpiderDataSourceCount,chemspider,FALSE,TRUE,
+referenceCount,ChemSpiderReferenceCount,chemspider,FALSE,TRUE,
+RSCCount,ChemSpiderRSCCount,chemspider,FALSE,TRUE,
+formulaScore,,,FALSE,FALSE,Match with formula explanation: see addFormulaScoring()
+RF_SMILES,,,FALSE,FALSE,Response factor predicted from SMILES: see predictRespFactor()
+RF_SIRFP,,,FALSE,FALSE,Response factor predicted from SIRIUS fingerprints: see predictRespFactor()
+LC50_SMILES,,,FALSE,FALSE,LC50 predicted from SMILES: see predictTox()
+LC50_SIRFP,,,FALSE,FALSE,LC50 predicted from SIRIUS fingerprints: see predictTox()
+smartsInclusionScore,SmartsSubstructureInclusionScore,,FALSE,FALSE,
+smartsExclusionScore,SmartsSubstructureExclusionScore,,FALSE,FALSE,
+suspectListScore,SuspectListScore,,FALSE,FALSE,Hit in custom suspect list file (set with ScoreSuspectLists in extraOpts)
+retentionTimeScore,RetentionTimeScore,,FALSE,FALSE,How well retention time matches predicted value. Training file is set by RetentionTimeTrainingFile in extraOpts.
+CPDATCount,CPDAT_COUNT,comptox,FALSE,TRUE,
+TOXCASTActive,TOXCAST_PERCENT_ACTIVE,comptox,FALSE,TRUE,
+dataSources,DATA_SOURCES,comptox,FALSE,TRUE,
+pubChemDataSources,PUBCHEM_DATA_SOURCES,comptox,FALSE,TRUE,
+EXPOCASTPredExpo,EXPOCAST_MEDIAN_EXPOSURE_PREDICTION_MG/KG-BW/DAY,comptox,FALSE,TRUE,
+ECOTOX,ECOTOX,comptox,TRUE,TRUE,
+NORMANSUSDAT,NORMANSUSDAT,comptox,TRUE,TRUE,
+MASSBANKEU,MASSBANKEU,comptox,TRUE,TRUE,
+TOX21SL,TOX21SL,comptox,TRUE,TRUE,
+TOXCAST,TOXCAST,comptox,TRUE,TRUE,
+KEMIMARKET,KEMIMARKET,comptox,TRUE,TRUE,
+MZCLOUD,MZCLOUD,comptox,TRUE,TRUE,
+pubMedNeuro,PubMedNeuro,comptox,FALSE,TRUE,Smoking metadata
+CIGARETTES,CIGARETTES,comptox,TRUE,TRUE,Smoking metadata
+INDOORCT16,INDOORCT16,comptox,TRUE,TRUE,Smoking metadata
+SRM2585DUST,SRM2585DUST,comptox,TRUE,TRUE,Smoking metadata
+SLTCHEMDB,SLTCHEMDB,comptox,TRUE,TRUE,Smoking metadata
+THSMOKE,THSMOKE,comptox,TRUE,TRUE,Smoking metadata
+ITNANTIBIOTIC,ITNANTIBIOTIC,comptox,TRUE,TRUE,Wastewater metadata
+STOFFIDENT,STOFFIDENT,comptox,TRUE,TRUE,Wastewater metadata
+KEMIMARKET_EXPO,KEMIMARKET_EXPO,comptox,TRUE,TRUE,Wastewater metadata
+KEMIMARKET_HAZ,KEMIMARKET_HAZ,comptox,TRUE,TRUE,Wastewater metadata
+REACH2017,REACH2017,comptox,TRUE,TRUE,Wastewater metadata
+KEMIWW_WDUIndex,KEMIWW_WDUIndex,comptox,TRUE,TRUE,Wastewater metadata
+KEMIWW_StpSE,KEMIWW_StpSE,comptox,TRUE,TRUE,Wastewater metadata
+KEMIWW_SEHitsOverDL,KEMIWW_SEHitsOverDL,comptox,TRUE,TRUE,Wastewater metadata
+ZINC15PHARMA,ZINC15PHARMA,comptox,TRUE,TRUE,Wastewater metadata
+PFASMASTER,PFASMASTER,comptox,TRUE,TRUE,Wastewater metadata
+peakFingerprintScore,AutomatedPeakFingerprintAnnotationScore,,FALSE,FALSE,
+lossFingerprintScore,AutomatedLossFingerprintAnnotationScore,,FALSE,FALSE,
+agroChemInfo,AgroChemInfo,pubchemlite,FALSE,FALSE,
+bioPathway,BioPathway,pubchemlite,FALSE,FALSE,
+drugMedicInfo,DrugMedicInfo,pubchemlite,FALSE,FALSE,
+foodRelated,FoodRelated,pubchemlite,FALSE,FALSE,
+pharmacoInfo,PharmacoInfo,pubchemlite,FALSE,FALSE,
+safetyInfo,SafetyInfo,pubchemlite,FALSE,FALSE,
+toxicityInfo,ToxicityInfo,pubchemlite,FALSE,FALSE,
+knownUse,KnownUse,pubchemlite,FALSE,FALSE,
+disorderDisease,DisorderDisease,pubchemlite,FALSE,FALSE,
+identification,Identification,pubchemlite,FALSE,FALSE,
+annoTypeCount,AnnoTypeCount,pubchemlite,FALSE,TRUE,
+annotHitCount,AnnotHitCount,pubchemlite,FALSE,TRUE,From OECD PFAS DB
+libMatch,,,FALSE,TRUE,Spectral match with library

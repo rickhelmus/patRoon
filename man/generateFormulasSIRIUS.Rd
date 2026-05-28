@@ -14,6 +14,7 @@ generateFormulasSIRIUS(fGroups, ...)
   specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
   adduct = NULL,
   config = NULL,
+  getFingerprints = FALSE,
   login = "check",
   alwaysLogin = FALSE,
   calculateFeatures = FALSE,

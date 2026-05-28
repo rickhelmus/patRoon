@@ -19,6 +19,7 @@ generateFormulasSIRIUS(fGroups, ...)
   calculateFeatures = FALSE,
   featThreshold = 0,
   featThresholdAnn = 0.75,
+  absAlignMzDev = defaultLim("mz", "narrow"),
   minIMSSpecSim = 0,
   projectPath = NULL,
   runMode = "execute",
@@ -99,6 +100,10 @@ annotations inside a feature group. @param topMost Only keep this number of cand
 (per feature group) with highest score. Sets the \option{--candidates} command line
 option.}
 
+\item{absAlignMzDev}{When the group formula annotation consensus is made from feature annotations, the \emph{m/z}
+values of annotated MS/MS fragments may slightly deviate from those of the corresponding group MS/MS peak list. The
+\code{absAlignMzDev} argument specifies the maximum \emph{m/z} window used to re-align the mass peaks.}
+
 \item{minIMSSpecSim}{\IMSWF If the spectrum similarity of an IMS feature group compared to its IMS precursor (see
 \code{\link[=assignMobilities_feat]{assignMobilities}}) is at least this value, then the IMS feature group will not
 be subjected to the annotation algorithm and all feature annotation properties will be copied from its precursor.
@@ -135,10 +140,6 @@ annotations for the feature group of the candidate.}
 
 \item{setAvgSpecificScores}{\setsWF If \code{TRUE} then set specific scorings (\emph{e.g.} MS/MS match) are also
 averaged.}
-
-\item{absAlignMzDev}{When the group formula annotation consensus is made from feature annotations, the \emph{m/z}
-values of annotated MS/MS fragments may slightly deviate from those of the corresponding group MS/MS peak list. The
-\code{absAlignMzDev} argument specifies the maximum \emph{m/z} window used to re-align the mass peaks.}
 }
 \value{
 A \code{\link{formulasSIRIUS}} object.

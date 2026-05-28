@@ -14,6 +14,7 @@ generateCompoundsSIRIUS(fGroups, ...)
   specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
   adduct = NULL,
   config = NULL,
+  topMost = 100,
   login = "check",
   alwaysLogin = FALSE,
   minIMSSpecSim = 0,
@@ -62,6 +63,9 @@ for more details.}
 
 \item{config}{A \code{RSirius::JobSubmission} configuration object, typically obtained with
 \code{\link{getSIRIUSConfig}}. If \code{NULL}, the default \command{SIRIUS} configuration is used.}
+
+\item{topMost}{Only keep this number of candidates (per feature group) with highest score. Setting this to a high
+number may result in significant usage of CPU/RAM resources for large numbers of candidates.}
 
 \item{login, alwaysLogin}{Specifies if and how account logging of SIRIUS should be handled:
 
@@ -116,10 +120,6 @@ annotations for the feature group of the candidate.}
 
 \item{setAvgSpecificScores}{\setsWF If \code{TRUE} then set specific scorings (\emph{e.g.} MS/MS match) are also
 averaged.}
-
-\item{topMost}{Only keep this number of candidates (per feature group) with highest score. Set to \code{NULL} to
-always keep all candidates, however, please note that this may result in significant usage of CPU/RAM resources for
-large numbers of candidates.}
 }
 \value{
 A \code{\link{compoundsSIRIUS}} object.

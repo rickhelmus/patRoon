@@ -96,9 +96,7 @@ formula should be present in at least 75\% of the features inside a feature grou
 
 \item{featThresholdAnn}{As \code{featThreshold}, but only considers features with annotations. For instance,
 \code{featThresholdAnn=0.75} dictates that a formula should be present in at least 75\% of the features with
-annotations inside a feature group. @param topMost Only keep this number of candidates
-(per feature group) with highest score. Sets the \option{--candidates} command line
-option.}
+annotations inside a feature group.}
 
 \item{absAlignMzDev}{When the group formula annotation consensus is made from feature annotations, the \emph{m/z}
 values of annotated MS/MS fragments may slightly deviate from those of the corresponding group MS/MS peak list. The

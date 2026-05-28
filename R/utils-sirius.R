@@ -345,10 +345,11 @@ runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUS
             return(ret)
         }
         
-        # UNDONE: report progress
+        printf("Importing SIRIUS results...\n")
+        
         if (calculateFeatures)
         {
-            results <- sapply(analyses(fGroups), function(ana)
+            results <- withProg(length(analyses(fGroups)), FALSE, sapply(analyses(fGroups), function(ana)
             {
                 ret <- pruneList(sapply(gNamesTBD, function(grp)
                 {
@@ -358,18 +359,22 @@ runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUS
                     return(getResFromFeat(SIRFeatListImp[[featID]], MSPeakLists[[ana, grp]]$MSMS))
                 }, simplify = FALSE))
                 saveCacheDataList(cacheName, ret, hashes[[ana]][names(ret)], dbArg = db)
+                doProgress()
                 return(ret)
-            }, simplify = FALSE)
+            }, simplify = FALSE))
         }
         else
         {
-            results <- pruneList(sapply(gNamesTBD, function(grp)
+            results <- withProg(length(gNamesTBD), FALSE, sapply(gNamesTBD, function(grp)
             {
                 # NOTE: check if feature is present: already done by doFGroup(), but may be removed if we're importing data
                 if (is.null(SIRFeatListImp[[grp]]))
                     return(NULL)
-                getResFromFeat(SIRFeatListImp[[grp]], MSPeakLists[[grp]]$MSMS)
+                ret <- getResFromFeat(SIRFeatListImp[[grp]], MSPeakLists[[grp]]$MSMS)
+                doProgress()
+                return(ret)
             }, simplify = FALSE))
+            results <- pruneList(results)
             saveCacheDataList(cacheName, results, hashes[names(results)], dbArg = db)
         }
     }

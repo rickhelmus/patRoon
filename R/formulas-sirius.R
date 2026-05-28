@@ -166,7 +166,6 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
                                                               verbose = TRUE)
 {
     # UNDONE: see generateCompoundsSIRIUS()
-    # UNDONE: optionally load fingerprints
 
     checkPackage("RSirius", "sirius-ms/sirius-client-openAPI", ghSubDir = "client-api_r/generated")
     

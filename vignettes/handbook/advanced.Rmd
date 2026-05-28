@@ -602,6 +602,8 @@ For more details, see the reference manual for the feature groups methods for `a
 
 ## Predicting toxicities and concentrations (MS2Tox and MS2Quant integration) {#pred}
 
+> **_NOTE_**: Prediction from `SIRIUS` fingerprints is **not supported currently**, as the models were trained on fingerprints from `SIRIUS` 5 for which the server was taken down. This functionality is hopefully restored when new models became available that are trained on `SIRIUS` 6 fingerprints.
+
 The [MS2Tox] and [MS2Quant] `R` packages predict toxicities and feature concentrations using a machine learning approach. The predictions are performed with either SMILES data or fingerprints calculated from MS/MS data with `SIRIUS+CSI:FingerID`. While using SMILES data is generally more accurate, using MS/MS fingerprints is generally faster and may be more suitable for features without know or suspected structure.
 
 In `patRoon` the predictions are done in two steps:

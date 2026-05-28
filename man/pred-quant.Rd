@@ -162,7 +162,7 @@ fingerprints), \code{"SMILES"} or \code{"both"}. Only relevant for \code{\link{c
   Best to keep this \code{"maybe"}, as calibration typically doesn't support IMS filtered data.}
 }
 \value{
-\code{predictRespFactors} returns an object amended with response factors (\code{RF_SMILES}/\code{LRF_SIRFP}
+\code{predictRespFactors} returns an object amended with response factors (\code{RF_SMILES}/\code{RF_SIRFP}
   columns).
 
   \code{calculateConcs} returns a \code{\link{featureGroups}} based object amended with concentrations for each
@@ -231,6 +231,10 @@ The \CRANpkg{rcdk} package and \href{https://github.com/openbabel/openbabel}{Ope
 \section{Predicting response factors}{
  The response factors are predicted with the \code{predictRespFactors} generic functions,
   which accepts the following input:
+  
+  \strong{NOTE}: Prediction from \command{SIRIUS} fingerprints is \strong{not supported anymore}, as the
+  required webservice from \command{SIRIUS} 5 was taken offline. This functionality is hopefully restored when new
+  prediction models become available that are trained on \command{SIRIUS} 6 fingerprints.
 
 \itemize{
 

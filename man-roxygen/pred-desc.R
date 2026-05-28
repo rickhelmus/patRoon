@@ -12,6 +12,10 @@
 #'
 #' @section Predicting <%=whatPred%>: The <%=whatPred%> are predicted with the \code{<%=predFunc%>} generic functions,
 #'   which accepts the following input:
+#'   
+#'   \strong{NOTE}: Prediction from \command{SIRIUS} fingerprints is \strong{not supported anymore}, as the
+#'   required webservice from \command{SIRIUS} 5 was taken offline. This functionality is hopefully restored when new
+#'   prediction models become available that are trained on \command{SIRIUS} 6 fingerprints.
 #'
 #' \itemize{
 #'

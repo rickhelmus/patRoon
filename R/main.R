@@ -789,7 +789,7 @@ NULL
 #'   small differences compared to workflows where concentrations are assigned prior to mobility assignments, as
 #'   \code{assignMobilities} simply copies concentrations from IMS precursors to IMS features.
 #'
-#' @return \code{predictRespFactors} returns an object amended with response factors (\code{RF_SMILES}/\code{LRF_SIRFP}
+#' @return \code{predictRespFactors} returns an object amended with response factors (\code{RF_SMILES}/\code{RF_SIRFP}
 #'   columns).
 #'
 #'   \code{calculateConcs} returns a \code{\link{featureGroups}} based object amended with concentrations for each

@@ -180,8 +180,8 @@ setMethod("predictTox", "compoundsSIRIUS", function(obj, type = "FP", LC50Mode =
 #' @export
 setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLists,
                                                                specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
-                                                               adduct = NULL, config = NULL, login = "check",
-                                                               alwaysLogin = FALSE, minIMSSpecSim = 0,
+                                                               adduct = NULL, config = NULL, topMost = 100,
+                                                               login = "check", alwaysLogin = FALSE, minIMSSpecSim = 0,
                                                                projectPath = NULL, runMode = "execute", SIRIUSAPI = NULL,
                                                                SIRIUSPath = NULL, verbose = TRUE)
 {
@@ -191,7 +191,6 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
     # UNDONE: add database column --> once links are fixed and once configs are defined
     # UNDONE: replace SIRIUSPath by patRoonExt
     # UNDONE: doc that login means accepting terms?
-    # UNDONE: re-add topMost argument
     
     checkPackage("RSirius", "sirius-ms/sirius-client-openAPI", ghSubDir = "client-api_r/generated")
     
@@ -199,6 +198,7 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertR6(config, null.ok = TRUE, add = ac)
+    checkmate::assertCount(topMost, positive = TRUE, add = ac)
     assertSIRIUSLogin(login, add = ac)
     checkmate::assertFlag(alwaysLogin, add = ac)
     checkmate::assertNumber(minIMSSpecSim, lower = 0, finite = TRUE, add = ac)
@@ -224,7 +224,7 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
 
     SIRResults <- runSIRIUS(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUSAPI, SIRIUSPath, projectPath,
                             config, login, alwaysLogin, formulasOnly = FALSE, calculateFeatures = FALSE,
-                            cacheName = "compoundsSIRIUS")    
+                            cacheName = "compoundsSIRIUS", topMostStructures = topMost)    
 
     prepRes <- function(res)
     {

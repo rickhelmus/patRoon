@@ -56,5 +56,6 @@ This function obtains a \link[RSirius]{JobSubmission} configuration object for u
 The function can return the server default configuration, fetch a named configuration, import a configuration from a
 JSON file, or use a provided configuration object/list. If needed, the SIRIUS API is started automatically and a
 login can be performed. There are \emph{many} configuration options available in \command{SIRIUS}. It is probably
-easiest to explore and configure them through the \command{SIRIUS} GUI, and save or export the configuration profile.
+easiest to explore and configure them through the \command{SIRIUS} GUI, save or export the configuration profile and
+then load it via the \code{config} or \code{import} arguments.
 }

@@ -94,8 +94,8 @@ getSIRIUSFormulaCandidates <- function(projectID, SIRIUSAPI, SIRFeatID)
     if (length(formCands) == 0)
         return(data.table())
     tab <- rbindlist(lapply(formCands, \(fc) fc$toList()), fill = TRUE)
-    setnames(tab, c("molecularFormula", "siriusScore", "siriusScoreNormalized", "isotopeScore"),
-             c("neutral_formula", "score", "scoreNormalized", "isoScore"), skip_absent = TRUE)
+    setnames(tab, c("molecularFormula", "siriusScore", "siriusScoreNormalized", "isotopeScore", "treeScore"),
+             c("neutral_formula", "score", "scoreNormalized", "isoScore", "MSMSScore"), skip_absent = TRUE)
     return(tab)
 }
 

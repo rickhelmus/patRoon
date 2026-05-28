@@ -50,7 +50,7 @@ mergeFragInfo <- function(fiLeft, fiRight, leftName, rightName)
 #'
 #' Returns an overview of scorings may be applied to rank candidate compounds.
 #'
-#' @param algorithm The algorithm: \code{"metfrag"} or \code{"sirius"}. Set to \code{NULL} to return all scorings.
+#' @param algorithm The algorithm: currently just \code{"metfrag"}. Set to \code{NULL} to return all scorings.
 #' @param database The database for which results should be returned (\emph{e.g.} \code{"pubchem"}). Set to \code{NULL}
 #'   to return all scorings.
 #' @param includeSuspectLists,onlyDefault,includeNoDB A logical specifying whether scoring terms related to suspect
@@ -66,7 +66,9 @@ mergeFragInfo <- function(fiLeft, fiRight, leftName, rightName)
 compoundScorings <- function(algorithm = NULL, database = NULL, includeSuspectLists = TRUE,
                              onlyDefault = FALSE, includeNoDB = TRUE)
 {
-    algos <- c("metfrag", "sirius")
+    # NOTE: this used to contain some SIRIUS scorings, but these were not relevant anymore for SIRIUS 6.0
+    
+    algos <- c("metfrag")
 
     ret <- patRoon:::compScorings # stored inside R/sysdata.rda
 
@@ -76,8 +78,8 @@ compoundScorings <- function(algorithm = NULL, database = NULL, includeSuspectLi
     checkmate::assertFlag(includeSuspectLists, add = ac)
     checkmate::reportAssertions(ac)
 
-    if (!is.null(algorithm))
-        ret <- ret[nzchar(ret[[algorithm]]), names(ret) != setdiff(algos, algorithm)]
+    # if (!is.null(algorithm))
+    #     ret <- ret[nzchar(ret[[algorithm]]), names(ret) != setdiff(algos, algorithm)]
     if (!is.null(database))
     {
         if (includeNoDB)

@@ -139,7 +139,7 @@ getSIRIUSFragInfos <- function(projectID, SIRIUSAPI, SIRFeatID, SIRFormIDs, PLMS
 }
 
 runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUSAPI, SIRIUSPath, projectPath, config,
-                      login, alwaysLogin, formulasOnly, calculateFeatures, cacheName)
+                      login, alwaysLogin, formulasOnly, calculateFeatures, cacheName, topMostStructures = NULL)
 {
     doFGroup <- function(grp, ana = NULL)
     {
@@ -152,7 +152,7 @@ runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUS
     }
     
     db <- openCacheDBScope()
-    baseHash <- makeHash(config, formulasOnly, calculateFeatures)
+    baseHash <- makeHash(config, formulasOnly, calculateFeatures, topMostStructures)
     
     gNamesTBD <- names(fGroups)[sapply(names(fGroups), doFGroup)]
     fgAdd <- getFGroupAdducts(gNamesTBD, annotations(fGroups)[match(gNamesTBD, group)], adduct, "sirius")
@@ -291,9 +291,12 @@ runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUS
             if (!formulasOnly)
             {
                 # BUG: opt_fields doesn't seem to do anything
-                ret$structCands <- SIRIUSAPI$features_api$GetStructureCandidates(projectID, sirFeat$alignedFeatureId,
-                                                                                 opt_fields = c("dbLinks", "libraryMatches"))
-                ret$structCands <- rbindlist(lapply(ret$structCands, \(sc) sc$toList()), fill = TRUE)
+                # UNDONE: support opt_fields="libraryMatches"?
+                ret$structCands <- SIRIUSAPI$features_api$GetStructureCandidatesPaged(projectID,
+                                                                                      sirFeat$alignedFeatureId,
+                                                                                      page = 0, size = topMostStructures,
+                                                                                      opt_fields = c("dbLinks"))
+                ret$structCands <- rbindlist(lapply(ret$structCands$content, \(sc) sc$toList()), fill = TRUE)
                 setnames(ret$structCands, c("inchiKey", "smiles", "structureName", "xlogP", "molecularFormula", "csiScore"),
                          c("InChIKey1", "SMILES", "compoundName", "XlogP", "neutral_formula", "score"), skip_absent = TRUE)
                 # UNDONE: add InChI and InChIKey?

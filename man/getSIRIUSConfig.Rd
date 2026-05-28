@@ -36,7 +36,9 @@ GUI. Cannot be used together with \code{config}.}
   if \code{alwaysLogin=TRUE} then a login is always performed, otherwise only if SIRIUS reports no active login.
 
   See the \href{https://v6.docs.sirius-ms.io/account-and-license/}{SIRIUS website} and \pkg{patRoon} handbook for
-  more information.}
+  more information.
+  
+  \strong{NOTE}: By loggin in you will accept the terms of the Service and Privacy Policy of the SIRIUS Webservice.}
 
 \item{SIRIUSAPI}{An \code{rsirius_api} object for connecting to the \command{SIRIUS} API. If \code{NULL}, a new
 connection will be started automatically.}

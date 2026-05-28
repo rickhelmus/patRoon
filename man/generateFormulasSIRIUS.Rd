@@ -86,7 +86,9 @@ for more details.}
   if \code{alwaysLogin=TRUE} then a login is always performed, otherwise only if SIRIUS reports no active login.
 
   See the \href{https://v6.docs.sirius-ms.io/account-and-license/}{SIRIUS website} and \pkg{patRoon} handbook for
-  more information.}
+  more information.
+  
+  \strong{NOTE}: By loggin in you will accept the terms of the Service and Privacy Policy of the SIRIUS Webservice.}
 
 \item{calculateFeatures}{If \code{TRUE} fomulae are first calculated for all features
 prior to feature group assignment (see \verb{Candidate assignment} in \code{\link{generateFormulas}}).}

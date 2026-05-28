@@ -188,8 +188,7 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
     # UNDONE: handle IMSSpecSims: test (including caching)
     # UNDONE: add database column --> once links are fixed and once configs are defined
     # UNDONE: replace SIRIUSPath by patRoonExt
-    # UNDONE: doc that login means accepting terms?
-    
+
     checkPackage("RSirius", "sirius-ms/sirius-client-openAPI", ghSubDir = "client-api_r/generated")
     
     ac <- checkmate::makeAssertCollection()

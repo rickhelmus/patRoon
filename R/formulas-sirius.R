@@ -160,12 +160,12 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
                                                               adduct = NULL, config = NULL, login = "check",
                                                               alwaysLogin = FALSE, calculateFeatures = FALSE,
                                                               featThreshold = 0, featThresholdAnn = 0.75,
+                                                              absAlignMzDev = defaultLim("mz", "narrow"),
                                                               minIMSSpecSim = 0, projectPath = NULL,
                                                               runMode = "execute", SIRIUSAPI = NULL, SIRIUSPath = NULL,
                                                               verbose = TRUE)
 {
     # UNDONE: see generateCompoundsSIRIUS()
-    # UNDONE: re-add setFormulaPLID() and absAlignMzDev arg
     # UNDONE: optionally load fingerprints
 
     checkPackage("RSirius", "sirius-ms/sirius-client-openAPI", ghSubDir = "client-api_r/generated")
@@ -177,7 +177,7 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     assertSIRIUSLogin(login, add = ac)
     checkmate::assertFlag(alwaysLogin, add = ac)
     checkmate::assertFlag(calculateFeatures, add = ac)
-    aapply(checkmate::assertNumber, . ~ featThreshold + featThresholdAnn + minIMSSpecSim,
+    aapply(checkmate::assertNumber, . ~ featThreshold + featThresholdAnn + absAlignMzDev + minIMSSpecSim,
            lower = 0, upper = 1, finite = TRUE, fixed = list(add = ac))
     checkmate::assert(
         checkmate::checkPathForOutput(projectPath, overwrite = TRUE, extension = "sirius"),
@@ -212,29 +212,31 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
         return(tab)
     }
     
-    featForms <- list()
+    featFormulas <- list()
     if (calculateFeatures)
     {
-        featForms <- pruneList(sapply(SIRResults, \(x) lapply(x, prepRes), simplify = FALSE))
-        formTabs <- generateGroupFormulasByConsensus(featForms,
+        featFormulas <- pruneList(sapply(SIRResults, \(x) lapply(x, prepRes), simplify = FALSE))
+        groupFormulas <- generateGroupFormulasByConsensus(featFormulas,
                                                      lapply(groupFeatIndex(fGroups), function(x) sum(x > 0)),
                                                      featThreshold, featThresholdAnn, names(fGroups))
     }
     else
-        formTabs <- pruneList(sapply(SIRResults, prepRes, simplify = FALSE))
+        groupFormulas <- pruneList(sapply(SIRResults, prepRes, simplify = FALSE))
     
-    scRanges <- sapply(formTabs, \(ct) list(score = range(ct$score)), simplify = FALSE)
+    # NOTE: this will overwrite prior PLID assignments from getSIRIUSFragInfos()
+    # UNDONE: harmonize PLID assignment between formulae and compounds?
+    groupFormulas <- setFormulaPLID(groupFormulas, MSPeakLists, absAlignMzDev)
     
     if (verbose)
     {
-        ngrp <- length(formTabs)
-        printf("Assigned %d formulas to %d feature groups (%.2f%%).\n", sum(sapply(formTabs, nrow)),
+        ngrp <- length(groupFormulas)
+        printf("Assigned %d formulas to %d feature groups (%.2f%%).\n", sum(sapply(groupFormulas, nrow)),
                ngrp, if (length(fGroups) == 0) 0 else ngrp * 100 / length(fGroups))
     }
     
-    return(formulasSIRIUS(groupAnnotations = formTabs, featureFormulas = featForms, scoreTypes = "score",
-                          scoreRanges = scRanges, algorithm = "sirius", MSPeakLists = MSPeakLists,
-                          specSimParams = specSimParams, IMSSpecSims = IMSSpecSims, gNames = names(fGroups)))
+    return(formulasSIRIUS(groupAnnotations = groupFormulas, featureFormulas = featFormulas, algorithm = "sirius",
+                          MSPeakLists = MSPeakLists, specSimParams = specSimParams, IMSSpecSims = IMSSpecSims,
+                          gNames = names(fGroups)))
 })
 
 #' @template featAnnSets-gen_args

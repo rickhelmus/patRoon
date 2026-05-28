@@ -887,39 +887,37 @@ Algorithm    | Usage                                          | Remarks
 ------------ | ---------------------------------------------- | ------------------------------------------------
 [GenForm]    | `generateFormulas(algorithm = "genform", ...)` | Bundled with `patRoon`. Reasonable default.
 [SIRIUS]     | `generateFormulas(algorithm = "sirius", ...)`  | Requires MS/MS data.
-DataAnalysis | `generateFormulas(algorithm = "bruker", ...)`  | Requires FMF features (i.e. `findFeatures(algorithm = "bruker", ...)`). Uses _SmartFormula_ algorithms.
 
-Calculation with [GenForm] is often a good default. It is fast and basic rules can be applied to filter out obvious non-existing formulae. A possible drawback of GenForm, however, is that may become slow when many candidates are calculated, for instance, due to a relative high feature _m/z_ (e.g. >600) or loose elemental restricitions. More thorough calculation is performed with [SIRIUS]: this algorithm often yields fewer and often more plausible results. However, [SIRIUS] requires MS/MS data (hence features without will not have results) and formula prediction may not work well for compounds that structurally deviate from the training sets used by [SIRIUS]. Calculation with DataAnalysis is only possible when features are obtained with DataAnalysis as well. An advantage is that analysis files do not have to be converted, however, compared to other algorithms calculation is often relative slow.
+Calculation with [GenForm] is often a good default. It is fast and basic rules can be applied to filter out obvious non-existing formulae. A possible drawback of GenForm, however, is that may become slow when many candidates are calculated, for instance, due to a relative high feature _m/z_ (e.g. >600) or loose elemental restricitions. More thorough calculation is performed with [SIRIUS]: this algorithm often yields fewer and often more plausible results. However, [SIRIUS] requires MS/MS data (hence features without will not have results) and formula prediction may not work well for compounds that structurally deviate from the training sets used by [SIRIUS].
 
 There are two methods for formula assignment:
 
 1. Formulae are first calculated for each individual feature within a feature group. These results are then pooled, outliers are removed and remaining formulae are assigned to the feature group (i.e. `calculateFeatures = TRUE`).
 2. Formulae are directly calculated for each feature group by using group averaged peak lists (see previous section) (i.e. `calculateFeatures = FALSE`).
 
-The first method is more thorough and the possibility to remove outliers may sometimes result in better formula assignment. However, the second method is much faster and generally recommended for large number of analyses.
+The first method is more thorough and the possibility to remove outliers may sometimes result in better formula assignment. However, the second method is much faster and generally recommended for large number of analyses and therefore the default.
 
-By default, formulae are either calculated by _only_ MS/MS data (SIRIUS) or with both MS _and_ MS/MS data (GenForm/Bruker). The latter also allows formula calculation when no MS/MS data is present. Furthermore, with Bruker algorithms, data from both MS and MS/MS formula data can be combined to allow inclusion of candidates that would otherwise be excluded by e.g. poor MS/MS data. However, a disadvantage is that formulae needs to be calculated twice. The `MSMode` argument (listed below) can be used to customize this behaviour.
+By default, formulae are either calculated by _only_ MS/MS data (SIRIUS) or with both MS _and_ MS/MS data (GenForm). The latter also allows formula calculation when no MS/MS data is present. The `MSMode` argument (listed below) can be used to customize this behavior.
 
 An overview of common parameters that are typically set to customize formula calculation is listed below.
 
 Argument          | Algorithm(s)        | Remarks
------------------ | ------------------- | -------------------------------------------------------------------------------
-relMzDev          | `genform`, `sirius` | The maximum relative _m/z_ deviation for a formula to be considered (in _ppm_).
-elements          | `genform`, `sirius` | Which elements to consider. By default `"CHNOP"`. Try to limit possible elements as much as possible.
-calculateFeatures | `genform`, `sirius` | Whether formulae should be calculated first for all features (see discussion above) (always `TRUE` with DataAnalysis).
-featThresholdAnn  | All                 | Minimum relative amount (_0-1_) that a candidate formula for a feature group should be found among all annotated features (e.g. _1_ means that a candidate is only considered if it was assigned to all annotated features). 
-adduct            | All                 | The adduct to consider for calculation (e.g. `"[M+H]+"`, `"[M-H]-"`, more details in the [adduct section](#adducts)). Don't set this when [adduct annotations](#incorpAdductIso) are available.
-MSMode            | `genform`, `bruker` | Whether formulae should be generated only from MS data (`"ms"`), MS/MS data (`"msms"`) or both (`"both"`). The latter is default, see discussion above.
-profile           | `sirius`            | Instrument profile, e.g. `"qtof"`, `"orbitrap"`, `"fticr"`.
+----------------- | --------- | -------------------------------------------------------------------------------
+relMzDev          | `genform` | The maximum relative _m/z_ deviation for a formula to be considered (in _ppm_).
+elements          | `genform` | Which elements to consider. By default `"CHNOP"`. Try to limit possible elements as much as possible.
+config            | `sirius`  | Configuration options for `SIRIUS`. More details [are discussed here](#SIRConf).
+calculateFeatures | All       | Whether formulae should be calculated first for all features (see discussion above) (always `TRUE` with DataAnalysis).
+featThresholdAnn  | All       | Minimum relative amount (_0-1_) that a candidate formula for a feature group should be found among all annotated features (e.g. _1_ means that a candidate is only considered if it was assigned to all annotated features). 
+adduct            | All       | The adduct to consider for calculation (e.g. `"[M+H]+"`, `"[M-H]-"`, more details in the [adduct section](#adducts)). Don't set this when [adduct annotations](#incorpAdductIso) are available.
+MSMode            | `genform` | Whether formulae should be generated only from MS data (`"ms"`), MS/MS data (`"msms"`) or both (`"both"`). The latter is default, see discussion above.
 
 Some typical examples:
 
 ```{r forms,eval=FALSE}
 formulasGF <- generateFormulas(fGroups, mslists, "genform") # GenForm, default settings
-formulasGF2 <- generateFormulas(fGroups, mslists, "genform", calculateFeatures = FALSE) # direct feature group assignment (faster)
-formulasSIR <- generateFormulas(fGroups, mslists, "sirius", elements = "CHNOPSClBr") # SIRIUS, common elements for pollutant
+formulasGF2 <- generateFormulas(fGroups, mslists, "genform", elements = "CHNOPSClBr") # SIRIUS, common elements for pollutants
+formulasSIR <- generateFormulas(fGroups, mslists, "sirius", config = getSIRIUSConfig("MySettings")) # SIRIUS, custom config
 formulasSIR2 <- generateFormulas(fGroups, mslists, "sirius", adduct = "[M-H]-") # SIRIUS, negative ionization
-formulasBr <- generateFormulas(fGroups, mslists, "bruker", MSMode = "MSMS") # Only consider MSMS data (SmartFormula3D)
 ```
 
 ### Compounds {#compounds}
@@ -938,23 +936,24 @@ All algorithms rank their candidates by matching MS/MS data with in-silico gener
 
 Compound annotation is often a relative time and resource intensive procedure. For this reason, annotation occurs for each feature group and not individual features. It is not uncommon that this is the most time consuming step in the workflow. For this reason, prioritization of features is highly important, even more so to avoid 'abusing' servers when an online database is used for compound retrieval.
 
-#### Database selection for MetFrag and SIRIUS
+#### Database selection for MetFrag
+
+> **_NOTE_** Database selection for `SIRIUS` is [handled through the SIRIUS configuration](#SIRConf).
 
 Selecting the right database is important for proper candidate assignment. If the 'right' chemical compound is not present in the used database, it is impossible to assign the correct structure. Luckily, however, several large databases such as [PubChem] and [ChemSpider] are openly available which contain tens of millions of compounds. On the other hand, these databases may also lead to many unlikely candidates and therefore more specialized (or custom databases) may be preferred. Which database will be used is dictated by the `database` argument to `generateCompounds()`, currently the following options exist:
 
 <!-- UNDONE: add missing databases when support is added -->
 
-Database            | Algorithm(s)            | Remarks
-------------------- | ----------------------- | -----------------------
-`pubchemlite`       | `"metfrag"`             | A specialized subset of the PubChem database. Often a good default. May need manual installation (see next section).
-`pubchem`           | `"metfrag"`, `"sirius"` | [PubChem] is currently the largest compound database and is used by default.
-`chemspider`        | `"metfrag"`             | [ChemSpider] is another large database. Requires security token from [here](http://www.chemspider.com/AboutServices.aspx) (see next section).
-`comptox`           | `"metfrag"`             | The EPA [CompTox] contains many compounds and scorings relevant to environmental studies. May need manual installation (see next section).
-`for-ident`         | `"metfrag"`             | The [FOR-IDENT] (STOFF-IDENT) database for water related substances.
-`kegg`              | `"metfrag"`, `"sirius"` | The [KEGG] database for biological compounds
-`hmdb`              | `"metfrag"`, `"sirius"` | The [HMDB] contains many human metabolites.
-`bio`               | `"sirius"`              | Selects all supports biological databases.
-`csv`, `psv`, `sdf` | `"metfrag"`             | Custom database (see next section). [CSV example][csvDB-ex].
+Database            |  Remarks
+------------------- | ------------------------------------------------------------------
+`pubchemlite`       | A specialized subset of the PubChem database. Often a good default. May need manual installation (see next section).
+`pubchem`           | [PubChem] is currently the largest compound database and is used by default.
+`chemspider`        | [ChemSpider] is another large database. Requires security token from [here](http://www.chemspider.com/AboutServices.aspx) (see next section).
+`comptox`           | The EPA [CompTox] contains many compounds and scorings relevant to environmental studies. May need manual installation (see next section).
+`for-ident`         | The [FOR-IDENT] (STOFF-IDENT) database for water related substances.
+`kegg`              | The [KEGG] database for biological compounds
+`hmdb`              | The [HMDB] contains many human metabolites.
+`csv`, `psv`, `sdf` | Custom database (see next section). [CSV example][csvDB-ex].
 
 
 #### Configuring MetFrag databases and scoring
@@ -1101,6 +1100,22 @@ fGroupsSusp <- estimateIDConfidence(fGroupsSusp, MSPeakLists = mslists, formulas
 ```
 
 
+### SIRIUS configuration {#SIRConf}
+
+Starting from the `SIRIUS 6` interface, most configuration options are specified through the SIRIUS configuration system. The `getSIRIUSConfig()` function can be used to get the required configuration object, which can then be customized and passed to `generateFormulas()` and `generateCompounds()` with the `config` function argument. The configuration options are quite extensive, and it is probably easiest to explore and change them through the `SIRIUS` GUI. Afterwards, the options can be saved internally under a custom name or exported as `json` file.
+
+Below are some examples on how to use the `getSIRIUSConfig()` function to obtain a configuration object and how to customize it:
+
+```{r SIRConfig,eval=FALSE}
+SIRConfig <- getSIRIUSConfig() # get default configuration
+SIRConfig$formulaIdParams$numberOfCandidates <- 5
+
+getSIRIUSConfig(NA) # get currently saved configuration profiles
+
+SIRConfig <- getSIRIUSConfig("MySettings")
+SIRConfig <- getSIRIUSConfig(import = "MySettings.json")
+```
+
 ### Account login for SIRIUS {#SIRLogin}
 
 Recent version of [SIRIUS] require an active account login to make queries to [CSI:FingerID]. This is primarily relevant when performing a compound annotation workflow with `SIRIUS` or a formula annotation workflow with `getFingerprints=TRUE`, e.g. [when predicting toxicities or concentrations](#pred).
@@ -1123,7 +1138,7 @@ The `login` parameter for `generateCompounds()` and `generateFormulas()` determi
 
 The first two options are primarily meant for manual login. The function parameter `alwaysLogin=TRUE` can be set to force a login for the third and fourth options.
 
-The fourth option is primarily useful for e.g. heavy users of SIRIUS or unattended automatic workflows. To securely provide the login details, it is best to store them elsewhere. [This webpage](https://solutions.posit.co/connections/db/best-practices/managing-credentials/) provides a detailed overview of how credentials can be safely stored. For instance, you can save the credentials in your `.Renviron` file and retreieve them when calling `generateCompounds()`:
+The fourth option is primarily useful for unattended automatic workflows. To securely provide the login details, it is best to store them elsewhere. [This webpage](https://solutions.posit.co/connections/db/best-practices/managing-credentials/) provides a detailed overview of how credentials can be safely stored. For instance, you can save the credentials in your `.Renviron` file and retreieve them when calling `generateCompounds()`:
 
 In your `.Renviron` file add:
 

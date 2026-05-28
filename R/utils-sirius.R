@@ -40,8 +40,6 @@ startSIRIUS <- function(path)
     checkPackage("RSirius", "sirius-ms/sirius-client-openAPI", ghSubDir = "client-api_r/generated")
     
     sdk <- RSirius::SiriusSDK$new()
-    # UNDONE: make this configurable?
-    # UNDONE: somehow default to a new SIRIUS instance? May make more sense for unattended processing?
     # SIRIUSAPI <- sdk$attach_or_start_sirius()
     SIRIUSAPI <- sdk$attach_to_sirius()
     shutdownSIR <- FALSE

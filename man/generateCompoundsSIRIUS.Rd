@@ -82,7 +82,9 @@ number may result in significant usage of CPU/RAM resources for large numbers of
   if \code{alwaysLogin=TRUE} then a login is always performed, otherwise only if SIRIUS reports no active login.
 
   See the \href{https://v6.docs.sirius-ms.io/account-and-license/}{SIRIUS website} and \pkg{patRoon} handbook for
-  more information.}
+  more information.
+  
+  \strong{NOTE}: By loggin in you will accept the terms of the Service and Privacy Policy of the SIRIUS Webservice.}
 
 \item{minIMSSpecSim}{\IMSWF If the spectrum similarity of an IMS feature group compared to its IMS precursor (see
 \code{\link[=assignMobilities_feat]{assignMobilities}}) is at least this value, then the IMS feature group will not

@@ -37,6 +37,19 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// getComponNetCoMatrix
+Rcpp::NumericMatrix getComponNetCoMatrix(Rcpp::List componGroupsList, Rcpp::List featGroupsList, Rcpp::CharacterVector gNames);
+RcppExport SEXP _patRoon_getComponNetCoMatrix(SEXP componGroupsListSEXP, SEXP featGroupsListSEXP, SEXP gNamesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type componGroupsList(componGroupsListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type featGroupsList(featGroupsListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type gNames(gNamesSEXP);
+    rcpp_result_gen = Rcpp::wrap(getComponNetCoMatrix(componGroupsList, featGroupsList, gNames));
+    return rcpp_result_gen;
+END_RCPP
+}
 // getGroupIDs
 Rcpp::IntegerVector getGroupIDs(const Rcpp::NumericVector& featRTs, const Rcpp::NumericVector& featMZs, const Rcpp::NumericVector& featMobs, const Rcpp::NumericVector& ints, const Rcpp::IntegerVector& anaIDs, const Rcpp::IntegerVector& repIDs, double rtWindow, double mzWindow, double mobWindow, const Rcpp::List& weightsList);
 RcppExport SEXP _patRoon_getGroupIDs(SEXP featRTsSEXP, SEXP featMZsSEXP, SEXP featMobsSEXP, SEXP intsSEXP, SEXP anaIDsSEXP, SEXP repIDsSEXP, SEXP rtWindowSEXP, SEXP mzWindowSEXP, SEXP mobWindowSEXP, SEXP weightsListSEXP) {
@@ -1000,6 +1013,7 @@ RcppExport SEXP _rcpp_module_boot_MSReadBackend();
 static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_writeTraML", (DL_FUNC) &_patRoon_writeTraML, 2},
     {"_patRoon_writeChromsToMzML", (DL_FUNC) &_patRoon_writeChromsToMzML, 4},
+    {"_patRoon_getComponNetCoMatrix", (DL_FUNC) &_patRoon_getComponNetCoMatrix, 3},
     {"_patRoon_getGroupIDs", (DL_FUNC) &_patRoon_getGroupIDs, 10},
     {"_patRoon_getEICList", (DL_FUNC) &_patRoon_getEICList, 24},
     {"_patRoon_doFillEIXIntensities", (DL_FUNC) &_patRoon_doFillEIXIntensities, 3},

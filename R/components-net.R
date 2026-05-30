@@ -114,10 +114,12 @@ annotateCompNetNontarget <- function(componList, iso, add, ...)
         ps <- nontarget::pattern.search(compS, iso = iso)
         # NOTE: nontarget::adduct.search() calls stop() when there are no results ...
         as <- tryCatch(nontarget::adduct.search(compS, adducts = add), error = function(...) NULL)
-        ads <- setDT(as$adducts[as$adducts[["adduct(s)"]] != "none", ])
-        ads[, group := comp$group[ads$`peak ID`]]
-        ads[, adduct := sub("<.*", "", `adduct(s)`)]
-        browser()
+        if (!is.null(as))
+        {
+            ads <- setDT(as$adducts[as$adducts[["adduct(s)"]] != "none", ])
+            ads[, group := comp$group[ads$`peak ID`]]
+            ads[, adduct := sub("<.*", "", `adduct(s)`)]
+        }
         # comp[, c("isogroup", "isonr", "charge") := {
         #     ps <- nontarget::pattern.search(featureTable(fGroups)[[1]][group %in% group]$mz, iso = iso)
         #     if (nrow(ps) == 0)
@@ -174,41 +176,11 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     compsFeatsTabs <- sapply(compsFeats, "[[", "components", simplify = FALSE)
     
     # generate consensus components: calculate pairwise grouping of features across analyses
+    compsGroupsList <- sapply(compsFeatsTabs, \(x) lapply(x, "[[", "group"), simplify = FALSE)
+    featGroupsList <- sapply(fTable, "[[", "group", simplify = FALSE)
+    coCount <- getComponNetCoMatrix(compsGroupsList, featGroupsList, names(fGroups))
     
-    gCount <- length(fGroups)
-    gNames <- names(fGroups)
-    coCount <- matrix(0, nrow = gCount, ncol = gCount, dimnames = list(gNames, gNames))
-    coPossible <- matrix(0, nrow = gCount, ncol = gCount, dimnames = list(gNames, gNames))
-    
-    for (ana in analyses(fGroups))
-    {
-        for (cmp in compsFeats[[ana]]$components)
-        {
-            for (fgi in cmp$group)
-            {
-                for (fgj in cmp$group)
-                {
-                    coCount[fgi, fgj] <- coCount[fgi, fgj] + 1
-                    if (fgi != fgj)
-                        coCount[fgj, fgi] <- coCount[fgj, fgi] + 1
-                }
-            }
-        }
-        
-        ft <- fTable[[ana]]
-        for (fgi in ft$group)
-        {
-            for (fgj in ft$group)
-            {
-                coPossible[fgi, fgj] <- coPossible[fgi, fgj] + 1
-                if (fgi != fgj)
-                    coPossible[fgj, fgi] <- coPossible[fgj, fgi] + 1
-            }
-        }
-    }
-    
-    coFrac <- coCount / coPossible
-    distm <- as.dist(1 - coFrac)
+    distm <- as.dist(1 - coCount)
     hc <- fastcluster::hclust(distm, method = "complete") # UNDONE: make configurable
     ct <- cutree(hc, h = 0.5) # UNDONE: make configurable
     

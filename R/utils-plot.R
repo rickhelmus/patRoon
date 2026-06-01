@@ -311,10 +311,7 @@ makeEIXPlot <- function(featPlotTab, anaInfo, gInfo, showPeakArea, showFGroupRec
                 rect(xRange[1], 0, xRange[2], maxInt, border = "red", lty = "dotted")
             
             if (!is.null(featTabGrp[["annotation"]]))
-            {
-                ftga <- featTabGrp[nzchar(annotation)]
-                text(mean(featTabGrp$x), maxInt + ylim[2] * 0.02, featTabGrp$annotation)
-            }
+                text(mean(featTabGrp$x), maxInt + ylim[2] * 0.02, featTabGrp$annotation[1])
         }
         
         if (showProgress)

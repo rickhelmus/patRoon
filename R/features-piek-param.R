@@ -5,7 +5,7 @@
 #' @include param.R
 NULL
 
-getFeaturesPiekParamDefs <- memoise(\() list(
+getFeaturesPiekParamDefs <- paramConfigDefsFact(list(
     genEICParams = list(
         default = getPiekEICParams(),
         description = "Parameters for EIC generation (use getPiekEICParams())",

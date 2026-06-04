@@ -27,3 +27,14 @@ paramConfigDefsFact <- function(li)
         return(defs)
     }
 }
+
+prepAndVerifyParamForCall <- function(param, classN, ...)
+{
+    checkmate::assertClass(param, classN)
+    
+    overrideArgs <- list(...)
+    for (arg in names(overrideArgs))
+        param[[arg]] <- overrideArgs[[arg]]
+    
+    return(as.list(param))
+}

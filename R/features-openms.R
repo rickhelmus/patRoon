@@ -178,13 +178,12 @@ setMethod("findFeaturesPOpenMS", "data.frame", function(obj, param, ...)
 {
     # UNDONE: adjust param for ...
     # UNDONE: assert param
-    do.call(findFeaturesOpenMS, c(list(obj), as.list(param)))
+    do.call(findFeaturesOpenMS, c(list(obj), prepAndVerifyParamForCall(param, "FeaturesOpenMSParam", ...)))
 })
 
 setMethod("findFeaturesP", c("data.frame", "FeaturesOpenMSParam"), function(obj, param, ...)
 {
-    # UNDONE: merge with above or make util
-    do.call(findFeaturesOpenMS, c(list(obj), as.list(param)))
+    do.call(findFeaturesOpenMS, c(list(obj), prepAndVerifyParamForCall(param, "FeaturesOpenMSParam", ...)))
 })
 
 getOpenMSFFCommand <- function(datafile, out, noiseThrInt, chromSNR, chromFWHM, mzPPM, reEstimateMTSD,

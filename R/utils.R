@@ -655,7 +655,9 @@ memoise <- function(fun)
     memory <- list()
     function(...)
     {
-        valueName <- if (...length() == 1) as.character(..1) else makeHash(..., checkDT = FALSE)
+        # HACK: if length(...) == 0 set a dummy string, as memory[[integer]] will throw an error instead of NULL if the
+        # index does not yet exist
+        valueName <- if (...length() == 0) "1" else if (...length() == 1) as.character(..1) else makeHash(..., checkDT = FALSE)
         if (!is.null(memory[[valueName]]))
             return(memory[[valueName]])
         res <- fun(...)

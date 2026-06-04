@@ -41,7 +41,6 @@ Description: Provides an easy-to-use interface to a mass spectrometry based
     automatic reporting.
 License: GPL-3
 LazyData: TRUE
-RoxygenNote: 7.3.3
 URL: https://github.com/rickhelmus/patRoon
 BugReports: https://github.com/rickhelmus/patRoon/issues
 Encoding: UTF-8
@@ -244,6 +243,7 @@ Collate:
     'features-envipick.R'
     'features-kpic2.R'
     'param.R'
+    'features-openms-param.R'
     'features-openms.R'
     'features-optimize.R'
     'features-optimize-envipick.R'
@@ -251,12 +251,14 @@ Collate:
     'features-optimize-openms.R'
     'features-optimize-xcms.R'
     'features-optimize-xcms3.R'
+    'features-piek-param.R'
     'features-piek.R'
     'features-safd.R'
     'features-sirius.R'
     'features-table.R'
     'features-tasq.R'
     'features-xcms.R'
+    'features-xcms3-param.R'
     'features-xcms3.R'
     'formulas-genform.R'
     'formulas-set.R'
@@ -310,3 +312,4 @@ Collate:
     'workflow-wrappers.R'
     'zzz.R'
 VignetteBuilder: knitr
+Config/roxygen2/version: 8.0.0

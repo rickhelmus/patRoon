@@ -713,6 +713,16 @@ findFeaturesPiek <- function(analysisInfo, genEICParams = getPiekEICParams(),
                         fromIMS = IMS, mzProfiles = mzProfiles, EIMs = EIMs))
 }
 
+setMethod("findFeaturesPPiek", "data.frame", function(obj, param, ...)
+{
+    do.call(findFeaturesPiek, c(list(obj), prepAndVerifyParamForCall(param, "FeaturesPiekParam", ...)))
+})
+
+setMethod("findFeaturesP", c("data.frame", "FeaturesPiekParam"), function(obj, param, ...)
+{
+    do.call(findFeaturesPiek, c(list(obj), prepAndVerifyParamForCall(param, "FeaturesPiekParam", ...)))
+})
+
 #' @param \dots Any additional parameters to be set in the returned parameter list. These will override the defaults.
 #'   See the \verb{EIC generation parameters} section for details.
 #' 

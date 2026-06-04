@@ -33,3 +33,27 @@ setMethod("findFeaturesP", c("workflow", "FeaturesXCMS3Param"),
 #' @rdname findFeaturesXCMS3
 setMethod("findFeaturesPXCMS3", "workflow",
           \(obj, param = NULL, ...) doWfFeat(obj, algo = "XCMS3", param = param, ...))
+
+#' @rdname findFeaturesEnviPick
+setMethod("findFeaturesP", c("workflow", "FeaturesEnviPickParam"),
+          \(obj, param = NULL, ...) doWfFeat(obj, algo = "EnviPick", param = param, ...))
+
+#' @rdname findFeaturesEnviPick
+setMethod("findFeaturesPEnviPick", "workflow",
+          \(obj, param = NULL, ...) doWfFeat(obj, algo = "EnviPick", param = param, ...))
+
+#' @rdname findFeaturesKPIC2
+setMethod("findFeaturesP", c("workflow", "FeaturesKPIC2Param"),
+          \(obj, param = NULL, ...) doWfFeat(obj, algo = "KPIC2", param = param, ...))
+
+#' @rdname findFeaturesKPIC2
+setMethod("findFeaturesPKPIC2", "workflow",
+          \(obj, param = NULL, ...) doWfFeat(obj, algo = "KPIC2", param = param, ...))
+
+#' @rdname findFeaturesPiek
+setMethod("findFeaturesP", c("workflow", "FeaturesPiekParam"),
+          \(obj, param = NULL, ...) doWfFeat(obj, algo = "Piek", param = param, ...))
+
+#' @rdname findFeaturesPiek
+setMethod("findFeaturesPPiek", "workflow",
+          \(obj, param = NULL, ...) doWfFeat(obj, algo = "Piek", param = param, ...))

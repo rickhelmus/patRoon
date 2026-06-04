@@ -98,23 +98,17 @@ findFeaturesXCMS3 <- function(analysisInfo, param = xcms::CentWaveParam(), ..., 
     return(ret)
 }
 
-setMethod("findFeaturesPXCMS3", "data.frame", function(obj, param, ...)
+doFindFeaturesPXCMS3 <- function(obj, param, ...)
 {
-    # UNDONE: adjust param for ...
-    # UNDONE: assert param
-    
-    pl <- as.list(param)
+    pl <- prepAndVerifyParamForCall(param, "FeaturesXCMS3Param", ...)
     xParamClass <- paste0(pl$algo, "Param")
     xParam <- do.call(new, c(list(xParamClass), pl[[xParamClass]]))
     
     do.call(findFeaturesXCMS3, c(list(obj, param = xParam, verbose = pl$verbose), pl$extraOpts))
-})
+}
 
-setMethod("findFeaturesP", c("data.frame", "FeaturesOpenMSParam"), function(obj, param, ...)
-{
-    # UNDONE: merge with above or make util
-    do.call(findFeaturesOpenMS, c(list(obj), as.list(param)))
-})
+setMethod("findFeaturesPXCMS3", "data.frame", doFindFeaturesPXCMS3)
+setMethod("findFeaturesP", c("data.frame", "FeaturesXCMS3Param"), doFindFeaturesPXCMS3)
 
 #' Imports features from XCMS (new interface)
 #'

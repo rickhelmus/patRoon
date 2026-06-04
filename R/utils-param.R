@@ -28,7 +28,7 @@ paramConfigDefsFact <- function(li)
     }
 }
 
-prepAndVerifyParamForCall <- function(param, classN, ...)
+prepAndVerifyParamForCall <- function(param, classN, ..., exOptsToDots = FALSE)
 {
     checkmate::assertClass(param, classN)
     
@@ -36,5 +36,13 @@ prepAndVerifyParamForCall <- function(param, classN, ...)
     for (arg in names(overrideArgs))
         param[[arg]] <- overrideArgs[[arg]]
     
-    return(as.list(param))
+    ret <- as.list(param)
+    
+    if (exOptsToDots)
+    {
+        ret <- c(ret, "..." = ret$extraOpts)
+        ret$extraOpts <- NULL
+    }    
+    
+    return(ret)
 }

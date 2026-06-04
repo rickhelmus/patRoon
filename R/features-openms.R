@@ -176,8 +176,6 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
 
 setMethod("findFeaturesPOpenMS", "data.frame", function(obj, param, ...)
 {
-    # UNDONE: adjust param for ...
-    # UNDONE: assert param
     do.call(findFeaturesOpenMS, c(list(obj), prepAndVerifyParamForCall(param, "FeaturesOpenMSParam", ...)))
 })
 

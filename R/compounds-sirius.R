@@ -248,7 +248,7 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
     if (verbose)
     {
         ngrp <- length(compTabs)
-        printf("Assigned %d compounds to %d feature groups (%.2f%%).\n", sum(sapply(compTabs, nrow)),
+        printf("Assigned %d compounds to %d feature groups (%.2f%%).\n", if (ngrp > 0) sum(sapply(compTabs, nrow)) else 0L,
                ngrp, if (length(fGroups) == 0) 0 else ngrp * 100 / length(fGroups))
     }
     

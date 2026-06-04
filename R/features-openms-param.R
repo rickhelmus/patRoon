@@ -142,6 +142,11 @@ getFeaturesOpenMSParamDefs <- paramConfigDefsFact(list(
         default = FALSE,
         description = "Use feature finding MS intensities",
         type = "flag"
+    ),
+    verbose = list(
+        default = TRUE,
+        description = "Verbose output",
+        type = "flag"
     )
 ))
 

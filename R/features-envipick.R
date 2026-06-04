@@ -88,6 +88,17 @@ findFeaturesEnviPick <- function(analysisInfo, ..., parallel = TRUE, verbose = T
     return(ret)
 }
 
+setMethod("findFeaturesPEnviPick", "data.frame", function(obj, param, ...)
+{
+    do.call(findFeaturesEnviPick, c(list(obj), prepAndVerifyParamForCall(param, "FeaturesEnviPickParam", ..., exOptsToDots = TRUE)))
+})
+
+setMethod("findFeaturesP", c("data.frame", "FeaturesEnviPickParam"), function(obj, param, ...)
+{
+    do.call(findFeaturesEnviPick, c(list(obj), prepAndVerifyParamForCall(param, "FeaturesEnviPickParam", ..., exOptsToDots = TRUE)))
+})
+
+
 # nocov start
 
 #' Imports features from enviMass

@@ -119,8 +119,17 @@ setGeneric("getPICSet", function(obj, ...) standardGeneric("getPICSet"))
 #' @rdname findFeatures
 setGeneric("findFeaturesP", function(obj, param, ...) standardGeneric("findFeaturesP"))
 
+#' @rdname findFeaturesPEnviPick
+setGeneric("findFeaturesPEnviPick", function(obj, ...) standardGeneric("findFeaturesPEnviPick"))
+
+#' @rdname findFeaturesPKPIC2
+setGeneric("findFeaturesPKPIC2", function(obj, ...) standardGeneric("findFeaturesPKPIC2"))
+
 #' @rdname findFeaturesOpenMS
 setGeneric("findFeaturesPOpenMS", function(obj, ...) standardGeneric("findFeaturesPOpenMS"))
+
+#' @rdname findFeaturesPPiek
+setGeneric("findFeaturesPPiek", function(obj, ...) standardGeneric("findFeaturesPPiek"))
 
 #' @rdname findFeaturesPXCMS3
 setGeneric("findFeaturesPXCMS3", function(obj, ...) standardGeneric("findFeaturesPXCMS3"))

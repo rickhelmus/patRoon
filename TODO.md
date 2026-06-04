@@ -1,5 +1,9 @@
 # Priority
 
+## SIRIUS
+
+- update tests, including newProject()
+
 ## general
 
 

@@ -137,8 +137,14 @@ setGeneric("findFeaturesPXCMS3", function(obj, ...) standardGeneric("findFeature
 #' @name groupFeatures
 setGeneric("groupFeatures", function(obj, algorithm, ...) standardGeneric("groupFeatures"))
 
+#' @rdname groupFeatures
+setGeneric("groupFeaturesP", function(obj, param, ...) standardGeneric("groupFeaturesP"))
+
 #' @rdname groupFeaturesOpenMS
 setGeneric("groupFeaturesOpenMS", function(feat, ...) standardGeneric("groupFeaturesOpenMS"))
+
+#' @rdname groupFeaturesOpenMS
+setGeneric("groupFeaturesPOpenMS", function(obj, ...) standardGeneric("groupFeaturesPOpenMS"))
 
 #' @rdname groupFeaturesXCMS
 setGeneric("groupFeaturesXCMS", function(feat, ...) standardGeneric("groupFeaturesXCMS"))

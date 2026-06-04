@@ -18,6 +18,12 @@ doWfFeat <- function(..., algo)
              paramClass = paste0("Features", algo, "Param"), ...)
 }
 
+doWfGroupFeat <- function(..., algo)
+{
+    doWfStep(func = paste0("groupFeaturesP", algo), slotNameIn = "features", slotNameOut = "fGroups",
+             paramClass = paste0("FeatureGroups", algo, "Param"), ...)
+}
+
 #' @rdname findFeaturesOpenMS
 setMethod("findFeaturesP", c("workflow", "FeaturesOpenMSParam"),
           \(obj, param = NULL, ...) doWfFeat(obj, algo = "OpenMS", param = param, ...))
@@ -57,3 +63,11 @@ setMethod("findFeaturesP", c("workflow", "FeaturesPiekParam"),
 #' @rdname findFeaturesPiek
 setMethod("findFeaturesPPiek", "workflow",
           \(obj, param = NULL, ...) doWfFeat(obj, algo = "Piek", param = param, ...))
+
+#' @rdname groupFeaturesOpenMS
+setMethod("groupFeaturesP", c("workflow", "FeatureGroupsOpenMSParam"),
+          \(obj, param = NULL, ...) doWfGroupFeat(obj, algo = "OpenMS", param = param, ...))
+
+#' @rdname groupFeaturesOpenMS
+setMethod("groupFeaturesPOpenMS", "workflow",
+          \(obj, param = NULL, ...) doWfGroupFeat(obj, algo = "OpenMS", param = param, ...))

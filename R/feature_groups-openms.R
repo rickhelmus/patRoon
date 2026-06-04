@@ -4,6 +4,7 @@
 
 #' @include features.R
 #' @include feature_groups.R
+#' @include feature_groups-openms-param.R
 NULL
 
 #' @rdname featureGroups-class
@@ -80,6 +81,16 @@ setMethod("groupFeaturesOpenMS", "features", function(feat, rtalign = TRUE, QT =
     
     return(doGroupFeatures(feat, doGroupFeaturesOpenMS, "openms", rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT,
                            maxGroupMZ, extraOptsRT, extraOptsGroup, verbose = verbose))
+})
+
+setMethod("groupFeaturesPOpenMS", "features", function(obj, param, ...)
+{
+    do.call(groupFeaturesOpenMS, c(list(obj), prepAndVerifyParamForCall(param, "FeatureGroupsOpenMSParam", ...)))
+})
+
+setMethod("groupFeaturesP", c("features", "FeatureGroupsOpenMSParam"), function(obj, param, ...)
+{
+    do.call(groupFeaturesOpenMS, c(list(obj), prepAndVerifyParamForCall(param, "FeatureGroupsOpenMSParam", ...)))
 })
 
 generateConsensusXML <- function(feat, out, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT,

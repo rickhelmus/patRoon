@@ -5,7 +5,8 @@
 #' @include param.R
 NULL
 
-getFeaturesXCMS3ParamDefs <- memoise(\() list(
+getFeaturesXCMS3ParamDefs <- paramConfigDefsFact(list(
+    # BUG/UNDONE: the as() calls can sometimes fail
     algo = list(
         default = "CentWave",
         description = "Algorithm to use for feature detection",

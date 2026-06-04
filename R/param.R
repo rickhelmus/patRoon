@@ -1,7 +1,3 @@
-defaultParam <- setClass("defaultParam", slots = c(dummy = "ANY"))
-DEFAULT <- defaultParam()
-isDefault <- function(x) inherits(x, "defaultParam")
-
 paramListFillDefaults <- function(paramList, definitions)
 {
     fillDefaults <- function(li, defs)
@@ -25,7 +21,8 @@ setMethod("show", "defaultParam", function(object)
 })
 
 param <- setClass("param", slots = c(name = "character", baseName = "character", description = "character",
-                                     version = "character", date = "POSIXct", definitions = "list", data = "list"),
+                                     version = "character", date = "POSIXct", definitions = "ParamConfigDefs",
+                                     data = "list"),
                   contains = "VIRTUAL")
 
 setMethod("initialize", "param", function(.Object, name, baseName, description, version,

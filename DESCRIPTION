@@ -242,6 +242,7 @@ Collate:
     'features-bruker.R'
     'features-envipick.R'
     'features-kpic2.R'
+    'utils-param.R'
     'param.R'
     'features-openms-param.R'
     'features-openms.R'

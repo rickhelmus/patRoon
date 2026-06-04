@@ -6,7 +6,7 @@
 #' @include utils-param.R
 NULL
 
-getFeaturesOpenMSParamDefs <- memoise(\() list(
+getFeaturesOpenMSParamDefs <- paramConfigDefsFact(list(
     noiseThrInt = list(
         default = 1000,
         description = "Intensity threshold",

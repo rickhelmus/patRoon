@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 #' @include main.R
+#' @include feature_groups-greedy-param.R
 NULL
 
 #' @rdname featureGroups-class
@@ -72,6 +73,18 @@ setMethod("groupFeaturesGreedy", "features", function(feat, rtalign = FALSE,
     
     return(doGroupFeatures(feat, doGroupFeaturesGreedy, "greedy", rtWindow, mzWindow, mobWindow, scoreWeights,
                            verbose = verbose))
+})
+
+#' @rdname groupFeaturesGreedy
+setMethod("groupFeaturesPGreedy", "features", function(obj, param, ...)
+{
+    do.call(groupFeaturesGreedy, c(list(obj), prepAndVerifyParamForCall(param, "FeatureGroupsGreedyParam", ...)))
+})
+
+#' @rdname groupFeaturesGreedy
+setMethod("groupFeaturesP", c("features", "FeatureGroupsGreedyParam"), function(obj, param, ...)
+{
+    do.call(groupFeaturesGreedy, c(list(obj), prepAndVerifyParamForCall(param, "FeatureGroupsGreedyParam", ...)))
 })
 
 doGroupFeaturesGreedy <- function(feat, rtWindow, mzWindow, mobWindow, scoreWeights, verbose)

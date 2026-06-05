@@ -4,6 +4,7 @@
 
 #' @include main.R
 #' @include feature_groups.R
+#' @include feature_groups-kpic2-param.R
 NULL
 
 #' @rdname featureGroups-class
@@ -65,6 +66,18 @@ setMethod("groupFeaturesKPIC2", "features", function(feat, rtalign = TRUE, loadR
     doG <- \(feat, ...) doGroupFeaturesKPIC2(feat, getPICSet(feat, loadRawData = loadRawData, IMS = "both"), ...)
     return(doGroupFeatures(feat, doG, "kpic2", rtalign = rtalign, loadRawData = loadRawData, groupArgs = groupArgs,
                            alignArgs = alignArgs, verbose = verbose))
+})
+
+#' @rdname groupFeaturesKPIC2
+setMethod("groupFeaturesPKPIC2", "features", function(obj, param, ...)
+{
+    do.call(groupFeaturesKPIC2, c(list(obj), prepAndVerifyParamForCall(param, "FeatureGroupsKPIC2Param", ...)))
+})
+
+#' @rdname groupFeaturesKPIC2
+setMethod("groupFeaturesP", c("features", "FeatureGroupsKPIC2Param"), function(obj, param, ...)
+{
+    do.call(groupFeaturesKPIC2, c(list(obj), prepAndVerifyParamForCall(param, "FeatureGroupsKPIC2Param", ...)))
 })
 
 #' @rdname groupFeaturesKPIC2

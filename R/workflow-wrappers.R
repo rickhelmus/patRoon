@@ -71,3 +71,27 @@ setMethod("groupFeaturesP", c("workflow", "FeatureGroupsOpenMSParam"),
 #' @rdname groupFeaturesOpenMS
 setMethod("groupFeaturesPOpenMS", "workflow",
           \(obj, param = NULL, ...) doWfGroupFeat(obj, algo = "OpenMS", param = param, ...))
+
+#' @rdname groupFeaturesXCMS3
+setMethod("groupFeaturesP", c("workflow", "FeatureGroupsXCMS3Param"),
+          \(obj, param = NULL, ...) doWfGroupFeat(obj, algo = "XCMS3", param = param, ...))
+
+#' @rdname groupFeaturesXCMS3
+setMethod("groupFeaturesPXCMS3", "workflow",
+          \(obj, param = NULL, ...) doWfGroupFeat(obj, algo = "XCMS3", param = param, ...))
+
+#' @rdname groupFeaturesKPIC2
+setMethod("groupFeaturesP", c("workflow", "FeatureGroupsKPIC2Param"),
+          \(obj, param = NULL, ...) doWfGroupFeat(obj, algo = "KPIC2", param = param, ...))
+
+#' @rdname groupFeaturesKPIC2
+setMethod("groupFeaturesPKPIC2", "workflow",
+          \(obj, param = NULL, ...) doWfGroupFeat(obj, algo = "KPIC2", param = param, ...))
+
+#' @rdname groupFeaturesGreedy
+setMethod("groupFeaturesP", c("workflow", "FeatureGroupsGreedyParam"),
+          \(obj, param = NULL, ...) doWfGroupFeat(obj, algo = "Greedy", param = param, ...))
+
+#' @rdname groupFeaturesGreedy
+setMethod("groupFeaturesPGreedy", "workflow",
+          \(obj, param = NULL, ...) doWfGroupFeat(obj, algo = "Greedy", param = param, ...))

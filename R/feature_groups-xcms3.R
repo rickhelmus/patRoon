@@ -4,6 +4,7 @@
 
 #' @include main.R
 #' @include feature_groups.R
+#' @include feature_groups-xcms3-param.R
 NULL
 
 #' @rdname featureGroups-class
@@ -75,6 +76,18 @@ setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = TRUE, loadR
     
     return(doGroupFeatures(feat, doG, "xcms3", rtalign = rtalign, loadRawData = loadRawData, groupParam = groupParam,
                            preGroupParam = preGroupParam, retAlignParam = retAlignParam, verbose = verbose))
+})
+
+#' @rdname groupFeaturesXCMS3
+setMethod("groupFeaturesPXCMS3", "features", function(obj, param, ...)
+{
+    do.call(groupFeaturesXCMS3, c(list(obj), prepAndVerifyParamForCall(param, "FeatureGroupsXCMS3Param", ...)))
+})
+
+#' @rdname groupFeaturesXCMS3
+setMethod("groupFeaturesP", c("features", "FeatureGroupsXCMS3Param"), function(obj, param, ...)
+{
+    do.call(groupFeaturesXCMS3, c(list(obj), prepAndVerifyParamForCall(param, "FeatureGroupsXCMS3Param", ...)))
 })
 
 #' @rdname groupFeaturesXCMS3

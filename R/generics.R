@@ -152,11 +152,20 @@ setGeneric("groupFeaturesXCMS", function(feat, ...) standardGeneric("groupFeatur
 #' @rdname groupFeaturesXCMS3
 setGeneric("groupFeaturesXCMS3", function(feat, ...) standardGeneric("groupFeaturesXCMS3"))
 
+#' @rdname groupFeaturesXCMS3
+setGeneric("groupFeaturesPXCMS3", function(obj, ...) standardGeneric("groupFeaturesPXCMS3"))
+
 #' @rdname groupFeaturesKPIC2
 setGeneric("groupFeaturesKPIC2", function(feat, ...) standardGeneric("groupFeaturesKPIC2"))
 
+#' @rdname groupFeaturesKPIC2
+setGeneric("groupFeaturesPKPIC2", function(obj, ...) standardGeneric("groupFeaturesPKPIC2"))
+
 #' @rdname groupFeaturesGreedy
 setGeneric("groupFeaturesGreedy", function(feat, ...) standardGeneric("groupFeaturesGreedy"))
+
+#' @rdname groupFeaturesGreedy
+setGeneric("groupFeaturesPGreedy", function(obj, ...) standardGeneric("groupFeaturesPGreedy"))
 
 #' @name check-GUI
 setGeneric("checkFeatures", function(fGroups, session = "checked-features.yml", EICParams = getDefEICParams(),

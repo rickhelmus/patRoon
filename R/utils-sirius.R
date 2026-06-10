@@ -234,13 +234,16 @@ runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUS
                     ret$precursorMz = pmz
                 return(ret)
             }
-            addSIRFeature <- function(id, pl, add)
+            addSIRFeature <- function(id, pl, add, ch)
             {
                 plmz <- pl$MS[precursor == TRUE]$mz
                 # UNDONE: charge can be set, but only charge 1 is supported by SIRIUS docs? (https://v6.docs.sirius-ms.io/adducts/)
-                # charge = fgAdd$grpAdducts[[g]]@charge
+                if (ch < -1L)
+                    ch <- -1L
+                else if (ch > 2L)
+                    ch <- 1L
                 RSirius::FeatureImport$new(externalFeatureId = id, ionMass = plmz,
-                                           detectedAdducts = list(add), charge = 1L,
+                                           detectedAdducts = list(add), charge = ch,
                                            mergedMs1 = makeSIRSpec(pl$MS, 1L, plmz),
                                            ms2Spectra = list(makeSIRSpec(pl$MSMS, 2L, plmz)))
             }
@@ -252,15 +255,16 @@ runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUS
                     pruneList(sapply(gNamesTBD, function(fg)
                     {
                         if (is.null(cachedData[[ana]][[fg]]) && doFGroup(fg, ana))
-                            addSIRFeature(paste0(ana, "_", fg), MSPeakLists[[ana, fg]], fgAdd$grpAdductsChr[[fg]])
+                            addSIRFeature(paste0(ana, "_", fg), MSPeakLists[[ana, fg]], fgAdd$grpAdductsChr[[fg]],
+                                          fgAdd$grpAdducts[[fg]]@charge)
                     }, simplify = FALSE))
                 }, simplify = FALSE)
                 unlist(sfeats, recursive = FALSE)
             }
             else
             {
-                sapply(gNamesTBD,
-                       \(fg) addSIRFeature(fg, MSPeakLists[[fg]], fgAdd$grpAdductsChr[[fg]]), simplify = FALSE)
+                sapply(gNamesTBD, \(fg) addSIRFeature(fg, MSPeakLists[[fg]], fgAdd$grpAdductsChr[[fg]],
+                                                      fgAdd$grpAdducts[[fg]]@charge), simplify = FALSE)
             }
             
             stopifnot(length(SIRFeatList) > 0)

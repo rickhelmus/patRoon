@@ -251,6 +251,7 @@ getDefEIXParams <- function()
         topMost = NULL,
         topMostByReplicate = FALSE,
         onlyPresent = TRUE,
+        mzMinWindow = 0,
         mzExpWindow = defaultLim("mz", "very_narrow"),
         mobExpWindow = defaultLim("mobility", "very_narrow"),
         mzExpMobWindow = defaultLim("mz", "medium"),
@@ -320,6 +321,12 @@ extendEIXInputTab <- function(tab, type, EIXParams, hasIMS, fromIMS)
         tab[, c("mobmin", "mobmax") := .(mobmin - EIXParams$window, mobmax + EIXParams$window)]
     if (hasIMS && !fromIMS)
         tab[, c("mzmin", "mzmax") := .(mzmin - EIXParams$mzExpMobWindow, mzmax + EIXParams$mzExpMobWindow)]
+    # UNDONE
+    if (EIXParams$mzMinWindow > 0)
+    {
+        tab[, c("mzmin", "mzmax") := .(pmin(mzmin, (mzmax+mzmin)/2 - EIXParams$mzMinWindow),
+                                       pmax(mzmax, (mzmax+mzmin)/2 + EIXParams$mzMinWindow))]
+    }
     return(tab)
 }
 

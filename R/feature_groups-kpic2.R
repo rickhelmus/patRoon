@@ -69,18 +69,6 @@ setMethod("groupFeaturesKPIC2", "features", function(feat, rtalign = TRUE, loadR
 })
 
 #' @rdname groupFeaturesKPIC2
-setMethod("groupFeaturesPKPIC2", "features", function(obj, param, ...)
-{
-    do.call(groupFeaturesKPIC2, c(list(obj), prepAndVerifyParamForCall(param, "FeatureGroupsKPIC2Param", ...)))
-})
-
-#' @rdname groupFeaturesKPIC2
-setMethod("groupFeaturesP", c("features", "FeatureGroupsKPIC2Param"), function(obj, param, ...)
-{
-    do.call(groupFeaturesKPIC2, c(list(obj), prepAndVerifyParamForCall(param, "FeatureGroupsKPIC2Param", ...)))
-})
-
-#' @rdname groupFeaturesKPIC2
 #' @export
 setMethod("groupFeaturesKPIC2", "featuresSet", function(feat, groupArgs = list(tolerance = c(0.005, 12)),
                                                         verbose = TRUE)
@@ -188,6 +176,18 @@ importFeatureGroupsKPIC2FromFeat <- function(picsSetGrouped, analysisInfo, feat)
     return(featureGroupsKPIC2(picsSetGrouped = picsSetGrouped, groups = groups, groupInfo = gInfo, features = feat,
                               ftindex = ftindex))
 }
+
+#' @rdname groupFeaturesKPIC2
+setMethod("groupFeaturesPKPIC2", "features", function(obj, param, ...)
+{
+    do.call(groupFeaturesKPIC2, c(list(obj), prepAndVerifyParamForCall(param, "FeatureGroupsKPIC2Param", ...)))
+})
+
+#' @rdname groupFeaturesKPIC2
+setMethod("groupFeaturesP", c("features", "FeatureGroupsKPIC2Param"), function(obj, param, ...)
+{
+    do.call(groupFeaturesKPIC2, c(list(obj), prepAndVerifyParamForCall(param, "FeatureGroupsKPIC2Param", ...)))
+})
 
 #' Imports feature groups from KPIC2
 #'

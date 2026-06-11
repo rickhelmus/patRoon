@@ -75,18 +75,6 @@ setMethod("groupFeaturesGreedy", "features", function(feat, rtalign = FALSE,
                            verbose = verbose))
 })
 
-#' @rdname groupFeaturesGreedy
-setMethod("groupFeaturesPGreedy", "features", function(obj, param, ...)
-{
-    do.call(groupFeaturesGreedy, c(list(obj), prepAndVerifyParamForCall(param, "FeatureGroupsGreedyParam", ...)))
-})
-
-#' @rdname groupFeaturesGreedy
-setMethod("groupFeaturesP", c("features", "FeatureGroupsGreedyParam"), function(obj, param, ...)
-{
-    do.call(groupFeaturesGreedy, c(list(obj), prepAndVerifyParamForCall(param, "FeatureGroupsGreedyParam", ...)))
-})
-
 doGroupFeaturesGreedy <- function(feat, rtWindow, mzWindow, mobWindow, scoreWeights, verbose)
 {
     hash <- makeHash(feat, rtWindow, mzWindow, mobWindow, scoreWeights)
@@ -184,3 +172,15 @@ doGroupFeaturesGreedy <- function(feat, rtWindow, mzWindow, mobWindow, scoreWeig
     saveCacheData("groupFeaturesGreedy", ret, hash)
     return(ret)
 }
+
+#' @rdname groupFeaturesGreedy
+setMethod("groupFeaturesPGreedy", "features", function(obj, param, ...)
+{
+    do.call(groupFeaturesGreedy, c(list(obj), prepAndVerifyParamForCall(param, "FeatureGroupsGreedyParam", ...)))
+})
+
+#' @rdname groupFeaturesGreedy
+setMethod("groupFeaturesP", c("features", "FeatureGroupsGreedyParam"), function(obj, param, ...)
+{
+    do.call(groupFeaturesGreedy, c(list(obj), prepAndVerifyParamForCall(param, "FeatureGroupsGreedyParam", ...)))
+})

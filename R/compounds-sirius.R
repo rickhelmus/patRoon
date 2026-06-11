@@ -230,11 +230,13 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
             return(NULL)
         
         # add in formula info
-        colsRename <- setdiff(names(res$formCands), c("formulaId", "fragInfo", "explainedPeaks"))
+        colsRename <- setdiff(names(res$formCands), c("formulaId", "fragInfo", "explainedPeaks", "explainablePeaks",
+                                                      "totalExplainedIntensity", "medAbsMassDev", "medRelMassDev",
+                                                      "ion_formula", "ion_formula_mz", "neutralMass"))
         setnames(res$formCands, colsRename, paste0("formula_", colsRename))
         tab <- merge(tab, res$formCands, by = "formulaId", sort = FALSE)
         
-        tab <- removeDTColumnsIfPresent(tab, "formulaId")
+        tab <- removeDTColumnsIfPresent(tab, c("formulaId", "formula_neutral_formula", "formula_adduct"))
         
         return(tab)
     }

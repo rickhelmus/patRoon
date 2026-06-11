@@ -86,14 +86,25 @@ openSIRIUSProject <- function(projectPath, SIRIUSAPI, runMode)
     return(projectID)
 }
 
-getSIRIUSFormulaCandidates <- function(projectID, SIRIUSAPI, SIRFeatID)
+getSIRIUSFormulaCandidates <- function(projectID, SIRIUSAPI, SIRFeatID, adduct)
 {
-    formCands <- SIRIUSAPI$features_api$GetFormulaCandidates(projectID, SIRFeatID)
+    formCands <- SIRIUSAPI$features_api$GetFormulaCandidates(projectID, SIRFeatID, opt_fields = "statistics")
     if (length(formCands) == 0)
         return(data.table())
-    tab <- rbindlist(lapply(formCands, \(fc) fc$toList()), fill = TRUE)
-    setnames(tab, c("molecularFormula", "siriusScore", "siriusScoreNormalized", "isotopeScore", "treeScore"),
-             c("neutral_formula", "score", "scoreNormalized", "isoScore", "MSMSScore"), skip_absent = TRUE)
+    tab <- rbindlist(lapply(formCands, function(fc)
+    {
+        l <- fc$toList()
+        l$medAbsMassDev <- l$medianMassDeviation$absolute
+        l$medRelMassDev <- l$medianMassDeviation$ppm
+        l$medianMassDeviation <- NULL
+        return(l)
+    }), fill = TRUE)
+    # NOTE: explainedPeaks is re-caclulated later, but putting it now places the column before explainablePeaks
+    setnames(tab,
+             c("molecularFormula", "siriusScore", "siriusScoreNormalized", "isotopeScore", "treeScore",
+               "numOfExplainedPeaks", "numOfExplainablePeaks"),
+             c("neutral_formula", "score", "scoreNormalized", "isoScore", "MSMSScore", "explainedPeaks",
+               "explainablePeaks"), skip_absent = TRUE)
     return(tab)
 }
 
@@ -313,6 +324,8 @@ runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUS
             fragInfos <- getSIRIUSFragInfos(projectID, SIRIUSAPI, sirFeat$alignedFeatureId, ret$formCands$formulaId, PLMS2)
             set(ret$formCands, j = "fragInfo", value = fragInfos[ret$formCands$formulaId])
             set(ret$formCands, j = "explainedPeaks", value = sapply(ret$formCands$fragInfo, nrow))
+            
+            ret$formCands <- addMiscFormulaInfo(ret$formCands, fgAdd$grpAdducts[[sirFeat$externalFeatureId]])
             
             if (!formulasOnly)
             {

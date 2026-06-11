@@ -443,6 +443,8 @@ makeEmptyListNamed <- function(li)
     return(li)
 }
 
+removeListEntries <- function(li, n) li[!names(li) %chin% n]
+
 # based on tabular() from formatting vignette of roxygen
 # nocov start
 tabularRD <- function(df, ...)

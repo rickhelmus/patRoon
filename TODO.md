@@ -5,7 +5,9 @@
 
 ## Params
 
-- XCMS3: make XCMS3 param defaults nested (like now) or one default for whole param? Or make it an option, also applicable to other params?
+- XCMS3
+    - make XCMS3 param defaults nested (like now) or one default for whole param? Or make it an option, also applicable to other params?
+    - doc that Lama alignment is not yet supported (needs XCMS4)
 
 
 # Priority

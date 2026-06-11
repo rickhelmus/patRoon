@@ -79,18 +79,6 @@ setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = TRUE, loadR
 })
 
 #' @rdname groupFeaturesXCMS3
-setMethod("groupFeaturesPXCMS3", "features", function(obj, param, ...)
-{
-    do.call(groupFeaturesXCMS3, c(list(obj), prepAndVerifyParamForCall(param, "FeatureGroupsXCMS3Param", ...)))
-})
-
-#' @rdname groupFeaturesXCMS3
-setMethod("groupFeaturesP", c("features", "FeatureGroupsXCMS3Param"), function(obj, param, ...)
-{
-    do.call(groupFeaturesXCMS3, c(list(obj), prepAndVerifyParamForCall(param, "FeatureGroupsXCMS3Param", ...)))
-})
-
-#' @rdname groupFeaturesXCMS3
 #' @export
 setMethod("groupFeaturesXCMS3", "featuresSet", function(feat,
                                                         groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$replicate),
@@ -225,6 +213,40 @@ importFeatureGroupsXCMS3FromFeat <- function(xdata, analysisInfo, feat)
     
     return(ret)
 }
+
+doGroupFeaturesPXCMS3 <- function(obj, param, ..., lamas = NULL)
+{
+    pl <- prepAndVerifyParamForCall(param, "FeatureGroupsXCMS3Param", ...)
+    
+    # fill in some missing params that cannot be defaulted (see getFeatureGroupsXCMS3ParamDefs)
+    pl$groupPeakDensityParam$sampleGroups <- pl$preGroupPeakDensityParam$sampleGroups <- analysisInfo(obj)$replicate
+    if (!is.null(param@lamas))
+        pl$alignLamaParama$lamas <- param@lamas
+    if (!is.null(lamas))
+        pl$alignLamaParama$lamas <- lamas
+    
+    getXCMSParam <- function(algo, prefix)
+    {
+        xParamClass <- paste0(algo, "Param")
+        # HACK: inconsistency in xcms
+        if (xParamClass == "LamaParam")
+            xParamClass <- "LamaParama"
+        do.call(new, c(list(xParamClass), pl[[paste0(prefix, algo, "Param")]]))
+    }
+    
+    groupParam <- getXCMSParam(pl$groupAlgo, "group")
+    preGroupParam <- getXCMSParam(pl$preGroupAlgo, "preGroup")
+    alignParam <- getXCMSParam(pl$alignAlgo, "align")
+    
+    do.call(groupFeaturesXCMS3, c(list(obj, rtalign = pl$rtalign, loadRawData = pl$loadRawData, groupParam = groupParam,
+                                       preGroupParam = preGroupParam, retAlignParam = alignParam, verbose = pl$verbose)))
+}
+
+#' @rdname groupFeaturesXCMS3
+setMethod("groupFeaturesPXCMS3", "features", doGroupFeaturesPXCMS3)
+
+#' @rdname groupFeaturesXCMS3
+setMethod("groupFeaturesP", c("features", "FeatureGroupsXCMS3Param"), doGroupFeaturesPXCMS3)
 
 #' Imports feature groups from XCMS (new interface)
 #'

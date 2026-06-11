@@ -6,9 +6,11 @@
 #' @include utils-param.R
 NULL
 
-# UNDONE: some XCMS objects cannot be default constructed, set to NULL? Construct with given parameter? How to handle this in the GUI?
-# --> this is only for xcms::PeakDensityParam() (needs repl groups) and Lama (needs ref mz/rt values) --> set density automatically and not support lama for now?
 getFeatureGroupsXCMS3ParamDefs <- paramConfigDefsFact(list(
+    # NOTE: PeakDensityParam() and LamaParama() cannot be constructed completely from defaults. For these, we set a
+    # dummy value during construction and remove it after list conversion. The actual values are filled in prior to the
+    # actual feature grouping.
+    
     rtalign = list(
         default = TRUE,
         description = "If TRUE then retention times are aligned",
@@ -20,25 +22,25 @@ getFeatureGroupsXCMS3ParamDefs <- paramConfigDefsFact(list(
         type = "flag"
     ),
     groupAlgo = list(
-        default = "density",
+        default = "PeakDensity",
         description = "Algorithm to use for feature grouping (after alignment)",
         type = "choice",
         choices = c("PeakDensity", "NearestPeaks", "MzClust")
     ),
     alignAlgo = list(
-        default = "obiwarp",
+        default = "Obiwarp",
         description = "Algorithm to use for retention time alignment",
         type = "choice",
         choices = c("Obiwarp", "PeakGroups", "Lama")
     ),
     preGroupAlgo = list(
-        default = "density",
+        default = "PeakDensity",
         description = "Algorithm to use for feature grouping prior to alignment (only with peak groups alignment)",
         type = "choice",
         choices = c("PeakDensity", "NearestPeaks", "MzClust")
     ),
     groupPeakDensityParam = list(
-        default = as(xcms::PeakDensityParam(), "list"),
+        default = removeListEntries(as(xcms::PeakDensityParam(sampleGroups = "dummy"), "list"), "sampleGroups"),
         description = "PeakDensity XCMS parameters (use xcms::PeakDensityParam())",
         type = "list"
     ),
@@ -62,13 +64,13 @@ getFeatureGroupsXCMS3ParamDefs <- paramConfigDefsFact(list(
         description = "PeakGroups XCMS parameters (use xcms::PeakGroupsParam())",
         type = "list"
     ),
-    alignLamaParam = list(
-        default = as(xcms::LamaParama(), "list"),
+    alignLamaParama = list(
+        default = removeListEntries(as(xcms::LamaParama(lamas = data.frame(mz = 1, rt = 1)), "list"), "lamas"),
         description = "Lama XCMS parameters (use xcms::LamaParama())",
         type = "list"
     ),
     preGroupPeakDensityParam = list(
-        default = as(xcms::PeakDensityParam(), "list"),
+        default = removeListEntries(as(xcms::PeakDensityParam(sampleGroups = "dummy"), "list"), "sampleGroups"),
         description = "PeakDensity XCMS parameters for pre-alignment grouping (use xcms::PeakDensityParam())",
         type = "list"
     ),
@@ -89,10 +91,20 @@ getFeatureGroupsXCMS3ParamDefs <- paramConfigDefsFact(list(
     )
 ))
 
-FeatureGroupsXCMS3Param <- setClass("FeatureGroupsXCMS3Param", contains = "param")
-setMethod("initialize", "FeatureGroupsXCMS3Param", function(.Object, ...)
+FeatureGroupsXCMS3Param <- setClass("FeatureGroupsXCMS3Param", slots = c(lamas = "ANY"), contains = "param")
+setMethod("initialize", "FeatureGroupsXCMS3Param", function(.Object, ..., lamas = NULL)
 {
-    callNextMethod(.Object, name = "FeatureGroupsXCMS3Param", baseName = "FeatureGroupsXCMS3Param",
-                   description = "Parameters for XCMS3 feature grouping", version = "1.0",
-                   definitions = getFeatureGroupsXCMS3ParamDefs(), ...)
+    ret <- callNextMethod(.Object, name = "FeatureGroupsXCMS3Param", baseName = "FeatureGroupsXCMS3Param",
+                          description = "Parameters for XCMS3 feature grouping", version = "1.0",
+                          definitions = getFeatureGroupsXCMS3ParamDefs(), ...)
+    ret@lamas <- lamas # NOTE: assign here, as ... are passed to data slot in parent constructor
+    return(ret)
+})
+
+setValidity("FeatureGroupsXCMS3Param", function(object)
+{
+    parsFilled <- paramListFillDefaults(object@data, object@definitions)
+    if (parsFilled$alignAlgo == "Lama") # UNDONE: needs XCMS4 interface
+        return("Lama alignment algorithm is not yet supported.")
+    return(TRUE)
 })

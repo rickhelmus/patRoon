@@ -79,14 +79,15 @@ setValidity("param", function(object)
             checkmate::assertChoice(value, def$choices, add = ac)
         else if (def$type == "list")
         {
-            list_args <- list(x = value, types = def$types, names = def$names, null.ok = def$null.ok)
-            do.call(checkmate::assertList, c(list_args, list(add = ac)))
+            la <- list(x = value, types = def$types, names = def$names, null.ok = def$null.ok)
+            do.call(checkmate::assertList, c(la, list(add = ac)))
         }    
         else if (def$type == "count")
         {
-            count_args <- list(x = value, finite = TRUE)
-            if (!is.null(def$positive) && def$positive) count_args$positive <- TRUE
-            do.call(checkmate::assertCount, c(count_args, list(add = ac)))
+            ca <- list(x = value, finite = TRUE)
+            if (!is.null(def[["positive"]]) && def$positive)
+                ca$positive <- TRUE
+            do.call(checkmate::assertCount, c(ca, list(add = ac)))
         }
     }
     

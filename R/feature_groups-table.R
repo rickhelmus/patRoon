@@ -195,21 +195,12 @@ importFeatureGroupsTable <- function(input, analysisInfo, addCols = NULL, groupA
     if (hasIMS(importedFeat) && is.null(gInfo[["ims_precursor_group"]]))
         gInfo[, ims_precursor_group := NA_character_]
     
-    gTable <- data.table(matrix(0, nrow = nrow(analysisInfo), ncol = nrow(gInfo)))
-    setnames(gTable, gInfo$group)
-    ftindex <- data.table(matrix(0L, nrow = nrow(analysisInfo), ncol = nrow(gInfo)))
-    setnames(ftindex, gInfo$group)
-    for (grp in gInfo$group)
-    {
-        ftg <- input[group == grp, c("ID", "analysis", "intensity")]
-        anai <- match(ftg$analysis, analysisInfo$analysis) # align analysis order
-        
-        set(gTable, anai, grp, ftg$intensity)
-        
-        finds <- sapply(seq_len(nrow(ftg)), \(i) importedFeat[[ftg$analysis[i]]][ID == ftg$ID[i], which = TRUE])
-        set(ftindex, anai, grp, finds)
-    }
-    
+    input[, featRow := seq_len(.N), by = "analysis"]
+    gTable <- dcast(input, analysis ~ group, value.var = "intensity", fill = 0)
+    gTable <- gTable[match(analysisInfo$analysis, gTable$analysis)][, analysis := NULL][, gInfo$group, with = FALSE]
+    ftindex <- dcast(input, analysis ~ group, value.var = "featRow", fill = 0L)
+    ftindex <- ftindex[match(analysisInfo$analysis, ftindex$analysis)][, analysis := NULL][, gInfo$group, with = FALSE]
+
     constArgs <- list(groups = gTable, groupInfo = gInfo, ftindex = ftindex, features = importedFeat)
     ret <- if (hasSets)
     {

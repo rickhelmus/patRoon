@@ -63,9 +63,25 @@ setMethod("doGroupFeatures", "features", function(feat, grouper, groupAlgo, ...,
 
 reGenerateFTIndex <- function(fGroups)
 {
-    gNames <- names(fGroups)
-    fGroups@ftindex <- setnames(rbindlist(lapply(featureTable(fGroups),
-                                                 function(ft) as.list(chmatch(gNames, ft$group, 0)))), gNames)
+    if (length(fGroups) == 0)
+    {
+        fGroups@ftindex <- data.table()
+        return(fGroups)
+    }
+    
+    fTab <- as.data.table(getFeatures(fGroups))
+    fTab[, featRow := seq_len(.N), by = "analysis"]
+    ftindex <- dcast(fTab, analysis ~ group, value.var = "featRow", fill = 0L)
+    missingAnas <- setdiff(analyses(fGroups), ftindex$analysis)
+    ftindex <- rbind(ftindex, data.table(analysis = missingAnas,
+                                         matrix(0L, nrow = length(missingAnas), ncol = length(fGroups),
+                                                dimnames = list(NULL, names(fGroups)))))
+    
+    # sync order
+    ftindex <- ftindex[match(analysisInfo(fGroups)$analysis, ftindex$analysis, nomatch = 0L)][, analysis := NULL]
+    ftindex <- ftindex[, intersect(names(fGroups), names(ftindex)), with = FALSE]
+    
+    fGroups@ftindex <- ftindex
     return(fGroups)
 }
 

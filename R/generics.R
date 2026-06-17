@@ -228,6 +228,9 @@ setGeneric("spectrumSimilarityIMS", function(obj, ...) standardGeneric("spectrum
 #' @rdname generateMSPeakLists
 setGeneric("generateMSPeakLists", function(fGroups, ...) standardGeneric("generateMSPeakLists"))
 
+#' @rdname generateMSPeakLists
+setGeneric("generateMSPeakListsP", function(obj, ...) standardGeneric("generateMSPeakListsP"))
+
 #' @rdname generateMSPeakListsMzR
 setGeneric("generateMSPeakListsMzR", function(fGroups, ...) standardGeneric("generateMSPeakListsMzR"))
 

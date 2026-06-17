@@ -24,6 +24,12 @@ doWfGroupFeat <- function(..., algo)
              paramClass = paste0("FeatureGroups", algo, "Param"), ...)
 }
 
+doWfMSPL <- function(...)
+{
+    doWfStep(func = "generateMSPeakListsP", slotNameIn = "fGroups", slotNameOut = "MSPeakLists",
+             paramClass = "MSPeakListsParam", ...)
+}    
+
 #' @rdname findFeaturesOpenMS
 setMethod("findFeaturesP", c("workflow", "FeaturesOpenMSParam"),
           \(obj, param = NULL, ...) doWfFeat(obj, algo = "OpenMS", param = param, ...))
@@ -95,3 +101,7 @@ setMethod("groupFeaturesP", c("workflow", "FeatureGroupsGreedyParam"),
 #' @rdname groupFeaturesGreedy
 setMethod("groupFeaturesPGreedy", "workflow",
           \(obj, param = NULL, ...) doWfGroupFeat(obj, algo = "Greedy", param = param, ...))
+
+
+#' @rdname generateMSPeakLists
+setMethod("generateMSPeakListsP", "workflow", \(obj, param = NULL, ...) doWfMSPL(obj, param = param, ...))

@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 #' @include main.R
+#' @include mspeaklists-param.R
 #' @include workflow-step.R
 NULL
 
@@ -1092,4 +1093,11 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRTWindo
 setMethod("generateMSPeakLists", "featureGroupsSet", function(fGroups, ...)
 {
     generateMSPeakListsSet(fGroups, generateMSPeakLists, ...)
+})
+
+#' @rdname generateMSPeakLists
+#' @export
+setMethod("generateMSPeakListsP", "featureGroups", function(obj, param = NULL, ...)
+{
+    do.call(generateMSPeakLists, c(list(obj), prepAndVerifyParamForCall(param, "MSPeakListsParam", ...)))
 })

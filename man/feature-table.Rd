@@ -71,8 +71,8 @@ parameters} for more information. Set to \code{NULL} to omit this data.}
 present (see \code{\link{calculateConcs}}/\code{\link{calculateTox}}).}
 
 \item{anaInfoCols}{A \code{character} with any additional columns from the \link[=analysis-information]{analysis
-information} table. Only supported if \code{features=TRUE}. If averaging is performed then the data in the
-specified columns should be numeric. Set to \code{NULL} to ignore.}
+information} table. Only supported if \code{features=TRUE}. If averaging is performed, then numeric data is
+averaged and character data collapsed. Set to \code{NULL} to ignore.}
 
 \item{IMS}{\IMSWF Specifies which feature groups are considered to be returned in IMS workflows. The following options
   are valid: \itemize{

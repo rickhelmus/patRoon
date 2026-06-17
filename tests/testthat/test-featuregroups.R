@@ -253,6 +253,11 @@ regrFNA <- as.data.table(fGroupsRegrNA, regression = TRUE, features = TRUE, anaI
 FCParams <- getFCParams(c("solvent-pos", "standard-pos"))
 fctbl <- as.data.table(fgOpenMS, FCParams = FCParams)
 fctblF <- as.data.table(fgOpenMS, FCParams = FCParams, features = TRUE)
+
+fGroupsMeta <- fgOpenMS
+analysisInfo(fGroupsMeta)$metaNum <- seq_along(analyses(fGroupsMeta))
+analysisInfo(fGroupsMeta)$metaChr <- paste0("chr", seq_along(analyses(fGroupsMeta)))
+
 test_that("as.data.table works", {
     expect_equal(nrow(as.data.table(fgOpenMS)), length(fgOpenMS))
 
@@ -319,6 +324,11 @@ test_that("as.data.table works", {
     checkmate::expect_names(names(as.data.table(fgOpenMSQ, qualities = "both")),
                             must.include = c(getFeatureQualityNames(fgOpenMSQ), 
                                              getFeatureQualityNames(fgOpenMSQ, scores = TRUE)))
+    
+    expect_names(names(as.data.table(fGroupsMeta, anaInfoCols = c("metaNum", "metaChr"), features = TRUE)),
+                 must.include = c("anaInfo_metaNum", "anaInfo_metaChr"))
+    # test collapsing of character metadata
+    expect_true(any(grepl(",", as.data.table(fGroupsMeta, anaInfoCols = c("metaNum", "metaChr"), average = TRUE, features = TRUE)$anaInfo_metaChr, fixed = TRUE)))
     
     expect_equal(nrow(as.data.table(fgOpenMSEmpty, average = TRUE)), 0)
     expect_equal(nrow(as.data.table(fgOpenMSEmpty, features = TRUE)), 0)

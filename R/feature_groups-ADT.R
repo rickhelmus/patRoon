@@ -45,8 +45,8 @@ NULL
 #' @param normConcToTox Set to \code{TRUE} to normalize concentrations to toxicities. Only relevant if this data is
 #'   present (see \code{\link{calculateConcs}}/\code{\link{calculateTox}}).
 #' @param anaInfoCols A \code{character} with any additional columns from the \link[=analysis-information]{analysis
-#'   information} table. Only supported if \code{features=TRUE}. If averaging is performed then the data in the
-#'   specified columns should be numeric. Set to \code{NULL} to ignore.
+#'   information} table. Only supported if \code{features=TRUE}. If averaging is performed, then numeric data is
+#'   averaged and character data collapsed. Set to \code{NULL} to ignore.
 #' @param collapseSuspects If a \code{character} then any suspects that were matched to the same feature group are
 #'   collapsed to a single row and suspect names are separated by the value of \code{collapseSuspects}. If \code{NULL}
 #'   then no collapsing occurs, and each suspect match is reported on a single row. See the \verb{Suspect collapsing}
@@ -404,7 +404,10 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
     else
     {
         if (averageBy != "fGroups")
-            featTab[, average_group := anaInfo[[averageBy]][match(analysis, anaInfo$analysis)]]
+        {
+            # NOTE: make character so we can merge with fgTab later, which should also be a character
+            featTab[, average_group := as.character(anaInfo[[averageBy]][match(analysis, anaInfo$analysis)])]
+        }
         
         # average all numeric columns
         numCols <- setdiff(names(which(sapply(featTab, is.numeric))), "average_group")
@@ -522,7 +525,17 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
     {
         ai <- anaInfo[, c(averageBy, anaInfoCols), with = FALSE]
         if (!isFALSE(average))
-            ai[, (anaInfoCols) := lapply(.SD, averageFunc), .SDcols = anaInfoCols, by = averageBy]
+        {
+            isNum <- which(sapply(ai[, anaInfoCols, with = FALSE], is.numeric))
+            isChr <- which(sapply(ai[, anaInfoCols, with = FALSE], is.character))
+            if (length(isNum) > 0)
+                ai[, (anaInfoCols[isNum]) := lapply(.SD, averageFunc), .SDcols = anaInfoCols[isNum], by = averageBy]
+            if (length(isChr) > 0)
+            {
+                ai[, (anaInfoCols[isChr]) := lapply(.SD, \(x) paste0(unique(x), collapse = ",")),
+                   .SDcols = anaInfoCols[isChr], by = averageBy]
+            }
+        }
         ai <- unique(ai, by = averageBy)
         ai <- ai[match(fgTab$average_group, get(averageBy))][, (averageBy) := NULL]
         anaInfoCols <- paste0("anaInfo_", anaInfoCols)
@@ -573,15 +586,6 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
     {
         if (!features)
             warning("The anaInfoCols argument is only supported if features = TRUE", call. = FALSE)
-        else if (!isFALSE(average))
-        {
-            notNum <- which(!sapply(anaInfo[, anaInfoCols, with = FALSE], is.numeric))
-            if (length(notNum) > 0)
-            {
-                stop("Cannot average because the following columns from anaInfoCols are not numeric: ",
-                     paste0(names(notNum), collapse = ", "), call. = FALSE)
-            }
-        }
     }
 
     ret <- doFGAADTGroups(fGroups, intColNames, average, averageBy, areas, addQualities, addScores, regression,

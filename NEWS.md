@@ -4,6 +4,8 @@
 * Fixed: `report()`: component table lacked ret and m/z columns
 * Fixed: `newProject()`: misc fixes when creating a project that loads analyses from a table (issue #154).
 * Fixed: Improve handling of raw data without exported MS2 isolation windows in `piek` and `generateMSPeakLists()` (issue #156)
+* Optimizations for very large datasets (issue #154)
+* `as.data.table()`: Support non numeric columns for `anaInfoCols` when averaging (issue #158)
 
 
 # patRoon 3.0

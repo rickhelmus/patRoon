@@ -191,7 +191,7 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
         stop("Fingerprints can currently only be loaded if calculateFeatures is set to FALSE", call. = FALSE)
     
     if (length(fGroups) == 0)
-        return(formulasSIRIUS6(algorithm = "sirius6"))
+        return(formulasSIRIUS(algorithm = "sirius"))
     
     adduct <- checkAndToAdduct(adduct, fGroups)
     
@@ -232,11 +232,21 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     
     if (verbose)
     {
+        printf("-------\n")
+        if (calculateFeatures && length(formTable) > 0)
+        {
+            fCounts <- sapply(formTable, countUniqueFormulas)
+            fTotCount <- sum(fCounts)
+            printf("Formula statistics:\n")
+            printf("%s: %d (%.1f%%)\n", names(formTable), fCounts, if (fTotCount == 0) 0 else fCounts * 100 / fTotCount)
+            printf("Total: %d\n", fTotCount)
+        }
         ngrp <- length(groupFormulas)
-        printf("Assigned %d formulas to %d feature groups (%.2f%%).\n", sum(sapply(groupFormulas, nrow)),
-               ngrp, if (length(fGroups) == 0) 0 else ngrp * 100 / length(fGroups))
+        gCount <- length(fGroups)
+        printf("Assigned %d unique formulas to %d feature groups (%.2f%% coverage).\n", countUniqueFormulas(groupFormulas),
+               ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
     }
-    
+
     ret <- formulasSIRIUS(groupAnnotations = groupFormulas, featureFormulas = featFormulas, algorithm = "sirius",
                           MSPeakLists = MSPeakLists, specSimParams = specSimParams, IMSSpecSims = IMSSpecSims,
                           gNames = names(fGroups), fingerprints = fingerprints)

@@ -210,7 +210,7 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
     checkmate::reportAssertions(ac)
     
     if (length(fGroups) == 0)
-        return(compoundsSIRIUS6(algorithm = "sirius6"))
+        return(compoundsSIRIUS(algorithm = "sirius"))
     
     adduct <- checkAndToAdduct(adduct, fGroups)
     
@@ -236,7 +236,7 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
         setnames(res$formCands, colsRename, paste0("formula_", colsRename))
         tab <- merge(tab, res$formCands, by = "formulaId", sort = FALSE)
         
-        tab <- removeDTColumnsIfPresent(tab, c("formulaId", "formula_neutral_formula", "formula_adduct"))
+        tab <- removeDTColumnsIfPresent(tab, c("formulaId", "formula_neutral_formula", "formula_adduct", "rank"))
         
         return(tab)
     }

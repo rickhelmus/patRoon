@@ -8,6 +8,12 @@
 - XCMS3
     - make XCMS3 param defaults nested (like now) or one default for whole param? Or make it an option, also applicable to other params?
     - doc that Lama alignment is not yet supported (needs XCMS4)
+- RAMClustR: fill in ionization in RCExperimentVals (and doc)
+- OpenMS components: set potentialAdducts always per ionization mode as list, and remove then unnecessary sets code. Update param.
+    - also do this for cliqueMS/adductInfo?
+- When function argument docs are removed: check if current descriptions in params are sufficient, and if not add those details in separate sections in the docs (eg components-openms params)
+- intclust components: should normalized and average still be flags?
+- add validty methods to components params where necessary (eg param objects for TPs)
 
 
 # Priority

@@ -336,14 +336,16 @@ runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUS
                                                                                       page = 0, size = topMostStructures,
                                                                                       opt_fields = c("dbLinks"))
                 ret$structCands <- rbindlist(lapply(ret$structCands$content, \(sc) sc$toList()), fill = TRUE)
-                setnames(ret$structCands, c("inchiKey", "smiles", "structureName", "xlogP", "molecularFormula", "csiScore"),
-                         c("InChIKey1", "SMILES", "compoundName", "XlogP", "neutral_formula", "score"), skip_absent = TRUE)
-                # UNDONE: add InChI and InChIKey?
-                
-                if (is.null(ret$structCands[["compoundName"]]))
-                    ret$structCands[, compoundName := InChIKey1]
-                else
-                    ret$structCands[, compoundName := fifelse(nzchar(compoundName, compoundName, InChIKey1))]
+                if (nrow(ret$structCands) > 0)
+                {
+                    setnames(ret$structCands, c("inchiKey", "smiles", "structureName", "xlogP", "molecularFormula", "csiScore"),
+                             c("InChIKey1", "SMILES", "compoundName", "XlogP", "neutral_formula", "score"), skip_absent = TRUE)
+                    # UNDONE: add InChI and InChIKey?
+                    if (is.null(ret$structCands[["compoundName"]]))
+                        ret$structCands[, compoundName := InChIKey1]
+                    else
+                        ret$structCands[, compoundName := fifelse(nzchar(compoundName), compoundName, InChIKey1)]
+                }
                 
                 ret$fingerprints <- if (getFingerprints && nrow(ret$structCands) > 0)
                 {

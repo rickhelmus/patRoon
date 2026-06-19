@@ -12,46 +12,43 @@ getComponentsCliqueMSParamDefs <- paramConfigDefsFact(list(
         default = 1,
         description = "Maximum charge to consider (passed to cliqueMS::getIsotopes)",
         type = "count",
-        positive = TRUE
+        typeCheckArgs = list(positive = TRUE)
     ),
     maxGrade = list(
         default = 2,
         description = "Maximum number of isotopes apart from the monoisotope (passed to cliqueMS::getIsotopes)",
         type = "count",
-        positive = TRUE
+        typeCheckArgs = list(positive = TRUE)
     ),
     ppm = list(
         default = 10,
         description = "Mass accuracy tolerance (ppm) (passed to cliqueMS functions)",
         type = "number",
-        lower = 0,
-        finite = TRUE
+        typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     adductInfo = list(
         default = NULL,
         description = "Adduct information data.frame passed to cliqueMS::getAnnotation; NULL to use package defaults",
         type = "data.frame",
-        null.ok = TRUE
+        typeCheckArgs = list(null.ok = TRUE)
     ),
     absMzDev = list(
         default = defaultLim("mz", "medium"),
         description = "Absolute m/z deviation used for componentization",
         type = "number",
-        finite = TRUE,
-        lower = 0
+        typeCheckArgs = list(finite = TRUE, lower = 0)
     ),
     minSize = list(
         default = 2,
         description = "Minimum number of feature groups to form a component",
         type = "count",
-        positive = TRUE
+        typeCheckArgs = list(positive = TRUE)
     ),
     relMinAdductAbundance = list(
         default = 0.75,
         description = "Relative threshold that an adduct should be assigned to features within the same feature group",
         type = "number",
-        finite = TRUE,
-        lower = 0
+        typeCheckArgs = list(finite = TRUE, lower = 0)
     ),
     adductConflictsUsePref = list(
         default = TRUE,
@@ -69,33 +66,25 @@ getComponentsCliqueMSParamDefs <- paramConfigDefsFact(list(
         default = c("[M+H]+", "[M-H]-"),
         description = "Preferred adducts used to resolve conflicts",
         type = "character",
-        min.chars = 1,
-        any.missing = FALSE,
-        unique = TRUE
+        typeCheckArgs = list(min.chars = 1, any.missing = FALSE, unique = TRUE)
     ),
     extraOptsCli = list(
         default = NULL,
         description = "Extra options passed to cliqueMS::getCliques as a named character list",
         type = "list",
-        names = "unique",
-        any.missing = FALSE,
-        null.ok = TRUE
+        typeCheckArgs = list(names = "unique", any.missing = FALSE, null.ok = TRUE)
     ),
     extraOptsIso = list(
         default = NULL,
         description = "Extra options passed to cliqueMS::getIsotopes as a named character list",
         type = "list",
-        names = "unique",
-        any.missing = FALSE,
-        null.ok = TRUE
+        typeCheckArgs = list(names = "unique", any.missing = FALSE, null.ok = TRUE)
     ),
     extraOptsAnn = list(
         default = NULL,
         description = "Extra options passed to cliqueMS::getAnnotation as a named character list",
         type = "list",
-        names = "unique",
-        any.missing = FALSE,
-        null.ok = TRUE
+        typeCheckArgs = list(names = "unique", any.missing = FALSE, null.ok = TRUE)
     ),
     parallel = list(
         default = TRUE,

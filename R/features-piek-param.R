@@ -10,13 +10,13 @@ getFeaturesPiekParamDefs <- paramConfigDefsFact(list(
         default = getPiekEICParams(),
         description = "Parameters for EIC generation (use getPiekEICParams())",
         type = "list",
-        null.ok = FALSE
+        typeCheckArgs = list(null.ok = FALSE)
     ),
     peakParams = list(
         default = getDefPeakParams("chrom", "piek"),
         description = "Parameters for peak detection (use getDefPeakParams())",
         type = "list",
-        null.ok = FALSE
+        typeCheckArgs = list(null.ok = FALSE)
     ),
     IMS = list(
         default = FALSE,
@@ -33,51 +33,43 @@ getFeaturesPiekParamDefs <- paramConfigDefsFact(list(
         default = defaultLim("retention", "very_narrow"),
         description = "Retention time window (+/- s) for assignment",
         type = "number",
-        lower = 0,
-        finite = TRUE
+        typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     rtWindowDup = list(
         default = defaultLim("retention", "narrow"),
         description = "RT window for duplicate feature detection",
         type = "number",
-        lower = 0,
-        finite = TRUE
+        typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     mzWindowDup = list(
         default = defaultLim("mz", "medium"),
         description = "m/z window for duplicate feature detection",
         type = "number",
-        lower = 0,
-        finite = TRUE
+        typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     mobWindowDup = list(
         default = defaultLim("mobility", "medium"),
         description = "Mobility window for duplicate feature detection",
         type = "number",
-        lower = 0,
-        finite = TRUE
+        typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     minPeakOverlapDup = list(
         default = 0.25,
         description = "Minimum retention time overlap (fraction) to consider duplicates",
         type = "number",
-        lower = 0,
-        upper = 1,
-        finite = TRUE
+        typeCheckArgs = list(lower = 0, upper = 1, finite = TRUE)
     ),
     minIntensityIMS = list(
         default = 25,
         description = "Minimum intensity for IMS datapoints",
         type = "number",
-        positive = TRUE,
-        finite = TRUE
+        typeCheckArgs = list(positive = TRUE, finite = TRUE)
     ),
     EICBatchSize = list(
         default = Inf,
         description = "Number of EICs processed per batch",
         type = "number",
-        positive = TRUE,
-        finite = FALSE
+        typeCheckArgs = list(positive = TRUE, finite = FALSE)
     ),
     keepDups = list(
         default = FALSE,

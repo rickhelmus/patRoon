@@ -15,14 +15,13 @@ getFeaturesKPIC2ParamDefs <- paramConfigDefsFact(list(
         default = 1000,
         description = "Level parameter passed to KPIC::getPIC or KPIC::getPIC.kmeans",
         type = "number",
-        positive = TRUE
+        typeCheckArgs = list(positive = TRUE)
     ),
     extraOpts = list(
         default = NULL,
         description = "List with extra options passed to KPIC::getPIC or KPIC::getPIC.kmeans",
         type = "list",
-        names = "unique",
-        null.ok = TRUE
+        typeCheckArgs = list(names = "unique", null.ok = TRUE)
     ),
     verbose = list(
         default = TRUE,

@@ -47,69 +47,35 @@ setMethod("initialize", "param", function(.Object, name, baseName, description, 
 setValidity("param", function(object)
 {
     ac <- checkmate::makeAssertCollection()
-    
+
     # Automated validation using definitions
     for (paramName in names(object@definitions))
     {
         def <- object@definitions[[paramName]]
         value <- object@data[[paramName]]
-        
+
         if (isDefault(value))
             next
         if (is.null(value) && (!is.null(def[["null.ok"]]) && def$null.ok))
             next
-        
-        # Validate based on parameter type
-        if (def$type == "number")
-        {
-            args <- list(x = value, finite = TRUE)
-            if (!is.null(def$positive) && def$positive)
-                args$lower <- 0
-            if (!is.null(def$lower))
-                args$lower <- def$lower
-            if (!is.null(def$upper))
-                args$upper <- def$upper
-            if (!is.null(def$finite))
-                args$finite <- def$finite
-            do.call(checkmate::assertNumber, c(args, list(add = ac)))
-        }
-        else if (def$type == "character")
-        {
-            args <- list(x = value)
-            if (!is.null(def$min.chars))
-                args$min.chars <- def$min.chars
-            if (!is.null(def$any.missing))
-                args$any.missing <- def$any.missing
-            if (!is.null(def$unique))
-                args$unique <- def$unique
-            do.call(checkmate::assertCharacter, c(args, list(add = ac)))
-        }    
-        else if (def$type == "flag")
-            checkmate::assertFlag(value, add = ac)
-        else if (def$type == "choice")
-            checkmate::assertChoice(value, def$choices, add = ac)
-        else if (def$type == "subset")
-            checkmate::assertSubset(value, def$choices, empty.ok = def$empty.ok, add = ac)
-        else if (def$type == "list")
-        {
-            la <- list(x = value, types = def$types, names = def$names, null.ok = def$null.ok)
-            do.call(checkmate::assertList, c(la, list(add = ac)))
-        }    
-        else if (def$type == "count")
-        {
-            ca <- list(x = value, finite = TRUE)
-            if (!is.null(def[["positive"]]) && def$positive)
-                ca$positive <- TRUE
-            do.call(checkmate::assertCount, c(ca, list(add = ac)))
-        }
-        else if (def$type == "IMS")
-            assertIMSArg(value, add = ac)
-        else
-            stop(sprintf("Unknown parameter type '%s' for parameter '%s'", def$type, paramName))
+
+        cmfunc <- switch(def$type,
+            number = checkmate::assertNumber,
+            character = checkmate::assertCharacter,
+            numeric = checkmate::assertNumeric,
+            string = checkmate::assertString,
+            flag = checkmate::assertFlag,
+            choice = checkmate::assertChoice,
+            subset = checkmate::assertSubset,
+            list = checkmate::assertList,
+            count = checkmate::assertCount,
+            IMS = assertIMSArg
+        )
+        do.call(cmfunc, c(list(x = value), def$typeCheckArgs, list(add = ac)))
     }
-    
+
     OK <- tryCatch(checkmate::reportAssertions(ac), error = function(e) e)
-    
+
     return(OK)
 })
 

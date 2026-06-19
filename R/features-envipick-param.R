@@ -10,8 +10,7 @@ getFeaturesEnviPickParamDefs <- paramConfigDefsFact(list(
         default = NULL,
         description = "List with extra options passed to enviPick::enviPickwrap()",
         type = "list",
-        names = "unique",
-        null.ok = TRUE
+        typeCheckArgs = list(names = "unique", null.ok = TRUE)
     ),
     verbose = list(
         default = TRUE,

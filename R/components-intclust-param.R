@@ -42,7 +42,7 @@ getComponentsIntClustParamDefs <- paramConfigDefsFact(list(
         default = 1,
         description = "Minimum module (component) size (passed to dynamicTreeCut::cutreeDynamic)",
         type = "count",
-        positive = TRUE
+        typeCheckArgs = list(positive = TRUE)
     ),
     IMS = list(
         default = "maybe",

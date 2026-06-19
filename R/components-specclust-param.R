@@ -17,7 +17,7 @@ getComponentsSpecClustParamDefs <- paramConfigDefsFact(list(
         default = getDefSpecSimParams(),
         description = "Default MS/MS spectral similarity parameters",
         type = "list",
-        null.ok = FALSE
+        typeCheckArgs = list(null.ok = FALSE)
     ),
     maxTreeHeight = list(
         default = 1,
@@ -33,7 +33,7 @@ getComponentsSpecClustParamDefs <- paramConfigDefsFact(list(
         default = 1,
         description = "Minimum module (component) size (passed to dynamicTreeCut::cutreeDynamic)",
         type = "count",
-        positive = TRUE
+        typeCheckArgs = list(positive = TRUE)
     ),
     IMS = list(
         default = "maybe",

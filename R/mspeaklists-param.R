@@ -11,21 +11,19 @@ getMSPeakListsParamDefs <- paramConfigDefsFact(list(
         default = defaultLim("retention", "narrow"),
         description = "Maximum retention time window for MS peak list generation",
         type = "number",
-        positive = TRUE,
-        finite = TRUE
+        typeCheckArgs = list(positive = TRUE, finite = TRUE)
     ),
     fixedIsolationWidth = list(
         default = FALSE,
         description = "Configures how MS/MS spectra are selected for a feature (FALSE, NA, or numeric tolerance)",
         type = "number",
-        null.ok = TRUE
+        typeCheckArgs = list(null.ok = TRUE)
     ),
     topMost = list(
         default = NULL,
         description = "Only extract MS peak lists from a maximum of topMost features (NULL for all)",
         type = "number",
-        null.ok = TRUE,
-        positive = TRUE
+        typeCheckArgs = list(null.ok = TRUE, positive = TRUE)
     ),
     avgFeatParams = list(
         default = getDefAvgPListParams(),

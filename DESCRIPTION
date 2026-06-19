@@ -191,6 +191,7 @@ Collate:
     'components-clust.R'
     'components-intclust-param.R'
     'components-intclust.R'
+    'components-nontarget-param.R'
     'components-set.R'
     'components-nontarget.R'
     'components-nontarget-set.R'

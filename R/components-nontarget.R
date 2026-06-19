@@ -5,6 +5,7 @@
 #' @include main.R
 #' @include components.R
 #' @include components-set.R
+#' @include components-nontarget-param.R
 #' @include feature_groups-set.R
 NULL
 
@@ -384,5 +385,19 @@ setMethod("generateComponentsNontarget", "featureGroupsSet", function(fGroups, i
 {
     return(generateComponentsSet(fGroups, ionization, generateComponentsNontarget, setIonization = TRUE, ...,
                                  classGenerator = componentsNTSet))
+})
+
+#' @rdname generateComponentsNontarget
+#' @export
+setMethod("generateComponentsPNontarget", "featureGroups", function(obj, param, ...)
+{
+    do.call(generateComponentsNontarget, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsNontargetParam", ...)))
+})
+
+#' @rdname generateComponentsNontarget
+#' @export
+setMethod("generateComponentsP", c("featureGroups", "ComponentsNontargetParam"), function(obj, param, ...)
+{
+    do.call(generateComponentsNontarget, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsNontargetParam", ...)))
 })
 

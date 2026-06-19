@@ -207,3 +207,17 @@ setMethod("generateComponentsCAMERA", "featureGroupsSet", function(fGroups, ioni
     generateComponentsSet(fGroups, ionization, generateComponentsCAMERA, setIonization = TRUE, ...)
 })
 
+#' @rdname generateComponentsCAMERA
+#' @export
+setMethod("generateComponentsPCAMERA", "featureGroups", function(obj, param, ...)
+{
+    do.call(generateComponentsCAMERA, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsCAMERAParam", ...)))
+})
+
+#' @rdname generateComponentsCAMERA
+#' @export
+setMethod("generateComponentsP", c("featureGroups", "ComponentsCAMERAParam"), function(obj, param, ...)
+{
+    do.call(generateComponentsCAMERA, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsCAMERAParam", ...)))
+})
+

@@ -30,6 +30,12 @@ doWfMSPL <- function(...)
              paramClass = "MSPeakListsParam", ...)
 }    
 
+doWfCompon <- function(..., algo)
+{
+    doWfStep(func = paste0("generateComponentsP", algo), slotNameIn = "fGroups", slotNameOut = "components",
+             paramClass = paste0("Components", algo, "Param"), ...)
+}
+
 #' @rdname findFeaturesOpenMS
 setMethod("findFeaturesP", c("workflow", "FeaturesOpenMSParam"),
           \(obj, param = NULL, ...) doWfFeat(obj, algo = "OpenMS", param = param, ...))
@@ -105,3 +111,59 @@ setMethod("groupFeaturesPGreedy", "workflow",
 
 #' @rdname generateMSPeakLists
 setMethod("generateMSPeakListsP", "workflow", \(obj, param = NULL, ...) doWfMSPL(obj, param = param, ...))
+
+#' @rdname generateComponentsRAMClustR
+setMethod("generateComponentsP", c("workflow", "ComponentsRAMClustRParam"),
+          \(obj, param = NULL, ...) doWfCompon(obj, algo = "RAMClustR", param = param, ...))
+
+#' @rdname generateComponentsRAMClustR
+setMethod("generateComponentsPRAMClustR", "workflow",
+          \(obj, param = NULL, ...) doWfCompon(obj, algo = "RAMClustR", param = param, ...))
+
+#' @rdname generateComponentsCAMERA
+setMethod("generateComponentsP", c("workflow", "ComponentsCAMERAParam"),
+          \(obj, param = NULL, ...) doWfCompon(obj, algo = "CAMERA", param = param, ...))
+
+#' @rdname generateComponentsCAMERA
+setMethod("generateComponentsPCAMERA", "workflow",
+          \(obj, param = NULL, ...) doWfCompon(obj, algo = "CAMERA", param = param, ...))
+
+#' @rdname generateComponentsIntClust
+setMethod("generateComponentsP", c("workflow", "ComponentsIntClustParam"),
+          \(obj, param = NULL, ...) doWfCompon(obj, algo = "IntClust", param = param, ...))
+
+#' @rdname generateComponentsIntClust
+setMethod("generateComponentsPIntClust", "workflow",
+          \(obj, param = NULL, ...) doWfCompon(obj, algo = "IntClust", param = param, ...))
+
+#' @rdname generateComponentsOpenMS
+setMethod("generateComponentsP", c("workflow", "ComponentsOpenMSParam"),
+          \(obj, param = NULL, ...) doWfCompon(obj, algo = "OpenMS", param = param, ...))
+
+#' @rdname generateComponentsOpenMS
+setMethod("generateComponentsPOpenMS", "workflow",
+          \(obj, param = NULL, ...) doWfCompon(obj, algo = "OpenMS", param = param, ...))
+
+#' @rdname generateComponentsCliqueMS
+setMethod("generateComponentsP", c("workflow", "ComponentsCliqueMSParam"),
+          \(obj, param = NULL, ...) doWfCompon(obj, algo = "CliqueMS", param = param, ...))
+
+#' @rdname generateComponentsCliqueMS
+setMethod("generateComponentsPCliqueMS", "workflow",
+          \(obj, param = NULL, ...) doWfCompon(obj, algo = "CliqueMS", param = param, ...))
+
+#' @rdname generateComponentsSpecClust
+setMethod("generateComponentsPSpecClust", "workflow",
+          \(obj, param = NULL, ...) doWfCompon(obj, algo = "SpecClust", param = param, ...))
+
+#' @rdname generateComponentsTPs
+setMethod("generateComponentsPTPs", "workflow",
+          \(obj, param = NULL, ...) doWfCompon(obj, algo = "TPs", param = param, ...))
+
+#' @rdname generateComponentsNontarget
+setMethod("generateComponentsP", c("workflow", "ComponentsNontargetParam"),
+          \(obj, param = NULL, ...) doWfCompon(obj, algo = "Nontarget", param = param, ...))
+
+#' @rdname generateComponentsNontarget
+setMethod("generateComponentsPNontarget", "workflow",
+          \(obj, param = NULL, ...) doWfCompon(obj, algo = "Nontarget", param = param, ...))

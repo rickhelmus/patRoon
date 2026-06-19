@@ -4,10 +4,12 @@ setOptClass("featureGroups")
 setOptClass("MSPeakLists")
 setOptClass("formulas")
 setOptClass("compounds")
+setOptClass("components") # UNDONE: this will become a list probably
 
 workflow <- setClass("workflow", slots = c(analysisInfo = "data.table", features = "featuresOpt",
                                            fGroups = "featureGroupsOpt", MSPeakLists = "MSPeakListsOpt",
                                            formulas = "formulasOpt", compounds = "compoundsOpt",
+                                           components = "componentsOpt",
                                            templateDir = "character"))
 
 setMethod("initialize", "workflow", function(.Object, analysisInfo, ...)

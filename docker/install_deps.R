@@ -4,7 +4,7 @@ options(timeout = 300)
 install.packages("remotes")
 remotes::install_github("rickhelmus/patRoonInst")
 
-# install everything, including patRoon. This will be removed afterward, but is handy to get all deps.
+# install everything, including patRoon. This will be removed afterwards, but is handy to get all deps.
 patRoonInst::install(ask = FALSE, quiet = FALSE)
 patRoon::installTIMSCONVERT()
 patRoon::installC3SDB()

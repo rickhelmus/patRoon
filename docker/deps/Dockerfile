@@ -23,7 +23,7 @@ RUN --mount=type=cache,id=cache_apt,target=/var/cache/apt --mount=type=cache,id=
 USER rstudio
 WORKDIR /home/rstudio
 
-COPY --chown=rstudio docker/install_deps.R DESCRIPTION .
+COPY --chown=rstudio docker/install_deps.R .
 COPY --chown=rstudio docker/rstudio/ccache.conf /home/rstudio/.ccache/
 COPY --chown=rstudio docker/rstudio/Makevars /home/rstudio/.R/
 

@@ -116,3 +116,17 @@ setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPe
     
     return(ret)
 })
+
+#' @rdname generateComponentsSpecClust
+#' @export
+setMethod("generateComponentsPSpecClust", "featureGroups", function(obj, param, ...)
+{
+    do.call(generateComponentsSpecClust, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsSpecClustParam", ...)))
+})
+
+#' @rdname generateComponentsSpecClust
+#' @export
+setMethod("generateComponentsP", c("featureGroups", "ComponentsSpecClustParam"), function(obj, param, ...)
+{
+    do.call(generateComponentsSpecClust, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsSpecClustParam", ...)))
+})

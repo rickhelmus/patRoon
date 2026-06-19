@@ -226,3 +226,17 @@ setMethod("generateComponentsRAMClustR", "featureGroupsSet", function(fGroups, i
 {
     generateComponentsSet(fGroups, ionization, generateComponentsRAMClustR, setIonization = TRUE, ...)
 })
+
+#' @rdname generateComponentsRAMClustR
+#' @export
+setMethod("generateComponentsPRAMClustR", "featureGroups", function(obj, param, ...)
+{
+    do.call(generateComponentsRAMClustR, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsRAMClustRParam", ...)))
+})
+
+#' @rdname generateComponentsRAMClustR
+#' @export
+setMethod("generateComponentsP", c("featureGroups", "ComponentsRAMClustRParam"), function(obj, param, ...)
+{
+    do.call(generateComponentsRAMClustR, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsRAMClustRParam", ...)))
+})

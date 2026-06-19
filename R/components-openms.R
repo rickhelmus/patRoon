@@ -211,6 +211,20 @@ setMethod("generateComponentsOpenMS", "featureGroupsSet", function(fGroups, ioni
                           setArgs = lapply(potentialAdducts, function(pa) list(potentialAdducts = pa)))
 })
 
+#' @rdname generateComponentsOpenMS
+#' @export
+setMethod("generateComponentsPOpenMS", "featureGroups", function(obj, param, ...)
+{
+    do.call(generateComponentsOpenMS, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsOpenMSParam", ...)))
+})
+
+#' @rdname generateComponentsOpenMS
+#' @export
+setMethod("generateComponentsP", c("featureGroups", "ComponentsOpenMSParam"), function(obj, param, ...)
+{
+    do.call(generateComponentsOpenMS, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsOpenMSParam", ...)))
+})
+
 
 getOpenMSMADCommand <- function(inFile, outFile, ionization, chargeMin, chargeMax, chargeSpan, qTry,
                                 potentialAdducts, minRTOverlap, retWindow, absMzDev, extraOpts)

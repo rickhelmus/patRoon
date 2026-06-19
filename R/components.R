@@ -641,3 +641,22 @@ setMethod("generateComponents", "featureGroups", function(fGroups, algorithm, ..
 
     f(fGroups, ...)
 })
+
+# NOTE: obj is not dispatched, we only want to pass through here so it works with any input
+setMethod("generateComponentsP", c("ANY", "character"), function(obj, param, ...)
+{
+    checkmate::assertChoice(param, c("ramclustr", "camera", "nontarget", "intclust",
+                                     "openms", "cliquems", "specclust", "tp"))
+
+    f <- switch(param,
+                ramclustr = generateComponentsPRAMClustR,
+                camera = generateComponentsPCAMERA,
+                nontarget = generateComponentsPNontarget,
+                intclust = generateComponentsPIntClust,
+                openms = generateComponentsPOpenMS,
+                cliquems = generateComponentsPCliqueMS,
+                specclust = generateComponentsPSpecClust,
+                tp = generateComponentsPTPs)
+
+    f(obj, ...)
+})

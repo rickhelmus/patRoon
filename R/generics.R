@@ -285,6 +285,33 @@ setGeneric("generateComponentsSpecClust", function(fGroups, ...) standardGeneric
 #' @rdname generateComponentsTPs
 setGeneric("generateComponentsTPs", function(fGroups, ...) standardGeneric("generateComponentsTPs"))
 
+#' @rdname generateComponents
+setGeneric("generateComponentsP", function(obj, param, ...) standardGeneric("generateComponentsP"))
+
+#' @rdname generateComponentsRAMClustR
+setGeneric("generateComponentsPRAMClustR", function(obj, ...) standardGeneric("generateComponentsPRAMClustR"))
+
+#' @rdname generateComponentsCAMERA
+setGeneric("generateComponentsPCAMERA", function(obj, ...) standardGeneric("generateComponentsPCAMERA"))
+
+#' @rdname generateComponentsNontarget
+setGeneric("generateComponentsPNontarget", function(obj, ...) standardGeneric("generateComponentsPNontarget"))
+
+#' @rdname generateComponentsIntClust
+setGeneric("generateComponentsPIntClust", function(obj, ...) standardGeneric("generateComponentsPIntClust"))
+
+#' @rdname generateComponentsOpenMS
+setGeneric("generateComponentsPOpenMS", function(obj, ...) standardGeneric("generateComponentsPOpenMS"))
+
+#' @rdname generateComponentsCliqueMS
+setGeneric("generateComponentsPCliqueMS", function(obj, ...) standardGeneric("generateComponentsPCliqueMS"))
+
+#' @rdname generateComponentsSpecClust
+setGeneric("generateComponentsPSpecClust", function(obj, ...) standardGeneric("generateComponentsPSpecClust"))
+
+#' @rdname generateComponentsTPs
+setGeneric("generateComponentsPTPs", function(obj, ...) standardGeneric("generateComponentsPTPs"))
+
 #' @name components-class
 setGeneric("expandForIMS", function(obj, ...) standardGeneric("expandForIMS"))
 

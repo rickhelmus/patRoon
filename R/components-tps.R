@@ -885,3 +885,17 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
     
     return(ret)
 })
+
+#' @rdname generateComponentsTPs
+#' @export
+setMethod("generateComponentsPTPs", "featureGroups", function(obj, param, ...)
+{
+    do.call(generateComponentsTPs, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsTPsParam", ...)))
+})
+
+#' @rdname generateComponentsTPs
+#' @export
+setMethod("generateComponentsP", c("featureGroups", "ComponentsTPsParam"), function(obj, param, ...)
+{
+    do.call(generateComponentsTPs, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsTPsParam", ...)))
+})

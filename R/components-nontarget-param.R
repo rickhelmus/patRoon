@@ -69,3 +69,4 @@ setMethod("initialize", "ComponentsNontargetParam", function(.Object, ...)
     callNextMethod(.Object, name = "ComponentsNontargetParam", baseName = "ComponentsNontargetParam",
                    description = "Parameters for nontarget component generation", version = "1.0",
                    definitions = getComponentsNontargetParamDefs(), ...)
+})

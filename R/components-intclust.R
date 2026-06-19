@@ -208,3 +208,17 @@ setMethod("generateComponentsIntClust", "featureGroups", function(fGroups, metho
     
     return(ret)
 })
+
+#' @rdname generateComponentsIntClust
+#' @export
+setMethod("generateComponentsPIntClust", "featureGroups", function(obj, param, ...)
+{
+    do.call(generateComponentsIntClust, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsIntClustParam", ...)))
+})
+
+#' @rdname generateComponentsIntClust
+#' @export
+setMethod("generateComponentsP", c("featureGroups", "ComponentsIntClustParam"), function(obj, param, ...)
+{
+    do.call(generateComponentsIntClust, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsIntClustParam", ...)))
+})

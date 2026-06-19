@@ -17,14 +17,13 @@ getComponentsTPsParamDefs <- paramConfigDefsFact(list(
         default = 20,
         description = "Minimum retention time difference (seconds) to consider when linking parents and TPs.",
         type = "number",
-        lower = 0,
-        finite = TRUE
+        typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     specSimParams = list(
         default = getDefSpecSimParams(),
         description = "MS/MS spectral similarity parameters.",
         type = "list",
-        null.ok = FALSE
+        typeCheckArgs = list(null.ok = FALSE)
     ),
     IMS = list(
         default = "maybe",

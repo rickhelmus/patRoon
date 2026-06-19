@@ -17,22 +17,19 @@ getComponentsCAMERAParamDefs <- paramConfigDefsFact(list(
         default = 2,
         description = "Minimum number of feature groups to form a component",
         type = "count",
-        positive = TRUE
+        typeCheckArgs = list(positive = TRUE)
     ),
     relMinReplicates = list(
         default = 0.5,
         description = "The features of a feature group in a component must be present in at least this relative fraction of replicates",
         type = "number",
-        lower = 0,
-        finite = TRUE
+        typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     extraOpts = list(
         default = NULL,
         description = "Extra options passed directly to CAMERA::annotate() as a named character list",
         type = "list",
-        types = "character",
-        names = "unique",
-        null.ok = TRUE
+        typeCheckArgs = list(types = "character", names = "unique", null.ok = TRUE)
     ),
     verbose = list(
         default = TRUE,

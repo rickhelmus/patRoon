@@ -133,10 +133,10 @@ jobs:
               run: |
                   print(.libPaths())
                   options(patRoonInst.repos.patRoonDeps = paste0("file:///", normalizePath("patRoonDeps")))
-                  patRoonInst::sync(origin = "patRoonDeps", allDeps = TRUE, quiet = FALSE, ignorePkgs = "MetaCleanData")
-                  patRoon::installC3SDB()
                   # HACK: do this until https://github.com/Rdatatable/data.table/issues/7749 is on CRAN
                   data.table::update_dev_pkg()
+                  patRoonInst::sync(origin = "patRoonDeps", allDeps = TRUE, quiet = FALSE, ignorePkgs = "MetaCleanData")
+                  patRoon::installC3SDB()
               shell: Rscript {0}
             - uses: r-lib/actions/check-r-package@v2
               with:
@@ -190,10 +190,10 @@ jobs:
                   python-version: '3.12'
             - name: Install further deps
               run: |
-                  remotes::install_github("rickhelmus/patRoonDataIMS")
-                  patRoon::installC3SDB()
                   # HACK: do this until https://github.com/Rdatatable/data.table/issues/7749 is on CRAN
                   data.table::update_dev_pkg()
+                  remotes::install_github("rickhelmus/patRoonDataIMS")
+                  patRoon::installC3SDB()
                   cat("Done!\n")
               shell: Rscript {0}
             - uses: r-lib/actions/check-r-package@v2

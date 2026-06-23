@@ -8,6 +8,9 @@ Sys.setenv(TESTTHAT_CPUS = 3)
 Sys.setenv(PATROON_MP_MAXPROCS = 2)
 Sys.setenv(PKG_BUILD_EXTRA_FLAGS = "false")
 
+# HACK: do this until https://github.com/Rdatatable/data.table/issues/7749 is on CRAN
+data.table::update_dev_pkg()
+
 # HACK: trigger compile first. It seems that parallel testing triggers multiple compiles, resulting in random compile
 # errors.
 devtools::load_all()

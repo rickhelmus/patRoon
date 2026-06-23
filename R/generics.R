@@ -337,6 +337,12 @@ setGeneric("generateFormulasSIRIUS", function(fGroups, ...) standardGeneric("gen
 #' @rdname generateFormulasDA
 setGeneric("generateFormulasDA", function(fGroups, ...) standardGeneric("generateFormulasDA"))
 
+#' @rdname generateFormulas
+setGeneric("generateFormulasP", function(obj, param, ...) standardGeneric("generateFormulasP"))
+
+#' @rdname generateFormulasGenForm
+setGeneric("generateFormulasPGenForm", function(obj, ...) standardGeneric("generateFormulasPGenForm"))
+
 ### Compounds
 
 #' @name compounds-class

@@ -10,6 +10,9 @@ origRmds <- file.path(handbookSubRmdPath, origRmds)
 disabledRmds <- file.path(handbookSubRmdPath, disabledRmds)
 file.rename(origRmds, disabledRmds)
 
+# HACK: do this until https://github.com/Rdatatable/data.table/issues/7749 is on CRAN
+data.table::update_dev_pkg()
+
 # get older pkgdown version for now, see https://github.com/r-lib/pkgdown/issues/2022
 # remotes::install_github("r-lib/pkgdown@v1.6.1")
 install.packages("pkgdown")

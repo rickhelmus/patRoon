@@ -68,6 +68,14 @@ setMethod("findFeaturesP", c("workflow", "FeaturesKPIC2Param"),
 setMethod("findFeaturesPKPIC2", "workflow",
           \(obj, param = NULL, ...) doWfFeat(obj, algo = "KPIC2", param = param, ...))
 
+#' @rdname findFeaturesSAFD
+setMethod("findFeaturesP", c("workflow", "FeaturesSAFDParam"),
+          \(obj, param = NULL, ...) doWfFeat(obj, algo = "SAFD", param = param, ...))
+
+#' @rdname findFeaturesSAFD
+setMethod("findFeaturesPSAFD", "workflow",
+          \(obj, param = NULL, ...) doWfFeat(obj, algo = "SAFD", param = param, ...))
+
 #' @rdname findFeaturesPiek
 setMethod("findFeaturesP", c("workflow", "FeaturesPiekParam"),
           \(obj, param = NULL, ...) doWfFeat(obj, algo = "Piek", param = param, ...))

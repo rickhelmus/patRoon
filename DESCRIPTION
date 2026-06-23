@@ -269,6 +269,7 @@ Collate:
     'features-optimize-xcms3.R'
     'features-piek-param.R'
     'features-piek.R'
+    'features-safd-param.R'
     'features-safd.R'
     'features-sirius.R'
     'features-table.R'

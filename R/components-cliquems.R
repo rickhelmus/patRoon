@@ -229,14 +229,17 @@ setMethod("generateComponentsCliqueMS", "featureGroupsSet", function(fGroups, io
 
 #' @rdname generateComponentsCliqueMS
 #' @export
-setMethod("generateComponentsPCliqueMS", "featureGroups", function(obj, param, ...)
+setMethod("generateComponentsPCliqueMS", "featureGroups", function(obj, param, ..., ionization = NULL)
 {
-    do.call(generateComponentsCliqueMS, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsCliqueMSParam", ...)))
+    do.call(generateComponentsCliqueMS, c(list(obj, ionization = ionization),
+                                         prepAndVerifyParamForCall(param, "ComponentsCliqueMSParam", ...)))
 })
 
 #' @rdname generateComponentsCliqueMS
 #' @export
-setMethod("generateComponentsP", c("featureGroups", "ComponentsCliqueMSParam"), function(obj, param, ...)
+setMethod("generateComponentsP", c("featureGroups", "ComponentsCliqueMSParam"), function(obj, param, ...,
+                                                                                        ionization = NULL)
 {
-    do.call(generateComponentsCliqueMS, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsCliqueMSParam", ...)))
+    do.call(generateComponentsCliqueMS, c(list(obj, ionization = ionization),
+                                         prepAndVerifyParamForCall(param, "ComponentsCliqueMSParam", ...)))
 })

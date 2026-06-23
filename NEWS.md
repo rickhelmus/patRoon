@@ -1,3 +1,6 @@
+* `generateComponentsRAMClustR()`: set `RCExperimentVals$instrument$ionization` automatically if unspecified.
+
+
 # patRoon 3.0
 
 This release adds a significant amount of new functionality and changes. Please see the updated [Handbook] and sections

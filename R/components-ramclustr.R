@@ -38,7 +38,8 @@ setMethod("expandForIMS", "componentsRC", function(obj, ...) cannotExpandComponI
 #' @param relMzDev Maximum relative mass deviation (\acronym{ppm}). Sets the \code{ppm.error} argument to
 #'   \code{\link[RAMClustR]{do.findmain}}.
 #' @param RCExperimentVals A named \code{list} containing two more \code{list}s: \code{design} and \code{instrument}.
-#'   These are used to construct the \code{ExpDes} argument passed to \code{\link[RAMClustR]{ramclustR}}.
+#'   These are used to construct the \code{ExpDes} argument passed to \code{\link[RAMClustR]{ramclustR}}. If
+#'   \code{instrument$ionization} is not specified, it will be set to the value of the \code{ionization} argument.
 #' @param extraOptsRC,extraOptsFM Named \code{list} with further arguments to be passed to
 #'   \code{\link[RAMClustR]{ramclustR}} and \code{\link[RAMClustR]{do.findmain}}. Set to \code{NULL} to ignore.
 #'
@@ -96,6 +97,9 @@ setMethod("generateComponentsRAMClustR", "featureGroups", function(fGroups, ioni
     if (length(fGroups) == 0)
         return(componentsRC(componentInfo = data.table(), components = list(),
                             RC = structure(list(), class = "hclust")))
+
+    if (!is.null(RCExperimentVals[["instrument"]]) && is.null(RCExperimentVals[["instrument"]][["ionization"]]))
+        RCExperimentVals$instrument$ionization <- ionization
 
     gTable <- groupTable(fGroups)
     gInfo <- groupInfo(fGroups)

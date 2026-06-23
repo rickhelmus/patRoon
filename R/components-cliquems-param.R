@@ -59,7 +59,7 @@ getComponentsCliqueMSParamDefs <- paramConfigDefsFact(list(
         default = c("preferential", "mostAbundant", "mostIntense"),
         description = "Strategies to resolve neutral mass conflicts",
         type = "subset",
-        choices = c("preferential", "mostAbundant", "mostIntense"),
+        typeCheckArgs = list(choices = c("preferential", "mostAbundant", "mostIntense")),
         empty.ok = FALSE
     ),
     prefAdducts = list(

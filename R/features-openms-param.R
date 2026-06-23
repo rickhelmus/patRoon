@@ -11,25 +11,25 @@ getFeaturesOpenMSParamDefs <- paramConfigDefsFact(list(
         default = 1000,
         description = "Intensity threshold",
         type = "number",
-        typeCheckArgs = list(positive = TRUE, finite = TRUE)
+        typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     chromSNR = list(
         default = 3,
         description = "Chromatographic signal-to-noise ratio threshold",
         type = "number",
-        typeCheckArgs = list(positive = TRUE, finite = TRUE)
+        typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     chromFWHM = list(
         default = 5,
         description = "Chromatographic full width at half maximum",
         type = "number",
-        typeCheckArgs = list(positive = TRUE, finite = TRUE)
+        typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     mzPPM = list(
         default = defaultLim("mz", "medium_rel"),
         description = "Mass-to-charge ratio tolerance in parts per million",
         type = "number",
-        typeCheckArgs = list(positive = TRUE, finite = TRUE)
+        typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     reEstimateMTSD = list(
         default = TRUE,
@@ -40,13 +40,13 @@ getFeaturesOpenMSParamDefs <- paramConfigDefsFact(list(
         default = "sample_rate",
         description = "Criterion for trace termination",
         type = "choice",
-        choices = c("sample_rate", "outliers")
+        typeCheckArgs = list(choices = c("sample_rate", "outliers"))
     ),
     traceTermOutliers = list(
         default = 5,
         description = "Number of outliers for trace termination",
         type = "number",
-        typeCheckArgs = list(positive = TRUE, finite = TRUE)
+        typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     minSampleRate = list(
         default = 0.5,
@@ -58,7 +58,7 @@ getFeaturesOpenMSParamDefs <- paramConfigDefsFact(list(
         default = 3,
         description = "Minimum trace length",
         type = "number",
-        typeCheckArgs = list(positive = TRUE, finite = TRUE)
+        typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     maxTraceLength = list(
         default = -1,
@@ -70,19 +70,19 @@ getFeaturesOpenMSParamDefs <- paramConfigDefsFact(list(
         default = "fixed",
         description = "Width filtering method",
         type = "choice",
-        choices = c("fixed", "off", "auto")
+        typeCheckArgs = list(choices = c("fixed", "off", "auto"))
     ),
     minFWHM = list(
         default = 1,
         description = "Minimum full width at half maximum",
         type = "number",
-        typeCheckArgs = list(positive = TRUE, finite = TRUE)
+        typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     maxFWHM = list(
         default = 30,
         description = "Maximum full width at half maximum",
         type = "number",
-        typeCheckArgs = list(positive = TRUE, finite = TRUE)
+        typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     traceSNRFiltering = list(
         default = FALSE,
@@ -93,19 +93,19 @@ getFeaturesOpenMSParamDefs <- paramConfigDefsFact(list(
         default = 10,
         description = "Local retention time range for feature detection",
         type = "number",
-        typeCheckArgs = list(positive = TRUE, finite = TRUE)
+        typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     localMZRange = list(
         default = 6.5,
         description = "Local mass-to-charge range for feature detection",
         type = "number",
-        typeCheckArgs = list(positive = TRUE, finite = TRUE)
+        typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     isotopeFilteringModel = list(
         default = "metabolites (5% RMS)",
         description = "Isotope filtering model",
         type = "choice",
-        choices = c("metabolites (5% RMS)", "metabolites (10% RMS)", "lipids (5% RMS)", "lipids (10% RMS)")
+        typeCheckArgs = list(choices = c("metabolites (5% RMS)", "metabolites (10% RMS)", "lipids (5% RMS)", "lipids (10% RMS)"))
     ),
     MZScoring13C = list(
         default = FALSE,

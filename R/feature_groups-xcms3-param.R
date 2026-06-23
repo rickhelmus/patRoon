@@ -25,19 +25,19 @@ getFeatureGroupsXCMS3ParamDefs <- paramConfigDefsFact(list(
         default = "PeakDensity",
         description = "Algorithm to use for feature grouping (after alignment)",
         type = "choice",
-        choices = c("PeakDensity", "NearestPeaks", "MzClust")
+        typeCheckArgs = list(choices = c("PeakDensity", "NearestPeaks", "MzClust"))
     ),
     alignAlgo = list(
         default = "Obiwarp",
         description = "Algorithm to use for retention time alignment",
         type = "choice",
-        choices = c("Obiwarp", "PeakGroups", "Lama")
+        typeCheckArgs = list(choices = c("Obiwarp", "PeakGroups", "Lama"))
     ),
     preGroupAlgo = list(
         default = "PeakDensity",
         description = "Algorithm to use for feature grouping prior to alignment (only with peak groups alignment)",
         type = "choice",
-        choices = c("PeakDensity", "NearestPeaks", "MzClust")
+        typeCheckArgs = list(choices = c("PeakDensity", "NearestPeaks", "MzClust"))
     ),
     groupPeakDensityParam = list(
         default = removeListEntries(as(xcms::PeakDensityParam(sampleGroups = "dummy"), "list"), "sampleGroups"),

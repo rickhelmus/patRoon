@@ -27,7 +27,7 @@ getFeaturesPiekParamDefs <- paramConfigDefsFact(list(
         default = "basepeak",
         description = "Method to assign m/z/mobility across EIC datapoints",
         type = "choice",
-        choices = c("basepeak", "weighted.mean")
+        typeCheckArgs = list(choices = c("basepeak", "weighted.mean"))
     ),
     assignRTWindow = list(
         default = defaultLim("retention", "very_narrow"),
@@ -63,13 +63,13 @@ getFeaturesPiekParamDefs <- paramConfigDefsFact(list(
         default = 25,
         description = "Minimum intensity for IMS datapoints",
         type = "number",
-        typeCheckArgs = list(positive = TRUE, finite = TRUE)
+        typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     EICBatchSize = list(
         default = Inf,
         description = "Number of EICs processed per batch",
         type = "number",
-        typeCheckArgs = list(positive = TRUE, finite = FALSE)
+        typeCheckArgs = list(lower = 0, finite = FALSE)
     ),
     keepDups = list(
         default = FALSE,

@@ -22,8 +22,7 @@ getComponentsTPsParamDefs <- paramConfigDefsFact(list(
     specSimParams = list(
         default = getDefSpecSimParams(),
         description = "MS/MS spectral similarity parameters.",
-        type = "list",
-        typeCheckArgs = list(null.ok = FALSE)
+        type = "specSimParams"
     ),
     IMS = list(
         default = "maybe",

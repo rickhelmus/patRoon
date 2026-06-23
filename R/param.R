@@ -47,18 +47,20 @@ setMethod("initialize", "param", function(.Object, name, baseName, description, 
 setValidity("param", function(object)
 {
     ac <- checkmate::makeAssertCollection()
+    
+    parsFilled <- paramListFillDefaults(object@data, object@definitions)
 
     # Automated validation using definitions
     for (paramName in names(object@definitions))
     {
         def <- object@definitions[[paramName]]
-        value <- object@data[[paramName]]
+        value <- parsFilled[[paramName]]
 
-        if (isDefault(value))
-            next
         if (is.null(value) && (!is.null(def[["null.ok"]]) && def$null.ok))
             next
-
+        if (is.null(def[["type"]]))
+            next # checked elsewhere
+        
         cmfunc <- switch(def$type,
             number = checkmate::assertNumber,
             character = checkmate::assertCharacter,
@@ -68,9 +70,15 @@ setValidity("param", function(object)
             choice = checkmate::assertChoice,
             subset = checkmate::assertSubset,
             list = checkmate::assertList,
+            data.frame = checkmate::assertDataFrame,
             count = checkmate::assertCount,
+            specSimParams = assertSpecSimParams,
             IMS = assertIMSArg
         )
+        
+        if (is.null(cmfunc))
+            stop(sprintf("Unknown type '%s' for parameter '%s'", def$type, paramName), call. = FALSE)
+        
         do.call(cmfunc, c(list(x = value), def$typeCheckArgs, list(add = ac)))
     }
 

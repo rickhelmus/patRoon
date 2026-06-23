@@ -181,3 +181,13 @@ findFeaturesSAFD <- function(analysisInfo, prefCentroid = FALSE, mzRange = c(0, 
     
     return(featuresSAFD(analysisInfo = analysisInfo, features = fts))
 }
+
+setMethod("findFeaturesPSAFD", "data.frame", function(obj, param, ...)
+{
+    do.call(findFeaturesSAFD, c(list(obj), prepAndVerifyParamForCall(param, "FeaturesSAFDParam", ..., exOptsToDots = TRUE)))
+})
+
+setMethod("findFeaturesP", c("data.frame", "FeaturesSAFDParam"), function(obj, param, ...)
+{
+    do.call(findFeaturesSAFD, c(list(obj), prepAndVerifyParamForCall(param, "FeaturesSAFDParam", ..., exOptToDots = TRUE)))
+})

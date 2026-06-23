@@ -11,7 +11,7 @@ test_that("all param classes can be constructed without errors", {
     expect_error(FeaturesEnviPickParam(), NA)
     expect_error(FeaturesKPIC2Param(), NA)
     expect_error(FeaturesPiekParam(), NA)
-    # expect_error(FeaturesSAFDParam(), NA) # UNDONE: add param
+    expect_error(FeaturesSAFDParam(), NA)
 
     # Component params
     expect_error(ComponentsOpenMSParam(), NA)

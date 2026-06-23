@@ -30,11 +30,6 @@ getComponentsCAMERAParamDefs <- paramConfigDefsFact(list(
         description = "Extra options passed directly to CAMERA::annotate() as a named character list",
         type = "list",
         typeCheckArgs = list(types = "character", names = "unique", null.ok = TRUE)
-    ),
-    verbose = list(
-        default = TRUE,
-        description = "Verbose output",
-        type = "flag"
     )
 ))
 

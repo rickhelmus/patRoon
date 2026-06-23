@@ -389,15 +389,18 @@ setMethod("generateComponentsNontarget", "featureGroupsSet", function(fGroups, i
 
 #' @rdname generateComponentsNontarget
 #' @export
-setMethod("generateComponentsPNontarget", "featureGroups", function(obj, param, ...)
+setMethod("generateComponentsPNontarget", "featureGroups", function(obj, param, ..., ionization = NULL)
 {
-    do.call(generateComponentsNontarget, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsNontargetParam", ...)))
+    do.call(generateComponentsNontarget, c(list(obj, ionization = ionization),
+                                           prepAndVerifyParamForCall(param, "ComponentsNontargetParam", ...)))
 })
 
 #' @rdname generateComponentsNontarget
 #' @export
-setMethod("generateComponentsP", c("featureGroups", "ComponentsNontargetParam"), function(obj, param, ...)
+setMethod("generateComponentsP", c("featureGroups", "ComponentsNontargetParam"), function(obj, param, ...,
+                                                                                          ionization = NULL)
 {
-    do.call(generateComponentsNontarget, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsNontargetParam", ...)))
+    do.call(generateComponentsNontarget, c(list(obj, ionization = ionization),
+                                           prepAndVerifyParamForCall(param, "ComponentsNontargetParam", ...)))
 })
 

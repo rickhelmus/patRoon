@@ -233,14 +233,17 @@ setMethod("generateComponentsRAMClustR", "featureGroupsSet", function(fGroups, i
 
 #' @rdname generateComponentsRAMClustR
 #' @export
-setMethod("generateComponentsPRAMClustR", "featureGroups", function(obj, param, ...)
+setMethod("generateComponentsPRAMClustR", "featureGroups", function(obj, param, ..., ionization = NULL)
 {
-    do.call(generateComponentsRAMClustR, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsRAMClustRParam", ...)))
+    do.call(generateComponentsRAMClustR, c(list(obj, ionization = ionization),
+                                           prepAndVerifyParamForCall(param, "ComponentsRAMClustRParam", ...)))
 })
 
 #' @rdname generateComponentsRAMClustR
 #' @export
-setMethod("generateComponentsP", c("featureGroups", "ComponentsRAMClustRParam"), function(obj, param, ...)
+setMethod("generateComponentsP", c("featureGroups", "ComponentsRAMClustRParam"), function(obj, param, ...,
+                                                                                          ionization = NULL)
 {
-    do.call(generateComponentsRAMClustR, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsRAMClustRParam", ...)))
+    do.call(generateComponentsRAMClustR, c(list(obj, ionization = ionization),
+                                           prepAndVerifyParamForCall(param, "ComponentsRAMClustRParam", ...)))
 })

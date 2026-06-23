@@ -213,16 +213,19 @@ setMethod("generateComponentsOpenMS", "featureGroupsSet", function(fGroups, ioni
 
 #' @rdname generateComponentsOpenMS
 #' @export
-setMethod("generateComponentsPOpenMS", "featureGroups", function(obj, param, ...)
+setMethod("generateComponentsPOpenMS", "featureGroups", function(obj, param, ..., ionization = NULL)
 {
-    do.call(generateComponentsOpenMS, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsOpenMSParam", ...)))
+    do.call(generateComponentsOpenMS, c(list(obj, ionization = ionization),
+                                        prepAndVerifyParamForCall(param, "ComponentsOpenMSParam", ...)))
 })
 
 #' @rdname generateComponentsOpenMS
 #' @export
-setMethod("generateComponentsP", c("featureGroups", "ComponentsOpenMSParam"), function(obj, param, ...)
+setMethod("generateComponentsP", c("featureGroups", "ComponentsOpenMSParam"), function(obj, param, ...,
+                                                                                      ionization = NULL)
 {
-    do.call(generateComponentsOpenMS, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsOpenMSParam", ...)))
+    do.call(generateComponentsOpenMS, c(list(obj, ionization = ionization),
+                                        prepAndVerifyParamForCall(param, "ComponentsOpenMSParam", ...)))
 })
 
 

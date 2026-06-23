@@ -31,7 +31,8 @@ getComponentsIntClustParamDefs <- paramConfigDefsFact(list(
     maxTreeHeight = list(
         default = 1,
         description = "Maximum tree height (passed to dynamicTreeCut::cutreeDynamic)",
-        type = "number"
+        type = "number",
+        typeCheckArgs = list(finite = TRUE)
     ),
     deepSplit = list(
         default = TRUE,

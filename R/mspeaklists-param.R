@@ -11,19 +11,17 @@ getMSPeakListsParamDefs <- paramConfigDefsFact(list(
         default = defaultLim("retention", "narrow"),
         description = "Maximum retention time window for MS peak list generation",
         type = "number",
-        typeCheckArgs = list(positive = TRUE, finite = TRUE)
+        typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     fixedIsolationWidth = list(
         default = FALSE,
-        description = "Configures how MS/MS spectra are selected for a feature (FALSE, NA, or numeric tolerance)",
-        type = "number",
-        typeCheckArgs = list(null.ok = TRUE)
+        description = "Configures how MS/MS spectra are selected for a feature (FALSE, NA, or numeric tolerance)"
     ),
     topMost = list(
         default = NULL,
         description = "Only extract MS peak lists from a maximum of topMost features (NULL for all)",
         type = "number",
-        typeCheckArgs = list(null.ok = TRUE, positive = TRUE)
+        typeCheckArgs = list(null.ok = TRUE, lower = 0)
     ),
     avgFeatParams = list(
         default = getDefAvgPListParams(),
@@ -53,6 +51,12 @@ setValidity("MSPeakListsParam", function(object)
     ac <- checkmate::makeAssertCollection()
     assertAvgPListParams(parsFilled$avgFeatParams, .var.name = "avgFeatParams", add = ac)
     assertAvgPListParams(parsFilled$avgFGroupParams, .var.name = "avgFGroupParams", add = ac)
+    checkmate::assert(
+        checkmate::checkFALSE(parsFilled$fixedIsolationWidth),
+        checkmate::checkScalarNA(parsFilled$fixedIsolationWidth),
+        checkmate::checkNumber(parsFilled$fixedIsolationWidth, lower = 0, finite = TRUE),
+        .var.name = "fixedIsolationWidth", add = ac
+    )
     OK <- tryCatch(checkmate::reportAssertions(ac), error = function(e) e)
     
     return(OK)

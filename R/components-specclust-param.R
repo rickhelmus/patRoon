@@ -16,13 +16,13 @@ getComponentsSpecClustParamDefs <- paramConfigDefsFact(list(
     specSimParams = list(
         default = getDefSpecSimParams(),
         description = "Default MS/MS spectral similarity parameters",
-        type = "list",
-        typeCheckArgs = list(null.ok = FALSE)
+        type = "specSimParams"
     ),
     maxTreeHeight = list(
         default = 1,
         description = "Maximum tree height (passed to dynamicTreeCut::cutreeDynamic)",
-        type = "number"
+        type = "number",
+        typeCheckArgs = list(finite = TRUE)
     ),
     deepSplit = list(
         default = TRUE,

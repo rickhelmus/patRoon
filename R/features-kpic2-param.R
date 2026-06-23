@@ -15,7 +15,7 @@ getFeaturesKPIC2ParamDefs <- paramConfigDefsFact(list(
         default = 1000,
         description = "Level parameter passed to KPIC::getPIC or KPIC::getPIC.kmeans",
         type = "number",
-        typeCheckArgs = list(positive = TRUE)
+        typeCheckArgs = list(lower = 0)
     ),
     extraOpts = list(
         default = NULL,

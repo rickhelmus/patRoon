@@ -13,7 +13,6 @@
     - also do this for cliqueMS/adductInfo?
 - When function argument docs are removed: check if current descriptions in params are sufficient, and if not add those details in separate sections in the docs (eg components-openms params)
 - intclust components: should normalized and average still be flags?
-- add validty methods to components params where necessary (eg param objects for TPs)
 - add SAFD param
 
 

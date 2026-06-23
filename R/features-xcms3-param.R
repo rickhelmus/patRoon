@@ -11,7 +11,7 @@ getFeaturesXCMS3ParamDefs <- paramConfigDefsFact(list(
         default = "CentWave",
         description = "Algorithm to use for feature detection",
         type = "choice",
-        choices = c("CentWave", "CentWavePredIso", "MatchedFilter", "Massifquant", "MSW")
+        typeCheckArgs = list(choices = c("CentWave", "CentWavePredIso", "MatchedFilter", "Massifquant", "MSW"))
     ),
     CentWaveParam = list(
         default = as(xcms::CentWaveParam(), "list"),

@@ -29,7 +29,7 @@ getComponentsOpenMSParamDefs <- paramConfigDefsFact(list(
         default = "heuristic",
         description = "Strategy to try candidate adduct assignments",
         type = "choice",
-        choices = c("heuristic", "all")
+        typeCheckArgs = list(choices = c("heuristic", "all"))
     ),
     # UNDONE: this needs to be updated to work for sets, see TODO.md
     potentialAdducts = list(
@@ -77,8 +77,7 @@ getComponentsOpenMSParamDefs <- paramConfigDefsFact(list(
         default = c("preferential", "mostAbundant", "mostIntense"),
         description = "Strategies to resolve neutral mass conflicts",
         type = "subset",
-        choices = c("preferential", "mostAbundant", "mostIntense"),
-        empty.ok = FALSE
+        typeCheckArgs = list(choices = c("preferential", "mostAbundant", "mostIntense"), empty.ok = FALSE)
     ),
     prefAdducts = list(
         default = c("[M+H]+", "[M-H]-"),

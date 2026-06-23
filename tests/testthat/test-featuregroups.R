@@ -325,8 +325,8 @@ test_that("as.data.table works", {
                             must.include = c(getFeatureQualityNames(fgOpenMSQ), 
                                              getFeatureQualityNames(fgOpenMSQ, scores = TRUE)))
     
-    expect_names(names(as.data.table(fGroupsMeta, anaInfoCols = c("metaNum", "metaChr"), features = TRUE)),
-                 must.include = c("anaInfo_metaNum", "anaInfo_metaChr"))
+    checkmate::expect_names(names(as.data.table(fGroupsMeta, anaInfoCols = c("metaNum", "metaChr"), features = TRUE)),
+                            must.include = c("anaInfo_metaNum", "anaInfo_metaChr"))
     # test collapsing of character metadata
     expect_true(any(grepl(",", as.data.table(fGroupsMeta, anaInfoCols = c("metaNum", "metaChr"), average = TRUE, features = TRUE)$anaInfo_metaChr, fixed = TRUE)))
     
@@ -707,8 +707,6 @@ test_that("plotting works", {
     expect_doppel("eic-area", function() plotChroms(subFGroups, showPeakArea = TRUE))
     expect_doppel("eic-gbr", function() plotChroms(subFGroups, groupBy = "replicate"))
     expect_doppel("eic-gbf", function() plotChroms(subFGroups, groupBy = "fGroups"))
-    expect_doppel("eic-ann", function() plotChroms(subFGroups, annotate = "mz"))
-    expect_doppel("eic-ann_mob", function() plotChroms(subFGroupsIMSOnly, annotate = "mob"))
     # below two should be mostly the same, but xlim and group rect will be slightly different since subsetting removes
     # some of the feature data that is used to determine the limits for these. For now just compare the two figures
     # manually.
@@ -732,8 +730,6 @@ test_that("plotting works", {
     expect_doppel("eim-area", function() plotMobilograms(subFGroupsIMSOnly, showPeakArea = TRUE))
     expect_doppel("eim-gbr", function() plotMobilograms(subFGroupsIMSOnly, groupBy = "replicate"))
     expect_doppel("eim-gbf", function() plotMobilograms(subFGroupsIMSOnly, groupBy = "fGroups"))
-    expect_doppel("eim-ann", function() plotMobilograms(subFGroupsIMSOnly, annotate = "mz"))
-    expect_doppel("eim-ann_mob", function() plotMobilograms(subFGroupsIMSOnly[IMS = TRUE], annotate = "mob"))
     # below two should be mostly the same, but xlim and group rect will be slightly different since subsetting removes
     # some of the feature data that is used to determine the limits for these. For now just compare the two figures
     # manually.
@@ -762,6 +758,13 @@ test_that("plotting works", {
     expect_ggplot(plotUpSet(fGCompOpenMS))
     
     expect_doppel("volcano", function() plotVolcano(fgOpenMS, FCParams))
+    
+    # EICx with annotations started (noticed June26) to give different results on Win/Lin, for now only run them on Linux...
+    skip_on_os("windows")
+    expect_doppel("eic-ann", function() plotChroms(subFGroups, annotate = "mz"))
+    expect_doppel("eic-ann_mob", function() plotChroms(subFGroupsIMSOnly, annotate = "mob"))
+    expect_doppel("eim-ann", function() plotMobilograms(subFGroupsIMSOnly, annotate = "mz"))
+    expect_doppel("eim-ann_mob", function() plotMobilograms(subFGroupsIMSOnly[IMS = TRUE], annotate = "mob"))
 })
 
 test_that("plotting empty objects works", {

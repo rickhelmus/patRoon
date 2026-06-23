@@ -605,3 +605,15 @@ setMethod("generateFormulas", "featureGroups", function(fGroups, MSPeakLists, al
     
     f(fGroups, MSPeakLists, specSimParams, ...)
 })
+
+# NOTE: obj is not dispatched, we only want to pass through here so it works with any input
+setMethod("generateFormulasP", c("ANY", "character"), function(obj, param, ...)
+{
+    checkmate::assertChoice(param, c("genform", "sirius"))
+    
+    f <- switch(param,
+                genform = generateFormulasPGenForm,
+                sirius = generateFormulasPSIRIUS)
+
+    f(obj, ...)
+})

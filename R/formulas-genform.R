@@ -5,6 +5,7 @@
 #' @include main.R
 #' @include mspeaklists.R
 #' @include formulas.R
+#' @include formulas-genform-param.R
 NULL
 
 getGenFormBin <- function()
@@ -495,3 +496,23 @@ setMethod("generateFormulasGenForm", "featureGroupsSet", function(fGroups, MSPea
                         setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,
                         setAvgSpecificScores = setAvgSpecificScores)
 })
+
+doGenFormulasPGenForm <- function(obj, param, ..., MSPeakLists, adduct = NULL)
+{
+    param <- prepAndVerifyParamForCall(param, "FormulasGenFormParam", ...)
+    param <- param[!names(param) %in% c("setThreshold", "setThresholdAnn", "setAvgSpecificScores")]
+    do.call(generateFormulasGenForm, c(list(obj, MSPeakLists = MSPeakLists, adduct = adduct), param))
+}
+
+doGenFormulasPGenFormSets <- function(obj, param, ..., MSPeakLists, adduct = NULL)
+{
+    param <- prepAndVerifyParamForCall(param, "FormulasGenFormParam", ...)
+    do.call(generateFormulasGenForm, c(list(obj, MSPeakLists = MSPeakLists, adduct = adduct), param))
+}
+
+setMethod("generateFormulasPGenForm", "featureGroups", doGenFormulasPGenForm)
+setMethod("generateFormulasPGenForm", "featureGroupsSet", doGenFormulasPGenFormSets)
+setMethod("generateFormulasP", c("featureGroups", "FormulasGenFormParam"), doGenFormulasPGenForm)
+setMethod("generateFormulasP", c("featureGroupsSet", "FormulasGenFormParam"), doGenFormulasPGenFormSets)
+
+

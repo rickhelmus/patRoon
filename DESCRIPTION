@@ -277,6 +277,7 @@ Collate:
     'features-xcms.R'
     'features-xcms3-param.R'
     'features-xcms3.R'
+    'formulas-genform-param.R'
     'formulas-genform.R'
     'formulas-set.R'
     'formulas-sirius.R'

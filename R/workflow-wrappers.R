@@ -8,7 +8,9 @@ doWfStep <- function(obj, func, slotNameIn, slotNameOut, param, paramClass, ...)
 {
     if (is.null(param))
         param <- new(paramClass, template = templateDir(obj))
-    slot(obj, slotNameOut) <- do.call(func, list(slot(obj, slotNameIn), param = param, ...))
+    args <- c(sapply(slotNameIn, slot, object = obj, simplify = FALSE), list(param = param, ...))
+    names(args)[1] <- "obj" # HACK: first should always be args, any other slot inputs should remain
+    slot(obj, slotNameOut) <- do.call(func, args)
     return(obj)
 }
 
@@ -34,6 +36,12 @@ doWfCompon <- function(..., algo)
 {
     doWfStep(func = paste0("generateComponentsP", algo), slotNameIn = "fGroups", slotNameOut = "components",
              paramClass = paste0("Components", algo, "Param"), ...)
+}
+
+doWfFormulas <- function(..., algo)
+{
+    doWfStep(func = paste0("generateFormulasP", algo), slotNameIn = c("fGroups", "MSPeakLists"),
+             slotNameOut = "formulas", paramClass = paste0("Formulas", algo, "Param"), ...)
 }
 
 #' @rdname findFeaturesOpenMS
@@ -175,3 +183,11 @@ setMethod("generateComponentsP", c("workflow", "ComponentsNontargetParam"),
 #' @rdname generateComponentsNontarget
 setMethod("generateComponentsPNontarget", "workflow",
           \(obj, param = NULL, ...) doWfCompon(obj, algo = "Nontarget", param = param, ...))
+
+#' @rdname generateFormulasGenForm
+setMethod("generateFormulasP", c("workflow", "FormulasGenFormParam"),
+          \(obj, param = NULL, ...) doWfFormulas(obj, algo = "GenForm", param = param, ...))
+
+#' @rdname generateFormulasGenForm
+setMethod("generateFormulasPGenForm", "workflow",
+          \(obj, param = NULL, ...) doWfFormulas(obj, algo = "GenForm", param = param, ...))

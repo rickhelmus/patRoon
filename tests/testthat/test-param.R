@@ -29,9 +29,14 @@ test_that("all param classes can be constructed without errors", {
     expect_error(FeatureGroupsKPIC2Param(), NA)
     expect_error(FeatureGroupsGreedyParam(), NA)
 
-    # Other
+    # Annotation
     expect_error(MSPeakListsParam(), NA)
     expect_error(FormulasGenFormParam(), NA)
     expect_error(CompoundsMetFragParam(), NA)
     expect_error(CompoundsLibraryParam(), NA)
+    
+    # TPs
+    expect_error(TPsBioTransformerParam(), NA)
+    expect_error(TPsCTSParam(), NA)
+    expect_error(TPsLibraryParam(), NA)
 })

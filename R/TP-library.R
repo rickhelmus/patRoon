@@ -4,6 +4,7 @@
 
 #' @include main.R
 #' @include TP-structure.R
+#' @include TP-library-param.R
 NULL
 
 #' @rdname transformationProductsStructure-class
@@ -101,3 +102,15 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, generations = 1
     saveCacheData("TPsLib", ret, hash)
     return(ret)
 }
+
+#' @rdname generateTPsLibrary
+#' @export
+generateTPsPLibrary <- function(obj, param, ...)
+{
+    param <- prepAndVerifyParamForCall(param, "TPsLibraryParam", ...)
+    do.call(generateTPsLibrary, c(list(obj), param))
+}
+
+#' @rdname generateTPsLibrary
+#' @export
+setMethod("generateTPsP", c("ANY", "TPsLibraryParam"), generateTPsPLibrary)

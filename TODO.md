@@ -13,6 +13,8 @@
 - When function argument docs are removed: check if current descriptions in params are sufficient, and if not add those details in separate sections in the docs (eg components-openms params)
 - intclust components: should normalized and average still be flags?
 - generateFormulasP: doc that bruker is not supported, add SIRIUS support
+- generateTPsBioTransformer(): maxExpGenerations is now additional to generations -->update NEWS and test
+- finish TP params: add workflow wrappers of algo specific methods
 
 
 # Priority

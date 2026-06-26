@@ -4,6 +4,7 @@
 
 #' @include main.R
 #' @include TP-structure.R
+#' @include TP-biotransformer-param.R
 NULL
 
 #' @rdname transformationProductsStructure-class
@@ -22,7 +23,7 @@ getBaseBTCmd <- function(parent, SMILES, type, generations, extraOpts, baseHash,
                   extraOpts)
     
     return(list(command = "java", args = mainArgs, logFile = paste0("biotr-", parent, ".txt"), parent = parent,
-                SMILES = SMILES, maxExpGenerations = maxExpGenerations, neutralizeTPs = neutralizeTPs,
+                SMILES = SMILES, maxExpTotGens = generations + maxExpGenerations, neutralizeTPs = neutralizeTPs,
                 hash = makeHash(parent, SMILES, baseHash)))
 }
 
@@ -50,7 +51,7 @@ BTMPFinishHandler <- function(cmd)
     curTPID <- 0L
     processChilds <- function(parID, parChemID, generation)
     {
-        if (generation > cmd$maxExpGenerations)
+        if (generation > cmd$maxExpTotGens)
             return(data.table())
         resSub <- copy(results[parent_chem_ID == parChemID])
         resSub[, c("ID", "parent_ID", "generation") := .(curTPID + seq_len(nrow(resSub)), parID, generation)]
@@ -117,7 +118,7 @@ BTMPPrepareHandler <- function(cmd)
 #'   \code{"phaseII"}, \code{"hgut"}, \code{"superbio"}, \code{"allHuman"}. Sets the \command{-b} command line option.
 #' @param generations The number of generations (steps) for the predictions. Sets the \command{-s} command line option.
 #'   More generations may be reported, see the \verb{Hierarchy expansion} section below.
-#' @param maxExpGenerations The maximum number of generations during hierarchy expansion, see below.
+#' @param maxExpGenerations The maximum number of additional generations during hierarchy expansion, see below.
 #' @param extraOpts A \code{character} with extra command line options passed to the \command{biotransformer.jar} tool.
 #' @param MP If \code{TRUE} then multiprocessing is enabled. Since \command{BioTransformer} supports native
 #'   parallelization, additional multiprocessing generally doesn't lead to significant reduction in computational times.
@@ -180,7 +181,7 @@ BTMPPrepareHandler <- function(cmd)
 #' @references \insertRef{DjoumbouFeunang2019}{patRoon} \cr\cr \insertRef{Wicker2015}{patRoon}
 #'
 #' @export
-generateTPsBioTransformer <- function(parents, type = "env", generations = 2, maxExpGenerations = generations + 2,
+generateTPsBioTransformer <- function(parents, type = "env", generations = 2, maxExpGenerations = 2,
                                       extraOpts = NULL, skipInvalid = TRUE, prefCalcChemProps = TRUE,
                                       neutralChemProps = FALSE, neutralizeTPs = TRUE,
                                       TPStructParams = getDefTPStructParams(), MP = FALSE)
@@ -198,7 +199,7 @@ generateTPsBioTransformer <- function(parents, type = "env", generations = 2, ma
         assertSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
     checkmate::assertChoice(type, c("ecbased", "cyp450", "phaseII", "hgut", "superbio", "allHuman", "env"), add = ac)
     checkmate::assertCount(generations, positive = TRUE, add = ac)
-    checkmate::assertCount(maxExpGenerations, positive = TRUE, add = ac)
+    checkmate::assertCount(maxExpGenerations, add = ac)
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + neutralizeTPs + MP,
            fixed = list(add = ac))
@@ -237,3 +238,15 @@ generateTPsBioTransformer <- function(parents, type = "env", generations = 2, ma
 
     return(transformationProductsBT(TPStructParams = TPStructParams, parents = parents, products = results))
 }
+
+#' @rdname generateTPsBioTransformer
+#' @export
+generateTPsPBioTransformer <- function(obj, param, ...)
+{browser()
+    param <- prepAndVerifyParamForCall(param, "TPsBioTransformerParam", ...)
+    do.call(generateTPsBioTransformer, c(list(obj), param))
+}
+
+#' @rdname generateTPsBioTransformer
+#' @export
+setMethod("generateTPsP", c("ANY", "TPsBioTransformerParam"), generateTPsPBioTransformer)

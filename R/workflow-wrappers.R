@@ -217,3 +217,21 @@ setMethod("generateComponentsP", c("workflow", "ComponentsNontargetParam"),
 #' @rdname generateComponentsNontarget
 setMethod("generateComponentsPNontarget", "workflow",
           \(obj, param = NULL, ...) doWfCompon(obj, algo = "Nontarget", param = param, ...))
+
+doWfTPs <- function(..., algo)
+{
+    doWfStep(func = paste0("generateTPsP", algo), slotNameIn = "fGroups", slotNameOut = "TPs",
+             paramClass = paste0("TPs", algo, "Param"), ...)
+}
+
+#' @rdname generateTPsBioTransformer
+setMethod("generateTPsP", c("workflow", "TPsBioTransformerParam"),
+          \(obj, param = NULL, ...) doWfTPs(obj, algo = "BioTransformer", param = param, ...))
+
+#' @rdname generateTPsCTS
+setMethod("generateTPsP", c("workflow", "TPsCTSParam"),
+          \(obj, param = NULL, ...) doWfTPs(obj, algo = "CTS", param = param, ...))
+
+#' @rdname generateTPsLibrary
+setMethod("generateTPsP", c("workflow", "TPsLibraryParam"),
+          \(obj, param = NULL, ...) doWfTPs(obj, algo = "Library", param = param, ...))

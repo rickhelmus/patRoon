@@ -4,6 +4,7 @@
 
 #' @include main.R
 #' @include TP-structure.R
+#' @include TP-CTS-param.R
 NULL
 
 #' @rdname transformationProductsStructure-class
@@ -181,3 +182,15 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
     
     return(transformationProductsCTS(TPStructParams = TPStructParams, parents = parents, products = results))
 }
+
+#' @rdname generateTPsCTS
+#' @export
+generateTPsPCTS <- function(obj, param, ...)
+{
+    param <- prepAndVerifyParamForCall(param, "TPsCTSParam", ...)
+    do.call(generateTPsCTS, c(list(obj), param))
+}
+
+#' @rdname generateTPsCTS
+#' @export
+setMethod("generateTPsP", c("ANY", "TPsCTSParam"), generateTPsPCTS)

@@ -122,7 +122,6 @@ annotateCompNetNontarget <- function(componList, iso, add, ...)
         # NOTE: nontarget::adduct.search() calls stop() when there are no results ...
         as <- tryCatch(nontarget::adduct.search(compS, adducts = add, ppm = FALSE, mztol = 0.05, use_adducts = c("M+H", "M+K", "M+Na", "M+NH4")), error = \(...) NULL)
         
-        cmb <- nontarget::combine(ps, as)
         comp[, ID := .I]
         
         # Parsing the information from pattern.search() is quite a journey... To summarize:
@@ -266,102 +265,9 @@ annotateCompNetNontarget <- function(componList, iso, add, ...)
                                      add_mz_tol = paste0(add_mz_tol, collapse = "/"),
                                      add_link = paste0(add_link, collapse = "/")), by = ID]
         }
-        if (F) {
-            
-        isoCands <- isoTab[, c("ID", "iso_to", "isotope", "iso_mz_tol", "charge"), with = FALSE][!is.na(isotope) & iso_to != "0"]
-        isoCandsLong <- rbindlist(lapply(seq_len(nrow(isoCands)), function(row)
-        {
-            data.table(ID = as.integer(strsplit(isoCands$iso_to[row], "/")[[1]]),
-                       # isogroup = isoCands$isogroup[row], iso_interaction = isoCands$iso_interaction[row],
-                       isotope = strsplit(isoCands$isotope[row], "/")[[1]],
-                       iso_mz_tol = strsplit(isoCands$iso_mz_tol[row], "/")[[1]],
-                       charge = strsplit(isoCands$charge[row], "/")[[1]],
-                       iso_from = isoCands$ID[row])
-        }))
-        isoGroupsCharges <- rbindlist(lapply(seq_len(nrow(ps[["Peaks in pattern groups"]])), function(row)
-        {
-            data.table(groupID = strsplit(ps[["Peaks in pattern groups"]][["group ID"]][row], "/")[[1]][-1],
-                       charge = strsplit(ps[["Peaks in pattern groups"]][["charge level"]][row], "/")[[1]])
-        }))
-        isoCandsLong[, c("isogroup", "iso_interaction") := {
-            gIDs <- strsplit(isoTab$isogroup[match(ID, isoTab$ID)], "/")[[1]]
-            inter <- strsplit(isoTab$iso_interaction[match(ID, isoTab$ID)], "/")[[1]]
-            ch <- charge
-            id <- isoGroupsCharges[charge == ch & groupID %chin% gIDs]$groupID
-            stopifnot(length(id) == 1L)
-            printf("ID %d: gIDs = %s, inter = %s, ch = %s, id = %s, wh = %d\n", ID, paste(gIDs, collapse = ","),
-                   paste(inter, collapse = ","), ch, id, which(gIDs == id))
-            .(id, inter[which(gIDs == id)])
-        }, by = .I]
-
-        isoCandsLongMono <- rbindlist(lapply(setdiff(isoCands$ID, isoCandsLong$ID), function(id)
-        {
-            irow <- isoTab[ID == id]
-            data.table(ID = id,
-                       isogroup = irow$isogroup, iso_interaction = irow$iso_interaction,
-                       isotope = "mono", iso_mz_tol = NA_character_, charge = NA_character_, iso_from = NA_integer_)
-        }))
-        isoCandsLong <- rbind(isoCandsLong, isoCandsLongMono)
-        
-        isoCandsLong <- isoCandsLong[, .(isogroup = paste0(isogroup, collapse = "/"),
-                                         iso_interaction = paste0(iso_interaction, collapse = "/"),
-                                         isotope = paste0(isotope, collapse = "/"),
-                                         iso_mz_tol = paste0(iso_mz_tol, collapse = "/"),
-                                         charge = paste0(charge, collapse = "/"),
-                                         iso_from = paste0(iso_from, collapse = "/")), by = ID]
-        isoTab[isoCandsLong, c("isogroup", "iso_interaction", "isotope", "iso_mz_tol", "charge", "iso_from") :=
-                   .(i.isogroup, i.iso_interaction, i.isotope, i.iso_mz_tol, i.charge, iso_from), on = "ID"]
-        # isoTab[is.na(iso_from), isotope := NA]
-        }
         
         # isoTab[!is.na(iso_to), iso_to := indsToGNames(iso_to, comp$group)]
-        addTab <- NULL
-        if (!is.null(as))
-        {
-            addTab <- as.data.table(as$adducts[, setdiff(names(as$adducts), rmCols)])
-            setnames(addTab, c("peak ID", "group ID", "to ID", "adduct(s)", "mass tolerance"),
-                     c("ID", "addgroup", "add_to", "adduct", "add_mz_tol"))
-            addTab[addgroup == 0, c("addgroup", "add_to", "adduct", "add_mz_tol") := NA]
-            addTab[, adduct := sub("<.*", "", adduct)]
-            addTab[!is.na(add_to), add_to := indsToGNames(add_to, comp$group)]
-        }
-        
-        cmbTab <- rbindlist(sapply(seq_len(nrow(cmb$Components)), function(i) {
-            compRow <- cmb$Components[i, ]
-            peakCols <- grep("peaks", names(compRow), value = TRUE)
-            # peakTypes <- character(length(peakCols))
-            # peakTypes[grepl("pattern", peakCols)] <- "isotope"
-            # peakTypes[grepl("adduct", peakCols)] <- "adduct"
-            # peakTypes[grepl("interfering", peakCols)] <- "interfering"
-            peakIDs <- sapply(peakCols, \(col) strsplit(compRow[[col]], ",")[[1]], simplify = FALSE)
-            if (length(peakIDs) == 0)
-                return(NULL)
-            allPeakIDs <- unique(unlist(peakIDs))
-            allPeakIDs <- as.integer(allPeakIDs[allPeakIDs != "-"])
-            tab <- copy(comp)
-            tab[, sub_component := i]
-            tab <- tab[ID %in% allPeakIDs]
-            
-            # tab[, type := sapply(ID, \(id) paste0(peakTypes[which(sapply(peakIDs, \(ids) id %in% ids))], collapse = ","))]
-            # UNDONE: add warnings
-            
-            tab <- merge(tab, isoTab, by = "ID", sort = FALSE, all.x = TRUE)
-            if (!is.null(addTab))
-                tab <- merge(tab, addTab, by = "ID", sort = FALSE, all.x = TRUE)
 
-            return(tab)
-        }, simplify = FALSE))
-        
-        comp <- merge(comp, cmbTab[, c("ID", setdiff(names(cmbTab), names(comp))), with = FALSE], by = "ID", sort = FALSE)
-        
-        # comp[, c("isogroup", "isonr", "charge") := {
-        #     ps <- nontarget::pattern.search(featureTable(fGroups)[[1]][group %in% group]$mz, iso = iso)
-        #     if (nrow(ps) == 0)
-        #         .(NA_real_, NA_real_, NA_real_)
-        #     else
-        #         .(ps$isogroup, ps$isonr, ps$charge)
-        # }, by = "group"]
-        
         return(comp)
     })
     

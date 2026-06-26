@@ -20,30 +20,6 @@ doWfFeat <- function(..., algo)
              paramClass = paste0("Features", algo, "Param"), ...)
 }
 
-doWfGroupFeat <- function(..., algo)
-{
-    doWfStep(func = paste0("groupFeaturesP", algo), slotNameIn = "features", slotNameOut = "fGroups",
-             paramClass = paste0("FeatureGroups", algo, "Param"), ...)
-}
-
-doWfMSPL <- function(...)
-{
-    doWfStep(func = "generateMSPeakListsP", slotNameIn = "fGroups", slotNameOut = "MSPeakLists",
-             paramClass = "MSPeakListsParam", ...)
-}    
-
-doWfCompon <- function(..., algo)
-{
-    doWfStep(func = paste0("generateComponentsP", algo), slotNameIn = "fGroups", slotNameOut = "components",
-             paramClass = paste0("Components", algo, "Param"), ...)
-}
-
-doWfFormulas <- function(..., algo)
-{
-    doWfStep(func = paste0("generateFormulasP", algo), slotNameIn = c("fGroups", "MSPeakLists"),
-             slotNameOut = "formulas", paramClass = paste0("Formulas", algo, "Param"), ...)
-}
-
 #' @rdname findFeaturesOpenMS
 setMethod("findFeaturesP", c("workflow", "FeaturesOpenMSParam"),
           \(obj, param = NULL, ...) doWfFeat(obj, algo = "OpenMS", param = param, ...))
@@ -92,6 +68,13 @@ setMethod("findFeaturesP", c("workflow", "FeaturesPiekParam"),
 setMethod("findFeaturesPPiek", "workflow",
           \(obj, param = NULL, ...) doWfFeat(obj, algo = "Piek", param = param, ...))
 
+
+doWfGroupFeat <- function(..., algo)
+{
+    doWfStep(func = paste0("groupFeaturesP", algo), slotNameIn = "features", slotNameOut = "fGroups",
+             paramClass = paste0("FeatureGroups", algo, "Param"), ...)
+}
+
 #' @rdname groupFeaturesOpenMS
 setMethod("groupFeaturesP", c("workflow", "FeatureGroupsOpenMSParam"),
           \(obj, param = NULL, ...) doWfGroupFeat(obj, algo = "OpenMS", param = param, ...))
@@ -125,8 +108,51 @@ setMethod("groupFeaturesPGreedy", "workflow",
           \(obj, param = NULL, ...) doWfGroupFeat(obj, algo = "Greedy", param = param, ...))
 
 
+doWfMSPL <- function(...)
+{
+    doWfStep(func = "generateMSPeakListsP", slotNameIn = "fGroups", slotNameOut = "MSPeakLists",
+             paramClass = "MSPeakListsParam", ...)
+}
+
 #' @rdname generateMSPeakLists
 setMethod("generateMSPeakListsP", "workflow", \(obj, param = NULL, ...) doWfMSPL(obj, param = param, ...))
+
+
+doWfFormulas <- function(..., algo)
+{
+    doWfStep(func = paste0("generateFormulasP", algo), slotNameIn = c("fGroups", "MSPeakLists"),
+             slotNameOut = "formulas", paramClass = paste0("Formulas", algo, "Param"), ...)
+}
+
+#' @rdname generateFormulasGenForm
+setMethod("generateFormulasP", c("workflow", "FormulasGenFormParam"),
+          \(obj, param = NULL, ...) doWfFormulas(obj, algo = "GenForm", param = param, ...))
+
+#' @rdname generateFormulasGenForm
+setMethod("generateFormulasPGenForm", "workflow",
+          \(obj, param = NULL, ...) doWfFormulas(obj, algo = "GenForm", param = param, ...))
+
+
+doWfCompounds <- function(..., algo)
+{
+    doWfStep(func = paste0("generateCompoundsP", algo), slotNameIn = c("fGroups", "MSPeakLists"),
+             slotNameOut = "compounds", paramClass = paste0("Compounds", algo, "Param"), ...)
+}
+
+#' @rdname generateCompoundsMetFrag
+setMethod("generateCompoundsPMetFrag", "workflow",
+          \(obj, param = NULL, ...) doWfCompounds(obj, algo = "MetFrag", param = param, ...))
+
+#' @rdname generateCompoundsMetFrag
+setMethod("generateCompoundsP", c("workflow", "CompoundsMetFragParam"),
+          \(obj, param = NULL, ...) doWfCompounds(obj, algo = "MetFrag", param = param, ...))
+
+
+doWfCompon <- function(..., algo)
+{
+    doWfStep(func = paste0("generateComponentsP", algo), slotNameIn = "fGroups", slotNameOut = "components",
+             paramClass = paste0("Components", algo, "Param"), ...)
+}
 
 #' @rdname generateComponentsRAMClustR
 setMethod("generateComponentsP", c("workflow", "ComponentsRAMClustRParam"),
@@ -183,11 +209,3 @@ setMethod("generateComponentsP", c("workflow", "ComponentsNontargetParam"),
 #' @rdname generateComponentsNontarget
 setMethod("generateComponentsPNontarget", "workflow",
           \(obj, param = NULL, ...) doWfCompon(obj, algo = "Nontarget", param = param, ...))
-
-#' @rdname generateFormulasGenForm
-setMethod("generateFormulasP", c("workflow", "FormulasGenFormParam"),
-          \(obj, param = NULL, ...) doWfFormulas(obj, algo = "GenForm", param = param, ...))
-
-#' @rdname generateFormulasGenForm
-setMethod("generateFormulasPGenForm", "workflow",
-          \(obj, param = NULL, ...) doWfFormulas(obj, algo = "GenForm", param = param, ...))

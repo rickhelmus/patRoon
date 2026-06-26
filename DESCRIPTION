@@ -215,6 +215,7 @@ Collate:
     'compounds-cluster.R'
     'mslibrary.R'
     'compounds-library.R'
+    'compounds-metfrag-param.R'
     'compounds-metfrag.R'
     'utils-feat_annotations-set.R'
     'compounds-set.R'

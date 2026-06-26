@@ -32,4 +32,5 @@ test_that("all param classes can be constructed without errors", {
     # Other
     expect_error(MSPeakListsParam(), NA)
     expect_error(FormulasGenFormParam(), NA)
+    expect_error(CompoundsMetFragParam(), NA)
 })

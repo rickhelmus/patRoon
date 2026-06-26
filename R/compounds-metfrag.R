@@ -7,6 +7,7 @@
 #' @include mspeaklists.R
 #' @include formulas.R
 #' @include feature_groups-set.R
+#' @include compounds-metfrag-param.R
 NULL
 
 #' Compounds list class for MetFrag results.
@@ -488,7 +489,8 @@ MFMPErrorHandler <- function(cmd, exitStatus, retries)
 #'   information. Note that both generic and \command{MetFrag} specific names are accepted (\emph{i.e.} \code{name} and
 #'   \code{metfrag} columns returned by \code{\link{compoundScorings}}). When a local database is used, the name should
 #'   match what is given there (\code{e.g} column names when \code{database=csv}). Note that MetFrag may still report
-#'   other scoring data, however, these are not used for ranking. Sets the \option{MetFragScoreTypes} option.
+#'   other scoring data, however, these are not used for ranking. Sets the \option{MetFragScoreTypes} option. Set
+#'   \code{NULL} to use a default derived from \code{compoundScorings("metfrag", database, onlyDefault = TRUE)$name}.
 #' @param scoreWeights Numeric vector containing weights of the used scoring types. Order is the same as set in
 #'   \code{scoreTypes}. Values are recycled if necessary. Sets the \option{MetFragScoreWeights} option.
 #' @param preProcessingFilters,postProcessingFilters A character vector defining pre/post filters applied before/after
@@ -580,8 +582,8 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
                                                                 dbRelMzDev = defaultLim("mz", "narrow_rel"),
                                                                 fragRelMzDev = defaultLim("mz", "narrow_rel"),
                                                                 fragAbsMzDev = defaultLim("mz", "narrow"), adduct = NULL,
-                                                                database = "pubchemlite", extendedPubChem = "auto", chemSpiderToken = "",
-                                                                scoreTypes = compoundScorings("metfrag", database, onlyDefault = TRUE)$name,
+                                                                database = "pubchemlite", extendedPubChem = "auto",
+                                                                chemSpiderToken = "", scoreTypes = NULL,
                                                                 scoreWeights = 1.0,
                                                                 preProcessingFilters = c("UnconnectedCompoundFilter", "IsotopeFilter"),
                                                                 postProcessingFilters = c("InChIKeyFilter"),
@@ -607,7 +609,7 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
                       checkmate::checkChoice(extendedPubChem, "auto"),
                       .var.name = "extendedPubChem")
     aapply(checkmate::assertCharacter, . ~ scoreTypes + preProcessingFilters + postProcessingFilters,
-           any.missing = FALSE, fixed = list(add = ac))
+           any.missing = FALSE, null.ok = c(TRUE, FALSE, FALSE), fixed = list(add = ac))
     checkmate::assertNumeric(scoreWeights, lower = 0, finite = TRUE, any.missing = FALSE, min.len = 1, add = ac)
     aapply(checkmate::assertList, . ~ identifiers + extraOpts, any.missing = FALSE,
            names = "unique", null.ok = TRUE, fixed = list(add = ac))
@@ -617,7 +619,7 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
     isLocalDB <- isLocalMetFragDB(database)
     allScoringNames <- union(compsScores$name, compsScores$metfrag)
     # allow freely definable scorings from local databases
-    if (!isLocalDB)
+    if (!isLocalDB && !is.null(scoreTypes))
         checkmate::assertSubset(scoreTypes, allScoringNames, add = ac)
 
     checkmate::reportAssertions(ac)
@@ -627,6 +629,9 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
     
     adduct <- checkAndToAdduct(adduct, fGroups)
 
+    if (is.null(scoreTypes))
+        scoreTypes <- compoundScorings("metfrag", database, onlyDefault = TRUE)$name
+    
     ftind <- groupFeatIndex(fGroups)
     gTable <- groupTable(fGroups)
     gNames <- names(fGroups)
@@ -845,3 +850,21 @@ setMethod("generateCompoundsMetFrag", "featureGroupsSet", function(fGroups, MSPe
                          fragAbsMzDev = fragAbsMzDev, ..., setThreshold = setThreshold,
                          setThresholdAnn = setThresholdAnn, setAvgSpecificScores = setAvgSpecificScores)
 })
+
+doCompoundsPMetFrag <- function(obj, param, ..., MSPeakLists, adduct = NULL, identifiers = NULL)
+{
+    param <- prepAndVerifyParamForCall(param, "CompoundsMetFragParam", ...)
+    param <- param[!names(param) %in% c("setThreshold", "setThresholdAnn", "setAvgSpecificScores")]
+    do.call(generateCompoundsMetFrag, c(list(obj, MSPeakLists = MSPeakLists, adduct = adduct, identifiers = identifiers), param))
+}
+
+doCompoundsPMetFragSets <- function(obj, param, ..., MSPeakLists, adduct = NULL, identifiers = NULL)
+{
+    param <- prepAndVerifyParamForCall(param, "CompoundsMetFragParam", ...)
+    do.call(generateCompoundsMetFrag, c(list(obj, MSPeakLists = MSPeakLists, adduct = adduct, identifiers = identifiers), param))
+}
+
+setMethod("generateCompoundsPMetFrag", "featureGroups", doCompoundsPMetFrag)
+setMethod("generateCompoundsPMetFrag", "featureGroupsSet", doCompoundsPMetFragSets)
+setMethod("generateCompoundsP", c("featureGroups", "CompoundsMetFragParam"), doCompoundsPMetFrag)
+setMethod("generateCompoundsP", c("featureGroupsSet", "CompoundsMetFragParam"), doCompoundsPMetFragSets)

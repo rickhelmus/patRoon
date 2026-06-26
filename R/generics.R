@@ -362,6 +362,12 @@ setGeneric("generateCompoundsSIRIUS", function(fGroups, ...) standardGeneric("ge
 #' @rdname generateCompoundsLibrary
 setGeneric("generateCompoundsLibrary", function(fGroups, ...) standardGeneric("generateCompoundsLibrary"))
 
+#' @rdname generateCompoundsP
+setGeneric("generateCompoundsP", function(obj, param, ...) standardGeneric("generateCompoundsP"))
+
+#' @rdname generateCompoundsPMetFrag
+setGeneric("generateCompoundsPMetFrag", function(obj, ...) standardGeneric("generateCompoundsPMetFrag"))
+
 #' @name patRoon-defunct
 setGeneric("compoundViewer", function(fGroups, MSPeakLists, compounds) standardGeneric("compoundViewer"))
 

@@ -118,9 +118,9 @@ annotateCompNetNontarget <- function(componList, iso, add, ...)
 
         # UNDONE: configurable args
         # UNDONE: store objects in slots
-        ps <- nontarget::pattern.search(compS, iso = iso, ppm = FALSE, mztol = 0.002)
+        ps <- nontarget::pattern.search(compS, iso = iso, ppm = FALSE, mztol = 0.02)
         # NOTE: nontarget::adduct.search() calls stop() when there are no results ...
-        as <- tryCatch(nontarget::adduct.search(compS, adducts = add), error = \(...) NULL)
+        as <- tryCatch(nontarget::adduct.search(compS, adducts = add, ppm = FALSE, mztol = 0.05, use_adducts = c("M+H", "M+K", "M+Na", "M+NH4")), error = \(...) NULL)
         
         cmb <- nontarget::combine(ps, as)
         comp[, ID := .I]
@@ -151,50 +151,121 @@ annotateCompNetNontarget <- function(componList, iso, add, ...)
         setnames(isoTab,
                  c("peak ID", "group ID", "interaction level", "to ID", "isotope(s)", "mass tolerance", "charge level"),
                  c("ID", "isogroup", "iso_interaction", "iso_to", "isotope", "iso_mz_tol", "charge"))
-        isoTab[isogroup == 0, c("isogroup", "iso_interaction", "iso_to", "isotope", "iso_mz_tol", "charge") := NA]
+        isoTab <- isoTab[isogroup != 0]
         
-        isoPeaks <- isoTab[, c("ID", "isogroup", "iso_interaction"), with = FALSE][!is.na(isogroup)]
-        isoPeaks <- rbindlist(lapply(seq_len(nrow(isoPeaks)), function(row)
+        isoPeaks <- isoTab[, c("ID", "isogroup", "iso_interaction"), with = FALSE]
+        if (nrow(isoPeaks) > 0)
         {
-            data.table(ID = isoPeaks$ID[row],
-                       isogroup = as.integer(strsplit(isoPeaks$isogroup[row], "/")[[1]]),
-                       iso_interaction = as.integer(strsplit(isoPeaks$iso_interaction[row], "/")[[1]]))
-        }))
-        
-        isoGroupsCharges <- rbindlist(lapply(seq_len(nrow(ps[["Peaks in pattern groups"]])), function(row)
-        {
-            data.table(groupID = as.integer(strsplit(ps[["Peaks in pattern groups"]][["group ID"]][row], "/")[[1]][-1]),
-                       charge = as.integer(strsplit(ps[["Peaks in pattern groups"]][["charge level"]][row], "/")[[1]]))
-        }))
-        
-        isoPeaks[isoGroupsCharges, charge := i.charge, on = c("isogroup" = "groupID")]
-        
-        isoCands <- isoTab[, c("ID", "iso_to", "isotope", "iso_mz_tol", "charge"), with = FALSE][!is.na(isotope) & iso_to != "0"]
-        isoCands <- rbindlist(lapply(seq_len(nrow(isoCands)), function(row)
-        {
-            data.table(ID = as.integer(strsplit(isoCands$iso_to[row], "/")[[1]]),
-                       # isogroup = isoCands$isogroup[row], iso_interaction = isoCands$iso_interaction[row],
-                       isotope = strsplit(isoCands$isotope[row], "/")[[1]],
-                       iso_mz_tol = strsplit(isoCands$iso_mz_tol[row], "/")[[1]],
-                       charge = as.integer(strsplit(isoCands$charge[row], "/")[[1]]),
-                       iso_from = isoCands$ID[row])
-        }))
-        
-        isoCands <- merge(isoPeaks, isoCands, by = c("ID", "charge"), all.x = TRUE, sort = FALSE)
-        isoCands[is.na(isotope), isotope := "mono"]
-        setorderv(isoCands, c("ID", "isogroup"))
-        
-        isoCands <- isoCands[, .(isogroup = paste0(isogroup, collapse = "/"),
-                                 iso_interaction = paste0(iso_interaction, collapse = "/"),
-                                 isotope = paste0(isotope, collapse = "/"),
-                                 iso_mz_tol = paste0(iso_mz_tol, collapse = "/"),
-                                 charge = paste0(charge, collapse = "/"),
-                                 iso_from = paste0(iso_from, collapse = "/")), by = ID]
-        
-        isoTab[isoCands, c("isogroup", "iso_interaction", "isotope", "iso_mz_tol", "charge", "iso_from") :=
-                   .(i.isogroup, i.iso_interaction, i.isotope, i.iso_mz_tol, i.charge, iso_from), on = "ID"]
+            isoPeaks <- rbindlist(lapply(seq_len(nrow(isoPeaks)), function(row)
+            {
+                data.table(ID = isoPeaks$ID[row],
+                           isogroup = as.integer(strsplit(isoPeaks$isogroup[row], "/")[[1]]),
+                           iso_interaction = as.integer(strsplit(isoPeaks$iso_interaction[row], "/")[[1]]))
+            }))
+            isoGroupsCharges <- rbindlist(lapply(seq_len(nrow(ps[["Peaks in pattern groups"]])), function(row)
+            {
+                # NOTE: charge is only a character if multiple were collapsed
+                data.table(groupID = as.integer(strsplit(ps[["Peaks in pattern groups"]][["group ID"]][row], "/")[[1]][-1]),
+                           charge = as.integer(strsplit(as.character(ps[["Peaks in pattern groups"]][["charge level"]][row]), "/")[[1]]))
+            }), idcol = "isoCluster")
+            
+            isoPeaks[isoGroupsCharges, c("charge", "isoCluster") := .(i.charge, i.isoCluster), on = c("isogroup" = "groupID")]
+            
+            isoCands <- isoTab[, c("ID", "iso_to", "isotope", "iso_mz_tol", "charge"), with = FALSE][!is.na(isotope) & iso_to != "0"]
+            isoCands <- rbindlist(lapply(seq_len(nrow(isoCands)), function(row)
+            {
+                data.table(ID = as.integer(strsplit(isoCands$iso_to[row], "/")[[1]]),
+                           # isogroup = isoCands$isogroup[row], iso_interaction = isoCands$iso_interaction[row],
+                           isotope = strsplit(isoCands$isotope[row], "/")[[1]],
+                           iso_mz_tol = strsplit(isoCands$iso_mz_tol[row], "/")[[1]],
+                           charge = as.integer(strsplit(isoCands$charge[row], "/")[[1]]),
+                           iso_from = isoCands$ID[row])
+            }))
+            
+            isoCands <- merge(isoPeaks, isoCands, by = c("ID", "charge"), all.x = TRUE, sort = FALSE)
+            isoCands[is.na(isotope), isotope := "mono"]
+            setorderv(isoCands, c("ID", "isogroup"))
+            
+            isoGroups <- isoCands[, .(has13C = any(isotope == "13C"), size = uniqueN(ID),
+                                      isoCluster = unique(isoCluster), charge = unique(charge)), by = isogroup]
+            isoGroups[, c("maxSize", "minCharge") := .(max(size), min(charge)), by = isoCluster]
+            
+            # keep if
+            # cluster size == 1 OR
+            # cluster size > 1 AND (has 13C AND no other cluster has 13C) OR
+            # size is largest
+            
+            isoGroups[, keep := {
+                wh13C <- which(has13C); whSzMax <- which(size == maxSize); whChMin <- which(charge == minCharge)
+                if (.N == 1)
+                    TRUE
+                else if (length(wh13C) == 1)
+                    seq_len(.N) == wh13C
+                else if (length(whSzMax) == 1)
+                    seq_len(.N) == whSzMax
+                else
+                    seq_len(.N) == whChMin
+            }, by = "isoCluster"]
+            
+            isoGroups[, keep := (has13C & !any(has13C)) | (!any(has13C) & size == maxSize), by = "isoCluster"]
+            isoCands <- isoCands[isogroup %in% isoGroups[keep == TRUE]$isogroup]
+            # NOTE: isogroup and charge should now be a single value for each cluster due to above filtering
+            
+            isoCands <- isoCands[, .(isogroup = as.integer(isogroup)[1],
+                                     iso_interaction = paste0(iso_interaction, collapse = "/"),
+                                     isotope = paste0(isotope, collapse = "/"),
+                                     iso_mz_tol = paste0(iso_mz_tol, collapse = "/"),
+                                     charge = as.integer(charge)[1],
+                                     iso_from = paste0(iso_from, collapse = "/")), by = ID]
+
+            isoTab[isoCands, c("isogroup", "iso_interaction", "isotope", "iso_mz_tol", "charge", "iso_from") :=
+                       .(i.isogroup, i.iso_interaction, i.isotope, i.iso_mz_tol, i.charge, iso_from), on = "ID"]
+        }
         isoTab[, iso_to := NULL]
         
+        addTab <- NULL
+        if (!is.null(as))
+        {
+            addTab <- as.data.table(as$adducts[, setdiff(names(as$adducts), rmCols)])
+            setnames(addTab, c("peak ID", "group ID", "to ID", "adduct(s)", "mass tolerance"),
+                     c("ID", "addgroup", "add_to", "adduct", "add_mz_tol"))
+            addTab <- addTab[addgroup != 0]
+            addTabLong <- rbindlist(lapply(seq_len(nrow(addTab)), function(row)
+            {
+                ret <- data.table(ID = addTab$ID[row],
+                                  # UNDONE: unlike isotopes, no multiple adduct groups per peak?
+                                  adduct = strsplit(addTab$adduct[row], "//")[[1]],
+                                  add_mz_tol = strsplit(addTab$add_mz_tol[row], "/")[[1]],
+                                  add_to = strsplit(addTab$add_to[row], "/")[[1]])
+                ret[, addgroup := addTab$addgroup[match(ID, addTab$ID)]]
+                ret[, adduct_other := sub(".*>", "", adduct)]
+                ret[, adduct := sub("<.*", "", adduct)]
+                return(ret)
+            }))
+            
+            # add adduct groups per neutral mass: for each ID, assign unique IDs per adduct_me and assign the same ID to
+            # the IDs of corresponding add_to/adduct_to pairs.
+            
+            addTabLong[, addgroup2 := .GRP, by = .(ID, adduct)]
+            for (row in seq_len(nrow(addTabLong)))
+            {
+                if (addTabLong$ID[row] < addTabLong$add_to[row])
+                {
+                    wh <- which(addTabLong$ID == addTabLong$add_to[row] &
+                                    addTabLong$adduct == addTabLong$adduct_other[row])
+                    set(addTabLong, i = wh, j = "addgroup2", value = addTabLong$addgroup2[row])
+                }
+            }
+
+            # UNDONE: convert adducts and then use regular utils for NM calculation
+            addTabLong[, neutralMass := {
+                (comp$mz[match(ID, comp$ID)] - add[add$Name == adduct, "Mass"]) / abs(add[add$Name == adduct, "Charge"])
+            }, by = .I]
+            addTab <- addTabLong[, .(addgroup = paste0(addgroup, collapse = "/"),
+                                     adduct = paste0(adduct, collapse = "/"),
+                                     add_mz_tol = paste0(add_mz_tol, collapse = "/"),
+                                     add_link = paste0(add_link, collapse = "/")), by = ID]
+        }
         if (F) {
             
         isoCands <- isoTab[, c("ID", "iso_to", "isotope", "iso_mz_tol", "charge"), with = FALSE][!is.na(isotope) & iso_to != "0"]
@@ -243,8 +314,7 @@ annotateCompNetNontarget <- function(componList, iso, add, ...)
         # isoTab[is.na(iso_from), isotope := NA]
         }
         
-        browser()
-        isoTab[!is.na(iso_to), iso_to := indsToGNames(iso_to, comp$group)]
+        # isoTab[!is.na(iso_to), iso_to := indsToGNames(iso_to, comp$group)]
         addTab <- NULL
         if (!is.null(as))
         {
@@ -335,7 +405,7 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
             return(m)
         }))
     })
-    
+
     compsFeats <- Map(fTable, EICs, f = makeCompNetFeatures)
     compsFeatsTabs <- sapply(compsFeats, "[[", "components", simplify = FALSE)
     

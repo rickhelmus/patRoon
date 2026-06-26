@@ -1,3 +1,10 @@
+# SPDX-FileCopyrightText: 2016-2026 Rick Helmus <r.helmus@uva.nl>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
+#' @include generics.R
+NULL
+
 paramListFillDefaults <- function(paramList, definitions)
 {
     fillDefaults <- function(li, defs)
@@ -73,7 +80,8 @@ setValidity("param", function(object)
             data.frame = checkmate::assertDataFrame,
             count = checkmate::assertCount,
             specSimParams = assertSpecSimParams,
-            IMS = assertIMSArg
+            IMS = assertIMSArg,
+            TPStructParams = assertTPStructParams
         )
         
         if (is.null(cmfunc))

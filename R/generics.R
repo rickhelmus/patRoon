@@ -403,6 +403,9 @@ setGeneric("products", function(TPs) standardGeneric("products"))
 #' @rdname generateTPsLogic
 setGeneric("generateTPsLogic", function(fGroups, minMass = 40, ...) standardGeneric("generateTPsLogic"))
 
+#' @rdname generateTPsP
+setGeneric("generateTPsP", function(obj, param, ...) standardGeneric("generateTPsP"))
+
 ### suspect screening
 
 #' @name featureGroupsScreening-class

@@ -6,6 +6,7 @@
 #' @include compounds.R
 #' @include feature_groups-set.R
 #' @include mslibrary.R
+#' @include compounds-library-param.R
 NULL
 
 unifyLibNames <- function(cTab)
@@ -354,3 +355,34 @@ setMethod("generateCompoundsLibrary", "featureGroupsSet", function(fGroups, MSPe
                          minSim = minSim, minAnnSim = minAnnSim, absMzDev = absMzDev, ..., setThreshold = setThreshold,
                          setThresholdAnn = setThresholdAnn, setAvgSpecificScores = setAvgSpecificScores)
 })
+
+doCompoundsPLibrary <- function(obj, param, ..., MSPeakLists, MSLibrary, adduct = NULL)
+{
+    param <- prepAndVerifyParamForCall(param, "CompoundsLibraryParam", ...)
+    param <- param[!names(param) %in% c("setThreshold", "setThresholdAnn", "setAvgSpecificScores")]
+    do.call(generateCompoundsLibrary, c(list(obj, MSPeakLists = MSPeakLists, MSLibrary = MSLibrary,
+                                             adduct = adduct), param))
+}
+
+doCompoundsPLibrarySets <- function(obj, param, ..., MSPeakLists, MSLibrary, adduct = NULL)
+{
+    param <- prepAndVerifyParamForCall(param, "CompoundsLibraryParam", ...)
+    do.call(generateCompoundsLibrary, c(list(obj, MSPeakLists = MSPeakLists, MSLibrary = MSLibrary,
+                                             adduct = adduct), param))
+}
+
+#' @rdname generateCompoundsLibrary
+#' @export
+setMethod("generateCompoundsPLibrary", "featureGroups", doCompoundsPLibrary)
+
+#' @rdname generateCompoundsLibrary
+#' @export
+setMethod("generateCompoundsPLibrary", "featureGroupsSet", doCompoundsPLibrarySets)
+
+#' @rdname generateCompoundsLibrary
+#' @export
+setMethod("generateCompoundsP", c("featureGroups", "CompoundsLibraryParam"), doCompoundsPLibrary)
+
+#' @rdname generateCompoundsLibrary
+#' @export
+setMethod("generateCompoundsP", c("featureGroupsSet", "CompoundsLibraryParam"), doCompoundsPLibrarySets)

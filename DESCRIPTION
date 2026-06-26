@@ -213,6 +213,7 @@ Collate:
     'feature_groups-screening-set.R'
     'components-tps.R'
     'compounds-cluster.R'
+    'compounds-library-param.R'
     'mslibrary.R'
     'compounds-library.R'
     'compounds-metfrag-param.R'

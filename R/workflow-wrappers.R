@@ -147,6 +147,14 @@ setMethod("generateCompoundsPMetFrag", "workflow",
 setMethod("generateCompoundsP", c("workflow", "CompoundsMetFragParam"),
           \(obj, param = NULL, ...) doWfCompounds(obj, algo = "MetFrag", param = param, ...))
 
+#' @rdname generateCompoundsLibrary
+setMethod("generateCompoundsPLibrary", "workflow",
+          \(obj, param = NULL, ...) doWfCompounds(obj, algo = "Library", param = param, ...))
+
+#' @rdname generateCompoundsLibrary
+setMethod("generateCompoundsP", c("workflow", "CompoundsLibraryParam"),
+          \(obj, param = NULL, ...) doWfCompounds(obj, algo = "Library", param = param, ...))
+
 
 doWfCompon <- function(..., algo)
 {

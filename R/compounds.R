@@ -1036,3 +1036,16 @@ setMethod("generateCompounds", "featureGroups", function(fGroups, MSPeakLists, a
 
     f(fGroups, MSPeakLists, specSimParams, ...)
 })
+
+# NOTE: obj is not dispatched, we only want to pass through here so it works with any input
+setMethod("generateCompoundsP", c("ANY", "character"), function(obj, param, ...)
+{
+    checkmate::assertChoice(param, c("metfrag", "sirius", "library"))
+    
+    f <- switch(param,
+                metfrag = generateCompoundsPMetFrag,
+                sirius = generateCompoundsPSIRIUS,
+                library = generateCompoundsPLibrary)
+
+    f(obj, ...)
+})

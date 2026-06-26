@@ -418,7 +418,7 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
         
         # collapse all character columns
         chCols <- names(which(sapply(featTab, is.character)))
-        featTab[, (chCols) := lapply(.SD, function(x) paste0(unique(x), collapse = ",")), .SDcols = chCols, by = by]
+        featTab[, (chCols) := lapply(.SD, \(x) paste0(sort(unique(x)), collapse = ",")), .SDcols = chCols, by = by]
         featTab <- unique(featTab, by = by)
     }
     
@@ -532,7 +532,7 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
                 ai[, (anaInfoCols[isNum]) := lapply(.SD, averageFunc), .SDcols = anaInfoCols[isNum], by = averageBy]
             if (length(isChr) > 0)
             {
-                ai[, (anaInfoCols[isChr]) := lapply(.SD, \(x) paste0(unique(x), collapse = ",")),
+                ai[, (anaInfoCols[isChr]) := lapply(.SD, \(x) paste0(sort(unique(x)), collapse = ",")),
                    .SDcols = anaInfoCols[isChr], by = averageBy]
             }
         }

@@ -320,6 +320,9 @@ runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUS
             ret <- list()
             
             ret$formCands <- getSIRIUSFormulaCandidates(projectID, SIRIUSAPI, sirFeat$alignedFeatureId)
+            if (nrow(ret$formCands) == 0)
+                return(NULL)
+            
             # NOTE: frag info for SIRIUS is only available from formula candidates(!)
             fragInfos <- getSIRIUSFragInfos(projectID, SIRIUSAPI, sirFeat$alignedFeatureId, ret$formCands$formulaId, PLMS2)
             set(ret$formCands, j = "fragInfo", value = fragInfos[ret$formCands$formulaId])

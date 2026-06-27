@@ -77,12 +77,15 @@ setMethod("show", "adduct", function(object)
 #'   \code{character} format.
 #' @inheritParams as.adduct
 #' @export
-setMethod("as.character", "adduct", function(x, format = "generic", err = TRUE)
+setMethod("as.character", "adduct", function(x, format = "generic", adductInfo = NULL, err = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertChoice(format, c("generic", "sirius", "genform", "metfrag", "openms", "cliquems"), add = ac)
+    checkmate::assertChoice(format, c("generic", "sirius", "genform", "metfrag", "openms", "cliquems", "nontarget"),
+                            add = ac)
     checkmate::assertFlag(err, add = ac)
     checkmate::reportAssertions(ac)
+    
+    checkmate::assertDataFrame(adductInfo, null.ok = format != "nontarget")
 
     getGFMFAdduct <- function()
     {
@@ -168,6 +171,24 @@ setMethod("as.character", "adduct", function(x, format = "generic", err = TRUE)
             fl <- splitFormulaToList(subs)
         
         return(paste0(names(fl), fl, collapse = ""))
+    }
+    else if (format == "nontarget")
+    {
+        adds <- if (length(x@add)) paste0(x@add, collapse = "+") else "FALSE"
+        subs <- if (length(x@sub)) paste0(x@sub, collapse = "-") else "FALSE"
+
+        adductInfo <- makeDT(adductInfo)
+        adductInfo[Formula_add != "FALSE", Formula_add := sapply(Formula_add, simplifyFormula)]
+        adductInfo[Formula_ded != "FALSE", Formula_ded := sapply(Formula_ded, simplifyFormula)]
+        
+        row <- adductInfo[adductInfo$Formula_add == adds & adductInfo$Formula_ded == subs &
+                              adductInfo$Charge == x@charge & adductInfo$Multi == x@molMult, ]
+
+        if (nrow(row) == 0)
+            stop(sprintf("Adduct '%s' not found in adductInfo table!", x), call. = FALSE)
+        else if (nrow(row) > 1)
+            stop("Multiple adducts found in adductInfo table!", call. = FALSE)
+        return(row$Name)
     }
 })
 

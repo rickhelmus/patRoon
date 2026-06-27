@@ -33,3 +33,13 @@ test_that("adduct class and utilities", {
 
     expect_equal(calculateNeutralFormula(calculateIonFormula("C2H4O", "[M+H]+"), "[M+H]+"), "C2H4O")
 })
+
+test_that("nontarget adduct conversion", {
+    addEnv <- new.env()
+    data(adducts, package = "enviPat", envir = addEnv)
+    for (add in addEnv$adducts$Name)
+    {
+        expect_equal(as.character(as.adduct(add, format = "nontarget", adductInfo = addEnv$adducts),
+                                  format = "nontarget", adductInfo = addEnv$adducts), add)
+    }
+})

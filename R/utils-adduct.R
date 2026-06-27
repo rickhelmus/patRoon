@@ -159,7 +159,7 @@ normalizeAdducts <- function(adds, err = TRUE)
 }
     
 # NOTE: this and below two functions are split to separate memoised functions to retain proper ref docs
-doAsAdduct <- memoise(function(x, format, isPositive, charge, err = TRUE)
+doAsAdduct <- memoise(function(x, format, isPositive, charge, adductInfo, err = TRUE)
 {
     if (is(x, "adduct"))
         return(x)
@@ -167,7 +167,7 @@ doAsAdduct <- memoise(function(x, format, isPositive, charge, err = TRUE)
         return(x)
     
     # check first: this should fail immediately
-    checkmate::assertChoice(format, c("generic", "sirius", "genform", "metfrag", "openms", "cliquems"))
+    checkmate::assertChoice(format, c("generic", "sirius", "genform", "metfrag", "openms", "cliquems", "nontarget"))
     if (format == "openms")
         checkmate::assertInt(charge)
     
@@ -182,6 +182,7 @@ doAsAdduct <- memoise(function(x, format, isPositive, charge, err = TRUE)
     }
     else
         checkmate::assertString(x, min.chars = 1, add = ac)
+    checkmate::assertDataFrame(adductInfo, null.ok = format != "nontarget", add = ac)
     checkmate::assertFlag(err, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -275,6 +276,17 @@ doAsAdduct <- memoise(function(x, format, isPositive, charge, err = TRUE)
         subs <- formulaListToString(abs(fl[fl < 0]))
         mult <- 1 # UNDONE: always one for OpenMS?
     }
+    else if (format == "nontarget")
+    {
+        addRow <- adductInfo[adductInfo$Name == x, ]
+        if (nrow(addRow) == 0)
+            stop(sprintf("Adduct '%s' not found in adductInfo table!", x), call. = FALSE)
+        if (nrow(addRow) > 1)
+            stop("Multiple adducts found in adductInfo table!", call. = FALSE)
+        adds <- if (addRow$Formula_add != "FALSE") addRow$Formula_add else character()
+        subs <- if (addRow$Formula_ded != "FALSE") addRow$Formula_ded else character()
+        charge <- addRow$Charge; mult <- addRow$Multi
+    }
     
     adds <- adds[nzchar(adds)]; subs <- subs[nzchar(subs)]
     
@@ -354,17 +366,21 @@ MetFragAdducts <- function() copy(adductsMF)
 #'   \code{"openms"} is the format used by the \command{MetaboliteAdductDecharger} tool.
 #'   
 #'   \code{"cliquems"} is the format used by \pkg{cliqueMS}.
+#'   
+#'   \code{"nontarget"} is the format used by \pkg{nontarget}/\pkg{enviPat} and requires \code{adductInfo} to be set.
 #' @param isPositive A logical that specifies whether the adduct should be
 #'   positive. Should only be set when \code{format="metfrag"} and \code{x} is a
 #'   \code{numeric} identifier.
 #' @param charge The final charge. Only needs to be set when \code{format="openms"}.
+#' @param adductInfo A \code{data.frame} with adduct info from \emph{e.g.} \link[enviPat:adducts]{enviPat::adducts}.
+#'   Only needs to be set when \code{format="nontarget"}.
 #' @param err If \code{TRUE} then an error will be thrown if conversion fails,
 #'   otherwise returns without data.
 #'   
 #' @rdname adduct-utils
 #' @export
-as.adduct <- function(x, format = "generic", isPositive = NULL, charge = NULL,
-                      err = TRUE) doAsAdduct(x, format, isPositive, charge, err = err)
+as.adduct <- function(x, format = "generic", isPositive = NULL, charge = NULL, adductInfo = NULL,
+                      err = TRUE) doAsAdduct(x, format, isPositive, charge, adductInfo, err = err)
 
 #' @details \code{calculateIonFormula} Converts one or more neutral formulae to
 #'   adduct ions.

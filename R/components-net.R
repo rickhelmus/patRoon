@@ -136,16 +136,15 @@ annotateCompNetNontarget <- function(componList, iso, add, ...)
         # To make the data a bit easier to parse and make things more consistent, we will make sure that the final table
         # contains the isotope grouping, interaction and annotations all in one row and for the peak ID of that row.
         # Thus, the isotope grouping+interatcion is repeated for each annotation, i.e. like other metadata. Furthermore,
-        # instead of pointing to a peak with a higher interaction level, we point to the origin peak. Finally, we add
-        # "mono" to the peaks that are monoisotopes.
+        # instead of pointing to a peak with a higher interaction level, we point to the origin peak. Also, we add
+        # "mono" to the peaks that are monoisotopes. Finally, we select the "best" isotope grouping in case there are
+        # multiple charge levels.
         #
         # To get there, all the collapsed information is first converted to long format, then merged and finally
         # collapsed again to one row per peak ID.
         
-        # UNDONE: move all isotope stuff to a function, maybe make it reusable for adducts
-        # UNDONE: replace peak IDs with fGroup names
-        
         rmCols <- c(names(compS), "int", "m/z")
+        
         isoTab <- as.data.table(ps$Patterns[, setdiff(names(ps$Patterns), rmCols)])
         setnames(isoTab,
                  c("peak ID", "group ID", "interaction level", "to ID", "isotope(s)", "mass tolerance", "charge level"),
@@ -174,11 +173,10 @@ annotateCompNetNontarget <- function(componList, iso, add, ...)
             isoCands <- rbindlist(lapply(seq_len(nrow(isoCands)), function(row)
             {
                 data.table(ID = as.integer(strsplit(isoCands$iso_to[row], "/")[[1]]),
-                           # isogroup = isoCands$isogroup[row], iso_interaction = isoCands$iso_interaction[row],
                            isotope = strsplit(isoCands$isotope[row], "/")[[1]],
                            iso_mz_tol = strsplit(isoCands$iso_mz_tol[row], "/")[[1]],
                            charge = as.integer(strsplit(isoCands$charge[row], "/")[[1]]),
-                           iso_from = isoCands$ID[row])
+                           iso_link = isoCands$ID[row])
             }))
             
             isoCands <- merge(isoPeaks, isoCands, by = c("ID", "charge"), all.x = TRUE, sort = FALSE)
@@ -187,7 +185,6 @@ annotateCompNetNontarget <- function(componList, iso, add, ...)
             
             isoGroups <- isoCands[, .(has13C = any(isotope == "13C"), size = uniqueN(ID),
                                       isoCluster = unique(isoCluster), charge = unique(charge)), by = isogroup]
-            isoGroups[, c("maxSize", "minCharge") := .(max(size), min(charge)), by = isoCluster]
             
             # keep if
             # cluster size == 1 OR
@@ -195,7 +192,7 @@ annotateCompNetNontarget <- function(componList, iso, add, ...)
             # size is largest
             
             isoGroups[, keep := {
-                wh13C <- which(has13C); whSzMax <- which(size == maxSize); whChMin <- which(charge == minCharge)
+                wh13C <- which(has13C); whSzMax <- which.max(size); whChMin <- which.min(charge)
                 if (.N == 1)
                     TRUE
                 else if (length(wh13C) == 1)
@@ -206,7 +203,6 @@ annotateCompNetNontarget <- function(componList, iso, add, ...)
                     seq_len(.N) == whChMin
             }, by = "isoCluster"]
             
-            isoGroups[, keep := (has13C & !any(has13C)) | (!any(has13C) & size == maxSize), by = "isoCluster"]
             isoCands <- isoCands[isogroup %in% isoGroups[keep == TRUE]$isogroup]
             # NOTE: isogroup and charge should now be a single value for each cluster due to above filtering
             
@@ -215,16 +211,20 @@ annotateCompNetNontarget <- function(componList, iso, add, ...)
                                      isotope = paste0(isotope, collapse = "/"),
                                      iso_mz_tol = paste0(iso_mz_tol, collapse = "/"),
                                      charge = as.integer(charge)[1],
-                                     iso_from = paste0(iso_from, collapse = "/")), by = ID]
+                                     iso_link = paste0(comp[match(iso_link, ID)]$group, collapse = "/")), by = ID]
 
-            isoTab[isoCands, c("isogroup", "iso_interaction", "isotope", "iso_mz_tol", "charge", "iso_from") :=
-                       .(i.isogroup, i.iso_interaction, i.isotope, i.iso_mz_tol, i.charge, iso_from), on = "ID"]
+            isoTab[isoCands, c("isogroup", "iso_interaction", "isotope", "iso_mz_tol", "charge", "iso_link") :=
+                       .(i.isogroup, i.iso_interaction, i.isotope, i.iso_mz_tol, i.charge, iso_link), on = "ID"]
         }
         isoTab[, iso_to := NULL]
         
         addTab <- NULL
         if (!is.null(as))
         {
+            # Similarly to isotope information, we apply some data transformation to make things easier to parse. The
+            # adduct from/to information is split over two columns. Then a grouping is made based on neutral mass, and
+            # the "best" adduct group is selected in case of conflicts.
+
             addTab <- as.data.table(as$adducts[, setdiff(names(as$adducts), rmCols)])
             setnames(addTab, c("peak ID", "group ID", "to ID", "adduct(s)", "mass tolerance"),
                      c("ID", "addgroup", "add_to", "adduct", "add_mz_tol"))
@@ -232,7 +232,6 @@ annotateCompNetNontarget <- function(componList, iso, add, ...)
             addTabLong <- rbindlist(lapply(seq_len(nrow(addTab)), function(row)
             {
                 ret <- data.table(ID = addTab$ID[row],
-                                  # UNDONE: unlike isotopes, no multiple adduct groups per peak?
                                   adduct = strsplit(addTab$adduct[row], "//")[[1]],
                                   add_mz_tol = strsplit(addTab$add_mz_tol[row], "/")[[1]],
                                   add_to = strsplit(addTab$add_to[row], "/")[[1]])
@@ -242,7 +241,7 @@ annotateCompNetNontarget <- function(componList, iso, add, ...)
                 return(ret)
             }))
             
-            # add adduct groups per neutral mass: for each ID, assign unique IDs per adduct_me and assign the same ID to
+            # add adduct groups per neutral mass: for each ID, assign unique IDs per adduct and assign the same ID to
             # the IDs of corresponding add_to/adduct_to pairs.
             
             addTabLong[, addgroup2 := .GRP, by = .(ID, adduct)]
@@ -255,19 +254,57 @@ annotateCompNetNontarget <- function(componList, iso, add, ...)
                     set(addTabLong, i = wh, j = "addgroup2", value = addTabLong$addgroup2[row])
                 }
             }
+            
+            # convert adduct and calculate neutral masses
+            addObjs <- lapply(addTabLong$adduct, as.adduct, format = "nontarget", adductInfo = add)
+            addTabLong[, adduct := sapply(addObjs, as.character)]
+            addTabLong[, adduct_other := sapply(adduct_other, \(ao) as.character(as.adduct(ao, format = "nontarget", adductInfo = add)))]
+            addTabLong[, neutralMass := calculateMasses(comp$mz[match(ID, comp$ID)], addObjs, type = "neutral")]
+            
+            prefAdducts <- c("[M+H]+", "[M-H]-") # UNDONE: make configurable
+            addGroups <- addTabLong[, .(size = .N,
+                                        prefMatch = min(match(adduct, prefAdducts, nomatch = length(prefAdducts) + 1))),
+                                    by = "addgroup2"]
+            # select 'best' adduct group in case there are neutral mass conflicts.
+            addTabLong[, sel := {
+                ag <- addgroup2
+                grps <- copy(addGroups[addgroup2 %in% ag])
+                if (nrow(grps) == 1)
+                    TRUE
+                else
+                {
+                    grps[, keep := {
+                        if (any(prefMatch <= length(prefAdducts)))
+                            seq_len(.N) == which.min(prefMatch)
+                        else if (!allSame(size))
+                            seq_len(.N) == which(size == max(size))
+                        else
+                            seq_len(.N) == which(addgroup2 == grps[1])
+                    }]
+                    addgroup2 %in% grps[keep == TRUE]$addgroup2
+                }
+            }, by = "ID"]
+            
+            # make sure both in an adduct pair are (de)selected
+            addTabLong[sel == TRUE, sel := {
+                addTabLong[adduct_other == .SD$adduct & ID == .SD$add_to & adduct == .SD$adduct_other & addgroup2 == .SD$addgroup2]$sel
+            }, .SDcols = c("adduct", "add_to", "adduct_other", "addgroup2"), by = .I]
+            addTabLong <- addTabLong[sel == TRUE]
+            setorderv(addTabLong, c("ID", "addgroup2", "add_to"))
 
-            # UNDONE: convert adducts and then use regular utils for NM calculation
-            addTabLong[, neutralMass := {
-                (comp$mz[match(ID, comp$ID)] - add[add$Name == adduct, "Mass"]) / abs(add[add$Name == adduct, "Charge"])
-            }, by = .I]
-            addTab <- addTabLong[, .(addgroup = paste0(addgroup, collapse = "/"),
-                                     adduct = paste0(adduct, collapse = "/"),
-                                     add_mz_tol = paste0(add_mz_tol, collapse = "/"),
-                                     add_link = paste0(add_link, collapse = "/")), by = ID]
+            addTab <- addTabLong[, .(addgroup = as.integer(unique(addgroup2)),
+                                     adduct = unique(adduct),
+                                     neutralMass = unique(neutralMass),
+                                     add_link = paste0(comp[match(add_to, ID)]$group, collapse = "/"),
+                                     add_link_adduct = paste0(adduct_other, collapse = "/"),
+                                     add_link_mz_tol = paste0(add_mz_tol, collapse = "/")), by = ID]
         }
         
-        # isoTab[!is.na(iso_to), iso_to := indsToGNames(iso_to, comp$group)]
-
+        comp <- merge(comp, isoTab, by = "ID", all.x = TRUE, sort = FALSE)
+        if (!is.null(addTab))
+            comp <- merge(comp, addTab, by = "ID", all.x = TRUE, sort = FALSE)
+        comp[, ID := NULL]
+        
         return(comp)
     })
     

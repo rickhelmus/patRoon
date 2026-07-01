@@ -117,21 +117,25 @@ getSIRIUSFragInfos <- function(projectID, SIRIUSAPI, SIRFeatID, SIRFormIDs, PLMS
     # HACK: no PL IDs (yet) for feature specific peak lists
     hasPLID <- !is.null(PLMS2[["ID"]])
     
+    emptyFI <- data.table(mz = numeric(0), ion_formula_mz = character(0), formula_SIR = character(0),
+                          adduct = character(0), error_mz = numeric(0), error_ppm = numeric(0),
+                          PLID = if (hasPLID) numeric(0), ion_formula = character(0),
+                          neutral_loss = character(0))
+    
     # NOTE: there may be duplicate formIDs --> only query unique ones and then expand to all SIRFormIDs
     fragInfos <- sapply(unique(SIRFormIDs), function(fid)
     {
         as <- SIRIUSAPI$features_api$GetFormulaAnnotatedSpectrum(projectID, SIRFeatID, fid)
+        if (is.null(as$peaks)) # no MS/MS data?
+            return(copy(emptyFI))
+        
         ionform <- calculateIonFormula(as$spectrumAnnotation$molecularFormula,
                                        gsub(" ", "", as$spectrumAnnotation$adduct))
+        
         rbindlist(lapply(as$peaks, function(p)
         {
             if (is.null(p$peakAnnotation) || !p$peakAnnotation$isValid()) # no annotations
-            {
-                return(data.table(mz = numeric(0), ion_formula_mz = character(0), formula_SIR = character(0),
-                                  adduct = character(0), error_mz = numeric(0), error_ppm = numeric(0),
-                                  PLID = if (hasPLID) numeric(0), ion_formula = character(0),
-                                  neutral_loss = character(0)))
-            }
+                return(copy(emptyFI))
             
             anns <- data.table(mz = p$mz, ion_formula_mz = p$peakAnnotation$exactMass,
                                formula_SIR = p$peakAnnotation$molecularFormula,

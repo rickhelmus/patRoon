@@ -97,6 +97,10 @@ getSIRIUSFormulaCandidates <- function(projectID, SIRIUSAPI, SIRFeatID, adduct)
         l$medAbsMassDev <- l$medianMassDeviation$absolute
         l$medRelMassDev <- l$medianMassDeviation$ppm
         l$medianMassDeviation <- NULL
+        if (is.null(l$medAbsMassDev))
+            l$medAbsMassDev <- NA_real_
+        if (is.null(l$medRelMassDev))
+            l$medRelMassDev <- NA_real_
         return(l)
     }), fill = TRUE)
     # NOTE: explainedPeaks is re-caclulated later, but putting it now places the column before explainablePeaks

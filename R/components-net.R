@@ -87,6 +87,22 @@ makeCompNetFeatures <- function(fTable, EICs)
     return(list(graph = graph, components = compTabs))
 }
 
+annotateCompNetFM <- function(componList, ionization, ...)
+{
+    # UNDONE: more configuration and defaults
+    componList <- lapply(componList, function(comp)
+    {
+        comp <- copy(comp)
+        fm <- InterpretMSSpectrum::findMAIN(comp[, c("mz", "intensity"), with = FALSE], ionmode = ionization, ...)
+        fmtab <- as.data.table(fm[[1]]) # HACK: [[1]] is how the print() method gets the table
+        comp[, c("isogroup", "isonr", "charge", "adduct", "ppm") := .(fmtab$isogr, fmtab$iso, fmtab$charge, fmtab$adduct, fmtab$ppm)]
+        comp[!is.na(adduct), neutalMass := mapply(mz, adduct, FUN = \(m, a) calculateMasses(m, as.adduct(a), type = "neutral"))]
+        return(comp)
+    })
+    
+    return(componList)
+}
+
 annotateCompNetNontarget <- function(componList, iso, add, ...)
 {
     # UNDONE: check deps
@@ -392,7 +408,8 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     componList <- componList[sapply(componList, nrow) >= minSize]
     
     # UNDONE
-    componList <- annotateCompNetNontarget(componList, iso = NULL, add = NULL)
+    # componList <- annotateCompNetNontarget(componList, iso = NULL, add = NULL)
+    componList <- annotateCompNetFM(componList, ionization = ionization)
     
     cInfo <- data.table(name = names(componList), cmp_ret = sapply(componList, function(cmp) mean(cmp$ret)),
                         cmp_retsd = sapply(componList, function(cmp) sd(cmp$ret)),

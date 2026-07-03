@@ -496,6 +496,7 @@ setGeneric("report", function(fGroups, MSPeakLists = NULL, formulas = NULL, comp
 ### Workflow
 
 setGeneric("templateDir", function(obj) standardGeneric("templateDir"))
+setGeneric("wfWrap", function(obj, ...) standardGeneric("wfWrap"))
 
 ### Misc.
 

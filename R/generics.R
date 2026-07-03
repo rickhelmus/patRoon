@@ -400,8 +400,18 @@ setGeneric("products", function(TPs) standardGeneric("products"))
 #' @rdname generateTPsLogic
 setGeneric("generateTPsLogic", function(fGroups, minMass = 40, ...) standardGeneric("generateTPsLogic"))
 
-#' @rdname generateTPsP
+#' @rdname generateTPs
 setGeneric("generateTPsP", function(obj, param, ...) standardGeneric("generateTPsP"))
+
+#' @rdname generateTPsPBioTransformer
+setGeneric("generateTPsPBioTransformer", function(obj, ...) standardGeneric("generateTPsPBioTransformer"))
+
+#' @rdname generateTPsCTS
+setGeneric("generateTPsPCTS", function(obj, ...) standardGeneric("generateTPsPCTS"))
+
+#' @rdname generateTPsPLibrary
+setGeneric("generateTPsPLibrary", function(obj, ...) standardGeneric("generateTPsPLibrary"))
+
 
 ### suspect screening
 

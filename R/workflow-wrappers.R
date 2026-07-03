@@ -6,6 +6,7 @@ NULL
 
 doWfStep <- function(obj, func, slotNameIn, slotNameOut, param, paramClass, ...)
 {
+    if (grepl("TPsP", func)) browser()
     if (is.null(param))
         param <- new(paramClass, template = templateDir(obj))
     args <- c(sapply(slotNameIn, slot, object = obj, simplify = FALSE), list(param = param, ...))
@@ -228,10 +229,23 @@ doWfTPs <- function(..., algo)
 setMethod("generateTPsP", c("workflow", "TPsBioTransformerParam"),
           \(obj, param = NULL, ...) doWfTPs(obj, algo = "BioTransformer", param = param, ...))
 
+#' @rdname generateTPsBioTransformer
+setMethod("generateTPsPBioTransformer", "workflow",
+          \(obj, param = NULL, ...) doWfTPs(obj, algo = "BioTransformer", param = param, ...))
+
+
 #' @rdname generateTPsCTS
 setMethod("generateTPsP", c("workflow", "TPsCTSParam"),
           \(obj, param = NULL, ...) doWfTPs(obj, algo = "CTS", param = param, ...))
 
+#' @rdname generateTPsCTS
+setMethod("generateTPsPCTS", "workflow",
+          \(obj, param = NULL, ...) doWfTPs(obj, algo = "CTS", param = param, ...))
+
 #' @rdname generateTPsLibrary
 setMethod("generateTPsP", c("workflow", "TPsLibraryParam"),
+          \(obj, param = NULL, ...) doWfTPs(obj, algo = "Library", param = param, ...))
+
+#' @rdname generateTPsLibrary
+setMethod("generateTPsPLibrary", "workflow",
           \(obj, param = NULL, ...) doWfTPs(obj, algo = "Library", param = param, ...))

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2016-2026 Rick Helmus <r.helmus@uva.nl>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
 #' @include workflow.R
 NULL
 
@@ -285,12 +289,9 @@ setMethod("generateTPsPLogic", "workflow",
 
 setMethod("wfWrap", "workflow", function(obj, expr)
 {
-    # Mapping from dot-prefixed symbol names (without the dot) to workflow slot names.
-    # This allows using shorter/cleaner names in expressions (e.g. .mslists -> MSPeakLists).
-    slotMap <- c(analysisInfo = "analysisInfo", features = "features",
-                 fGroups = "fGroups", mslists = "MSPeakLists",
-                 formulas = "formulas", compounds = "compounds",
-                 components = "components", TPs = "TPs")
+    slotMap <- names(obj)
+    names(slotMap) <- paste0(".", slotMap)
+    names(slotMap)[slotMap == "MSPeakLists"] <- ".mslists"
 
     expr <- substitute(expr)
 
@@ -309,10 +310,9 @@ setMethod("wfWrap", "workflow", function(obj, expr)
             # Check if the symbol starts with a dot and the remainder is a valid slot name (e.g. .fGroups -> fGroups)
             if (!isFuncPos && nchar(symName) > 1 && substr(symName, 1, 1) == ".")
             {
-                bareName <- substr(symName, 2, nchar(symName))
-                if (bareName %in% names(slotMap))
+                if (symName %in% names(slotMap))
                 {
-                    slotName <- slotMap[bareName]
+                    slotName <- slotMap[[symName]]
                     matchedSlots <<- c(matchedSlots, slotName)
                     return(substitute(slot(obj, NAME), list(NAME = slotName)))
                 }

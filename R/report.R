@@ -170,9 +170,13 @@ adjustReportSettings <- function(settings, adjSettings) return(modifyList(settin
 #' @aliases report
 #' @rdname reporting
 #' @export
-setMethod("report", "featureGroups", function(fGroups, MSPeakLists, formulas, compounds, compsCluster, components,
-                                              TPs, settingsFile, path, EICParams, EIMParams, specSimParams, clearPath,
-                                              openReport, parallel, overrideSettings)
+setMethod("report", "featureGroups", function(obj, MSPeakLists = NULL, formulas = NULL, compounds = NULL, compsCluster = NULL,
+                                              components = NULL, TPs = NULL,
+                                              settingsFile = system.file("report", "settings.yml", package = "patRoon"),
+                                              path = NULL, EICParams = getDefEICParams(topMost = 1, topMostByReplicate = TRUE),
+                                              EIMParams = getDefEIMParams(topMost = 1, topMostByReplicate = TRUE),
+                                              specSimParams = getDefSpecSimParams(), clearPath = FALSE, openReport = TRUE,
+                                              parallel = FALSE, overrideSettings = list())
 {
     ac <- checkmate::makeAssertCollection()
     if (!is.null(path))
@@ -198,7 +202,7 @@ setMethod("report", "featureGroups", function(fGroups, MSPeakLists, formulas, co
     if (is.null(path))
         path <- settings$general$path
     
-    if (length(fGroups) == 0)
+    if (length(obj) == 0)
     {
         cat("No feature groups, nothing to report...\n")
         return(invisible(NULL))
@@ -208,7 +212,7 @@ setMethod("report", "featureGroups", function(fGroups, MSPeakLists, formulas, co
     
     # UNDONE: check format setting here, when others are supported
     
-    doReportHTML(fGroups, MSPeakLists, formulas, compounds, compsCluster, components, TPs, settings, path,
+    doReportHTML(obj, MSPeakLists, formulas, compounds, compsCluster, components, TPs, settings, path,
                  EICParams, EIMParams, specSimParams, openReport, parallel)
     
     invisible(NULL)

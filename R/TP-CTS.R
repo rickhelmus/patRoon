@@ -185,12 +185,16 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
 
 #' @rdname generateTPsCTS
 #' @export
-generateTPsPCTS <- function(obj, param, ...)
+setMethod("generateTPsPCTS", "ANY", function(obj, param, ...)
 {
     param <- prepAndVerifyParamForCall(param, "TPsCTSParam", ...)
     do.call(generateTPsCTS, c(list(obj), param))
-}
+})
 
 #' @rdname generateTPsCTS
 #' @export
-setMethod("generateTPsP", c("ANY", "TPsCTSParam"), generateTPsPCTS)
+setMethod("generateTPsP", c("ANY", "TPsCTSParam"), function(obj, param, ...)
+{
+    param <- prepAndVerifyParamForCall(param, "TPsCTSParam", ...)
+    do.call(generateTPsCTS, c(list(obj), param))
+})

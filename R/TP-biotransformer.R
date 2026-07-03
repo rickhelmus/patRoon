@@ -241,12 +241,16 @@ generateTPsBioTransformer <- function(parents, type = "env", generations = 2, ma
 
 #' @rdname generateTPsBioTransformer
 #' @export
-generateTPsPBioTransformer <- function(obj, param, ...)
-{browser()
+setMethod("generateTPsPBioTransformer", "ANY", function(obj, param, ...)
+{
     param <- prepAndVerifyParamForCall(param, "TPsBioTransformerParam", ...)
     do.call(generateTPsBioTransformer, c(list(obj), param))
-}
+})
 
 #' @rdname generateTPsBioTransformer
 #' @export
-setMethod("generateTPsP", c("ANY", "TPsBioTransformerParam"), generateTPsPBioTransformer)
+setMethod("generateTPsP", c("ANY", "TPsBioTransformerParam"), function(obj, param, ...)
+{
+    param <- prepAndVerifyParamForCall(param, "TPsBioTransformerParam", ...)
+    do.call(generateTPsBioTransformer, c(list(obj), param))
+})

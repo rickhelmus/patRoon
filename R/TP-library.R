@@ -105,12 +105,16 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, generations = 1
 
 #' @rdname generateTPsLibrary
 #' @export
-generateTPsPLibrary <- function(obj, param, ...)
+setMethod("generateTPsPLibrary", "ANY", function(obj, param, ...)
 {
     param <- prepAndVerifyParamForCall(param, "TPsLibraryParam", ...)
     do.call(generateTPsLibrary, c(list(obj), param))
-}
+})
 
 #' @rdname generateTPsLibrary
 #' @export
-setMethod("generateTPsP", c("ANY", "TPsLibraryParam"), generateTPsPLibrary)
+setMethod("generateTPsP", c("ANY", "TPsLibraryParam"), function(obj, param, ...)
+{
+    param <- prepAndVerifyParamForCall(param, "TPsLibraryParam", ...)
+    do.call(generateTPsLibrary, c(list(obj), param))
+})

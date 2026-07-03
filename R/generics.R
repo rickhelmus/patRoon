@@ -485,13 +485,7 @@ setGeneric("reportPDF", function(fGroups, path = "report", reportFGroups = TRUE,
                                                                                 topMostByReplicate = TRUE),
                                  clearPath = FALSE) standardGeneric("reportPDF"))
 #' @name reporting
-setGeneric("report", function(fGroups, MSPeakLists = NULL, formulas = NULL, compounds = NULL, compsCluster = NULL,
-                              components = NULL, TPs = NULL,
-                              settingsFile = system.file("report", "settings.yml", package = "patRoon"),
-                              path = NULL, EICParams = getDefEICParams(topMost = 1, topMostByReplicate = TRUE),
-                              EIMParams = getDefEIMParams(topMost = 1, topMostByReplicate = TRUE),
-                              specSimParams = getDefSpecSimParams(), clearPath = FALSE, openReport = TRUE,
-                              parallel = FALSE, overrideSettings = list()) standardGeneric("report"))
+setGeneric("report", function(obj, ...) standardGeneric("report"))
 
 ### Workflow
 

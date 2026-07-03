@@ -6,7 +6,7 @@
 #' @include utils-param.R
 NULL
 
-getTPsLibraryParamDefs <- paramConfigDefsFact(list(
+getTPsLibraryFormulaParamDefs <- paramConfigDefsFact(list(
     generations = list(
         default = 1L,
         description = "The number of transformation generations to predict",
@@ -15,7 +15,7 @@ getTPsLibraryParamDefs <- paramConfigDefsFact(list(
     ),
     skipInvalid = list(
         default = TRUE,
-        description = "Skip parents without sufficient chemical information (e.g. SMILES)",
+        description = "Skip invalid parents without sufficient chemical information (e.g. formulae)",
         type = "flag"
     ),
     prefCalcChemProps = list(
@@ -28,36 +28,26 @@ getTPsLibraryParamDefs <- paramConfigDefsFact(list(
         description = "If TRUE, ensure suspects are neutral",
         type = "flag"
     ),
-    neutralizeTPs = list(
-        default = FALSE,
-        description = "If TRUE, neutralize predicted TPs",
-        type = "flag"
-    ),
     matchParentsBy = list(
-        default = "InChIKey",
+        default = "name",
         description = "How to match parents in the library",
         type = "choice",
         typeCheckArgs = list(choices = c("InChIKey", "InChIKey1", "InChI", "SMILES", "formula", "name"))
     ),
     matchGenerationsBy = list(
-        default = "InChIKey",
+        default = "name",
         description = "How to match generations in the library",
         type = "choice",
         typeCheckArgs = list(choices = c("InChIKey", "InChIKey1", "InChI", "SMILES", "formula", "name"))
-    ),
-    TPStructParams = list(
-        default = getDefTPStructParams(),
-        description = "Parameters for the calculation of TP structure properties",
-        type = "TPStructParams"
     )
 ))
 
 #' @export
-TPsLibraryParam <- setClass("TPsLibraryParam", contains = "param")
+TPsLibraryFormulaParam <- setClass("TPsLibraryFormulaParam", contains = "param")
 
-setMethod("initialize", "TPsLibraryParam", function(.Object, ...)
+setMethod("initialize", "TPsLibraryFormulaParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "TPsLibraryParam", baseName = "Library",
-                   description = "Parameters for library-based TP generation", version = "1.0",
-                   definitions = getTPsLibraryParamDefs(), ...)
+    callNextMethod(.Object, name = "TPsLibraryFormulaParam", baseName = "LibraryFormula",
+                   description = "Parameters for library-based formula TP generation", version = "1.0",
+                   definitions = getTPsLibraryFormulaParamDefs(), ...)
 })

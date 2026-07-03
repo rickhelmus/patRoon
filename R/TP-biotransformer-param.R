@@ -30,6 +30,21 @@ getTPsBioTransformerParamDefs <- paramConfigDefsFact(list(
         type = "character",
         typeCheckArgs = list(min.chars = 1, null.ok = TRUE)
     ),
+    skipInvalid = list(
+        default = TRUE,
+        description = "Skip parents without sufficient chemical information (e.g. SMILES)",
+        type = "flag"
+    ),
+    prefCalcChemProps = list(
+        default = TRUE,
+        description = "If TRUE, prefer calculated chemical properties over already present data in the suspect list",
+        type = "flag"
+    ),
+    neutralChemProps = list(
+        default = FALSE,
+        description = "If TRUE, ensure suspects are neutral",
+        type = "flag"
+    ),
     neutralizeTPs = list(
         default = TRUE,
         description = "If TRUE, neutralize predicted TPs",

@@ -39,4 +39,8 @@ test_that("all param classes can be constructed without errors", {
     expect_error(TPsBioTransformerParam(), NA)
     expect_error(TPsCTSParam(), NA)
     expect_error(TPsLibraryParam(), NA)
+    expect_error(TPsAnnCompParam(), NA)
+    expect_error(TPsAnnFormParam(), NA)
+    expect_error(TPsLibraryFormulaParam(), NA)
+    expect_error(TPsLogicParam(), NA)
 })

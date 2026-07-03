@@ -395,3 +395,20 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps =
     return(transformationProductsAnnComp(doRetDirs = FALSE, TPStructParams = TPStructParams, parents = parentsTab,
                                          products = results))
 }
+
+#' @rdname generateTPsAnnComp
+#' @export
+setMethod("generateTPsPAnnComp", "ANY", function(obj, param, ..., compounds, TPsRef = NULL, fGroupsComps = NULL)
+{
+    param <- prepAndVerifyParamForCall(param, "TPsAnnCompParam", ...)
+    do.call(generateTPsAnnComp, c(list(obj, compounds = compounds, TPsRef = TPsRef, fGroupsComps = fGroupsComps), param))
+})
+
+#' @rdname generateTPsAnnComp
+#' @export
+setMethod("generateTPsP", c("ANY", "TPsAnnCompParam"), function(obj, param, ..., compounds, TPsRef = NULL,
+                                                                fGroupsComps = NULL)
+{
+    param <- prepAndVerifyParamForCall(param, "TPsAnnCompParam", ...)
+    do.call(generateTPsAnnComp, c(list(obj, compounds = compounds, TPsRef = TPsRef, fGroupsComps = fGroupsComps), param))
+})

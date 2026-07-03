@@ -412,6 +412,18 @@ setGeneric("generateTPsPCTS", function(obj, ...) standardGeneric("generateTPsPCT
 #' @rdname generateTPsPLibrary
 setGeneric("generateTPsPLibrary", function(obj, ...) standardGeneric("generateTPsPLibrary"))
 
+#' @rdname generateTPsPAnnForm
+setGeneric("generateTPsPAnnForm", function(obj, ...) standardGeneric("generateTPsPAnnForm"))
+
+#' @rdname generateTPsPAnnComp
+setGeneric("generateTPsPAnnComp", function(obj, ...) standardGeneric("generateTPsPAnnComp"))
+
+#' @rdname generateTPsPLibraryFormula
+setGeneric("generateTPsPLibraryFormula", function(obj, ...) standardGeneric("generateTPsPLibraryFormula"))
+
+#' @rdname generateTPsPLogic
+setGeneric("generateTPsPLogic", function(obj, ...) standardGeneric("generateTPsPLogic"))
+
 
 ### suspect screening
 

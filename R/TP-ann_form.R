@@ -247,3 +247,19 @@ generateTPsAnnForm <- function(parents, formulas, minFitFormula = 0.94, skipInva
     
     return(transformationProductsAnnForm(parents = parents, products = results))
 }
+
+#' @rdname generateTPsAnnForm
+#' @export
+setMethod("generateTPsPAnnForm", "ANY", function(obj, param, ..., formulas)
+{
+    param <- prepAndVerifyParamForCall(param, "TPsAnnFormParam", ...)
+    do.call(generateTPsAnnForm, c(list(obj, formulas = formulas), param))
+})
+
+#' @rdname generateTPsAnnForm
+#' @export
+setMethod("generateTPsP", c("ANY", "TPsAnnFormParam"), function(obj, param, ..., formulas)
+{
+    param <- prepAndVerifyParamForCall(param, "TPsAnnFormParam", ...)
+    do.call(generateTPsAnnForm, c(list(obj, formulas = formulas), param))
+})

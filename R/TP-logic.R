@@ -133,4 +133,20 @@ setMethod("generateTPsLogic", "featureGroupsSet", function(fGroups, minMass = 40
     
     return(transformationProductsLogic(parents = res$parents, products = res$products))
 })
- 
+
+#' @rdname generateTPsLogic
+#' @export
+setMethod("generateTPsPLogic", "featureGroups", function(obj, param, ..., adduct = NULL, transformations = NULL)
+{
+    param <- prepAndVerifyParamForCall(param, "TPsLogicParam", ...)
+    do.call(generateTPsLogic, c(list(obj, adduct = adduct, transformations = transformations), param))
+})
+
+#' @rdname generateTPsLogic
+#' @export
+setMethod("generateTPsP", c("featureGroups", "TPsLogicParam"), function(obj, param, ..., adduct = NULL,
+                                                                        transformations = NULL)
+{
+    param <- prepAndVerifyParamForCall(param, "TPsLogicParam", ...)
+    do.call(generateTPsLogic, c(list(obj, adduct = adduct, transformations = transformations), param))
+})

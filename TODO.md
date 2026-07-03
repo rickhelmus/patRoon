@@ -2,12 +2,16 @@
 
 - findFeatures: update docs (fix analysisInfo --> obj), NEWS
 - doc new generics
+- wfWrap: don't wrap analysisInfo?
 - report()
     - keep objects configurable?
     - renamed fGroups --> obj and moved args from generic to fGroups method: update NEWS and docs
 - sets
-    - make a separate workflowSets object so that only for that methods have to be defined?
-    - then make a makeSet method for WF that returns workSets object? could replace need to make a method for features
+    - make a separate workflowSets object so that only for that methods have to be defined
+    - then make a makeSet method for WF that returns workSets object
+    - define findFeatures(..., set) methods
+    - define sets in constructor
+    - call makeSet() automatically for groupFeatures()? Can still define it for completeness
 
 
 ## Params

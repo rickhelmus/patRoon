@@ -281,3 +281,74 @@ setMethod("generateTPsP", c("workflow", "TPsLogicParam"),
 #' @rdname generateTPsLogic
 setMethod("generateTPsPLogic", "workflow",
           \(obj, param = NULL, ...) doWfTPs(obj, algo = "Logic", param = param, ...))
+
+
+setMethod("wfWrap", "workflow", function(obj, expr)
+{
+    # UNDONE: map mslists to MSPeakLists
+    slotNames <- c("analysisInfo", "features", "fGroups", "MSPeakLists", "formulas", "compounds", "components", "TPs")
+
+    expr <- substitute(expr)
+
+    if (!is.call(expr))
+        stop("Expression must be a function call")
+
+    # Recursively walk the expression tree, replacing dot-prefixed symbol references to workflow slots with
+    # slot(obj, "<name>") calls.
+    matchedSlots <- character()
+
+    replaceSlots <- function(e, isFuncPos = FALSE)
+    {
+        if (is.symbol(e))
+        {
+            symName <- as.character(e)
+            # Check if the symbol starts with a dot and the remainder is a valid slot name (e.g. .fGroups -> fGroups)
+            if (!isFuncPos && nchar(symName) > 1 && substr(symName, 1, 1) == ".")
+            {
+                bareName <- substr(symName, 2, nchar(symName))
+                if (bareName %in% slotNames)
+                {
+                    matchedSlots <<- c(matchedSlots, bareName)
+                    return(substitute(slot(obj, NAME), list(NAME = bareName)))
+                }
+            }
+            return(e)
+        }
+        else if (is.call(e))
+        {
+            # Process the call: recurse into the function position (which we never replace) and all argument positions
+            # (which we may replace).
+            funcPos <- e[[1]]
+            args <- if (length(e) > 1) as.list(e[-1]) else list()
+            newArgs <- lapply(args, function(a) replaceSlots(a, isFuncPos = FALSE))
+            as.call(c(list(replaceSlots(funcPos, isFuncPos = TRUE)), newArgs))
+        }
+        else if (is.pairlist(e))
+            as.pairlist(lapply(e, function(x) replaceSlots(x, isFuncPos = FALSE)))
+        else if (is.expression(e))
+            as.expression(lapply(e, function(x) replaceSlots(x, isFuncPos = FALSE)))
+        else
+            e # Atomic vectors, NULL, etc. – leave as-is
+    }
+
+    exprReplaced <- replaceSlots(expr)
+
+    if (length(matchedSlots) == 0)
+        stop("The expression does not reference any workflow data slots. ",
+             "Please make sure at least one argument is a dot-prefixed symbol ",
+             "that names a workflow object ",
+             "(e.g. .analysisInfo, .features, .fGroups, .MSPeakLists, .formulas, ",
+             ".compounds, .components, .TPs).")
+
+    # Evaluate the modified expression.
+    #   - envir: we supply 'obj' so that slot(obj, "<name>") resolves.
+    #   - enclos: parent.frame() so that other symbols (e.g. numeric constants,
+    #             helper functions, etc.) are found in the caller's scope.
+    result <- eval(exprReplaced, envir = list(obj = obj), enclos = parent.frame())
+
+    # Store the result back into the first matched slot
+    # UNDONE: clearly document this!
+    slot(obj, matchedSlots[1]) <- result
+
+    return(obj)
+})

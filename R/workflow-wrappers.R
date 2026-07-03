@@ -285,8 +285,12 @@ setMethod("generateTPsPLogic", "workflow",
 
 setMethod("wfWrap", "workflow", function(obj, expr)
 {
-    # UNDONE: map mslists to MSPeakLists
-    slotNames <- c("analysisInfo", "features", "fGroups", "MSPeakLists", "formulas", "compounds", "components", "TPs")
+    # Mapping from dot-prefixed symbol names (without the dot) to workflow slot names.
+    # This allows using shorter/cleaner names in expressions (e.g. .mslists -> MSPeakLists).
+    slotMap <- c(analysisInfo = "analysisInfo", features = "features",
+                 fGroups = "fGroups", mslists = "MSPeakLists",
+                 formulas = "formulas", compounds = "compounds",
+                 components = "components", TPs = "TPs")
 
     expr <- substitute(expr)
 
@@ -306,10 +310,11 @@ setMethod("wfWrap", "workflow", function(obj, expr)
             if (!isFuncPos && nchar(symName) > 1 && substr(symName, 1, 1) == ".")
             {
                 bareName <- substr(symName, 2, nchar(symName))
-                if (bareName %in% slotNames)
+                if (bareName %in% names(slotMap))
                 {
-                    matchedSlots <<- c(matchedSlots, bareName)
-                    return(substitute(slot(obj, NAME), list(NAME = bareName)))
+                    slotName <- slotMap[bareName]
+                    matchedSlots <<- c(matchedSlots, slotName)
+                    return(substitute(slot(obj, NAME), list(NAME = slotName)))
                 }
             }
             return(e)

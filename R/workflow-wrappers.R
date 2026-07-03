@@ -6,11 +6,10 @@ NULL
 
 doWfStep <- function(obj, func, slotNameIn, slotNameOut, param, paramClass, ...)
 {
-    if (grepl("TPsP", func)) browser()
     if (is.null(param))
         param <- new(paramClass, template = templateDir(obj))
     args <- c(sapply(slotNameIn, slot, object = obj, simplify = FALSE), list(param = param, ...))
-    names(args)[1] <- "obj" # HACK: first should always be args, any other slot inputs should remain
+    names(args)[1] <- "obj" # HACK: first should always be obj, any other slot inputs should remain
     slot(obj, slotNameOut) <- do.call(func, args)
     return(obj)
 }
@@ -249,3 +248,36 @@ setMethod("generateTPsP", c("workflow", "TPsLibraryParam"),
 #' @rdname generateTPsLibrary
 setMethod("generateTPsPLibrary", "workflow",
           \(obj, param = NULL, ...) doWfTPs(obj, algo = "Library", param = param, ...))
+
+
+#' @rdname generateTPsAnnForm
+setMethod("generateTPsP", c("workflow", "TPsAnnFormParam"),
+          \(obj, param = NULL, ...) doWfTPs(obj, algo = "AnnForm", param = param, ...))
+
+#' @rdname generateTPsAnnForm
+setMethod("generateTPsPAnnForm", "workflow",
+          \(obj, param = NULL, ...) doWfTPs(obj, algo = "AnnForm", param = param, ...))
+
+#' @rdname generateTPsAnnComp
+setMethod("generateTPsP", c("workflow", "TPsAnnCompParam"),
+          \(obj, param = NULL, ...) doWfTPs(obj, algo = "AnnComp", param = param, ...))
+
+#' @rdname generateTPsAnnComp
+setMethod("generateTPsPAnnComp", "workflow",
+          \(obj, param = NULL, ...) doWfTPs(obj, algo = "AnnComp", param = param, ...))
+
+#' @rdname generateTPsLibraryFormula
+setMethod("generateTPsP", c("workflow", "TPsLibraryFormulaParam"),
+          \(obj, param = NULL, ...) doWfTPs(obj, algo = "LibraryFormula", param = param, ...))
+
+#' @rdname generateTPsLibraryFormula
+setMethod("generateTPsPLibraryFormula", "workflow",
+          \(obj, param = NULL, ...) doWfTPs(obj, algo = "LibraryFormula", param = param, ...))
+
+#' @rdname generateTPsLogic
+setMethod("generateTPsP", c("workflow", "TPsLogicParam"),
+          \(obj, param = NULL, ...) doWfTPs(obj, algo = "Logic", param = param, ...))
+
+#' @rdname generateTPsLogic
+setMethod("generateTPsPLogic", "workflow",
+          \(obj, param = NULL, ...) doWfTPs(obj, algo = "Logic", param = param, ...))

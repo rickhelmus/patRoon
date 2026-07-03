@@ -96,6 +96,22 @@ generateTPsLibraryFormula <- function(parents = NULL, TPLibrary, generations = 1
     return(ret)
 }
 
+#' @rdname generateTPsLibraryFormula
+#' @export
+setMethod("generateTPsPLibraryFormula", "ANY", function(obj, param, ..., TPLibrary)
+{
+    param <- prepAndVerifyParamForCall(param, "TPsLibraryFormulaParam", ...)
+    do.call(generateTPsLibraryFormula, c(list(obj, TPLibrary = TPLibrary), param))
+})
+
+#' @rdname generateTPsLibraryFormula
+#' @export
+setMethod("generateTPsP", c("ANY", "TPsLibraryFormulaParam"), function(obj, param, ..., TPLibrary)
+{
+    param <- prepAndVerifyParamForCall(param, "TPsLibraryFormulaParam", ...)
+    do.call(generateTPsLibraryFormula, c(list(obj, TPLibrary = TPLibrary), param))
+})
+
 #' Automatically generate a transformation product library with formula data.
 #'
 #' Functionality to automatically generate a TP library with formula data from a set of transformation rules, which can

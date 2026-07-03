@@ -14,8 +14,10 @@
 - intclust components: should normalized and average still be flags?
 - generateFormulasP: doc that bruker is not supported, add SIRIUS support
 - generateTPsBioTransformer(): maxExpGenerations is now additional to generations -->update NEWS and test
+- add suspect lists, TP libraries, logic transformations etc to params?
+    - in any case: add string option to load from CSV
 
-* NEWS
+## NEWS
 
 * `generateComponentsRAMClustR()`: set `RCExperimentVals$instrument$ionization` automatically if unspecified.
 

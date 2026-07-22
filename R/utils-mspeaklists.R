@@ -374,7 +374,7 @@ doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, minPeaks, m
 
     intPred <- if (negate) function(i, t) i < t else function(i, t) i >= t
 
-    # do first so that cumaltive intensity is from unfiltered peaks
+    # do first so that cumulative intensity is from unfiltered peaks
     if (!is.null(relMinCumIntensity) && nrow(ret) > 0)
     {
         tic <- sum(ret$intensity)

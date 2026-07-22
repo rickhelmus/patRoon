@@ -6,6 +6,7 @@
 * Fixed: Improve handling of raw data without exported MS2 isolation windows in `piek` and `generateMSPeakLists()` (issue #156)
 * Optimizations for very large datasets (issue #154)
 * `as.data.table()`: Support non numeric columns for `anaInfoCols` when averaging (issue #158)
+* Fixed: `topMost` argument for `generateMSPeakLists()` threw an error (issue #159)
 
 
 # patRoon 3.0

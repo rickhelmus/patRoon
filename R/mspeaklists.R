@@ -991,7 +991,8 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRTWindo
     topAna <- if (!is.null(topMost) && topMost < length(analyses(fGroups)))
     {
         anas <- analyses(fGroups)
-        sapply(groupTable(fGroups), function(ints) anas[order(ints, decreasing = TRUE)[seq_len(topMost)]])
+        sapply(groupTable(fGroups), function(ints) anas[order(ints, decreasing = TRUE)[seq_len(topMost)]],
+               simplify = FALSE)
     }
     
     getMSPL <- function(backend, ft, params, MSLevel)

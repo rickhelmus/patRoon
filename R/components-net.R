@@ -5,31 +5,29 @@
 #' @include main.R
 NULL
 
-getNetCompHClust <- function(rmat)
+getNetCompHClust <- function(rmat, method = "complete", h = 0.95)
 {
     distm <- as.dist(1 - abs(rmat))
-    hc <- fastcluster::hclust(distm, method = "complete") # UNDONE: make method configurable?
-    ct <- cutree(hc, h = 0.95) # make configurable/same as applied to rmat
+    hc <- fastcluster::hclust(distm, method = method)
+    ct <- cutree(hc, h = h)
     clIDs <- sort(unique(ct))
     return(lapply(clIDs, \(id) names(ct[ct == id])))
 }
 
-getNetCompHCS <- function(graph)
+getNetCompHCS <- function(graph, ...)
 {
-    # UNDONE: make configurable
-    return(RBGL::highlyConnSG(igraph::as_graphnel(graph), sat = 3, ldv = c(3, 2, 1))$clusters)
+    return(RBGL::highlyConnSG(igraph::as_graphnel(graph), ...)$clusters)
 }
 
 getNetCompCommunity <- function(graph, func = igraph::cluster_walktrap, ...)
 {
-    # UNDONE: default OK?
+    # UNDONE: default func OK?
     return(unname(igraph::communities(func(graph, ...))))
 }
 
-getNetCompCliques <- function(graph)
+getNetCompCliques <- function(graph, ...)
 {
-    # UNDONE: make configurable
-    cliques <- igraph::max_cliques(graph)
+    cliques <- igraph::max_cliques(graph, ...)
     
     # ensure cliques don't overlap
     cliques <- cliques[order(sapply(cliques, length), decreasing = TRUE)]
@@ -51,24 +49,29 @@ getNetCompCliques <- function(graph)
     return(cliquesF)
 }
 
-makeCompNetFeatures <- function(fTable, EICs)
+makeCompNetFeatures <- function(fTable, EICs, sim, minSim, maxP, method, ...)
 {
-    # UNDONE: also allow cosine correlation
-    # UNDONE: handle new deps
-    
     eicm <- do.call(cbind, lapply(EICs, \(eic) eic[, "intensity"]))
     
-    corr <- Hmisc::rcorr(eicm, type = "pearson")
-    # rmat <- corr$r
-    # rmat[rmat < 0.95 | corr$P >= 0.05] <- 0 # UNDONE: make configurable
-    # diag(rmat) <- 0
-
-    rmat <- proxy::simil(eicm, method = "cosine", by_rows = FALSE) |> as.matrix()
-    rmat[rmat < 0.95] <- 0 # UNDONE: make configurable
+    if (sim == "pearson")
+    {
+        corr <- Hmisc::rcorr(eicm, type = "pearson")
+        rmat <- corr$r
+        rmat[rmat < minSim | corr$P >= maxP] <- 0 # UNDONE: make p value threshold configurable? Doc that p threshold is applied.
+    }
+    else
+    {
+        rmat <- proxy::simil(eicm, method = "cosine", by_rows = FALSE) |> as.matrix()
+        rmat[rmat < minSim] <- 0
+    }
     diag(rmat) <- 0
     
     graph <- igraph::graph_from_adjacency_matrix(rmat, mode = "undirected", weighted = TRUE, diag = FALSE)
-    compList <- getNetCompCommunity(graph) #getNetCompCliques(graph)  #getNetCompHCS(graph) #getNetCompHClust(rmat)
+    compList <- switch(method,
+                       community = getNetCompCommunity(graph, ...),
+                       cliques = getNetCompCliques(graph, ...),
+                       hcs = getNetCompHCS(graph, ...),
+                       hclust = getNetCompHClust(rmat, ...))
     
     compTabs <- lapply(compList, function(grps)
     {
@@ -79,7 +82,7 @@ makeCompNetFeatures <- function(fTable, EICs)
         
         tab <- data.table(group = grps, degree = igraph::degree(subg, normalized = TRUE))
         weights <- sapply(grps, \(g) igraph::E(subg)[igraph::incident(subg, g)]$weight, simplify = FALSE)
-        weights <- lapply(weights, function(w) w[w > 0])
+        weights <- lapply(weights, \(w) w[w > 0])
         tab[, c("corMin", "corMax", "corMean") := .(sapply(weights, min), sapply(weights, max), sapply(weights, mean))]
         return(tab)
     })
@@ -87,39 +90,40 @@ makeCompNetFeatures <- function(fTable, EICs)
     return(list(graph = graph, components = compTabs))
 }
 
-annotateCompNetFM <- function(componList, ionization, ...)
+annotateCompNetFM <- function(componList, mzWindow, ionization, adducts, ...)
 {
     # UNDONE: more configuration and defaults
     componList <- lapply(componList, function(comp)
     {
         comp <- copy(comp)
-        fm <- InterpretMSSpectrum::findMAIN(comp[, c("mz", "intensity"), with = FALSE], ionmode = ionization, ...)
+        fm <- InterpretMSSpectrum::findMAIN(comp[, c("mz", "intensity"), with = FALSE], mzabs = mzWindow,
+                                            ionmode = ionization, rules = adducts, ...)
         fmtab <- as.data.table(fm[[1]]) # HACK: [[1]] is how the print() method gets the table
         comp[, c("isogroup", "isonr", "charge", "adduct", "ppm") := .(fmtab$isogr, fmtab$iso, fmtab$charge, fmtab$adduct, fmtab$ppm)]
-        comp[!is.na(adduct), neutalMass := mapply(mz, adduct, FUN = \(m, a) calculateMasses(m, as.adduct(a), type = "neutral"))]
+        comp[!is.na(adduct), neutralMass := mapply(mz, adduct, FUN = \(m, a) calculateMasses(m, as.adduct(a), type = "neutral"))]
         return(comp)
     })
     
     return(componList)
 }
 
-annotateCompNetNontarget <- function(componList, iso, add, ...)
+annotateCompNetNontarget <- function(componList, mzWindow, adducts, prefAdducts, patArgs, addArgs)
 {
-    # UNDONE: check deps
-    # UNDONE: increase default mass tolerances
     # UNDONE: ignore ret
     
     epEnv <- new.env()
-    if (is.null(iso)) # UNDONE: doc that this is the default
+    if (is.null(patArgs[["iso"]])) # UNDONE: doc that this is the default
     {
         data(isotopes, package = "enviPat", envir = epEnv)
-        iso <- nontarget::make.isos(epEnv$isotopes)
+        patArgs$iso <- nontarget::make.isos(epEnv$isotopes)
     }
-    if (is.null(add)) # UNDONE: doc that this is the default
+    if (is.null(addArgs[["adducts"]])) # UNDONE: doc that this is the default
     {
         data(adducts, package = "enviPat", envir = epEnv)
-        add <- epEnv$adducts
+        addArgs$adducts <- epEnv$adducts
     }
+    
+    adducts <- lapply(adducts, as.character, format = "nontarget", adductInfo = addArgs$adduct)
     
     indsToGNames <- function(inds, gNames)
     {
@@ -132,11 +136,11 @@ annotateCompNetNontarget <- function(componList, iso, add, ...)
         comp <- copy(comp)
         compS <- comp[, c("mz", "intensity", "ret"), with = FALSE]
 
-        # UNDONE: configurable args
         # UNDONE: store objects in slots
-        ps <- nontarget::pattern.search(compS, iso = iso, ppm = FALSE, mztol = 0.02)
+        ps <- do.call(nontarget::pattern.search, c(list(compS, ppm = FALSE, mztol = mzWindow), patArgs))
         # NOTE: nontarget::adduct.search() calls stop() when there are no results ...
-        as <- tryCatch(nontarget::adduct.search(compS, adducts = add, ppm = FALSE, mztol = 0.05, use_adducts = c("M+H", "M+K", "M+Na", "M+NH4")), error = \(...) NULL)
+        as <- tryCatch(do.call(nontarget::adduct.search, c(list(compS, ppm = FALSE, mztol = mzWindow,
+                                                                use_adducts = adducts), addArgs)), error = \(...) NULL)
         
         comp[, ID := .I]
         
@@ -272,12 +276,11 @@ annotateCompNetNontarget <- function(componList, iso, add, ...)
             }
             
             # convert adduct and calculate neutral masses
-            addObjs <- lapply(addTabLong$adduct, as.adduct, format = "nontarget", adductInfo = add)
+            addObjs <- lapply(addTabLong$adduct, as.adduct, format = "nontarget", adductInfo = addArgs$adducts)
             addTabLong[, adduct := sapply(addObjs, as.character)]
-            addTabLong[, adduct_other := sapply(adduct_other, \(ao) as.character(as.adduct(ao, format = "nontarget", adductInfo = add)))]
+            addTabLong[, adduct_other := sapply(adduct_other, \(ao) as.character(as.adduct(ao, format = "nontarget", adductInfo = addArgs$adducts)))]
             addTabLong[, neutralMass := calculateMasses(comp$mz[match(ID, comp$ID)], addObjs, type = "neutral")]
             
-            prefAdducts <- c("[M+H]+", "[M-H]-") # UNDONE: make configurable
             addGroups <- addTabLong[, .(size = .N,
                                         prefMatch = min(match(adduct, prefAdducts, nomatch = length(prefAdducts) + 1))),
                                     by = "addgroup2"]
@@ -339,12 +342,24 @@ setMethod("initialize", "componentsNet",
 #' @export
 setMethod("expandForIMS", "componentsNet", function(obj, ...) cannotExpandComponIMS(obj))
 
-setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization = NULL, minSize = 2)
+setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization = NULL, minSize = 2,
+                                                             mzWindow = defaultLim("mz", "medium"),
+                                                             componSim = "cosine", componMinSim = 0.95,
+                                                             componMaxP = 0.05, componMethod = "community",
+                                                             componArgs = list(), groupClust = "complete",
+                                                             groupClustH = 0.5, annotAlgo = "imss",
+                                                             annotAdducts = c("[M+H]+", "[M+Na]+", "[M+K]+", "[M+NH4]+",
+                                                                              "[M-H]-", "[M-H2O-H]-"),
+                                                             annotPrefAdducts = c("[M+H]+", "[M-H]-"),
+                                                             annotArgs = list())
 {
-    # checkPackage("cliqueMS", "rickhelmus/cliqueMS") # UNDONE
+    # UNDONE: handle new deps
+    # UNDONE: checkmates
     
-    # UNDONE: asserts
     checkmate::assertCount(minSize, positive = TRUE)
+    checkmate::assertChoice(componSim, c("pearson", "cosine"))
+    checkmate::assertChoice(componMethod, c("community", "cliques", "hcs", "hclust"))
+    checkmate::assertChoice(annotAlgo, c("imss", "nontarget"))
     
     fTable <- featureTable(fGroups)
     
@@ -365,7 +380,9 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
         }))
     })
 
-    compsFeats <- Map(fTable, EICs, f = makeCompNetFeatures)
+    compsFeats <- Map(fTable, EICs, f = makeCompNetFeatures,
+                      MoreArgs = c(list(sim = componSim, minSim = componMinSim, maxP = componMaxP,
+                                        method = componMethod), componArgs))
     compsFeatsTabs <- sapply(compsFeats, "[[", "components", simplify = FALSE)
     
     # generate consensus components: calculate pairwise grouping of features across analyses
@@ -374,8 +391,8 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     coCount <- getComponNetCoMatrix(compsGroupsList, featGroupsList, names(fGroups))
     
     distm <- as.dist(1 - coCount)
-    hc <- fastcluster::hclust(distm, method = "complete") # UNDONE: make configurable
-    ct <- cutree(hc, h = 0.5) # UNDONE: make configurable
+    hc <- fastcluster::hclust(distm, method = groupClust)
+    ct <- cutree(hc, h = groupClustH)
     
     gInfo <- groupInfo(fGroups)
     allFeatCompTab <- rbindlist(lapply(compsFeatsTabs, \(x) rbindlist(x, idcol = "compID")), idcol = "analysis")
@@ -407,9 +424,16 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     # UNDONE: also filter feature components by size? Then also need to update graphs for plotting
     componList <- componList[sapply(componList, nrow) >= minSize]
     
-    # UNDONE
-    # componList <- annotateCompNetNontarget(componList, iso = NULL, add = NULL)
-    componList <- annotateCompNetFM(componList, ionization = ionization)
+    componList <- if (annotAlgo == "nontarget")
+    {
+        if (length(annotArgs) == 0)
+            annotArgs <- list(pattern = list(), adduct = list())
+        annotateCompNetNontarget(componList, mzWindow = mzWindow, adducts = annotAdducts,
+                                 prefAdducts = annotPrefAdducts, patArgs = annotArgs$pattern, addArgs = annotArgs$adduct)
+    }
+    else
+        do.call(annotateCompNetFM, c(list(componList, mzWindow = mzWindow, ionization = ionization,
+                                          adducts = annotAdducts), annotArgs))
     
     cInfo <- data.table(name = names(componList), cmp_ret = sapply(componList, function(cmp) mean(cmp$ret)),
                         cmp_retsd = sapply(componList, function(cmp) sd(cmp$ret)),
@@ -430,6 +454,6 @@ setMethod("plotGraph", "componentsNet", function(obj, analysis)
     nodes[, group := sapply(id, \(x) which(sapply(obj@featureComponents[[analysis]], \(y) x %chin% y$group))[1])]
     edges <- data$edges
     edges$value <- edges$weight; edges$title <- round(edges$weight, 2)
-    nodes <- nodes[id %in% c(edges$from, edges$to)] # UNDONE: remove singletons during componentization
+    nodes <- nodes[id %in% c(edges$from, edges$to)] # UNDONE: remove singletons during componentization?
     visNetwork::visNetwork(nodes, edges) |> visNetwork::visIgraphLayout(physics = TRUE)
 })

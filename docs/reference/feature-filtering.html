@@ -121,6 +121,7 @@
 <span>  absMinConcTox <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  relMinConcTox <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  maxReplicateIntRSD <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  maxReplicateIntRSDPres <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  blankThreshold <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  retentionRange <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  mzRange <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -234,10 +235,11 @@ feature concentrations and the toxicity of the feature group. For instance, <cod
 calculated concentration of a feature should be at least <samp>10%</samp> of its toxicity.</p></dd>
 
 
-<dt id="arg-maxreplicateintrsd">maxReplicateIntRSD<a class="anchor" aria-label="anchor" href="#arg-maxreplicateintrsd"></a></dt>
-<dd><p>Maximum relative standard deviation (RSD) of intensity values for features within a
-replicate. If the RSD is above this value all features within the replicate are removed. Set to <code>NULL</code> to
-ignore.</p></dd>
+<dt id="arg-maxreplicateintrsd-maxreplicateintrsdpres">maxReplicateIntRSD, maxReplicateIntRSDPres<a class="anchor" aria-label="anchor" href="#arg-maxreplicateintrsd-maxreplicateintrsdpres"></a></dt>
+<dd><p>Maximum relative standard deviation (RSD) of intensity values for
+features within a replicate. If the RSD is above this value all features within the replicate are removed. The
+<code>maxReplicateIntRSD</code> includes absent features in the RSD calculation (<em>i.e.</em> zero intensities), whereas
+these are ignored with <code>maxReplicateIntRSDPres</code>. Set to <code>NULL</code> to ignore.</p></dd>
 
 
 <dt id="arg-blankthreshold">blankThreshold<a class="anchor" aria-label="anchor" href="#arg-blankthreshold"></a></dt>
@@ -383,7 +385,7 @@ or relative) amount of sets. Set to <code>NULL</code> to ignore.</p></dd>
 <li><p>Chromatography and mass filters (<em>i.e</em> <code>retentionRange</code>, <code>mzRange</code>, <code>mzDefectRange</code>,
   <code>chromWidthRange</code>, <code>featQualityRange</code> and <code>groupQualityRange</code>).</p></li>
 <li><p>Replicate abundance filters (<em>i.e.</em> <code>absMinReplicateAbundance</code>, <code>relMinReplicateAbundance</code> and
-  <code>maxReplicateIntRSD</code>).</p></li>
+  <code>maxReplicateIntRSD</code>/<code>maxReplicateIntRSDPres</code>).</p></li>
 <li><p>Blank filter (<em>i.e.</em> blankThreshold).</p></li>
 <li><p>Intensity filters (<em>i.e.</em> <code>absMinIntensity</code> and <code>relMinIntensity</code>).</p></li>
 <li><p>Replicate abundance filters (2nd time, only if previous filters affected results).</p></li>

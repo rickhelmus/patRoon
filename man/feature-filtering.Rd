@@ -33,6 +33,7 @@ replicateSubtract(fGroups, replicates, threshold = 0)
   absMinConcTox = NULL,
   relMinConcTox = NULL,
   maxReplicateIntRSD = NULL,
+  maxReplicateIntRSDPres = NULL,
   blankThreshold = NULL,
   retentionRange = NULL,
   mzRange = NULL,
@@ -114,9 +115,10 @@ filtering, as controlled by the \code{predAggrParams} argument. Also see the \co
 feature concentrations and the toxicity of the feature group. For instance, \code{absMinConcTox=0.1} means that the
 calculated concentration of a feature should be at least \samp{10\%} of its toxicity.}
 
-\item{maxReplicateIntRSD}{Maximum relative standard deviation (RSD) of intensity values for features within a
-replicate. If the RSD is above this value all features within the replicate are removed. Set to \code{NULL} to
-ignore.}
+\item{maxReplicateIntRSD, maxReplicateIntRSDPres}{Maximum relative standard deviation (RSD) of intensity values for
+features within a replicate. If the RSD is above this value all features within the replicate are removed. The
+\code{maxReplicateIntRSD} includes absent features in the RSD calculation (\emph{i.e.} zero intensities), whereas
+these are ignored with \code{maxReplicateIntRSDPres}. Set to \code{NULL} to ignore.}
 
 \item{blankThreshold}{Feature groups that are also present in blank analyses (see
 \link[=analysis-information]{analysis info}) are filtered out unless their relative intensity is above this
@@ -246,7 +248,7 @@ Basic rule based filtering of feature groups.
   \code{chromWidthRange}, \code{featQualityRange} and \code{groupQualityRange}).
 
   \item Replicate abundance filters (\emph{i.e.} \code{absMinReplicateAbundance}, \code{relMinReplicateAbundance} and
-  \code{maxReplicateIntRSD}).
+  \code{maxReplicateIntRSD}/\code{maxReplicateIntRSDPres}).
 
   \item Blank filter (\emph{i.e.} blankThreshold).
 

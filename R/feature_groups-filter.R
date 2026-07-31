@@ -231,7 +231,8 @@ maxToxFilter <- function(fGroups, absThreshold, relThreshold, aggrParams, remove
     }, applyIMS = applyIMS))
 }
 
-replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxIntRSD, negate = FALSE, applyIMS = "both")
+replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxIntRSD, maxIntRSDPres, negate = FALSE,
+                                     applyIMS = "both")
 {
     if (NULLToZero(absThreshold) == 0 && NULLToZero(relThreshold) == 0 && NULLToZero(maxIntRSD) == 0)
         return(fGroups) # all thresholds NULL/0
@@ -251,7 +252,7 @@ replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxInt
             thresholds <- setNames(rep(absThreshold, length(replicates(fGroups))), replicates(fGroups))
     }
     
-    maxIntRSD <- NULLToZero(maxIntRSD)
+    maxIntRSD <- NULLToZero(maxIntRSD); maxIntRSDPres <- NULLToZero(maxIntRSDPres)
 
     return(doFGroupsFilter(fGroups, "replicate abundance", c(absThreshold, relThreshold, maxIntRSD, negate), function(fGroups)
     {
@@ -259,7 +260,15 @@ replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxInt
         {
             if (doThr && sum(x > 0) < thresholds[[rg]])
                 return(TRUE)
-            return(maxIntRSD != 0 && length(x) > 1 && any(x > 0) && (sd(x) / mean(x)) > maxIntRSD) # UNDONE: remove zeros?
+            if (maxIntRSD != 0 && length(x) > 1 && any(x > 0) && (sd(x) / mean(x)) > maxIntRSD)
+                return(TRUE)
+            if (maxIntRSDPres != 0)
+            {
+                xp <- x[x > 0]
+                if (length(xp) > 1 && (sd(xp) / mean(xp)) > maxIntRSDPres)
+                    return(TRUE)
+            }
+            return(FALSE)
         }
         
         if (negate)
@@ -540,9 +549,10 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #' @param absMinReplicateAbundance,relMinReplicateAbundance Minimum absolute/relative abundance that a grouped feature
 #'   should be present within a replicate. If this minimum is not met all features within the replicate are removed. Set
 #'   to \code{NULL} to skip this step.
-#' @param maxReplicateIntRSD Maximum relative standard deviation (RSD) of intensity values for features within a
-#'   replicate. If the RSD is above this value all features within the replicate are removed. Set to \code{NULL} to
-#'   ignore.
+#' @param maxReplicateIntRSD,maxReplicateIntRSDPres Maximum relative standard deviation (RSD) of intensity values for
+#'   features within a replicate. If the RSD is above this value all features within the replicate are removed. The
+#'   \code{maxReplicateIntRSD} includes absent features in the RSD calculation (\emph{i.e.} zero intensities), whereas
+#'   these are ignored with \code{maxReplicateIntRSDPres}. Set to \code{NULL} to ignore.
 #' @param absMinConc,relMinConc The minimum absolute/relative predicted concentration (calculated by
 #'   \code{\link{calculateConcs}}) assigned to a feature. The toxicities are first aggregated prior to filtering, as
 #'   controlled by the \code{predAggrParams} argument. Also see the \code{removeNA} argument.
@@ -612,7 +622,7 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #'   \code{chromWidthRange}, \code{featQualityRange} and \code{groupQualityRange}).
 #'
 #'   \item Replicate abundance filters (\emph{i.e.} \code{absMinReplicateAbundance}, \code{relMinReplicateAbundance} and
-#'   \code{maxReplicateIntRSD}).
+#'   \code{maxReplicateIntRSD}/\code{maxReplicateIntRSDPres}).
 #'
 #'   \item Blank filter (\emph{i.e.} blankThreshold).
 #'
@@ -646,13 +656,14 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                                               absMinReplicateAbundance = NULL, relMinReplicateAbundance = NULL,
                                               absMinConc = NULL, relMinConc = NULL, absMaxTox = NULL, relMaxTox = NULL,
                                               absMinConcTox = NULL, relMinConcTox = NULL,
-                                              maxReplicateIntRSD = NULL, blankThreshold = NULL,
-                                              retentionRange = NULL, mzRange = NULL, mzDefectRange = NULL,
-                                              chromWidthRange = NULL, featQualityRange = NULL, groupQualityRange = NULL,
-                                              replicates = NULL, IMS = NULL, withIMSPrecursor = FALSE, IMSRangeParams = NULL,
-                                              results = NULL, removeBlanks = FALSE, removeISTDs = FALSE,
-                                              checkFeaturesSession = NULL, predAggrParams = getDefPredAggrParams(),
-                                              removeNA = FALSE, negate = FALSE, applyIMS = "both")
+                                              maxReplicateIntRSD = NULL, maxReplicateIntRSDPres = NULL,
+                                              blankThreshold = NULL, retentionRange = NULL, mzRange = NULL,
+                                              mzDefectRange = NULL, chromWidthRange = NULL, featQualityRange = NULL,
+                                              groupQualityRange = NULL, replicates = NULL, IMS = NULL,
+                                              withIMSPrecursor = FALSE, IMSRangeParams = NULL, results = NULL,
+                                              removeBlanks = FALSE, removeISTDs = FALSE, checkFeaturesSession = NULL,
+                                              predAggrParams = getDefPredAggrParams(), removeNA = FALSE, negate = FALSE,
+                                              applyIMS = "both")
 {
     if (isTRUE(checkFeaturesSession))
         checkFeaturesSession <- "checked-features.yml"
@@ -662,7 +673,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                absMinIntensity + relMinIntensity + absMinMaxIntensity + relMinMaxIntensity + absMinAnalyses +
                relMinAnalyses + absMinReplicates + relMinReplicates + absMinFeatures + relMinFeatures +
                absMinReplicateAbundance + relMinReplicateAbundance + absMinConc + relMinConc + absMaxTox + relMaxTox +
-               absMinConcTox + relMinConcTox + maxReplicateIntRSD + blankThreshold,
+               absMinConcTox + relMinConcTox + maxReplicateIntRSD + maxReplicateIntRSDPres + blankThreshold,
            lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     aapply(assertRange, . ~ retentionRange + mzRange + mzDefectRange + chromWidthRange, null.ok = TRUE,
            fixed = list(add = ac))
@@ -716,7 +727,8 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     obj <- maybeDoFilter(groupQualityFilter, groupQualityRange)
 
     # replicate round #1
-    obj <- maybeDoFilter(replicateAbundanceFilter, absMinReplicateAbundance, relMinReplicateAbundance, maxReplicateIntRSD)
+    obj <- maybeDoFilter(replicateAbundanceFilter, absMinReplicateAbundance, relMinReplicateAbundance,
+                         maxReplicateIntRSD, maxReplicateIntRSDPres)
     lenAfter <- length(obj)
 
     obj <- maybeDoFilter(blankFilter, blankThreshold)
@@ -724,7 +736,8 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
 
     # replicate round #2 (only do if previous filters affected results)
     if (length(obj) != lenAfter)
-        obj <- maybeDoFilter(replicateAbundanceFilter, absMinReplicateAbundance, relMinReplicateAbundance, maxReplicateIntRSD)
+        obj <- maybeDoFilter(replicateAbundanceFilter, absMinReplicateAbundance, relMinReplicateAbundance,
+                             maxReplicateIntRSD, maxReplicateIntRSDPres)
 
 
     obj <- maybeDoFilter(minMaxIntensityFilter, absMinMaxIntensity, relMinMaxIntensity)

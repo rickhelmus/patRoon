@@ -17,6 +17,7 @@ to `maxRelCumIntensity`.
 * `as.data.table()`: Support non numeric columns for `anaInfoCols` when averaging (issue #158)
 * Fixed: `topMost` argument for `generateMSPeakLists()` threw an error (issue #159)
 * Fixed: `fixedIsolationWindow` was incorrectly handled for eg Agilent DDA data (issue #161)
+* Added the `maxReplicateIntRSDPres` filter that ignores absent (zero intensity) filters in its RSD calculation, and clarified in the docs that the legacy `maxReplicateIntRSD` filter doesn't (issue #162)
 
 
 # patRoon 3.0

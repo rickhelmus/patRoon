@@ -507,6 +507,7 @@ test_that("delete and filter", {
     expect_known_show(filter(fgOpenMS, relMinReplicateAbundance = 1), "fgf-minrepabu-rel")
     expect_known_show(filter(fgOpenMS, absMinReplicateAbundance = 3), "fgf-minrepabu-abs")
     expect_known_show(filter(fgOpenMS, maxReplicateIntRSD = 0.5), "fgf-reprsd")
+    expect_known_show(filter(fgOpenMS, maxReplicateIntRSDPres = 0.5), "fgf-reprsdpres")
     expect_known_show(filter(fgOpenMS, blankThreshold = 5), "fgf-bl")
     expect_known_show(filter(fgOpenMS, absMinIntensity = 1500, blankThreshold = 5,
                              retentionRange = c(120, Inf), relMinReplicateAbundance = 1),

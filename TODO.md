@@ -279,7 +279,6 @@
     - get rid of getXCMSSet() calls?
 - filter()
     - document which filters work on feature level (e.g. chromWidth)
-    - remove zero values for maxReplicateIntRSD?
 - integrate OpenMS feature scoring and isotopes and PPS in general (also include filters?)
 - OpenMS: Support KD grouper?
 - Integration of mzMine features (package pending...), MS-DIAL and peakonly?

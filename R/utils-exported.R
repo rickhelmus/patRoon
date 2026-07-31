@@ -567,7 +567,7 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
                                 startMobs = mobilityRange[1], endMobs = mobilityRange[2],
                                 relMinAbundance = avgSpectraParams$relMinAbundance,
                                 absMinAbundance = avgSpectraParams$absMinAbundance,
-                                minRelCumIntensity = avgSpectraParams$minRelCumIntensity,
+                                maxRelCumIntensity = avgSpectraParams$maxRelCumIntensity,
                                 smoothWindowIMS = avgSpectraParams$smoothWindowIMS,
                                 halfWindowIMS = avgSpectraParams$halfWindowIMS,
                                 maxGapIMS = avgSpectraParams$maxGapIMS,
@@ -586,7 +586,7 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
     ret <- averageSpectraList(list(blSpecs), avgAnalysesParams$clusterMzWindow, avgAnalysesParams$topMost,
                               avgAnalysesParams$minIntensityPre, avgAnalysesParams$minIntensityPost,
                               avgAnalysesParams$relMinAbundance, avgAnalysesParams$absMinAbundance,
-                              avgAnalysesParams$minRelCumIntensity, avgAnalysesParams$method, FALSE, FALSE, FALSE,
+                              avgAnalysesParams$maxRelCumIntensity, avgAnalysesParams$method, FALSE, FALSE, FALSE,
                               FALSE)[[1]]
     ret[, precursor := NULL]
     setnames(ret, c("abundance_rel", "abundance_abs", "abundance_prev_rel", "abundance_prev_abs"),

@@ -153,13 +153,13 @@ public:
 struct SpectrumRawFilter
 {
     SpectrumRawTypes::Intensity minIntensity = 0;
-    float minRelCumIntensity = 0.0;
+    float maxRelCumIntensity = 1.0;
     NumRange<SpectrumRawTypes::Mass> mzRange;
     unsigned topMost = 0;
     bool withPrecursor = false, retainPrecursor = false;
     
     SpectrumRawFilter &setMinIntensity(SpectrumRawTypes::Intensity i) { minIntensity = i; return *this; }
-    SpectrumRawFilter &setMinRelCumIntensity(float r) { minRelCumIntensity = r; return *this; }
+    SpectrumRawFilter &setMaxRelCumIntensity(float r) { maxRelCumIntensity = r; return *this; }
     SpectrumRawFilter &setMZRange(SpectrumRawTypes::Mass s, SpectrumRawTypes::Mass e) { mzRange.set(s, e); return *this; }
     SpectrumRawFilter &setMZRange(const NumRange<SpectrumRawTypes::Mass> &r) { mzRange = r; return *this; }
     SpectrumRawFilter &setTopMost(unsigned t) { topMost = t; return *this; }

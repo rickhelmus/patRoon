@@ -160,12 +160,12 @@ SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilt
     }
     
     std::vector<float> relCumInts;
-    if (filter.minRelCumIntensity > 0.0 && (endInd - startInd) > 1)
+    if (filter.maxRelCumIntensity < 1.0 && (endInd - startInd) > 1)
     {
         const auto tic = std::accumulate(spectrum.getIntensities().begin() + startInd,
                                          spectrum.getIntensities().begin() + endInd, 0.0);
         const auto sortedInds = getSortedInds(spectrum.getIntensities().begin() + startInd,
-                                              spectrum.getIntensities().begin() + endInd);
+                                              spectrum.getIntensities().begin() + endInd, false);
         relCumInts.resize(endInd - startInd);
         SpectrumRawTypes::Intensity cumInt = 0.0;
         for (size_t i=0; i<sortedInds.size(); ++i)
@@ -178,7 +178,7 @@ SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilt
     bool addedPrec = false;
     for (size_t i=startInd; i<endInd; ++i)
     {
-        if (!relCumInts.empty() && relCumInts[i - startInd] < filter.minRelCumIntensity)
+        if (!relCumInts.empty() && relCumInts[i - startInd] > filter.maxRelCumIntensity)
             continue;
         
         if (spectrum.getIntensities()[i] >= minInt)

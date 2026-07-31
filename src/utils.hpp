@@ -63,13 +63,16 @@ template <typename C1, typename C2> std::vector<size_t> getSortedInds2D(const C1
     return ret;
 }
 
-template <typename IT> std::vector<size_t> getSortedInds(const IT &start, const IT &end)
+template <typename IT> std::vector<size_t> getSortedInds(const IT &start, const IT &end, bool ascending = true)
 {
     std::vector<size_t> ret(std::distance(start, end));
     std::iota(ret.begin(), ret.end(), 0);
     /*std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j)
     { return std::tie(*(start + i), i) < std::tie(*(start + j), j); });*/
-    std::stable_sort(ret.begin(), ret.end(), [&](size_t i, size_t j) { return *(start + i) < *(start + j); });
+    if (ascending)
+        std::stable_sort(ret.begin(), ret.end(), [&](size_t i, size_t j) { return *(start + i) < *(start + j); });
+    else
+        std::stable_sort(ret.begin(), ret.end(), [&](size_t i, size_t j) { return *(start + i) > *(start + j); });
     return ret;
 }
 

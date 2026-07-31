@@ -1,5 +1,14 @@
 # DEVEL
 
+**Important changes**
+
+* The cumulative intensity filters for MS peak list averaging and filtering were changed to address issue #160. The
+filters now correctly prioritize the most intense peaks and remove the lower intensity peaks that are above the filter
+threshold. For this reason the `minRelCumIntensity` and `relMinCumIntensity` (latter was named incorrectly) are renamed
+to `maxRelCumIntensity`.
+
+**Other changes**
+
 * Fixed: `getEICs()` output was returned as nested matrices when `output="fill"`
 * Fixed: `report()`: component table lacked ret and m/z columns
 * Fixed: `newProject()`: misc fixes when creating a project that loads analyses from a table (issue #154).

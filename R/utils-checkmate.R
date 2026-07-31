@@ -669,7 +669,7 @@ assertAvgPListParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
                   add = add)
     assertListVal(x, "absMinAbundance", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,
                   add = add)
-    assertListVal(x, "minRelCumIntensity", checkmate::assertNumber, lower = 0, upper = 1, finite = TRUE,
+    assertListVal(x, "maxRelCumIntensity", checkmate::assertNumber, lower = 0, upper = 1, finite = TRUE,
                   .var.name = .var.name, add = add)
     assertListVal(x, "topMost", checkmate::assertCount, positive = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "minIntensityPre", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,

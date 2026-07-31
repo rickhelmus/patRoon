@@ -42,7 +42,8 @@ emptyMSPeakList <- function(abundanceColumn, avgCols)
 #' spectra that are averaged. If \code{absMinAbundance} exceeds the number of spectra then the threshold is
 #' automatically lowered to the number of spectra.
 #' 
-#' \item \code{minRelCumIntensity} Minimum relative cumulative intensity of an MS peak in the averaged spectrum.
+#' \item \code{maxRelCumIntensity} The maximum relative cumulative intensity of a peak, calculated in descending order
+#' (most intense peaks first). Set to \samp{1} to disable.
 #'
 #' \item \code{smoothWindowIMS},\code{halfWindowIMS},\code{maxGapIMS} Parameters used for centroiding \emph{m/z} peaks
 #' from IMS-HRMS data. See \verb{Centroiding IMS data} for more details.
@@ -110,7 +111,7 @@ getDefAvgPListParams <- function(..., IMS = getLimIMS())
         minIntensityIMS = 25,
         absMinAbundance = 0,
         relMinAbundance = 0,
-        minRelCumIntensity = 0,
+        maxRelCumIntensity = 1,
         smoothWindowIMS = 0,
         halfWindowIMS = 2,
         maxGapIMS = if (IMS == "agilent") 0.01 else 0.005,
@@ -216,7 +217,7 @@ getDefSpecSimParams <- function(...)
 }
 
 averageSpectraList <- function(spectraList, clusterMzWindow, topMost, minIntensityPre, minIntensityPost,
-                               relMinAbundance, absMinAbundance, minRelCumIntensity, method, assignPrecursor,
+                               relMinAbundance, absMinAbundance, maxRelCumIntensity, method, assignPrecursor,
                                withPrecursor, pruneMissingPrecursor, retainPrecursor)
 {
     # pre-treat
@@ -237,11 +238,11 @@ averageSpectraList <- function(spectraList, clusterMzWindow, topMost, minIntensi
                 s <- s[keep]
             }
             
-            if (minRelCumIntensity > 0)
+            if (maxRelCumIntensity < 1)
             {
                 tic <- sum(s$intensity)
-                s[order(intensity), cumInt := cumsum(intensity) / tic]
-                s <- s[cumInt >= minRelCumIntensity]
+                s[order(intensity, decreasing = TRUE), cumInt := cumsum(intensity) / tic]
+                s <- s[cumInt <= maxRelCumIntensity]
                 s[, cumInt := NULL]
             }
             return(s)
@@ -367,7 +368,7 @@ deIsotopeMSPeakList <- function(MSPeakList, negate)
 }
 
 doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, minPeaks, maxMZOverPrec, absMinAbundanceFeat,
-                               relMinAbundanceFeat, absMinAbundanceFGroup, relMinAbundanceFGroup, relMinCumIntensity,
+                               relMinAbundanceFeat, absMinAbundanceFGroup, relMinAbundanceFGroup, maxRelCumIntensity,
                                deIsotope, removeMZs, retainPrecursor, precursorMZ, mzWindow, negate)
 {
     ret <- copy(pList)
@@ -375,11 +376,14 @@ doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, minPeaks, m
     intPred <- if (negate) function(i, t) i < t else function(i, t) i >= t
 
     # do first so that cumulative intensity is from unfiltered peaks
-    if (!is.null(relMinCumIntensity) && nrow(ret) > 0)
+    if (!is.null(maxRelCumIntensity) && nrow(ret) > 0)
     {
         tic <- sum(ret$intensity)
-        ret[order(intensity), cumInt := cumsum(intensity) / tic]
-        ret <- ret[intPred(cumInt, relMinCumIntensity)]
+        ret[order(intensity, decreasing = TRUE), cumInt := cumsum(intensity) / tic]
+        ret <- if (negate)
+            ret[cumInt > maxRelCumIntensity]
+        else
+            ret[cumInt <= maxRelCumIntensity]
         ret[, cumInt := NULL]
     }
     

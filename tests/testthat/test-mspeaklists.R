@@ -149,13 +149,13 @@ testMSPLCumInt <- function(obj, orig, avg, thr, negate = FALSE)
     by <- c("group", "set", "type")
     if (!avg)
         by <- c(by, "analysis")
-    tabOrig[order(intensity), cumInt := cumsum(intensity) / sum(intensity), by = by]
+    tabOrig[order(intensity, decreasing = TRUE), cumInt := cumsum(intensity) / sum(intensity), by = by]
     tab[tabOrig, cumInt := i.cumInt, on = c(by, "ID")]
     tab <- tab[precursor == FALSE] # might've been re-added
     if (negate)
-        expect_lte(max(tab$cumInt), thr)
-    else
         expect_gte(min(tab$cumInt), thr)
+    else
+        expect_lte(max(tab$cumInt), thr)
 }
 
 getMSPLProp <- function(obj, avg, col)
@@ -183,9 +183,9 @@ test_that("avg params", {
     # UNDONE: these tests are not so useful as there are only two analyses to average... so the abundance will also be between one (in case of feature being in only one analyses) or two
     # testMSPLAbundance(generateMSPeakLists(fGroups, avgFGroupParams = getDefAvgPListParams(relMinAbundance = 0.5)), TRUE, TRUE, 0.5)
     # testMSPLAbundance(generateMSPeakLists(fGroups, avgFGroupParams = getDefAvgPListParams(absMinAbundance = 2)), TRUE, FALSE, 2)
-    expect_lt(length(generateMSPeakLists(fGroups, avgFeatParams = getDefAvgPListParams(minRelCumIntensity = 0.5))),
+    expect_lt(length(generateMSPeakLists(fGroups, avgFeatParams = getDefAvgPListParams(maxRelCumIntensity = 0.5))),
               length(plists))
-    expect_lt(nrow(as.data.table(generateMSPeakLists(fGroups, avgFGroupParams = getDefAvgPListParams(minRelCumIntensity = 0.5)))),
+    expect_lt(nrow(as.data.table(generateMSPeakLists(fGroups, avgFGroupParams = getDefAvgPListParams(maxRelCumIntensity = 0.5)))),
               nrow(as.data.table(plists)))
 })
 
@@ -241,8 +241,8 @@ test_that("delete and filter", {
     expect_max_lt(getMSPLProp(filter(plists, relMinAbundanceFGroup = 1, negate = TRUE), "fgroup_abundance_rel", avg = TRUE), 1)
     expect_max_lt(getMSPLProp(filter(plists, absMinAbundanceFGroup = 2, negate = TRUE), "fgroup_abundance_abs", avg = TRUE), 2)
 
-    testMSPLCumInt(filter(plists, relMinCumIntensity = 0.5), plists, FALSE, 0.5)
-    testMSPLCumInt(filter(plists, relMinCumIntensity = 0.5, negate = TRUE), plists, FALSE, 0.5, TRUE)
+    testMSPLCumInt(filter(plists, maxRelCumIntensity = 0.5), plists, FALSE, 0.5)
+    testMSPLCumInt(filter(plists, maxRelCumIntensity = 0.5, negate = TRUE), plists, FALSE, 0.5, TRUE)
     
     testMaxMZOverPrec(filter(plists, maxMZOverPrec = 0.5), 0.5, FALSE)
     testMaxMZOverPrec(filter(plists, maxMZOverPrec = 0.5, negate = TRUE), 0.5, TRUE)

@@ -636,7 +636,7 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
                           const std::vector<SpectrumRawTypes::Mobility> startMobs,
                           const std::vector<SpectrumRawTypes::Mobility> endMobs,
                           SpectrumRawTypes::PeakAbundance relMinAbundance,
-                          SpectrumRawTypes::PeakAbundance absMinAbundance, float minRelCumIntensity,
+                          SpectrumRawTypes::PeakAbundance absMinAbundance, float maxRelCumIntensity,
                           unsigned smoothWindowIMS, unsigned halfWindowIMS, SpectrumRawTypes::Mass maxGapIMS,
                           unsigned topMost, SpectrumRawTypes::Intensity minIntensityIMS,
                           SpectrumRawTypes::Intensity minIntensityPre, SpectrumRawTypes::Intensity minIntensityPost,
@@ -648,7 +648,7 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
     const auto specMeta = backend.getSpecMetadata();
     const auto baseSpecFilter = SpectrumRawFilter()
         .setTopMost(topMost)
-        .setMinRelCumIntensity(minRelCumIntensity)
+        .setMaxRelCumIntensity(maxRelCumIntensity)
         .setWithPrecursor(withPrecursor)
         .setRetainPrecursor(retainPrecursor);
     const auto specFilter = SpectrumRawFilter(baseSpecFilter).setMinIntensity(minIntensityPre);

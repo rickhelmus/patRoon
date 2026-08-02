@@ -125,8 +125,8 @@ annotateCompNetNontarget <- function(componList, mzWindow, adducts, prefAdducts,
         data(adducts, package = "enviPat", envir = epEnv)
         addArgs$adducts <- epEnv$adducts
     }
-    
-    adducts <- lapply(adducts, as.character, format = "nontarget", adductInfo = addArgs$adduct)
+
+    adducts <- sapply(adducts, as.character, format = "nontarget", adductInfo = addArgs$adduct, USE.NAMES = FALSE)
     
     indsToGNames <- function(inds, gNames)
     {
@@ -140,7 +140,13 @@ annotateCompNetNontarget <- function(componList, mzWindow, adducts, prefAdducts,
         ps <- do.call(nontarget::pattern.search, c(list(compS, ppm = FALSE, mztol = mzWindow), patArgs))
         # NOTE: nontarget::adduct.search() calls stop() when there are no results ...
         as <- tryCatch(do.call(nontarget::adduct.search, c(list(compS, ppm = FALSE, mztol = mzWindow,
-                                                                use_adducts = adducts), addArgs)), error = \(...) NULL)
+                                                                use_adducts = adducts), addArgs)), error = \(e) e)
+        if (inherits(as, "error"))
+        {
+            if (!grepl("No matches found", as$message))
+                stop(as)
+            as <- NULL
+        }
         return(list(ps = ps, as = as))
     })
     
@@ -245,6 +251,8 @@ annotateCompNetNontarget <- function(componList, mzWindow, adducts, prefAdducts,
             isoTab[isoCands, c("isogroup", "iso_interaction", "isotope", "iso_mz_tol", "charge", "iso_link") :=
                        .(i.isogroup, i.iso_interaction, i.isotope, i.iso_mz_tol, i.charge, iso_link), on = "ID"]
         }
+        else
+            isoTab[, iso_link := NA_character_]
         isoTab[, iso_to := NULL]
         
         addTab <- NULL
@@ -327,10 +335,15 @@ annotateCompNetNontarget <- function(componList, mzWindow, adducts, prefAdducts,
                                      add_link_adduct = paste0(adduct_other, collapse = "/"),
                                      add_link_mz_tol = paste0(add_mz_tol, collapse = "/")), by = ID]
         }
+        else
+        {
+            addTab <- data.table(ID = integer(), addgroup = integer(), adduct = character(),
+                                 neutralMass = numeric(), add_link = character(),
+                                 add_link_adduct = character(), add_link_mz_tol = character())
+        }
         
         comp <- merge(comp, isoTab, by = "ID", all.x = TRUE, sort = FALSE)
-        if (!is.null(addTab))
-            comp <- merge(comp, addTab, by = "ID", all.x = TRUE, sort = FALSE)
+        comp <- merge(comp, addTab, by = "ID", all.x = TRUE, sort = FALSE)
         comp[, ID := NULL]
         
         return(comp)
@@ -376,6 +389,11 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     checkmate::assertList(componArgs, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     checkmate::assertNumber(groupClustH, finite = TRUE, lower = 0, upper = 1, add = ac)
     checkmate::assertChoice(annotAlgo, c("imss", "nontarget"), add = ac)
+    checkmate::assert(
+        checkmate::checkCharacter(annotAdducts, min.chars = 1, any.missing = FALSE, min.len = 2),
+        checkmate::checkList(annotAdducts, types = "adduct", min.len = 2, any.missing = FALSE),
+        .var.name = "annotAdducts", add = ac
+    )
     checkmate::assertCharacter(annotAdducts, min.chars = 1, any.missing = FALSE, unique = TRUE, add = ac)
     checkmate::assertCharacter(annotPrefAdducts, min.chars = 1, any.missing = FALSE, unique = TRUE, add = ac)
     checkmate::assertList(annotArgs, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
@@ -392,6 +410,17 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
         checkPackage("InterpretMSSpectrum")
     if (annotAlgo == "nontarget")
         checkPackage("nontarget")
+    
+    if (!is.list(annotAdducts))
+        annotAdducts <- lapply(annotAdducts, as.adduct)
+    
+    # only retain relevant adducts for ionization (NOTE: otherwise nontarget throws an error)
+    annotAdducts <- annotAdducts[sapply(annotAdducts, \(a) a@charge > 0) == (ionization == "positive")]
+    if (length(annotAdducts) < 2)
+    {
+        stop("Need at least two adducts for annotation, but only ", length(annotAdducts),
+             " were provided for ionization '", ionization, "'", call. = FALSE)
+    }
     
     fTable <- featureTable(fGroups)
     
@@ -471,7 +500,6 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     
     cInfo <- data.table(name = names(componList), cmp_ret = sapply(componList, function(cmp) mean(cmp$ret)),
                         cmp_retsd = sapply(componList, function(cmp) sd(cmp$ret)),
-                        # neutral_mass = sapply(componList, function(cmp) mean(cmp$neutralMass)), # UNDONE?
                         size = sapply(componList, nrow))
     
     return(componentsNet(featureComponents = compsFeatsTabs,

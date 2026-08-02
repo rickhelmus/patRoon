@@ -174,8 +174,8 @@ setMethod("as.character", "adduct", function(x, format = "generic", adductInfo =
     }
     else if (format == "nontarget")
     {
-        adds <- if (length(x@add)) paste0(x@add, collapse = "+") else "FALSE"
-        subs <- if (length(x@sub)) paste0(x@sub, collapse = "-") else "FALSE"
+        adds <- if (length(x@add)) simplifyFormula(paste0(x@add, collapse = "")) else "FALSE"
+        subs <- if (length(x@sub)) simplifyFormula(paste0(x@sub, collapse = "")) else "FALSE"
 
         adductInfo <- makeDT(adductInfo)
         adductInfo[Formula_add != "FALSE", Formula_add := sapply(Formula_add, simplifyFormula)]

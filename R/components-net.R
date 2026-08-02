@@ -19,9 +19,8 @@ getNetCompHCS <- function(graph, ...)
     return(RBGL::highlyConnSG(igraph::as_graphnel(graph), ...)$clusters)
 }
 
-getNetCompCommunity <- function(graph, func = igraph::cluster_walktrap, ...)
+getNetCompCommunity <- function(graph, func = igraph::cluster_leiden, ...)
 {
-    # UNDONE: default func OK?
     return(unname(igraph::communities(func(graph, ...))))
 }
 
@@ -471,7 +470,6 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
         }, by = "group"]
         
         return(tab)
-        # UNDONE: add more metadata?
     })
     
     if (length(componList) > 0)

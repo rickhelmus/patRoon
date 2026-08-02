@@ -364,8 +364,6 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
                                                              annotPrefAdducts = c("[M+H]+", "[M-H]-"),
                                                              annotArgs = list())
 {
-    # UNDONE: handle new deps
-    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     ionization <- checkAndGetIonization(ionization, fGroups, add = ac)
@@ -382,6 +380,18 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     checkmate::assertCharacter(annotPrefAdducts, min.chars = 1, any.missing = FALSE, unique = TRUE, add = ac)
     checkmate::assertList(annotArgs, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
+    
+    # Check optional dependencies
+    if (componSim == "pearson")
+        checkPackage("Hmisc")
+    if (componSim == "cosine")
+        checkPackage("proxy")
+    if (componMethod == "hcs")
+        checkPackage("RBGL")
+    if (annotAlgo == "imss")
+        checkPackage("InterpretMSSpectrum")
+    if (annotAlgo == "nontarget")
+        checkPackage("nontarget")
     
     fTable <- featureTable(fGroups)
     

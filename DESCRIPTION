@@ -142,7 +142,11 @@ Suggests:
     ChemmineR,
     fmcsR,
     reticulate,
-    Rmstoolkitlib
+    Rmstoolkitlib,
+    proxy,
+    Hmisc,
+    RBGL,
+    InterpretMSSpectrum
 LinkingTo:
     Rcpp,
     rapidjsonr

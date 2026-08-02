@@ -57,7 +57,7 @@ makeCompNetFeatures <- function(fTable, EICs, sim, minSim, maxP, method, ...)
     {
         corr <- Hmisc::rcorr(eicm, type = "pearson")
         rmat <- corr$r
-        rmat[rmat < minSim | corr$P >= maxP] <- 0 # UNDONE: make p value threshold configurable? Doc that p threshold is applied.
+        rmat[rmat < minSim | corr$P >= maxP] <- 0 # UNDONE: Doc that p threshold is applied.
     }
     else
     {
@@ -92,19 +92,22 @@ makeCompNetFeatures <- function(fTable, EICs, sim, minSim, maxP, method, ...)
 
 annotateCompNetFM <- function(componList, mzWindow, ionization, adducts, ...)
 {
-    # UNDONE: more configuration and defaults
-    componList <- lapply(componList, function(comp)
+    objects <- lapply(componList, function(comp)
     {
-        comp <- copy(comp)
-        fm <- InterpretMSSpectrum::findMAIN(comp[, c("mz", "intensity"), with = FALSE], mzabs = mzWindow,
-                                            ionmode = ionization, rules = adducts, ...)
-        fmtab <- as.data.table(fm[[1]]) # HACK: [[1]] is how the print() method gets the table
+        list(fm = InterpretMSSpectrum::findMAIN(comp[, c("mz", "intensity"), with = FALSE], mzabs = mzWindow,
+                                                ionmode = ionization, rules = adducts, ...))
+    })
+    
+    componList <- lapply(seq_along(componList), function(i)
+    {
+        comp <- copy(componList[[i]])
+        fmtab <- as.data.table(objects[[i]]$fm[[1]]) # HACK: [[1]] is how the print() method gets the table
         comp[, c("isogroup", "isonr", "charge", "adduct", "ppm") := .(fmtab$isogr, fmtab$iso, fmtab$charge, fmtab$adduct, fmtab$ppm)]
         comp[!is.na(adduct), neutralMass := mapply(mz, adduct, FUN = \(m, a) calculateMasses(m, as.adduct(a), type = "neutral"))]
         return(comp)
     })
     
-    return(componList)
+    return(list(components = componList, objects = objects))
 }
 
 annotateCompNetNontarget <- function(componList, mzWindow, adducts, prefAdducts, patArgs, addArgs)
@@ -131,16 +134,22 @@ annotateCompNetNontarget <- function(componList, mzWindow, adducts, prefAdducts,
         return(sapply(inds, \(i) paste0(gNames[as.integer(i)], collapse = "/")))
     }
     
-    componList <- lapply(componList, function(comp)
+    objects <- lapply(componList, function(comp)
     {
-        comp <- copy(comp)
         compS <- comp[, c("mz", "intensity", "ret"), with = FALSE]
-
-        # UNDONE: store objects in slots
         ps <- do.call(nontarget::pattern.search, c(list(compS, ppm = FALSE, mztol = mzWindow), patArgs))
         # NOTE: nontarget::adduct.search() calls stop() when there are no results ...
         as <- tryCatch(do.call(nontarget::adduct.search, c(list(compS, ppm = FALSE, mztol = mzWindow,
                                                                 use_adducts = adducts), addArgs)), error = \(...) NULL)
+        return(list(ps = ps, as = as))
+    })
+    
+    componList <- lapply(seq_along(componList), function(i)
+    {
+        comp <- copy(componList[[i]])
+        compS <- comp[, c("mz", "intensity", "ret"), with = FALSE]
+        ps <- objects[[i]]$ps
+        as <- objects[[i]]$as
         
         comp[, ID := .I]
         
@@ -326,13 +335,15 @@ annotateCompNetNontarget <- function(componList, mzWindow, adducts, prefAdducts,
         
         return(comp)
     })
+    names(componList) <- names(objects)
     
-    return(componList)
+    return(list(components = componList, objects = objects))
 }
 
 #' @rdname components-class
 #' @export
-componentsNet <- setClass("componentsNet", slots = c(featureComponents = "list", featureGraphs = "list"),
+componentsNet <- setClass("componentsNet", slots = c(featureComponents = "list", featureGraphs = "list",
+                                                     annotationObjects = "list"),
                           contains = "components")
 
 setMethod("initialize", "componentsNet",
@@ -424,7 +435,7 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     # UNDONE: also filter feature components by size? Then also need to update graphs for plotting
     componList <- componList[sapply(componList, nrow) >= minSize]
     
-    componList <- if (annotAlgo == "nontarget")
+    annotResult <- if (annotAlgo == "nontarget")
     {
         if (length(annotArgs) == 0)
             annotArgs <- list(pattern = list(), adduct = list())
@@ -435,13 +446,16 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
         do.call(annotateCompNetFM, c(list(componList, mzWindow = mzWindow, ionization = ionization,
                                           adducts = annotAdducts), annotArgs))
     
+    componList <- annotResult$components
+    
     cInfo <- data.table(name = names(componList), cmp_ret = sapply(componList, function(cmp) mean(cmp$ret)),
                         cmp_retsd = sapply(componList, function(cmp) sd(cmp$ret)),
-                        # neutral_mass = sapply(componList, function(cmp) mean(cmp$neutralMass)),
+                        # neutral_mass = sapply(componList, function(cmp) mean(cmp$neutralMass)), # UNDONE?
                         size = sapply(componList, nrow))
     
     return(componentsNet(featureComponents = compsFeatsTabs,
                          featureGraphs = sapply(compsFeats, "[[", "graph", simplify = FALSE),
+                         annotationObjects = annotResult$objects,
                          componentInfo = cInfo, components = componList))
 })
 

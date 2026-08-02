@@ -365,12 +365,23 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
                                                              annotArgs = list())
 {
     # UNDONE: handle new deps
-    # UNDONE: checkmates
     
-    checkmate::assertCount(minSize, positive = TRUE)
-    checkmate::assertChoice(componSim, c("pearson", "cosine"))
-    checkmate::assertChoice(componMethod, c("community", "cliques", "hcs", "hclust"))
-    checkmate::assertChoice(annotAlgo, c("imss", "nontarget"))
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    ionization <- checkAndGetIonization(ionization, fGroups, add = ac)
+    aapply(checkmate::assertCount, . ~ minSize, positive = TRUE, fixed = list(add = ac))
+    checkmate::assertNumber(mzWindow, finite = TRUE, lower = 0, add = ac)
+    checkmate::assertChoice(componSim, c("pearson", "cosine"), add = ac)
+    checkmate::assertNumber(componMinSim, finite = TRUE, lower = 0, upper = 1, add = ac)
+    checkmate::assertNumber(componMaxP, finite = TRUE, lower = 0, upper = 1, add = ac)
+    checkmate::assertChoice(componMethod, c("community", "cliques", "hcs", "hclust"), add = ac)
+    checkmate::assertList(componArgs, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
+    checkmate::assertNumber(groupClustH, finite = TRUE, lower = 0, upper = 1, add = ac)
+    checkmate::assertChoice(annotAlgo, c("imss", "nontarget"), add = ac)
+    checkmate::assertCharacter(annotAdducts, min.chars = 1, any.missing = FALSE, unique = TRUE, add = ac)
+    checkmate::assertCharacter(annotPrefAdducts, min.chars = 1, any.missing = FALSE, unique = TRUE, add = ac)
+    checkmate::assertList(annotArgs, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
     
     fTable <- featureTable(fGroups)
     

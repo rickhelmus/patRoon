@@ -243,6 +243,13 @@ runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUS
         doSIRIUSLogin(login, alwaysLogin, SIRIUSAPI)
         projectID <- openSIRIUSProject(projectPath, SIRIUSAPI, runMode)
         
+        DBNames <- if (!formulasOnly)
+        {
+            # to prettify dbLinks names
+            dbs <- SIRIUSAPI$searchable_databases_api$GetDatabases()
+            setNames(sapply(dbs, \(db) db$displayName), sapply(dbs, \(db) db$databaseId))
+        }
+        
         if (runMode == "execute")
         {
             makeSIRSpec <- function(pl, lev, pmz)
@@ -356,6 +363,12 @@ runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUS
                         ret$structCands[, compoundName := InChIKey1]
                     else
                         ret$structCands[, compoundName := fifelse(nzchar(compoundName), compoundName, InChIKey1)]
+                    
+                    ret$structCands[, mcesDistToTopHit := as.numeric(mcesDistToTopHit)]
+                    
+                    ret$structCands[, c("database", "identifier") := .(sapply(dbLinks, \(x) paste0(DBNames[x$name], collapse = ";")),
+                                                                       sapply(dbLinks, \(x) paste0(x$id, collapse = ";")))]
+                    ret$structCands[, dbLinks := NULL]
                 }
                 
                 ret$fingerprints <- if (getFingerprints && nrow(ret$structCands) > 0)

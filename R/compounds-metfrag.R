@@ -380,6 +380,12 @@ processMFResults <- function(comptab, runData, lfile = "")
             if (!is.null(comptab[[col]]))
                 comptab[, (col) := as.character(get(col))]
         }
+        
+        if (!is.null(comptab[["relatedCIDs"]]))
+        {
+            # we want to consistently separate indentifiers with ";"
+            comptab[, relatedCIDs := gsub(" ", ";", relatedCIDs, fixed = TRUE)]
+        }
 
         comptab[, database := runData$database]
     }

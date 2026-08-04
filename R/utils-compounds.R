@@ -78,8 +78,8 @@ compoundScorings <- function(algorithm = NULL, database = NULL, includeSuspectLi
     checkmate::assertFlag(includeSuspectLists, add = ac)
     checkmate::reportAssertions(ac)
 
-    # if (!is.null(algorithm))
-    #     ret <- ret[nzchar(ret[[algorithm]]), names(ret) != setdiff(algos, algorithm)]
+    if (!is.null(algorithm))
+        ret <- ret[nzchar(ret[[algorithm]]), !names(ret) %in% setdiff(algos, algorithm)]
     if (!is.null(database))
     {
         if (includeNoDB)
@@ -132,37 +132,69 @@ makeDBIdentLink <- function(db, ident)
     
     if (length(ident) == 0)
         return(character())
-    if (is.na(db) || is.na(ident))
-        return("NA")
     
     # CSI:FingerID/PubChemLite might return multiple identifiers, separated by ; or a space
     # set consensus results can also merge multiple identifiers
     idlist <- strsplit(ident, ";| ")
+    dblist <- strsplit(db, ";") # SIRIUS 6 results can have >1 database
     
-    if (grepl("pubchem", tolower(db)))
-        fmt <- "<a target=\"_blank\" href=\"https://pubchem.ncbi.nlm.nih.gov/compound/{ id }\">{ id }</a>"
-    else if (tolower(db) == "chemspider")
-        fmt <- "<a target=\"_blank\" href=\"http://www.chemspider.com/Search.aspx?q={ id }\">{ id }</a>"
-    else if (startsWith(idlist[[1]][1], "DTX"))
-        fmt <- "<a target=\"_blank\" href=\"https://comptox.epa.gov/dashboard/dsstoxdb/results?search={ id }\">{ id }</a>"
-    else if (tolower(db) == "library")
-        fmt <- paste0("{ id } (",
-                      "<a target=\"_blank\" href=\"https://massbank.eu/MassBank/RecordDisplay?id={ id }\">MB.eu</a>",
-                      " | ",
-                      "<a target=\"_blank\" href=\"https://mona.fiehnlab.ucdavis.edu/spectra/display/{ id }\">MoNA</a>)")
-    else
-        fmt <- NULL
-
-    ret <- character(length(ident))
-    NAIdent <- is.na(ident) | !nzchar(ident)
-    ret[NAIdent] <- NA_character_
-    ret[!NAIdent] <- sapply(idlist[!NAIdent], function(id) {
-        if (!is.null(fmt))
-            id <- glue::glue(fmt, id = id)
-        return(paste0(id, collapse = "; "))
-    })
+    if (length(dblist) == 1 && length(idlist) > 1)
+        dblist <- rep(dblist, length(idlist))
+    else if (length(dblist) != length(idlist))
+        stop("Number of databases and identifiers does not match")
     
-    return(ret)
+    makeLink <- function(db, id)
+    {
+        if (is.na(id) || !nzchar(id) || id == "null")
+            return(db)
+        if (grepl("pubchem", tolower(db)))
+            return(glue::glue("<a target=\"_blank\" href=\"https://pubchem.ncbi.nlm.nih.gov/compound/{ id }\">{ id }</a>"))
+        if (tolower(db) == "chemspider")
+            return(glue::glue("<a target=\"_blank\" href=\"http://www.chemspider.com/Search.aspx?q={ id }\">{ id }</a>"))
+        if (startsWith(id, "DTX"))
+            return(glue::glue("<a target=\"_blank\" href=\"https://comptox.epa.gov/dashboard/dsstoxdb/results?search={ id }\">{ id }</a>"))
+        if (tolower(db) == "library")
+            return(glue::glue("{ id } (<a target=\"_blank\" href=\"https://massbank.eu/MassBank/RecordDisplay?id={ id }\">MB.eu</a> | <a target=\"_blank\" href=\"https://mona.fiehnlab.ucdavis.edu/spectra/display/{ id }\">MoNA</a>)"))
+        # add some from SIRIUS 6: https://github.com/sirius-ms/sirius/blob/8a0c111d03b9f6dd6526eb37c3d099c9b2c36d24/chemical_db_oss/src/main/java/de/unijena/bioinf/chemdb/DataSource.java#L31
+        # UNDONE: this is mostly copy/paste, need to verify more...
+        # NOTE: commented out are URLs verified not too work
+        if (db == "HMDB")
+            return(glue::glue("<a target=\"_blank\" href=\"https://hmdb.ca/metabolites/{ id }\">{ id }</a>"))
+        if (tolower(db) == "knapsack")
+            return(glue::glue("<a target=\"_blank\" href=\"http://www.knapsackfamily.com/knapsack_core/result.php?sname=INCHIKEY&word=:{ id }\">{ id }</a>"))
+        if (tolower(db) == "chebi")
+            return(glue::glue("<a target=\"_blank\" href=\"https://www.ebi.ac.uk/chebi/searchId.do?chebiId={ id }\">{ id }</a>"))
+        if (db == "kegg")
+            return(glue::glue("<a target=\"_blank\" href=\"https://www.genome.jp/dbget-bin/www_bget?cpd:{ id }\">{ id }</a>"))
+        # if (db == "Maconda")
+        #     return(glue::glue("<a target=\"_blank\" href=\"http://www.maconda.bham.ac.uk/contaminant.php?id={ id }\">{ id }</a>"))
+        if (db == "Biocyc")
+            return(glue::glue("<a target=\"_blank\" href=\"https://biocyc.org/compound?orgid=META&id={ id }\">{ id }</a>"))
+        if (db == "YMDB")
+            return(glue::glue("<a target=\"_blank\" href=\"https://www.ymdb.ca/compounds/{ id }\">{ id }</a>"))
+        # if (db == "SuperNatural")
+        #     return(glue::glue("<a target=\"_blank\" href=\"http://bioinf-applied.charite.de/supernatural_new/index.php?site=compound_search&start=0&supplier=all&tox=any&classification=all&compound_input=true&sn_id={ id }\">{ id }</a>"))
+        if (tolower(db) == "coconut")
+            return(glue::glue("<a target=\"_blank\" href=\"https://coconut.naturalproducts.net/compound/coconut_id/{ id }\">{ id }</a>"))
+        # if (db == "Blood Exposome")
+        #     return(glue::glue("<a target=\"_blank\" href=\"https://bloodexposome.org/#/description?qcid={ id }\">{ id }</a>"))
+        if (db == "TeroMol")
+            return(glue::glue("<a target=\"_blank\" href=\"http://terokit.qmclab.com/molecule.html?MolId={ id }\">{ id }</a>"))
+        if (db == "LOTUS")
+            return(glue::glue("<a target=\"_blank\" href=\"https://lotus.naturalproducts.net/search/simple/{ id }\">{ id }</a>"))
+        if (tolower(db) == "foodb")
+            return(glue::glue("<a target=\"_blank\" href=\"https://foodb.ca/compounds/{ id }\">{ id }</a>"))
+        if (db == "MiMeDB")
+            return(glue::glue("<a target=\"_blank\" href=\"https://mimedb.org/metabolites/{ id }\">{ id }</a>"))
+        if (db == "LipidMaps")
+            return(glue::glue("<a target=\"_blank\" href=\"https://www.lipidmaps.org/databases/lmsd/{ id }\">{ id }</a>"))
+        if (db == "Lipid")
+            return(glue::glue("<a target=\"_blank\" href=\"https://www.lipidmaps.org/databases/lmsd/{ id }\">{ id }</a>"))
+        return(glue::glue("{ db }: { id }"))
+    }
+    
+    return(mapply(dblist, idlist, FUN = \(dbs, ids) paste0(mapply(dbs, ids, FUN = makeLink), collapse = "; "),
+                  USE.NAMES = FALSE))
 }
 
 getCompInfoList <- function(compResults, compIndex, mConsNames, addHTMLURL)

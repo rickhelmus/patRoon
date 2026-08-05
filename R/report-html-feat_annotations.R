@@ -472,6 +472,8 @@ reportHTMLUtils$methods(
         tab <- subsetDTColumnsIfPresent(tab, c("group", "compoundName", "compoundName2", "identifier",
                                                "neutral_formula", "neutralMass", "explainedPeaks", "score",
                                                "estIDLevel", "InChIKey", "UID"))
+        if (!is.null(tab[["identifier"]]) && any(grepl(";", tab$identifier)))
+            tab <- removeDTColumnsIfPresent(tab, "identifier") # only show identifier in main table if all are single identifiers
         
         tab[, candidate := seq_len(.N), by = "group"]
         
@@ -569,6 +571,8 @@ reportHTMLUtils$methods(
                 db <- if (nzchar(cn)) ct[[paste0("database", cn)]] else ct$database
                 set(ct, j = col, value = makeDBIdentLink(db, ct[[col]]))
             }
+            
+            ct <- removeDTColumnsIfPresent(ct, grep("database", names(ct), value = TRUE))
             
             return(makeAnnDetailsReact("Compound properties", ct,
                                        if (isFGSet(objects$fGroups)) sets(objects$fGroups) else NULL))

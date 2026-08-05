@@ -133,20 +133,22 @@ makeDBIdentLink <- function(db, ident)
     if (length(ident) == 0)
         return(character())
     
-    # CSI:FingerID/PubChemLite might return multiple identifiers, separated by ; or a space
+    # CSI:FingerID/PubChemLite might return multiple identifiers separated by ;
     # set consensus results can also merge multiple identifiers
-    idlist <- strsplit(ident, ";| ")
-    dblist <- strsplit(db, ";") # SIRIUS 6 results can have >1 database
+    idlist <- strsplit(ident, ";", fixed = TRUE)
+    dblist <- strsplit(db, ";", fixed = TRUE) # SIRIUS 6 results can have >1 database
     
     if (length(dblist) == 1 && length(idlist) > 1)
         dblist <- rep(dblist, length(idlist))
     else if (length(dblist) != length(idlist))
         stop("Number of databases and identifiers does not match")
     
+    idtab <- rbindlist(lapply(seq_along(dblist), \(i) data.table(db = dblist[[i]], id = idlist[[i]])), idcol = TRUE)
+    
     makeLink <- function(db, id)
     {
         if (is.na(id) || !nzchar(id) || id == "null")
-            return(db)
+            return("NA")
         if (grepl("pubchem", tolower(db)))
             return(glue::glue("<a target=\"_blank\" href=\"https://pubchem.ncbi.nlm.nih.gov/compound/{ id }\">{ id }</a>"))
         if (tolower(db) == "chemspider")
@@ -190,11 +192,15 @@ makeDBIdentLink <- function(db, ident)
             return(glue::glue("<a target=\"_blank\" href=\"https://www.lipidmaps.org/databases/lmsd/{ id }\">{ id }</a>"))
         if (db == "Lipid")
             return(glue::glue("<a target=\"_blank\" href=\"https://www.lipidmaps.org/databases/lmsd/{ id }\">{ id }</a>"))
-        return(glue::glue("{ db }: { id }"))
+        return(id)
     }
     
-    return(mapply(dblist, idlist, FUN = \(dbs, ids) paste0(mapply(dbs, ids, FUN = makeLink), collapse = "; "),
-                  USE.NAMES = FALSE))
+    idtab[, link := mapply(makeLink, db, id)]
+    idtab[, link := paste0(link, collapse = ", "), by = c(".id", "db")]
+    idtab <- unique(idtab, by = c(".id", "db"))
+    idtab[, link := paste0(db, ": ", link, collapse = "; "), by = ".id"]
+    ret <- unique(idtab, by = ".id")$link
+    return(gsub(": NA", "", ret, fixed = TRUE)) # fixup IDs that are actually DB names
 }
 
 getCompInfoList <- function(compResults, compIndex, mConsNames, addHTMLURL)

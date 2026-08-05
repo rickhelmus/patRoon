@@ -18,6 +18,7 @@ to `maxRelCumIntensity`.
 * Fixed: `topMost` argument for `generateMSPeakLists()` threw an error (issue #159)
 * Fixed: `fixedIsolationWindow` was incorrectly handled for eg Agilent DDA data (issue #161)
 * Added the `maxReplicateIntRSDPres` filter that ignores absent (zero intensity) filters in its RSD calculation, and clarified in the docs that the legacy `maxReplicateIntRSD` filter doesn't (issue #162)
+* `fixedIsolationWindow` can now be a two-sized vector to specify asymmetric isolation windows (issue #161)
 
 
 # patRoon 3.0

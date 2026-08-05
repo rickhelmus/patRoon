@@ -34,16 +34,14 @@ template<typename Spec> std::vector<size_t> flattenedSpecIDs(const std::vector<S
 }
 
 bool precWithinIsoWindow(SpectrumRawTypes::Mass prec, SpectrumRawTypes::Mass specPrec,
-                         SpectrumRawTypes::Mass fixedIsoWidth, NumRange<SpectrumRawTypes::Mass> range)
+                         NumRange<SpectrumRawTypes::Mass> fixedIsoWidth, NumRange<SpectrumRawTypes::Mass> range)
 {
     // NOTE: in case of MS/MS, we match all spectra if the precursor or iso window was unset (0.0)
-    if (prec == 0.0 || (!range.isSet() && fixedIsoWidth < 0.0) || fixedIsoWidth < 0.0)
+    if (prec == 0.0 || (fixedIsoWidth.isSet() && fixedIsoWidth.start < 0.0))
         return true;
     
-    if (fixedIsoWidth != 0.0)
-    {
-        range.start = range.end = fixedIsoWidth;
-    }
+    if (fixedIsoWidth.isSet())
+        range = fixedIsoWidth;
     range.start = specPrec - range.start; range.end += specPrec;
     return range.within(prec);
 }
@@ -54,7 +52,7 @@ std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata
                                                        const NumRange<SpectrumRawTypes::Time> &timeRange,
                                                        SpectrumRawTypes::MSLevel MSLevel,
                                                        SpectrumRawTypes::Mass precursor,
-                                                       SpectrumRawTypes::Mass fixedIsoWidth,
+                                                       NumRange<SpectrumRawTypes::Mass> fixedIsoWidth,
                                                        SpectrumRawTypes::Intensity minBPIntensity)
 {
     const SpectrumRawMetadataMS &metaMS = (MSLevel == SpectrumRawTypes::MSLevel::MS1) ? specMeta.first : specMeta.second;

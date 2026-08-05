@@ -310,7 +310,7 @@ Rcpp::List getMSSpectra(const MSReadBackend &backend, SpectrumRawTypes::Time tim
     
     const auto MSLev = (MSLevel == 1) ? SpectrumRawTypes::MSLevel::MS1 : SpectrumRawTypes::MSLevel::MS2;
     const auto sels = getSpecRawSelections(backend.getSpecMetadata(), makeNumRange(timeStart, timeEnd), MSLev,
-                                           prec, 0.0, 0);
+                                           prec, NumRange<SpectrumRawTypes::Mass>(), 0);
     const std::vector<std::vector<SpectrumRawSelection>> selsList(1, std::vector<SpectrumRawSelection>{sels});
     
     const auto spectra = applyMSData<SpectrumRaw>(backend, MSLev, selsList, sfunc, minIntensityIMS,
@@ -433,11 +433,18 @@ Rcpp::DataFrame getCentroidedFrame(const MSReadBackend &backend, int index, Spec
 
 // [[Rcpp::export]]
 Rcpp::DataFrame getScans(const MSReadBackend &backend, SpectrumRawTypes::Time timeStart, SpectrumRawTypes::Time timeEnd,
-                         int MSLevel, SpectrumRawTypes::Mass prec, SpectrumRawTypes::Mass fixedIsoWidth = 0.0)
+                         int MSLevel, SpectrumRawTypes::Mass prec,
+                         const std::vector<SpectrumRawTypes::Mass> &fixedIsoWidth)
 {
+    NumRange<SpectrumRawTypes::Mass> fixedIsoWidthRange;
+    if (fixedIsoWidth.size() == 1)
+        fixedIsoWidthRange.set(fixedIsoWidth[0], fixedIsoWidth[0]);
+    else if (fixedIsoWidth.size() == 2)
+        fixedIsoWidthRange.set(fixedIsoWidth[0], fixedIsoWidth[1]);
+    
     const auto sels = getSpecRawSelections(backend.getSpecMetadata(), makeNumRange(timeStart, timeEnd),
                                            (MSLevel == 1) ? SpectrumRawTypes::MSLevel::MS1 : SpectrumRawTypes::MSLevel::MS2,
-                                           prec, fixedIsoWidth);
+                                           prec, fixedIsoWidthRange);
     std::vector<SpectrumRawTypes::Scan> inds, frInds;
     for (const auto &sel : sels)
     {
@@ -631,7 +638,7 @@ void setSpecMetadata(MSReadBackend &backend, const Rcpp::DataFrame &mdMS, const 
 Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<SpectrumRawTypes::Time> &startTimes,
                           const std::vector<SpectrumRawTypes::Time> &endTimes,
                           const std::vector<SpectrumRawTypes::Mass> &precursorMZs,
-                          SpectrumRawTypes::Mass fixedIsolationWidth, bool withPrecursor,
+                          const std::vector<SpectrumRawTypes::Mass> &fixedIsolationWidth, bool withPrecursor,
                           bool retainPrecursor, int MSLevel, const std::string &method, SpectrumRawTypes::Mass mzWindow,
                           const std::vector<SpectrumRawTypes::Mobility> startMobs,
                           const std::vector<SpectrumRawTypes::Mobility> endMobs,
@@ -653,6 +660,13 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
         .setRetainPrecursor(retainPrecursor);
     const auto specFilter = SpectrumRawFilter(baseSpecFilter).setMinIntensity(minIntensityPre);
     //const auto specFilterIMS = SpectrumRawFilter(baseSpecFilter);
+    
+    // convert fixedIsolationWidth to a range: single value -> symmetric range, two values -> min/max range
+    NumRange<SpectrumRawTypes::Mass> fixedIsoWidthRange;
+    if (fixedIsolationWidth.size() == 1)
+        fixedIsoWidthRange.set(fixedIsolationWidth[0], fixedIsolationWidth[0]);
+    else if (fixedIsolationWidth.size() == 2)
+        fixedIsoWidthRange.set(fixedIsolationWidth[0], fixedIsolationWidth[1]);
     
     // NOTE: for IMS data, averageSpectraRaw() is called which returns a SpectrumRawAveraged. Since we don't care about
     // the additional metadata from this class, we purposely slice it by explicitly specifying the lambda's return type.
@@ -681,7 +695,7 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
     for (size_t i=0; i<entries; ++i)
     {
         scanSels.push_back(getSpecRawSelections(specMeta, makeNumRange(startTimes[i], endTimes[i]), MSLev,
-                                                precursorMZs[i], fixedIsolationWidth, minBPIntensity));
+                                                precursorMZs[i], fixedIsoWidthRange, minBPIntensity));
         /*Rcpp::Rcout << "ss " << i << "/" << precursorMZs[i] << ": ";
         for (const auto &ss : scanSels.back())
             Rcpp::Rcout << ss.index << "/" << specMeta.second.scans[ss.index] << " ";
@@ -768,7 +782,7 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
     for (size_t i=0; i<entries; ++i)
     {
         scanSels.push_back(getSpecRawSelections(specMeta, makeNumRange(startTimes[i], endTimes[i]),
-                                                SpectrumRawTypes::MSLevel::MS1, 0));
+                                                SpectrumRawTypes::MSLevel::MS1, 0, NumRange<SpectrumRawTypes::Mass>()));
     }
     
     const auto allEIMs = applyMSData<EIM>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc, minIntensity,
@@ -1168,7 +1182,7 @@ Rcpp::List getChromPoints(const MSReadBackend &backend, const std::vector<Spectr
     for (size_t i=0; i<entries; ++i)
     {
         const auto sels = getSpecRawSelections(specMeta, makeNumRange(startTimes[i], endTimes[i]),
-                                               SpectrumRawTypes::MSLevel::MS1, 0);
+                                               SpectrumRawTypes::MSLevel::MS1, 0, NumRange<SpectrumRawTypes::Mass>());
         std::vector<SpectrumRawTypes::Time> times(sels.size());
         for (size_t j=0; j<sels.size(); ++j)
             times[j] = specMeta.first.times[sels[j].index];

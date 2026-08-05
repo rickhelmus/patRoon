@@ -920,6 +920,9 @@ setMethod("spectrumSimilarityIMS", "MSPeakLists", function(obj, fGroups, doFGrou
 #'   \item A numeric value: select the spectra that were recorded for the feature m/z within this tolerance window (+/-
 #'   precursor m/z).
 #'
+#'   \item A two-sized \code{numeric} vector: select the spectra that were recorded for the feature m/z within the
+#'   specified minimum and maximum tolerance window (relative to the precursor m/z).
+#'
 #'   }
 #'
 #'   If no isolation was applied to record MS/MS data (\emph{e.g.} data-independent MS/MS), then all MS/MS spectra will
@@ -968,6 +971,7 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRTWindo
         checkmate::checkFALSE(fixedIsolationWidth),
         checkmate::checkScalarNA(fixedIsolationWidth),
         checkmate::checkNumber(fixedIsolationWidth, lower = 0, finite = TRUE),
+        checkmate::checkNumeric(fixedIsolationWidth, len = 2, lower = 0, finite = TRUE, any.missing = FALSE),
         .var.name = "fixedIsolationWidth", add = ac
     )
     checkmate::assertCount(topMost, positive = TRUE, null.ok = TRUE, add = ac)
@@ -997,7 +1001,7 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRTWindo
     
     getMSPL <- function(backend, ft, params, MSLevel)
     {
-        fiw <- if (isFALSE(fixedIsolationWidth)) 0 else if (is.na(fixedIsolationWidth)) -1 else fixedIsolationWidth
+        fiw <- if (isFALSE(fixedIsolationWidth)) 0 else if (anyNA(fixedIsolationWidth)) -1 else fixedIsolationWidth
         ret <- getMSPeakLists(backend, ft$retmin, ft$retmax, ft$mz, fiw, withPrecursor = params$withPrecursor,
                               retainPrecursor = params$retainPrecursor, MSLevel = MSLevel, method = params$method,
                               mzWindow = params$clusterMzWindow, startMobs = ft$mobmin,

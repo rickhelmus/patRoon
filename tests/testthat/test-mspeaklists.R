@@ -43,7 +43,10 @@ test_that("verify generation of MS peak lists", {
     adt[, anaCount := .N, by = .(group, set)]
     expect_true(all(adt$anaCount == 1))
 
-    expect_gt(length(plists), length(generateMSPeakLists(fGroups, fixedIsolationWidth = 0.1)))
+    plistsIso <- generateMSPeakLists(fGroups, fixedIsolationWidth = 0.1)
+    expect_gt(length(plists), length(plistsIso))
+    expect_equal(plistsIso, generateMSPeakLists(fGroups, fixedIsolationWidth = c(0.1, 0.1)))
+    expect_lt(length(plistsIso), length(generateMSPeakLists(fGroups, fixedIsolationWidth = c(1, 0.1))))
     expect_lt(length(plists), length(generateMSPeakLists(fGroups, fixedIsolationWidth = NA)))
 
     # disabled: deprecated

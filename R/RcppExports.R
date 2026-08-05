@@ -65,7 +65,7 @@ getCentroidedFrame <- function(backend, index, mobStart, mobEnd, smoothWindow, h
     .Call(`_patRoon_getCentroidedFrame`, backend, index, mobStart, mobEnd, smoothWindow, halfWindow, maxGap)
 }
 
-getScans <- function(backend, timeStart, timeEnd, MSLevel, prec, fixedIsoWidth = 0.0) {
+getScans <- function(backend, timeStart, timeEnd, MSLevel, prec, fixedIsoWidth) {
     .Call(`_patRoon_getScans`, backend, timeStart, timeEnd, MSLevel, prec, fixedIsoWidth)
 }
 

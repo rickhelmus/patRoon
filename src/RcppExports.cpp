@@ -344,7 +344,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // getScans
-Rcpp::DataFrame getScans(const MSReadBackend& backend, SpectrumRawTypes::Time timeStart, SpectrumRawTypes::Time timeEnd, int MSLevel, SpectrumRawTypes::Mass prec, SpectrumRawTypes::Mass fixedIsoWidth);
+Rcpp::DataFrame getScans(const MSReadBackend& backend, SpectrumRawTypes::Time timeStart, SpectrumRawTypes::Time timeEnd, int MSLevel, SpectrumRawTypes::Mass prec, const std::vector<SpectrumRawTypes::Mass>& fixedIsoWidth);
 RcppExport SEXP _patRoon_getScans(SEXP backendSEXP, SEXP timeStartSEXP, SEXP timeEndSEXP, SEXP MSLevelSEXP, SEXP precSEXP, SEXP fixedIsoWidthSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -354,7 +354,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SpectrumRawTypes::Time >::type timeEnd(timeEndSEXP);
     Rcpp::traits::input_parameter< int >::type MSLevel(MSLevelSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type prec(precSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type fixedIsoWidth(fixedIsoWidthSEXP);
+    Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mass>& >::type fixedIsoWidth(fixedIsoWidthSEXP);
     rcpp_result_gen = Rcpp::wrap(getScans(backend, timeStart, timeEnd, MSLevel, prec, fixedIsoWidth));
     return rcpp_result_gen;
 END_RCPP
@@ -384,7 +384,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // getMSPeakLists
-Rcpp::List getMSPeakLists(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Time>& startTimes, const std::vector<SpectrumRawTypes::Time>& endTimes, const std::vector<SpectrumRawTypes::Mass>& precursorMZs, SpectrumRawTypes::Mass fixedIsolationWidth, bool withPrecursor, bool retainPrecursor, int MSLevel, const std::string& method, SpectrumRawTypes::Mass mzWindow, const std::vector<SpectrumRawTypes::Mobility> startMobs, const std::vector<SpectrumRawTypes::Mobility> endMobs, SpectrumRawTypes::PeakAbundance relMinAbundance, SpectrumRawTypes::PeakAbundance absMinAbundance, float maxRelCumIntensity, unsigned smoothWindowIMS, unsigned halfWindowIMS, SpectrumRawTypes::Mass maxGapIMS, unsigned topMost, SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre, SpectrumRawTypes::Intensity minIntensityPost, SpectrumRawTypes::Intensity minBPIntensity);
+Rcpp::List getMSPeakLists(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Time>& startTimes, const std::vector<SpectrumRawTypes::Time>& endTimes, const std::vector<SpectrumRawTypes::Mass>& precursorMZs, const std::vector<SpectrumRawTypes::Mass>& fixedIsolationWidth, bool withPrecursor, bool retainPrecursor, int MSLevel, const std::string& method, SpectrumRawTypes::Mass mzWindow, const std::vector<SpectrumRawTypes::Mobility> startMobs, const std::vector<SpectrumRawTypes::Mobility> endMobs, SpectrumRawTypes::PeakAbundance relMinAbundance, SpectrumRawTypes::PeakAbundance absMinAbundance, float maxRelCumIntensity, unsigned smoothWindowIMS, unsigned halfWindowIMS, SpectrumRawTypes::Mass maxGapIMS, unsigned topMost, SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre, SpectrumRawTypes::Intensity minIntensityPost, SpectrumRawTypes::Intensity minBPIntensity);
 RcppExport SEXP _patRoon_getMSPeakLists(SEXP backendSEXP, SEXP startTimesSEXP, SEXP endTimesSEXP, SEXP precursorMZsSEXP, SEXP fixedIsolationWidthSEXP, SEXP withPrecursorSEXP, SEXP retainPrecursorSEXP, SEXP MSLevelSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP startMobsSEXP, SEXP endMobsSEXP, SEXP relMinAbundanceSEXP, SEXP absMinAbundanceSEXP, SEXP maxRelCumIntensitySEXP, SEXP smoothWindowIMSSEXP, SEXP halfWindowIMSSEXP, SEXP maxGapIMSSEXP, SEXP topMostSEXP, SEXP minIntensityIMSSEXP, SEXP minIntensityPreSEXP, SEXP minIntensityPostSEXP, SEXP minBPIntensitySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -393,7 +393,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Time>& >::type startTimes(startTimesSEXP);
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Time>& >::type endTimes(endTimesSEXP);
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mass>& >::type precursorMZs(precursorMZsSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type fixedIsolationWidth(fixedIsolationWidthSEXP);
+    Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mass>& >::type fixedIsolationWidth(fixedIsolationWidthSEXP);
     Rcpp::traits::input_parameter< bool >::type withPrecursor(withPrecursorSEXP);
     Rcpp::traits::input_parameter< bool >::type retainPrecursor(retainPrecursorSEXP);
     Rcpp::traits::input_parameter< int >::type MSLevel(MSLevelSEXP);

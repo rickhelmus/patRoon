@@ -190,6 +190,7 @@ Collate:
     'components-cliquems.R'
     'components-clust.R'
     'components-intclust.R'
+    'components-net.R'
     'components-set.R'
     'components-nontarget.R'
     'components-nontarget-set.R'

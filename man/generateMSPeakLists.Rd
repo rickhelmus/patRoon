@@ -37,6 +37,9 @@ time). If \code{NULL} all spectra from a feature will be taken into account. Low
   \item A numeric value: select the spectra that were recorded for the feature m/z within this tolerance window (+/-
   precursor m/z).
 
+  \item A two-sized \code{numeric} vector: select the spectra that were recorded for the feature m/z within the
+  specified minimum and maximum tolerance window (relative to the precursor m/z).
+
   }
 
   If no isolation was applied to record MS/MS data (\emph{e.g.} data-independent MS/MS), then all MS/MS spectra will

@@ -173,18 +173,11 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertR6(config, null.ok = TRUE, add = ac)
-    assertSIRIUSLogin(login, add = ac)
-    aapply(checkmate::assertFlag, . ~  alwaysLogin + calculateFeatures + getFingerprints + verbose,
+    assertCommonSIRIUSArgs(login, alwaysLogin, projectPath, runMode, SIRIUSAPI, add = ac)
+    aapply(checkmate::assertFlag, . ~  calculateFeatures + getFingerprints + verbose,
            fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ featThreshold + featThresholdAnn + absAlignMzDev + minIMSSpecSim,
            lower = 0, upper = 1, finite = TRUE, fixed = list(add = ac))
-    checkmate::assert(
-        checkmate::checkPathForOutput(projectPath, overwrite = TRUE, extension = "sirius"),
-        checkmate::checkNull(projectPath),
-        .var.name = "projectPath", add = ac
-    )
-    checkmate::assertChoice(runMode, c("execute", "read"), add = ac)
-    checkmate::assertClass(SIRIUSAPI, "rsirius_api", null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (getFingerprints && calculateFeatures)

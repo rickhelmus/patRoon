@@ -186,7 +186,6 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
 {
     # UNDONE: error handling for SIRIUS API calls
     # UNDONE: handle IMSSpecSims: test (including caching)
-    # UNDONE: add database column --> once links are fixed and once configs are defined
     # UNDONE: replace SIRIUSPath by patRoonExt
 
     checkPackage("RSirius", "sirius-ms/sirius-client-openAPI", ghSubDir = "client-api_r/generated")
@@ -196,16 +195,8 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
     assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertR6(config, null.ok = TRUE, add = ac)
     checkmate::assertCount(topMost, positive = TRUE, add = ac)
-    assertSIRIUSLogin(login, add = ac)
-    checkmate::assertFlag(alwaysLogin, add = ac)
+    assertCommonSIRIUSArgs(login, alwaysLogin, projectPath, runMode, SIRIUSAPI, add = ac)
     checkmate::assertNumber(minIMSSpecSim, lower = 0, finite = TRUE, add = ac)
-    checkmate::assert(
-        checkmate::checkPathForOutput(projectPath, overwrite = TRUE, extension = "sirius"),
-        checkmate::checkNull(projectPath),
-        .var.name = "projectPath", add = ac
-    )
-    checkmate::assertChoice(runMode, c("execute", "read"), add = ac)
-    checkmate::assertClass(SIRIUSAPI, "rsirius_api", null.ok = TRUE, add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
     

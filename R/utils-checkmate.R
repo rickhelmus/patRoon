@@ -800,16 +800,26 @@ assertDynamicTreeCutArgs <- function(maxTreeHeight, deepSplit, minModuleSize, ad
     checkmate::assertCount(minModuleSize, positive = TRUE, add = add)
 }
 
-assertSIRIUSLogin <- function(x, .var.name = checkmate::vname(x), add = NULL)
+assertCommonSIRIUSArgs <- function(login, alwaysLogin, projectPath, runMode, SIRIUSAPI, add = NULL)
 {
+    ac <- checkmate::makeAssertCollection()
     checkmate::assert(
-        checkmate::checkFALSE(x),
-        checkmate::checkChoice(x, c("check", "interactive")),
-        checkmate::checkCharacter(x, any.missing = FALSE, min.chars = 1, len = 2),
-        .var.name = .var.name, add = add
+        checkmate::checkFALSE(login),
+        checkmate::checkChoice(login, c("check", "interactive")),
+        checkmate::checkCharacter(login, any.missing = FALSE, min.chars = 1, len = 2),
+        .var.name = "login", add = add
     )
-    if (is.character(x) && length(x) == 2)
-        assertHasNames(x, c("username", "password"), .var.name = x, add = add)
+    if (is.character(login) && length(login) == 2)
+        assertHasNames(login, c("username", "password"), add = add)
+    checkmate::assertFlag(alwaysLogin, add = ac)
+    checkmate::assert(
+        checkmate::checkPathForOutput(projectPath, overwrite = TRUE, extension = "sirius"),
+        checkmate::checkNull(projectPath),
+        .var.name = "projectPath", add = ac
+    )
+    checkmate::assertChoice(runMode, c("execute", "read"), add = ac)
+    checkmate::assertClass(SIRIUSAPI, "rsirius_api", null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
 }
 
 assertAndPrepareReportSettings <- function(settings, setAggr = TRUE)

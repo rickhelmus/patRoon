@@ -40,9 +40,9 @@ prepAndVerifyParamForCall <- function(param, classN, ..., exOptsToDots = FALSE)
     
     if (exOptsToDots)
     {
-        ret <- c(ret, "..." = ret$extraOpts)
+        ret <- c(ret, ret$extraOpts)
         ret$extraOpts <- NULL
-    }    
-    
+    }
+
     return(ret)
 }

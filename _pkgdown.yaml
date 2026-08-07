@@ -1,6 +1,7 @@
 title: patRoon
 url: https://rickhelmus.github.io/patRoon
 template:
+    bootstrap: 5
     params:
         bootswatch: flatly
 navbar:

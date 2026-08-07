@@ -61,3 +61,58 @@ setValidity("MSPeakListsParam", function(object)
     
     return(OK)
 })
+
+
+#' @export
+getFilterMSPeakListsParamDefs <- paramConfigDefsFact(list(
+    MSLevel = list(
+        default = 2,
+        description = "MS levels to filter (1 or 2)",
+        type = "subset",
+        typeCheckArgs = list(choices = 1:2)
+    ),
+    absMinIntensity = list(
+        default = NULL,
+        description = "Absolute minimum intensity threshold",
+        type = "number",
+        typeCheckArgs = list(null.ok = TRUE, lower = 0, finite = TRUE)
+    ),
+    relMinIntensity = list(
+        default = 0.05,
+        description = "Minimum relative intensity threshold",
+        type = "number",
+        typeCheckArgs = list(null.ok = TRUE, lower = 0, finite = TRUE)
+    ),
+    topMostPeaks = list(
+        default = 25,
+        description = "Only keep the top most intense peaks per spectrum (NULL to keep all)",
+        type = "count",
+        typeCheckArgs = list(positive = TRUE, null.ok = TRUE)
+    ),
+    maxMZOverPrec = list(
+        default = 4,
+        description = "Maximum m/z over precursor (relative) allowed in MS/MS",
+        type = "number",
+        typeCheckArgs = list(null.ok = TRUE, lower = 0, finite = TRUE)
+    ),
+    extraOpts = list(
+        default = list(),
+        description = "Extra filter options as a named list",
+        type = "list",
+        typeCheckArgs = list(null.ok = TRUE, any.missing = FALSE, names = "unique")
+    )
+))
+
+#' @export
+FilterMSPeakListsParam <- setClass("FilterMSPeakListsParam", contains = "param")
+setMethod("initialize", "FilterMSPeakListsParam", function(.Object, ...)
+{
+    args <- list(...)
+    defs <- getFilterMSPeakListsParamDefs()
+    dotsConstr <- args[names(args) %in% names(defs)]
+    dotsConstr$extraOpts <- args[setdiff(names(args), names(defs))]
+
+    do.call(callNextMethod, c(list(.Object, name = "FilterMSPeakListsParam", baseName = "FilterMSPeakListsParam",
+                                   description = "Parameters for MSPeakLists filtering", version = "1.0",
+                                   definitions = defs), dotsConstr))
+})

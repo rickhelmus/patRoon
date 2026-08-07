@@ -688,6 +688,14 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
     return(obj)
 })
 
+#' @rdname filter
+#' @export
+setMethod("filterP", "MSPeakLists", function(obj, param = NULL, ...)
+{
+    do.call(filter, c(list(obj),
+                      prepAndVerifyParamForCall(param, "FilterMSPeakListsParam", ..., exOptsToDots = TRUE)))
+})
+
 #' @describeIn MSPeakLists Plots a spectrum using MS or MS/MS peak lists for a given feature group. Two spectra can be
 #'   compared when two feature groups are specified.
 #'

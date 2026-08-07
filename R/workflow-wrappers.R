@@ -287,14 +287,19 @@ setMethod("generateTPsPLogic", "workflow",
           \(obj, param = NULL, ...) doWfTPs(obj, algo = "Logic", param = param, ...))
 
 
-doWfFilter <- function(...)
+doWfFilter <- function(obj, slotName, paramClass, param = NULL, ...)
 {
-    doWfStep(func = "filterP", slotNameIn = "fGroups", slotNameOut = "fGroups",
-             paramClass = "FilterFeatGroupsParam", ...)
+    doWfStep(func = "filterP", slotNameIn = slotName, slotNameOut = slotName, paramClass = paramClass, obj = obj,
+             param = param, ...)
 }
 
 #' @rdname feature-filtering
-setMethod("filterP", "workflow", \(obj, param = NULL, ...) doWfFilter(obj, param = param, ...))
+setMethod("filterP", c("workflow", "FilterFeatGroupsParam"),
+          \(obj, param = NULL, ...) doWfFilter(obj, slotName = "fGroups", paramClass = "FilterFeatGroupsParam", param = param, ...))
+
+#' @rdname MSPeakLists-class
+setMethod("filterP", c("workflow", "FilterMSPeakListsParam"),
+          \(obj, param = NULL, ...) doWfFilter(obj, slotName = "MSPeakLists", paramClass = "FilterMSPeakListsParam", param = param, ...))
 
 
 setMethod("wfWrap", "workflow", function(obj, expr)

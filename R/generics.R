@@ -627,7 +627,7 @@ setGeneric("filter", function(obj, ...) standardGeneric("filter"))
 #' @templateVar func filter
 #' @templateVar desc provides various functionality to do post-filtering of data.
 #' @template generics
-setGeneric("filterP", function(obj, ...) standardGeneric("filterP"))
+setGeneric("filterP", function(obj, param, ...) standardGeneric("filterP"))
 
 #' @templateVar func fromIMS
 #' @templateVar desc returns \code{TRUE} if the object was directly created from IMS data.

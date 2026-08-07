@@ -287,6 +287,16 @@ setMethod("generateTPsPLogic", "workflow",
           \(obj, param = NULL, ...) doWfTPs(obj, algo = "Logic", param = param, ...))
 
 
+doWfFilter <- function(...)
+{
+    doWfStep(func = "filterP", slotNameIn = "fGroups", slotNameOut = "fGroups",
+             paramClass = "FilterFeatGroupsParam", ...)
+}
+
+#' @rdname feature-filtering
+setMethod("filterP", "workflow", \(obj, param = NULL, ...) doWfFilter(obj, param = param, ...))
+
+
 setMethod("wfWrap", "workflow", function(obj, expr)
 {
     slotMap <- names(obj)

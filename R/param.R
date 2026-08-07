@@ -79,6 +79,7 @@ setValidity("param", function(object)
             list = checkmate::assertList,
             data.frame = checkmate::assertDataFrame,
             count = checkmate::assertCount,
+            range = assertRange,
             specSimParams = assertSpecSimParams,
             IMS = assertIMSArg,
             TPStructParams = assertTPStructParams

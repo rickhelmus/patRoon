@@ -243,6 +243,7 @@ Collate:
     'feature_groups-bruker.R'
     'feature_groups-comparison.R'
     'feature_groups-envimass.R'
+    'feature_groups-filter-param.R'
     'feature_groups-filter.R'
     'feature_groups-greedy-param.R'
     'feature_groups-greedy.R'

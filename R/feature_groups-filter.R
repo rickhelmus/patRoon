@@ -758,6 +758,13 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     return(obj)
 })
 
+#' @rdname feature-filtering
+#' @export
+setMethod("filterP", "featureGroups", function(obj, param = NULL, ...)
+{
+    do.call(filter, c(list(obj), prepAndVerifyParamForCall(param, "FilterFeatGroupsParam", ..., exOptsToDots = TRUE)))
+})
+
 #' @param \dots \setsPassedArgs1{featureGroups}
 #' @param sets \setsWF A \code{character} with name(s) of the sets to keep (or remove if \code{negate=TRUE}).
 #' @param absMinSets,relMinSets \setsWF Feature groups are only kept when they contain data for at least this (absolute

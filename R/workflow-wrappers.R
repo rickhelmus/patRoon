@@ -296,24 +296,32 @@ setMethod("wfWrap", "workflow", function(obj, expr)
     expr <- substitute(expr)
 
     if (!is.call(expr))
-        stop("Expression must be a function call")
+        stop("Expression must be an assignment (e.g. .fGroups <- ...")
 
-    # Recursively walk the expression tree, replacing dot-prefixed symbol references to workflow slots with
-    # slot(obj, "<name>") calls.
-    matchedSlots <- character()
+    op <- as.character(expr[[1]])
+    if (!(op %in% c("<-", "=")))
+        stop("Expression must be an assignment using '<-' or '='")
 
+    lhs <- expr[[2]]
+    # Require the left-hand side to be a dot-prefixed symbol naming a workflow slot
+    if (!is.symbol(lhs))
+        stop("Left-hand side must be a dot-prefixed symbol naming a workflow slot (e.g. .fGroups)")
+
+    lhsName <- as.character(lhs)
+    if (!(lhsName %in% names(slotMap)))
+        stop("Left-hand side must be a dot-prefixed symbol naming a workflow slot (e.g. .fGroups)")
+
+    # Replace dot-prefixed symbols in the expression with slot(obj, "<name>") calls
     replaceSlots <- function(e, isFuncPos = FALSE)
     {
         if (is.symbol(e))
         {
             symName <- as.character(e)
-            # Check if the symbol starts with a dot and the remainder is a valid slot name (e.g. .fGroups -> fGroups)
             if (!isFuncPos && nchar(symName) > 1 && substr(symName, 1, 1) == ".")
             {
                 if (symName %in% names(slotMap))
                 {
                     slotName <- slotMap[[symName]]
-                    matchedSlots <<- c(matchedSlots, slotName)
                     return(substitute(slot(obj, NAME), list(NAME = slotName)))
                 }
             }
@@ -338,22 +346,13 @@ setMethod("wfWrap", "workflow", function(obj, expr)
 
     exprReplaced <- replaceSlots(expr)
 
-    if (length(matchedSlots) == 0)
-        stop("The expression does not reference any workflow data slots. ",
-             "Please make sure at least one argument is a dot-prefixed symbol ",
-             "that names a workflow object ",
-             "(e.g. .analysisInfo, .features, .fGroups, .MSPeakLists, .formulas, ",
-             ".compounds, .components, .TPs).")
+    # Evaluate the replaced assignment in a temporary environment so that slot<- updates the 'obj' binding
+    evalEnv <- new.env(parent = parent.frame())
+    evalEnv$obj <- obj
+    eval(exprReplaced, envir = evalEnv, enclos = parent.frame())
 
-    # Evaluate the modified expression.
-    #   - envir: we supply 'obj' so that slot(obj, "<name>") resolves.
-    #   - enclos: parent.frame() so that other symbols (e.g. numeric constants,
-    #             helper functions, etc.) are found in the caller's scope.
-    result <- eval(exprReplaced, envir = list(obj = obj), enclos = parent.frame())
-
-    # Store the result back into the first matched slot
-    # UNDONE: clearly document this!
-    slot(obj, matchedSlots[1]) <- result
+    # Retrieve the (possibly) modified workflow object and return it
+    obj <- evalEnv$obj
 
     return(obj)
 })

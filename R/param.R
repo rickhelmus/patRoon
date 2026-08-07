@@ -82,6 +82,7 @@ setValidity("param", function(object)
             range = assertRange,
             specSimParams = assertSpecSimParams,
             IMS = assertIMSArg,
+            IMSMatchParams = assertIMSMatchParams,
             TPStructParams = assertTPStructParams
         )
         

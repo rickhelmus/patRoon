@@ -6,6 +6,7 @@
 #' @include feature_groups.R
 #' @include feature_groups-set.R
 #' @include utils-screening.R
+#' @include feature_groups-screening-param.R
 NULL
 
 #' Class for suspect screened feature groups.
@@ -677,3 +678,20 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
 #' @rdname suspect-screening
 #' @export
 setMethod("screenSuspects", "featureGroupsScreening", doScreenSuspectsAmend)
+
+#' @rdname suspect-screening
+#' @export
+setMethod("screenSuspectsP", "featureGroups", function(obj, param = NULL, ..., suspects, adduct = NULL)
+{
+    param <- prepAndVerifyParamForCall(param, "ScreenSuspectsParam", ...)
+    param <- param[names(param) != "amend"]
+    do.call(screenSuspects, c(list(obj, suspects = suspects, adduct = adduct), param))
+})
+
+#' @rdname suspect-screening
+#' @export
+setMethod("screenSuspectsP", "featureGroupsScreening", function(obj, param = NULL, ..., suspects, adduct = NULL)
+{
+    do.call(screenSuspects, c(list(obj, suspects = suspects, adduct = adduct),
+                              prepAndVerifyParamForCall(param, "ScreenSuspectsParam", ...)))
+})

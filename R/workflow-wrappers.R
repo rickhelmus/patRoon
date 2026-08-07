@@ -302,6 +302,12 @@ setMethod("filterP", c("workflow", "FilterMSPeakListsParam"),
           \(obj, param = NULL, ...) doWfFilter(obj, slotName = "MSPeakLists", paramClass = "FilterMSPeakListsParam", param = param, ...))
 
 
+#' @rdname suspect-screening
+setMethod("screenSuspectsP", "workflow",
+          \(obj, param = NULL, ...) doWfStep(func = "screenSuspectsP", slotNameIn = "fGroups", slotNameOut = "fGroups",
+                                             paramClass = "ScreenSuspectsParam", obj, param = param, ...))
+
+
 setMethod("wfWrap", "workflow", function(obj, expr)
 {
     slotMap <- names(obj)

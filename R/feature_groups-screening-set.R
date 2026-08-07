@@ -5,6 +5,7 @@
 #' @include main.R
 #' @include feature_groups-set.R
 #' @include feature_groups-screening.R
+#' @include feature_groups-screening-param.R
 NULL
 
 # merges screening info from screenInfo slots
@@ -474,6 +475,23 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
 #' @rdname suspect-screening
 #' @export
 setMethod("screenSuspects", "featureGroupsScreeningSet", doScreenSuspectsAmend)
+
+#' @rdname suspect-screening
+#' @export
+setMethod("screenSuspectsP", "featureGroupsSet", function(obj, param = NULL, ..., suspects, adduct = NULL)
+{
+    param <- prepAndVerifyParamForCall(param, "ScreenSuspectsParam", ...)
+    param <- param[names(param) != "amend"]
+    do.call(screenSuspects, c(list(obj, suspects = suspects, adduct = adduct), param))
+})
+
+#' @rdname suspect-screening
+#' @export
+setMethod("screenSuspectsP", "featureGroupsScreeningSet", function(obj, param = NULL, ..., suspects, adduct = NULL)
+{
+    do.call(screenSuspects, c(list(obj, suspects = suspects, adduct = adduct),
+                              prepAndVerifyParamForCall(param, "ScreenSuspectsParam", ...)))
+})
 
 
 #' @rdname featureGroupsScreening-class

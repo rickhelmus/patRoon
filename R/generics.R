@@ -438,6 +438,9 @@ setGeneric("screenSuspects", function(fGroups, suspects, rtWindow = defaultLim("
                                       neutralChemProps = FALSE,
                                       onlyHits = FALSE, ...) standardGeneric("screenSuspects"))
 
+#' @rdname suspect-screening
+setGeneric("screenSuspectsP", function(obj, ...) standardGeneric("screenSuspectsP"))
+
 ### Optimization
 
 #' @name optimizationResult-class

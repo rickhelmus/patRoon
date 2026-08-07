@@ -209,6 +209,7 @@ Collate:
     'components-specclust-param.R'
     'components-specclust.R'
     'components-tps-param.R'
+    'feature_groups-screening-param.R'
     'feature_annotations.R'
     'formulas.R'
     'mspeaklists-param.R'

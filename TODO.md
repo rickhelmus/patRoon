@@ -27,6 +27,8 @@
 - generateTPsBioTransformer(): maxExpGenerations is now additional to generations -->update NEWS and test
 - add suspect lists, TP libraries, logic transformations etc to params?
     - in any case: add string option to load from CSV
+- screenSuspectsP(): keep onlyHits and amend in params?
+
 
 # Priority
 

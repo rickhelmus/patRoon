@@ -1,0 +1,3274 @@
+# Changelog
+
+## patRoon 3.0
+
+This release adds a significant amount of new functionality and changes.
+Please see the updated
+[Handbook](https://rickhelmus.github.io/patRoon/handbook_bd/index.html),
+[pre-print](https://doi.org/10.21203/rs.3.rs-9517980/v1), and sections
+below for more information. Users of previous `patRoon` versions should
+inform themselves with the important changes highlighted in the next
+section.
+
+### Upgrading notes
+
+This releases adds changes to various functions to improve consistency
+and support new functionality. While care was taken to avoid breaking
+changes, some changes will affect existing workflows. Below is a summary
+of important points.
+
+- It is important to clear the cache when updating to this release. This
+  can be done by running `clearCache("all")` or manually removing the
+  `cache.sqlite` file from your project directory.
+
+- The analysis information table format was changed to support new
+  functionality, file formats and cleanup.
+
+  1.  Rename the `"group"` column to `"replicate"`
+  2.  Adjust the `path` column to the new format: `path_raw`,
+      `path_centroid`, `path_profile` and `path_ims`. Often, renaming
+      `path` to `path_centroid` is sufficient.
+
+- The following packages should be updated or installed
+
+  - `patRoonData`: to ensure compatibility with `patRoon 3.0`,
+    e.g. `remotes::install_github("rickhelmus/patRoonData")`.
+  - `patRoonExt`: to ensure the latest versions of external dependencies
+    and availability of IMS specifics,
+    e.g. `remotes::install_github("rickhelmus/patRoonExt")`.
+  - `Rmstoolkitlib`: this is needed if you want to use the new
+    `mstoolkit` raw data backend. This should be installed *before*
+    installing `patRoon`,
+    e.g. `remotes::install_github("rickhelmus/Rmstoolkitlib")`.
+  - `patRoonDataIMS`: to install demo IMS-HRMS data,
+    e.g. `remotes::install_github("rickhelmus/patRoonDataIMS")`.
+  - See the Installation chapter in the updated
+    [Handbook](https://rickhelmus.github.io/patRoon/handbook_bd/index.html)
+    for more details and installation options.
+
+- The
+  [`generateAnalysisInfo()`](https://rickhelmus.github.io/patRoon/reference/analysis-information.md)
+  function was updated for the new format. The `fromXXX` function
+  arguments need to be set properly. See
+  [`?generateAnalysisInfo`](https://rickhelmus.github.io/patRoon/reference/analysis-information.md)
+  for more details.
+
+- The
+  [`convertMSFiles()`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md)
+  interface has various small changes to simplify its usage and extend
+  support. For instance:
+
+  ``` r
+
+  # pre 3.0
+  convertMSFiles(anaInfo = anaInfo, from = "bruker", to = "mzML", algorithm = "pwiz", centroid = "vendor",
+                 overWrite = FALSE)
+  # 3.0
+  convertMSFiles(anaInfo, typeFrom = "raw", formatFrom = "bruker", typeTo = "centroid", formatTo = "mzML",
+                 algorithm = "pwiz", overwrite = FALSE)
+  ```
+
+  Please see
+  [`?convertMSFiles`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md)
+  for more details.
+
+- MS peak list generation: the previous backends (“algorithms”) are now
+  deprecated and no algorithm argument should be specified. The
+  interface was also simplfied. See
+  ([`?generateMSPeakLists`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakLists.md)
+  for details). E.g.:
+
+  ``` r
+
+  # pre 3.0
+  mslists <- generateMSPeakLists(fGroups, "mzr", maxMSRtWindow = 5, precursorMzWindow = 4, avgFeatParams = ...,
+                                 avgFGroupParams = ...)
+  # 3.0
+  mslists <- generateMSPeakLists(fGroups, maxMSRTWindow = 5, avgFeatParams = ..., avgFGroupParams = ...)
+  ```
+
+- The filtering of MS peak lists is simplified and is now done per MS
+  level (see
+  [`?MSPeakLists`](https://rickhelmus.github.io/patRoon/reference/MSPeakLists-class.md)
+  for details):
+
+  ``` r
+
+  # pre 3.0
+  mslists <- filter(mslists, relMSMSIntThr = 0.05, topMSMSPeaks = 25, ...)
+  # 3.0
+  mslists <- filter(mslists, msLevel = 2, relMinIntensity = 0.05, topMost = 25, ...)
+  ```
+
+- The estimation of identification confidence levels was extended beyond
+  suspect screening workflows. The
+  [`annotateSuspects()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md)
+  function was renamed to
+  [`estimateIDConfidence()`](https://rickhelmus.github.io/patRoon/reference/id-conf.md).
+  This function should also be used to estimate ID levels for feature
+  annotation candidates. See
+  [`?estimateIDConfidence`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)
+  for details. Eg:
+
+  ``` r
+
+  # pre 3.0
+  fGroups <- annotateSuspects(fGroups, formulas = formulas, compounds = compounds, MSPeakLists = mslists,
+                              IDFile = "idlevelrules.yml")
+  # 3.0
+  formulas <- estimateIDConfidence(formulas, IDFile = "idlevelrules.yml")
+  compounds <- estimateIDConfidence(compounds, MSPeakLists = mslists, formulas = formulas, IDFile = "idlevelrules.yml")
+  fGroups <- estimateIDConfidence(fGroups, formulas = formulas, compounds = compounds, MSPeakLists = mslists,
+                                  IDFile = "idlevelrules.yml")
+  ```
+
+- The default rules for ID level estimation was changed for level 3a.
+  Either re-generate the file by running
+  `genIDLevelRulesFile("idlevelrules.yml")` or update the existing file
+  by changing the `individualMoNAScore` and `libMatch` thresholds to
+  0.7.
+
+- The report configuration file was updated. Run the following to update
+  an existing file:
+
+  ``` r
+
+  genReportSettingsFile("report.yml", baseFrom = "report.yml")
+  ```
+
+- The default numeric limits were centralized (discussed further below).
+  To generate a new file for configuration:
+
+  ``` r
+
+  genLimitsFile()
+  ```
+
+  See
+  [`?limits`](https://rickhelmus.github.io/patRoon/reference/limits.md)
+  for details.
+
+- Several defaults and names for function arguments were changed
+  (discussed further below).
+
+Please read the remaining sections below and updated documentation for
+more details and changes. Furthermore, it may be useful to compare the
+script output of
+[`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md)
+to see how these changes may affect your workflow. Finally, feel free to
+contact or create a GitHub issue when in doubt.
+
+### Major new functionality
+
+#### IMS workflows
+
+The 3.0 release is primarily centered around supporting ion mobility
+separation (IMS) coupled to HRMS workflows. This technique brings
+several important benefits for NTA, such as an additional parameter for
+feature annotation (collision cross section or CCS), cleaning up of HRMS
+data to improve feature detection and annotation, improved separation of
+compounds with equal or close m/z and support of rapid and selective
+MS/MS (PASEF). The complete workflow was upgraded to support IMS-HRMS
+data and make use of the benefits from this technique. Please see the
+new IMS chapter in the
+[Handbook](https://rickhelmus.github.io/patRoon/handbook_bd/IMSWorkflow.html)
+for further details.
+
+#### `msdata` interface
+
+The new `msdata` raw data interface was introduced to efficiently read
+complex raw data. The primary motivation was to support the complexity
+and specific formatting of IMS-HRMS data, but the applied optimizations
+also benefit classical HRMS workflows. More information on `msdata` and
+its configuration is detailed in the
+[Handbook](https://rickhelmus.github.io/patRoon/handbook_bd/sample-analyses.html#fileTypes)
+and reference manual
+([`?msdata`](https://rickhelmus.github.io/patRoon/reference/msdata.md)).
+
+**NOTE**: due to (slight) changes rounding numerical data there may be
+slight differences in EICs, spectra and feature data compared to the old
+interface.
+
+#### `piek` and `greedy` algorithms
+
+This release adds the newly developed `piek` algorithm, which is a
+simple, flexible and fast algorithm for detecting features in both HRMS
+and IMS-HRMS data. Furthermore, the `greedy` algorithm was added to
+provide fast grouping of features across samples and also supports both
+HRMS and IMS-HRMS data. Both algorithms are embedded in `patRoon 3.0`
+and therefore don’t need any installation of external software. See the
+[Handbook](https://rickhelmus.github.io/patRoon/handbook_bd/features.html#features)
+and reference manual
+([`?findFeaturesPiek`](https://rickhelmus.github.io/patRoon/reference/findFeaturesPiek.md)
+and
+[`?groupFeaturesGreedy`](https://rickhelmus.github.io/patRoon/reference/groupFeaturesGreedy.md))
+for further details.
+
+#### Sample metadata and analysis information
+
+A lot of existing functionality was upgraded to support the use of
+sample metadata in post-processing operations, such as easily making
+sample groups from metadata for plotting and aggregation of data.
+Furthermore, the (previously very basic) support for applying linear
+regression to eg prioritize feature data was improved considerably, and
+was primarily motivated to improve feature prioritization of unknown
+transformation products (see
+[10.1021/acs.est.4c09121](http://doi.org/10.1021/acs.est.4c09121)).
+Finally, functionality was added to easily subset features from metadata
+and update the analysis information in feature objects, e.g. to add or
+modify sample metadata. The
+[Handbook](https://rickhelmus.github.io/patRoon/handbook_bd/useMeta.html#useMeta)
+was updated with a new subsection to demonstrate the use of sample
+metadata. Furthermore, see below for more details which functions were
+changed.
+
+#### Transformation products
+
+Two new algorithms were added for finding transformation products:
+`"ann_form"`
+([`generateTPsAnnForm()`](https://rickhelmus.github.io/patRoon/reference/generateTPsAnnForm.md))
+and `"ann_comp"`
+([`generateTPsAnnComp()`](https://rickhelmus.github.io/patRoon/reference/generateTPsAnnComp.md)).
+These algorithms use data from a thorough feature annotation of unknown
+features to find candidate TPs and are eg scored on their ‘fit’ to given
+parents. The algorithms were based on the work described in
+[10.1021/acs.est.4c09121](http://doi.org/10.1021/acs.est.4c09121).
+
+### Other new functionality
+
+#### Importing feature data
+
+Support was added to import features from external data sources (which
+has been requested for a very long time!). The new functions
+[`importFeaturesTable()`](https://rickhelmus.github.io/patRoon/reference/importFeaturesTable.md)
+and `importFeaturesGroupsTable()` provide a way to import tabular data
+with raw or sample grouped features, respectively. See the updated
+[Handbook](https://rickhelmus.github.io/patRoon/handbook_bd/features.html#importFeat)
+and reference manual
+([`?importFeaturesTable`](https://rickhelmus.github.io/patRoon/reference/importFeaturesTable.md)
+and
+[`?importFeatureGroupsTable`](https://rickhelmus.github.io/patRoon/reference/importFeatureGroupsTable.md))
+for more details.
+
+#### New data filters
+
+Several new data filters were added throughout the workflow:
+
+- `absMinMaxIntensity` and `relMinMaxIntensity`: filter features by
+  their maximum intensity across samples (suggested by Nienke Meekel).
+- Peak abundance filters for MS peak lists to eliminate low abundance
+  peaks across averaged spectra.
+- `minRelCumIntensity` spectrum averaging and
+  [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  parameter to filter MS peaks by their cumulative intensity in the
+  spectrum (suggested by Leon Saal, issue
+  [\#150](https://github.com/rickhelmus/patRoon/issues/150)).
+- `maxMZOverPrec`: eliminate peaks with higher m/z values than
+  precursors in MS2 data.
+- `fragFormulas` and `lossFormulas`: filter candidates by matching
+  fragment or neutral loss formulae.
+
+#### MS2 background subtraction and ID confidence estimation for unknowns
+
+This release adds approaches to subtract MS2 background and estimate
+identification confidence levels unknowns, as described in
+10.1021/acs.est.4c09121. The latter functionality allows the estimation
+of ID levels for formula and compound candidates obtained during feature
+annotation. The approach is similar (but optimized) compared to the
+previously introduced system for suspect screening workflows. Similar
+filters existing to remove candidates with poor ID levels. See the
+updated
+[Handbook](https://rickhelmus.github.io/patRoon/handbook_bd/index.html)
+and reference manual
+([`?getBGMSMSPeaks`](https://rickhelmus.github.io/patRoon/reference/getBGMSMSPeaks.md)
+and
+[`?estimateIDConfidence`](https://rickhelmus.github.io/patRoon/reference/id-conf.md))
+for more details.
+
+#### Improvements for reporting and project creation
+
+The code behind
+[`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md)
+and
+[`report()`](https://rickhelmus.github.io/patRoon/reference/reporting.md)
+was considerably optimized and improved. The
+[`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md)
+function was updated to support all the new functionality introduced in
+`patRoon 3.0`. The reporting interface was improved in various ways, and
+the output files are smaller due to lzstring compression and
+optimizations were applied for self-contained report files.
+
+#### Updating feature group properties
+
+The new
+[`updateGroups()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)
+method function re-calculates feature group properties (RT, m/z and
+mobility). This function is primarily intended to be used after
+filtering steps of feature data. Re-calculating aforementioned
+properties can then be improved by exclusion of e.g. noisy features.
+
+### Important changes
+
+#### Centralized default numeric limits
+
+The defaults for common numerical limits and thresholds (retention time,
+m/z and mobility) are now moved to a separate ‘limits file’. This
+simplifies the configuration of these parameters and avoids the need to
+configure them throughout all functions in the workflow. As a result,
+some default values may have been slightly changed for consistency. See
+the Limits section in the updated
+[Handbook](https://rickhelmus.github.io/patRoon/handbook_bd/limits.html)
+for more information.
+
+#### Changed defaults
+
+- [`generateFormulas()`](https://rickhelmus.github.io/patRoon/reference/generateFormulas.md):
+  `calculateFeatures` now defaults to `FALSE`: this usually yields
+  equally valid results and is generally much faster.
+- [`generateCompoundsMetFrag()`](https://rickhelmus.github.io/patRoon/reference/generateCompoundsMetFrag.md)
+  - the default database was changed from PubChem to PubChemLite, which
+    is much faster and generally more suitable for non-target analysis.
+  - MetFusion scoring is not used anymore by default. The `scoreTypes`
+    function argument can be configured to include it again.
+- [`generateCompoundsLibrary()`](https://rickhelmus.github.io/patRoon/reference/generateCompoundsLibrary.md)
+  - `specSimParamsLib` now defaults to the value for `specSimParams`
+  - `specSimParams` now defaults to excluding the precursor mass peak
+- Identification confidence levels: increased 3a library match threshold
+  to a more reasonable value (from 0.4 to 0.7)
+
+#### Changed naming
+
+- The use of “replicate groups” was changed to “replicates” throughout
+  the whole code and documentation for consistency and clarity. Some
+  important changes include
+  - The `group` column in the analysis information should now be named
+    `replicate`. If only the old column name is present it will still be
+    used, with a warning.
+  - `replicateGroups()` was renamed to
+    [`replicates()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  - `replicateGroupSubtract()` was renamed to
+    [`replicateSubtract()`](https://rickhelmus.github.io/patRoon/reference/feature-filtering.md)
+  - The `rGroups` argument to `[` and
+    [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    was renamed to `replicates`.
+  - The `topMostByRGroup` EIC parameter was renamed to
+    `topMostByReplicate`
+- The
+  [`annotateSuspects()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md)
+  function was renamed to
+  [`estimateIDConfidence()`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)
+  for consistency with ID level estimation functionality for formulae
+  and compounds.
+- `overWrite` –\> `overwrite` for consistency, applies to
+  [`predictCheckFeaturesSession()`](https://rickhelmus.github.io/patRoon/reference/check-GUI.md)
+  and file conversion functions
+- [`generateMSPeakLists()`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakLists.md):
+  `maxMSRtWindow` was renamed to `maxMSRTWindow` for consistency
+- [`plotInt()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+  `xnames` –\> `xNames`
+- EIC parameters
+  ([`getDefEICParams()`](https://rickhelmus.github.io/patRoon/reference/EIXParams.md)):
+  `retWindow` –\> `window`
+- log P values are now consistently stored in `"logP"` columns in
+  results for compound annotations and transformation products.
+
+#### Analysis information and use of sample metadata
+
+Several changes were made to the analysis information tables to improve
+support for different file formats and allow the use of sample metadata
+(as introduced before). See the updated
+[Handbook](https://rickhelmus.github.io/patRoon/handbook_bd/index.html)
+for more details.
+
+- The `path` column is replaced by four different columns: `path_raw`,
+  `path_centroid`, `path_profile` and `path_ims`, which can be used to
+  specify the paths to different types of data. If only a `path` column
+  is present, it will be used as `path_centroid` with a warning.
+- The `group` column should now be named `replicate`. If only a `group`
+  column is present, it will be used as `replicate` with a warning.
+- Any additional columns with free-form data can be included and can be
+  used to post-process feature data (see below).
+- A new function was added to adjust analysis information during the
+  workfow (`analysisInfo()<-`).
+- Similarly, the new `reorder` argument to `[` can be used to reorder
+  the sample analyses, which may e.g. be useful for plotting.
+- The
+  [`generateAnalysisInfo()`](https://rickhelmus.github.io/patRoon/reference/analysis-information.md)
+  function was updated for the changes: please see
+  [`?generateAnalysisInfo`](https://rickhelmus.github.io/patRoon/reference/analysis-information.md)
+  for its new interface.
+- Using sample metadata for grouping and aggregation
+  - New function arguments to group & aggregate data (e.g. `groupBy`,
+    `aggregate`) were added to
+    [`unique()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md),
+    [`overlap()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)
+    and plotting functions.
+  - In some cases these replace older function arguments
+    - [`plot()`](https://rickhelmus.github.io/patRoon/reference/generics.md),
+      [`plotChroms()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+      `groupBy` replaces `colourBy`
+    - [`plotVenn()`](https://rickhelmus.github.io/patRoon/reference/generics.md),
+      [`overlap()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md),
+      [`unique()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md),
+      [`plotInt()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+      `groupBy` replaces `sets`
+    - [`plotChord()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+      `groupBy` replaces `outerGroups`, `aggregate` replaces `average`
+    - [`plotVenn()`](https://rickhelmus.github.io/patRoon/reference/generics.md),
+      [`overlap()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md),
+      [`plotUpSet()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+      `aggregate` replaces possibility to pass a `list` to `which`
+  - [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    - the `average` argument can now be used to average by grouping
+      specified by metadata columns.
+    - `average` can now be set to `fGroups` to average all properties
+      for each feature group (works if `features=TRUE` or
+      `features=FALSE`).
+    - The `anaInfoCols` argument can be used to add metadata to the
+      output table.
+- The subset operator for features and feature groups (`[`) now supports
+  subsetting by sample metadata and other data in the analysis
+  information with the new `ni` argument. This approach was based on how
+  data is subset with `data.table`.
+- Using sample metadata for linear regression of feature intensities
+  - The
+    [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    and
+    [`plotInt()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    functions were updated to improve support for linear regression.
+    These functions can now use any sample metadata column(s) to easily
+    perform a linear regression versus feature intensities/areas.
+  - [`plotInt()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+    see the `xBy`, `groupBy` and `regression` function arguments.
+  - [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+    see the `regressionBy` function argument
+  - [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+    the `conc_reg` column was renamed to `x_reg`.
+- Internal changes
+  - the analysis information is now internally stored as a `data.table`
+    for efficiency.
+  - the `featureGroups` objects do not store analysis information
+    internally anymore, but instead refer to the analysis information
+    stored in the respective `features` object.
+
+#### MS peak lists
+
+- The
+  [`generateMSPeakLists()`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakLists.md)
+  function now uses the `msdata` interface to read raw data. The old
+  backends (mzR and DataAnalysis) are now deprecated and should not be
+  used anymore. For this reason, the `algorithm` function argument from
+  [`generateMSPeakLists()`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakLists.md)
+  was removed and the
+  [`generateMSPeakListsMzR()`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakListsMzR.md),
+  [`generateMSPeakListsDA()`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakListsDA.md),
+  [`generateMSPeakListsDAFMF()`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakListsDAFMF.md)
+  functions are now marked as deprecated.
+- The `precursorMzWindow` is replaced by the `fixedIsolationWidth`
+  function argument, with slightly different behavior. In most cases
+  `fixedIsolationWidth=FALSE` is recommended: this automatically detects
+  the used isolation window for DDA and disables it for DIA.
+- The averaging of spectra is now intensity weighted.
+- The parameters to average spectra were changed and extended (see
+  ?`getDefAvgPListParams`)
+  - The default method was changed from hierarchical clustering
+    (`"hclust"`) to distance based averaging (`"distance_mean"`), which
+    is faster and more suitable for large datasets such as IMS data.
+  - The `"distance"` averaging method was renamed to `"distance_point"`.
+  - The `absMinAbundance` and `relMinAbundance` parameters were added to
+    filter MS peaks by their abundance in the averaged spectra.
+  - Several IMS specific parameters were added.
+
+#### Other
+
+- File conversion & raw data
+  - The interface for the
+    [`convertMSFiles()`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md)
+    was updated and split. See the updated documentation
+    ([`?MSConversion`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md))
+    for more details.
+    - Algorithm specific functions are now exported:
+      `convertMSFilesPwiz()`,
+      [`convertMSFilesBruker()`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md),
+      [`convertMSFilesOpenMS()`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md).
+    - New algorithms were introduced for IMS conversion: `"timsconvert"`
+      ([`convertMSFilesTIMSCONVERT()`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md))
+      and `"imscollapse"`
+      ([`convertMSFilesIMSCollapse()`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md)).
+    - **IMPORTANT** The low level functionality of
+      [`convertMSFiles()`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md)
+      function was split in to
+      [`convertMSFilesPaths()`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md).
+      In most cases,
+      [`convertMSFiles()`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md)
+      is still used, but use
+      [`convertMSFilesPaths()`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md)
+      if file conversion should occur directly from file paths instead
+      of a given analysis information table.
+    - Some of the arguments have been changed for consistency, please
+      see the updated documentation.
+  - The `MSFileFormats()` utility function was replaced by the new
+    [`getMSConversionFormats()`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md)
+    and
+    [`getMSFileFormats()`](https://rickhelmus.github.io/patRoon/reference/getMSFileFormats.md)
+    functions.
+  - If multiple file formats are present in the paths specified by the
+    analysis information (eg mzXML and mzML), then only a consistent set
+    of file formats is selected. Previously a mixed set could be chosen.
+    If no full consistent set is available an error will be thrown.
+- Features
+  - The
+    [`importFeatures()`](https://rickhelmus.github.io/patRoon/reference/importFeatures.md)
+    and
+    [`importFeatureGroups()`](https://rickhelmus.github.io/patRoon/reference/importFeatureGroups.md)
+    functions are more consistent in function argument order and
+    supported input data sources. See the updated documentation
+    ([`?importFeatures`](https://rickhelmus.github.io/patRoon/reference/importFeatures.md)
+    and
+    [`?importFeatureGroups`](https://rickhelmus.github.io/patRoon/reference/importFeatureGroups.md))
+    for more details.
+  - SAFD algorithm
+    ([`findFeaturesSAFD()`](https://rickhelmus.github.io/patRoon/reference/findFeaturesSAFD.md))
+    - The `msdata` interface is now used to load raw data instead of
+      interfacing with the `MS_import.jl` package. As a result:
+      - `MS_import.jl` does not need to be installed anymore.
+      - Reading data is expected to be faster.
+      - This adds support for other data formats such as mzML.
+      - Very basic support for files with ion mobility data: these can
+        be used for feature detection, but the IMS dimension will be
+        ignored.
+    - The `profPath` function argument is removed, as this information
+      should now be specified in the analysis information (see above).
+    - Added `prefCentroid`, `centroidMethod` and `centroidDM` function
+      arguments
+  - Suspect screening+sets workflows: the set aggregated annotation
+    similarities are now reported as max value instead of mean.
+  - Internal changes
+    - The `groupInfo` slot of `featureGroups` is now stored as a
+      `data.table` to improve efficiency.
+- Feature annotation
+  - [`generateFormulasDA()`](https://rickhelmus.github.io/patRoon/reference/generateFormulasDA.md)
+    is now deprecated and should not be used anymore. Use GenForm or
+    SIRIUS for formula generation.
+  - [`estimateIDConfidence()`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)
+    (previously
+    [`annotateSuspects()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md))
+    now copies annotation similarities from feature annotations instead
+    of calculating them from scratch. As a result:
+    - The `specSimParams` argument was removed.
+    - **IMPORTANT**:
+      [`estimateIDConfidence()`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)
+      should be used to calculate annotation similarities for `formulas`
+      and `compounds` objects in advance.
+    - See the updated
+      [Handbook](https://rickhelmus.github.io/patRoon/handbook_bd/annotation.html#estIDConf)
+      section on identification confidence estimation for more details.
+- Transformation products
+  - [`generateComponentsTPs()`](https://rickhelmus.github.io/patRoon/reference/generateComponentsTPs.md):
+    the internal representation of results are stored differently.
+    - The component result table contains for each row a result for one
+      feature group (similar to other components results).
+    - For TP algorithms that work with possibly multiple candidates for
+      a feature group, the candidates are stored in a separate table in
+      the `candidates` column.
+    - The
+      [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+      function for TP components does not include candidates anymore by
+      default: set `candidates=TRUE` to include them.
+  - generateTPs()
+    - consistent calculation and configuration of log P / retDir
+      calculations for all algorithms. Hence, results may differ
+      compared to earlier `patRoon` versions.
+    - Advanced parameters for calculation of log P values, structural
+      similarity etc should now be configured through the
+      `TPStructParams` function argument (see
+      [`?getDefTPStructParams`](https://rickhelmus.github.io/patRoon/reference/getDefTPStructParams.md)).
+    - The retention direction calculation now also takes into account a
+      minimum log P difference (besides minimum retention time). This
+      will typically lead to different (but more reasonable) results.
+      This can be disabled through the aforementioned `TPStructParams`.
+
+### Minor changes and new functionality
+
+- File conversion & raw data
+  - Additional checks are performed to verify paths to raw instrument
+    data.
+  - [`convertMSFilesPWiz()`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md):
+    minIntensity function argument to eliminate low intensity mass peaks
+    and therefore reduce file size.
+  - [`getBPCs()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+    don’t return m/z information anymore. This was due to the change to
+    use the msdata interface, which does not (yet) provide this
+    information.
+  - `patRoon.checkCentroided` option is removed: checks are much faster
+    now and part of regular file reading operations.
+- Features
+  - Made feature qualities more configurable and extendable (suggested
+    by Leon Saal, issue
+    [\#133](https://github.com/rickhelmus/patRoon/issues/133)/PR
+    [\#134](https://github.com/rickhelmus/patRoon/issues/134))
+    - added
+      [`featureQualities()`](https://rickhelmus.github.io/patRoon/reference/feature-quality.md)
+      and
+      [`featureGroupQualities()`](https://rickhelmus.github.io/patRoon/reference/feature-quality.md)
+      functions to obtain the default qualities and calculation
+      functions used by `MetaClean`
+    - added
+      [`getFeatureQualityNames()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+      generic to obtain the quality/score names for a
+      `features`/`featureGroups` object
+    - added `featureQualities` and `featureGroupQualities` arguments to
+      [`calculatePeakQualities()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+      methods to customize calculation.
+  - The
+    [`delete()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    method function for suspect screening results can now remove suspect
+    hits through the `k` function argument.
+  - Loading OpenMS peak intensities is now much faster and removed now
+    unneeded intSearchRTWindow function argument.
+  - Feature ID column is now always of character type.
+  - Optimized suspect screening.
+  - The unique and total suspects/suspect hits are now (consistently)
+    printed.
+  - [`plotInt()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+    added `areas`, `averageFunc`, `xlim` and `ylim` function arguments.
+  - [`plotChroms3D()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    function to plot 3D feature data (retention, intensity and m/z or
+    mobility).
+  - [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+    `removeISTDs` and `onlyHits` are now cached like other filters.
+  - [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    - Columns with text data are now collapsed instead of removed if
+      `features=TRUE` and results are averaged.
+    - Fold change calculation is now possible if `features==TRUE`.
+    - The `adduct` column is split per set and renamed to `group_adduct`
+      if `features=TRUE`
+    - The intensity and area columns are now suffixed
+      (`_intensity`/`_area`) if `features=FALSE`.
+    - added `susp_bestEstIDLevel` column.
+    - moved all docs to new page with all
+      [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+      methods: see
+      [`` ?`feature-table` ``](https://rickhelmus.github.io/patRoon/reference/feature-table.md).
+  - [`overlap()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md):
+    `which` can be set to `NULL` to consider all compared data groups.
+  - Gathering of feature data for EIC construction was considerably
+    optimized.
+  - [`getPICSet()`](https://rickhelmus.github.io/patRoon/reference/kpic2-conv.md)
+    can now import features from non-centroid or IMS data
+  - [`getPICSet()`](https://rickhelmus.github.io/patRoon/reference/kpic2-conv.md)
+    and
+    [`calculatePeakQualities()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    now gain `EICParams` function arguments to configure EIC
+    construction.
+  - A new `ion_mz` column is added to feature tables and annotations,
+    which represents the original m/z of the ion in sets workflows.
+  - The class for suspect screening+sets workflows
+    (`featureGroupsScreeningSet`) doesn’t have `setObjects` anymore,
+    which makes common operations faster
+  - Changes related to support IMS workflows
+    - the `features` class gained `hasIMS` and `fromIMS` slots and
+      method accessors.
+    - Several new advanced and IMS specific EIC parameters: see
+      [`?getDefEICParams`](https://rickhelmus.github.io/patRoon/reference/EIXParams.md).
+    - [`plotChroms()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+      support annotation of mobility values (besides RT and m/z).
+    - `IMS` argument for many functions (`[`,
+      [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md),
+      plotting functions,
+      [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md),
+      …) which configures the usage of features with and/or without IMS
+      data.
+    - [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+      `applyIMS` to selectively apply filtering to features with or
+      without IMS data.
+    - [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+      `withIMSPrecursor` filter to only keep features with IMS
+      precursors.
+- Feature annotation
+  - [`plotSpectrum()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+    `normalization` and `showLegend` function arguments.
+  - [`estimateIDConfidence()`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)
+    (previously `annotateSuspects`) is now faster.
+- Components
+  - components from `nontarget`: renamed “rt” column to “ret” for
+    consistency.
+- Transformation products
+  - [`generateComponentsTPs()`](https://rickhelmus.github.io/patRoon/reference/generateComponentsTPs.md)
+    - slightly changed function argument order.
+    - The fragment and neutral loss matches are now calculated for all
+      candidates (as done previously) and per candidate.
+    - [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+      can now filter fragment and neutral loss matches per candidate.
+    - The `componentsTPs` gained a few new slots, primarily for
+      reporting.
+    - Optimized calculation of total fragment and neutral loss matches
+- Misc
+  - `patRoon.cache.maxEntries` package option (issue
+    [\#139](https://github.com/rickhelmus/patRoon/issues/139)).
+  - Updated PubChem Transformations to 0.2.3.
+  - The default metabolic logic transformations are now accessible
+    through the
+    [`TPLogicTransformations()`](https://rickhelmus.github.io/patRoon/reference/TPLogicTransformations.md)
+    function.
+  - Optimized future parallelization.
+  - Disabled parallelization for reporting by default, as it can (still)
+    result in worse performance (e.g. seen on Windows).
+  - MS2Quant metadata is now also stored for sets workflow data
+    (`MS2QuantMeta` slots for `fGroupsScreeningSet`, `formulasSet` and
+    `compoundsSet`).
+  - [`plotUpSet()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    The `nsets` argument now defaults to `NULL`, meaning it will be set
+    to the number of compared items.
+
+### Fixes
+
+- Features
+  - Fixed: syncing of `xdata` slots imported XCMS features that are not
+    sorted by analysis (eg after peak filling) (issue
+    [\#141](https://github.com/rickhelmus/patRoon/issues/141)).
+  - [`normInts()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)
+    changes (feedback Jan Specker)
+    - Fixed: `groupNorm=TRUE` now correctly handles zero values which
+      would result in `NaN` values.
+    - Changed: `norm_conc` is set to one if all are values are NA
+      (default for
+      [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md)).
+  - Fixed: workaround for bug in plotting feature optimization results
+    (issue [\#145](https://github.com/rickhelmus/patRoon/issues/145)).
+  - Fixed: `featureGroups` annotations slot is properly updated if all
+    features are removed from a set.
+  - Fixed:
+    [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    method for `features`: properly handle empty objects.
+  - Fixed: KPIC2 grouping would error when there are no results.
+  - Fixed: KPIC2/XCMS/XCMS3 grouping would error when there are no
+    results.
+  - Fixed:
+    [`getXCMSnExp()`](https://rickhelmus.github.io/patRoon/reference/xcms-conv.md)
+    with `loadRawData=FALSE` now sets additional metadata so that
+    e.g. analysis subsetting works.
+  - Fixed: feature filter didn’t hash `qualityRange`.
+  - Fixed:
+    [`normInts()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)
+    produced invalid output if no internal standards were found.
+  - Fixed: Sets worklfows: `RF_SMILES` is now stored correctly per set.
+  - Fixed: suspect list verification only checked part of the columns.
+  - Fixed:
+    [`plotVenn()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    now warns when there are too many groups, instead of erroring.
+  - Fixed: Properly select all suspect column in sets workflows, which
+    previously might yield in improper results when calculating suspect
+    annotation data, filtering and reporting.
+- Feature annotation
+  - Fixed: SIRIUS with `calculateFeatures=TRUE` could sometimes fail due
+    to file name truncation.
+  - Fixed:
+    [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    method for `MSPeakListsSet`: properly handle case where `sets`
+    argument is combined with other filters.
+  - Fixed: avoid error when
+    [`consensus()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    is called with empty objects for a set (issue
+    [\#144](https://github.com/rickhelmus/patRoon/issues/144)).
+  - Fixed:
+    [`generateCompoundsMetFrag()`](https://rickhelmus.github.io/patRoon/reference/generateCompoundsMetFrag.md):
+    don’t try to do multiprocess parallelization for non-local databases
+    (e.g. PubChem) to avoid connection errors.
+  - `annotationBy` filter for MS peak lists: clarify and verify that it
+    only works on group averaged peak lists and cannot be combined with
+    `reAverage=TRUE`.
+  - Fixed:
+    [`plotScores()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+    does now take `mar`/`mai` of
+    [`par()`](https://rdrr.io/r/graphics/par.html) parameters into
+    account.
+- Components
+  - Fixed: reporting components from `cliqueMS` and suspect screened
+    features would fail (reported by Jan Specker).
+  - Fixed: feature componentization would fail if no annotations were
+    found (reported by Jan Specker).
+- TPs
+  - Fixed: The `removeTPIsomers` filter for
+    `transformationProductsStructure` didn’t actually apply the
+    `removeDuplicates` filter.
+  - [`generateComponentsTPs()`](https://rickhelmus.github.io/patRoon/reference/generateComponentsTPs.md):
+    if no TP annotations are available then total fragment/neutral loss
+    matches are reported as NA instead of zero.
+- Misc
+  - Fixed:
+    [`report()`](https://rickhelmus.github.io/patRoon/reference/reporting.md):
+    don’t show (empty) annotations column in feature data if no feature
+    annotations are present.
+  - Fixed:
+    [`report()`](https://rickhelmus.github.io/patRoon/reference/reporting.md):
+    TP graphs were generated for components with absent (parent)
+    fGroups.
+  - Fixed:
+    [`report()`](https://rickhelmus.github.io/patRoon/reference/reporting.md):
+    candidate column in CSV of quant/tox prediction tables now don’t
+    contain image link columns.
+  - Fixed:
+    [`report()`](https://rickhelmus.github.io/patRoon/reference/reporting.md):
+    the `onlyUsedScorings` options was ignored.
+  - Fixed:
+    [`report()`](https://rickhelmus.github.io/patRoon/reference/reporting.md):
+    *Report settings* manual section was slightly outdated with missing
+    settings.
+  - Fixed: The `removeTPIsomers` filter for
+    `transformationProductsStructure` didn’t actually apply the
+    `removeDuplicates` filter.
+  - Fixed:
+    [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md):
+    don’t break long lines of text strings.
+  - Fixed:
+    [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md):
+    XCMS3/KPIC2 groupFeatures tried to do RT alignment in sets worfklow.
+  - Fixed: Sets names are now checked to not contain any special
+    characters (besides underscores). Automatic labels are now separated
+    by underscores instead of dots.
+
+## patRoon 2.3.4
+
+### Important changes
+
+- Fixed: previous versions incorrectly assumed that MS2Tox returned LC50
+  values as natural logarithms instead of log10. (reported by Alessia
+  Ore)
+
+### Other changes and fixes:
+
+- Fixed: `reAverage = TRUE` was not handled correctly for the
+  [`delete()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  method for `MSPeakListsSet`
+- Speed up ‘unsetting’ of large formulas/compounds objects, which
+  affects eg plotting TP similarities, annotatedPeakList() etc (reported
+  by Alessia Ore)
+- [`report()`](https://rickhelmus.github.io/patRoon/reference/reporting.md):
+  correctly handle removed suspect hits while reporting TP similarities
+  (reported by Alessia Ore)
+- Added visual clue to
+  [`checkFeatures()`](https://rickhelmus.github.io/patRoon/reference/check-GUI.md)
+  and
+  [`checkComponents()`](https://rickhelmus.github.io/patRoon/reference/check-GUI.md)
+  to see whether a feature or component is marked to be removed (pull
+  request [\#117](https://github.com/rickhelmus/patRoon/issues/117) as
+  suggested by Leon Saal)
+- [`loadMSLibrary()`](https://rickhelmus.github.io/patRoon/reference/loadMSLibrary.md):
+  don’t always set `Ion_mode` of records to positive and guess missing
+  `Ion_mode` data (issue
+  [\#119](https://github.com/rickhelmus/patRoon/issues/119))
+- Fixed:
+  [`generateFormulasGenForm()`](https://rickhelmus.github.io/patRoon/reference/generateFormulasGenForm.md)
+  `topMost` was not considered for cached results
+- Small doc updates for `MSPeakLists`
+- Fixed: the score filters for the
+  [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  method of formulas/compounds could in rare cases not be applied
+  correctly for consensus and/or sets results
+- MSP MS libraries: don’t be case sensitive when checking the “Num
+  Peaks” field (Bas van de Velde)
+- Small fixes in example code from the Handbook (reported by Boris Droz
+  and Jan Specker)
+- Changed cache for filtering of feature groups to reduce cache size
+  ([\#98](https://github.com/rickhelmus/patRoon/issues/98))
+- Updated PubChem Transformations to 0.2.0
+- Replaced the `featuresSets` method for `groupFeatures` with (updated)
+  `featuresSets` algorithm specific `groupFeatures` methods
+  (`groupFeaturesOpenMS` etc), so that the latter can be called directly
+  in sets workflows
+  ([\#128](https://github.com/rickhelmus/patRoon/issues/128))
+- Fixed regression: `groupQualityRange` filter would always remove all
+  feature groups (reported by Geert Franken)
+
+## patRoon 2.3.3
+
+### Import changes
+
+- The SIRIUS login workflow was changed as it was using an incorrect
+  procedure. Please see the updated Handbook section:
+  <https://rickhelmus.github.io/patRoon/handbook_bd/annotation.html#SIRLogin>.
+  Note that SIRIUS 6 is *not* yet supported.
+
+### Minor changes
+
+- [`generateTPsLibrary()`](https://rickhelmus.github.io/patRoon/reference/generateTPsLibrary.md)/[`generateTPsLibraryFormula()`](https://rickhelmus.github.io/patRoon/reference/generateTPsLibraryFormula.md)
+  any TPs that are equal to the parent and are from a generation\>1 are
+  now removed
+- Added clarification in
+  [`generateCompoundsSIRIUS()`](https://rickhelmus.github.io/patRoon/reference/generateCompoundsSIRIUS.md)
+  documentation that formula candidates without structure assignment are
+  omitted (suggested by Nienke Meekel)
+
+### Fixes
+
+- Fixed: The `removeTPIsomers` filter for
+  `transformationProductsStructure` didn’t actually apply the
+  `removeDuplicates` filter.
+- Fixed: if `updateScores=TRUE` for the methods
+  [`addFormulaScoring()`](https://rickhelmus.github.io/patRoon/reference/compounds-class.md),
+  [`predictRespFactors()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  and
+  [`predictTox()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  then `NaN` scores could be introduced if the `formulaScore` is zero.
+- Fixed: if `updateScores=TRUE` for the method
+  [`addFormulaScoring()`](https://rickhelmus.github.io/patRoon/reference/compounds-class.md)
+  then the `score` would be updated twice.
+- Fixed:
+  [`generateTPsLibrary()`](https://rickhelmus.github.io/patRoon/reference/generateTPsLibrary.md)/[`generateTPsLibraryFormula()`](https://rickhelmus.github.io/patRoon/reference/generateTPsLibraryFormula.md)
+  specifying \>1 generation did not yield in additional TP searches if
+  `parents!=NULL`
+- Fixed:
+  [`report()`](https://rickhelmus.github.io/patRoon/reference/reporting.md)
+  would error with components generated by CAMERA (reported by Nienke
+  Meekel)
+- Fixed: handle OpenBabel crashes on malformed input (reported by Nienke
+  Meekel)
+
+## patRoon 2.3.2
+
+- Fixed:
+  [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  method for `featureGroups`: `normConcToTox` argument was ignored (not
+  for `featureGroupsScreening`)
+- Various reporting fixes for screening results from suspect lists
+  without formula/SMILES data.
+- [`generateAnalysisInfo()`](https://rickhelmus.github.io/patRoon/reference/analysis-information.md):
+  try to equalize the output and input directory order
+- Added get and plot methods for total ion chromatograms (TICs) and base
+  peak chromatograms (BPCs) for the analysisInfo `data.frame`,
+  `features` and `featureGroups` class as:
+  [`getTICs()`](https://rickhelmus.github.io/patRoon/reference/generics.md),
+  [`getBPCs()`](https://rickhelmus.github.io/patRoon/reference/generics.md),
+  [`plotTICs()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  and
+  [`plotBPCs()`](https://rickhelmus.github.io/patRoon/reference/generics.md).
+- Updated PubChem transformations to 0.1.9
+- Fix: reporting compounds consensus with library algorithm would fail
+  (issue [\#110](https://github.com/rickhelmus/patRoon/issues/110))
+- SIRIUS formula annotations: calculate `ion_formula_mz` column instead
+  of taking it from SIRIUS data, as it rarely may not be available
+  (issue [\#111](https://github.com/rickhelmus/patRoon/issues/111))
+- Fix: improve handling SIRIUS results for features with non-standard
+  adduct assignments (issue
+  [\#111](https://github.com/rickhelmus/patRoon/issues/111))
+- Store individual plots in `MS2QuantMeta` slots
+- force rJava GC to improve stability with MS2Quant predictions
+
+## patRoon 2.3.1
+
+When updating to this release, it **is important** to remove any cached
+data, i.e. by running `clearCache("all")` or manually removing the
+`cache.sqlite` file from your project directory.
+
+- Fixed:
+  [`predictRespFactors()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  could incorrectly cache results and perform concentration conversions
+  twice for calibrants under some circumstances (reported by Drew Szabo)
+- Fixed:
+  [`verifyDependencies()`](https://rickhelmus.github.io/patRoon/reference/verifyDependencies.md)
+  could throw errors when external dependencies were not found.
+- Fixed:
+  [`predictRespFactors()`](https://rickhelmus.github.io/patRoon/reference/generics.md)/[`predictTox()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+  better handle objects without results
+- Metadata of `MS2Quant` is now stored in the `MS2QuantMeta` slots
+  (suggested by Drew Szabo)
+- Fixed:
+  [`calculateTox()`](https://rickhelmus.github.io/patRoon/reference/pred-tox.md)/[`calculateConcs()`](https://rickhelmus.github.io/patRoon/reference/pred-quant.md):
+  only consider relevant feature annotations
+- Fixed:
+  [`calculateConcs()`](https://rickhelmus.github.io/patRoon/reference/pred-quant.md):
+  avoid warnings when there are no feature groups
+- [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  methods for `featureGroups`/`featureGroupsScreening`:
+  - Fixed: avoid errors with `features==TRUE` and
+    `collapseSuspects=NULL`
+  - Fixed: several fixes when merging predicted
+    concentrations/toxicities if `features==TRUE` and/or
+    `collapseSuspects=NULL`
+  - Fixed: `replicate_groups` with incorrect data was included with
+    `features==TRUE` and `average==TRUE`
+  - Fixed: predicted concentrations are now properly averaged with
+    `features==TRUE` and `average==TRUE`
+- Updated PubChem transformations to 0.1.8
+- Improved documentation for `collapseSuspects` argument for
+  [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  method for suspect screening results
+
+## patRoon 2.3
+
+This release adds significant new functionality, several important
+changes and several bug fixes thanks to user feedback.
+
+Users of previous `patRoon` versions should inform themselves with the
+important changes highlighted in the next section. Furthermore, it **is
+important** to remove any cached data, i.e. by running
+`clearCache("all")` or manually removing the `cache.sqlite` file from
+your project directory.
+
+### Important new functionality and changes
+
+#### Revamped installation of patRoon and its dependencies
+
+This release adds new way to install and update `patRoon` and its
+dependencies. The most important changes are
+
+- Introduction of `patRoon` bundles: these are standalone installations
+  of `R`, `patRoon` and its `R` package dependencies, and all other
+  external dependencies such as
+  [MetFrag](http://ipb-halle.github.io/MetFrag/projects/metfragcl/),
+  OpenJDK, [OpenMS](http://openms.de/) etc. This is primarily useful for
+  users not familiar to `R` or wanting to quickly try a new `patRoon`
+  release.
+- Semi automated installations with the
+  [patRoonInst](https://github.com/rickhelmus/patRoonInst) auxiliary
+  package. This package will install `patRoon` and its dependencies
+  automatically, which prevents the need to manually install packages
+  from different sources (BioConductor, GitHub etc). Furthermore, this
+  package also installs `patRoonExt`, another axuliary package that
+  bundles most external dependencies
+  (e.g. [MetFrag](http://ipb-halle.github.io/MetFrag/projects/metfragcl/),
+  [PubChemLite](https://zenodo.org/record/6503754),
+  [OpenMS](http://openms.de/)).
+- The old `patRoon_install` script is now replaced by the above
+  installation methids, and is therefore considered deprecated, will be
+  removed in the future and should therefore not be used anymore.
+
+For more information, please read the [updated installation
+chapter](https://rickhelmus.github.io/patRoon/handbook_bd/installation.html)
+in the handbook, and see the project pages of
+[patRoonInst](https://github.com/rickhelmus/patRoonInst) and
+[patRoonExt](https://github.com/rickhelmus/patRoonExt).
+
+> ***IMPORTANT*** If you installed `patRoon` via the legacy installation
+> script, please read the [installation
+> chapter](https://rickhelmus.github.io/patRoon/handbook_bd/installation.html)
+> to disable/remove this installation prior to updating `patRoon`!
+
+#### Prediction of feature toxicities and concentrations (MS2Tox/MS2Quant integration)
+
+The second milestone of this release is the integration of the
+[MS2Tox](https://github.com/kruvelab/MS2Tox) and
+[MS2Quant](https://github.com/kruvelab/MS2Quant) `R` packages, which
+support machine learning approaches to predict the toxicity and
+concentration of features. The integration adds the following
+functionality to `patRoon`:
+
+- Automated prediction of toxicity (fish LC50) and response
+  factors/concentrations for features from
+  [SIRIUS+CSI:FingerID](https://bio.informatik.uni-jena.de/software/sirius/)
+  fingerprints or `SMILES`.
+- The predictions can be made from suspect data and formula/compound
+  annotation candidates. These can be combined and aggregated when
+  calculating toxicities/concentrations for features.
+- The
+  [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  function and reporting interface were updated to inspect the predicted
+  toxicities/concentrations.
+- Various new filters were added to prioritize data on calculated
+  toxicities, response factors and concentrations.
+- Various small usability improvements to simplify calibrations and
+  concentration units.
+
+Please see the [relevant section in the
+handbook](https://rickhelmus.github.io/patRoon/handbook_bd/pred.html),
+and the project pages of [MS2Tox](https://github.com/kruvelab/MS2Tox)
+and [MS2Quant](https://github.com/kruvelab/MS2Quant) for more details.
+
+### Minor new functionality and changes
+
+- [`loadMSLibrary()`](https://rickhelmus.github.io/patRoon/reference/loadMSLibrary.md):
+  improve compatibility with more `.msp` flavors (issue
+  [\#72](https://github.com/rickhelmus/patRoon/issues/72)).
+- [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md):
+  save/load parameters to reproduce subsequent project creations (issue
+  [\#61](https://github.com/rickhelmus/patRoon/issues/61))
+- [`groupFeaturesOpenMS()`](https://rickhelmus.github.io/patRoon/reference/groupFeaturesOpenMS.md):
+  now supports handling large numbers of analyses on Windows (reported
+  by Geert Franken, fix thanks to
+  <https://github.com/OpenMS/OpenMS/issues/6845>).
+- Add package option `patRoon.checkCentroided` to control whether
+  analyses files are verified to be centroided (suggested by Geert
+  Franken).
+- Updated PubChem transformations to v0.1.7
+- Reference documentation: all generics are now documented, mainly to
+  ensure that default arguments are listed again in the function
+  documentation (reported by Geert Franken)
+- [`overlap()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md):
+  the `which` param can now also be a `list` to compare groups of
+  replicate groups (similar to
+  [`plotVenn()`](https://rickhelmus.github.io/patRoon/reference/generics.md))
+- [`consensus()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  method for `featureGroups`: new `verifyAnaInfo` flag to optionally
+  skip if the analysis information are equal for all compared objects.
+  This is mainly useful when the data is the same but in different
+  formats.
+- Compatibility with OpenMS 3.0
+- Windows CI is now performed on GitHub actions instead of AppVeyor.
+- [`genReportSettingsFile()`](https://rickhelmus.github.io/patRoon/reference/reporting.md):
+  `baseFrom` argument to update old report settings files.
+- [`generateFormulasSIRIUS()`](https://rickhelmus.github.io/patRoon/reference/generateFormulasSIRIUS.md):
+  new `getFingerprints` and `token` arguments to download CSI:FingerID
+  fingerprints for formula candidates. This was primarily implemented to
+  support calculating toxicities/concentrations from formula
+  annotations.
+
+### Fixes
+
+- Fixed: in rare cases EICs were incorrectly loaded from cache
+- Fixed:
+  [`report()`](https://rickhelmus.github.io/patRoon/reference/reporting.md)
+  now correctly handles SIRIUS compounds results and suspects without
+  SMILES
+- Fixed: report layout is now compatible with `bslib 0.5.0` (reported by
+  Alessia Ore)
+- Fixed: `annotatedBy` filter for `MSPeakLists` could remove precursor
+  peaks in MS/MS data regardless if `retainPrecursorMSMS=TRUE`
+- Fixed:
+  [`report()`](https://rickhelmus.github.io/patRoon/reference/reporting.md):
+  The `suspect(s)` column for compound annotation results was always
+  empty
+- Fixed: the `reAverage` argument was ignored by the
+  [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  method of `MSPeakLists` when checking if cached data is available
+  (issue [\#87](https://github.com/rickhelmus/patRoon/issues/87))
+- Fixed: if `reAverage=TRUE` to the
+  [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  method of `MSPeakLists` then the peak IDs were not regenerated (issue
+  [\#87](https://github.com/rickhelmus/patRoon/issues/87))
+- Fixed: Suspect screening results were incorrectly merged with \>2 sets
+  (issue [\#90](https://github.com/rickhelmus/patRoon/issues/90))
+- Fixed:
+  [`plotSpectrum()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  method for `formulas`/`compounds` didn’t expand plot height for
+  formula annotations with only one mass peak
+- Fixed:
+  [`annotatedPeakList()`](https://rickhelmus.github.io/patRoon/reference/generics.md)/[`plotSpectrum()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  methods for `compounds` didn’t label mass peaks with compounds
+  algorithm if `formulas` were provided but no formula candidate was
+  present.
+- Fixed: in some specific conditions the plot() would throw an error
+  (“cannot coerce type ‘S4’ to vector of type ‘double’”)
+- Fixed:
+  [`generateFormulas()`](https://rickhelmus.github.io/patRoon/reference/generateFormulas.md)
+  generic definition had wrong argument order
+- Fixed: `getSIRIUSToken()` resulted in errors if the password input was
+  cancelled.
+
+## patRoon 2.2
+
+This release adds significant new functionality, several important
+changes and many bug fixes thanks to user feedback.
+
+Users of previous `patRoon` versions should inform themselves with the
+important changes highlighted in the next section. Furthermore, it **is
+important** to remove any cached data, i.e. by running
+`clearCache("all")` or manually removing the `cache.sqlite` file from
+your project directory.
+
+### Important new functionality and changes
+
+#### New reporting interface
+
+The most significant change in this release is the addition of
+redesigned reporting functionality. Some key functionality and changes:
+
+- The `html` interface was completely redesigned to provide a modern,
+  responsive and easier to use interface, which is powered by the
+  `bslib` and `reactable` `R` packages.
+- The browsing and exploring of reported data is made significantly
+  easier by centralizing all workflow data (features, annotations, TPs
+  etc). Furthermore, tabular data can be easily filtered and can be
+  grouped by properties such as suspects, parents, replicate groups etc.
+- All plots are now stored as `SVG` vector graphics, which are generally
+  smaller in size, faster to create and can be zoomed in without loss of
+  quality.
+- The generation of plots and other reporting data was optimized, and
+  can be further speed up by parallelization.
+- Caching of report data was significantly optimized, which makes
+  re-generating reports with partially changed data/parameters much
+  faster.
+- Due to these optimizations, the default number of annotation
+  candidates was increased from 5 to 25.
+- Chromatograms can now also be plotted for individual features. In
+  addition, it is also possible to add plots of EICs in analyses where
+  no feature was found, which makes it easy to spot any features that
+  were not detected (or filtered out).
+- The configuration of reporting parameters was simplified and is now
+  achieved through a `YAML` file.
+- And many other improvements…
+
+An example can be seen from the [report output of the
+tutorial](https://rickhelmus.github.io/patRoon/examples/report.html).
+
+The new reporting interface is used with the new
+[`report()`](https://rickhelmus.github.io/patRoon/reference/reporting.md)
+method function. All the documentation was updated to reflect these
+changes. The now ‘legacy’ report interface
+([`reportCSV()`](https://rickhelmus.github.io/patRoon/reference/reporting-legacy.md),
+[`reportPDF()`](https://rickhelmus.github.io/patRoon/reference/reporting-legacy.md)
+and
+[`reportHTML()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md))
+is still available for backwards compatibility and may still be of
+interest as the new interface currently only supports the HTML format.
+
+The new reporting functionality obviously did not yet underwent years of
+usage and feedback. Hence, please report any bugs and suggestions you
+may have!
+
+#### Usage of SIRIUS version 5
+
+Active logins are now necessary to use webservices such as CSI:FingerID,
+see
+e.g. <https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/>
+This release of `patRoon` adds support to make logging in more easy and
+adds several compatibility fixes for the latest `SIRIUS` version. The
+new utility function `getSIRIUSToken()` can be used to obtain a
+necessary login token. The new `token` argument for
+[`generateCompoundsSIRIUS()`](https://rickhelmus.github.io/patRoon/reference/generateCompoundsSIRIUS.md)
+can be used to automatically log in. The `newPorject()` function was
+extended to use this new functionality.
+
+#### Docker images moved
+
+The Docker images are now served by the GitLab server of the University
+of Amsterdam. To pull the latest images you can run the following
+command:
+
+    docker pull uva-hva.gitlab.host:4567/r.helmus/patroon/patroonrs
+
+The changes are reflected in the installation section of the handbook.
+
+#### TP formula libraries
+
+A new algorithm for
+[`generateTPs()`](https://rickhelmus.github.io/patRoon/reference/generateTPs.md)
+was added: `library_formula`. This algorithm is similar to the `library`
+algorithm, but only works with chemical formulae. This is especially
+useful if only formula data is available for parents and/or TPs. The
+[`genFormulaTPLibrary()`](https://rickhelmus.github.io/patRoon/reference/genFormulaTPLibrary.md)
+utility function can be used to automatically generate a formula library
+from given transformation rules. More information can be found in the
+updated handbook and reference manual
+([`?generateTPsLibraryFormula`](https://rickhelmus.github.io/patRoon/reference/generateTPsLibraryFormula.md)).
+
+#### Other
+
+Other important changes include:
+
+- Features
+  - Common parameters for creation of extracted ion chromatograms
+    (EICs), such as `topMost` and `onlyPresent`, are now combined in a
+    parameter list. The parameter list is specified with the new
+    `EICParams` argument to functions such as
+    [`plotChroms()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    and
+    [`report()`](https://rickhelmus.github.io/patRoon/reference/reporting.md).
+    A list with default parameter values is generated with the
+    [`getDefEICParams()`](https://rickhelmus.github.io/patRoon/reference/EIXParams.md)
+    function. More information can be found in the reference manual:
+    `?EICParams`.
+  - The order of some of the arguments to the
+    [`plotChroms()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    method for `featureGroups` was changed.
+  - [`makeSet()`](https://rickhelmus.github.io/patRoon/reference/makeSet.md)
+    method for `featureGroups` (and related functions
+    [`adducts()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    and
+    [`selectIons()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)):
+    the original set specific feature groups are now combined to create
+    the final feature groups, instead of grouping features from all sets
+    at once. This prevents rare cases where features with different
+    adduct assignments in the same set would be grouped together
+    (i.e. if their neutral mass would be the same). Note that this
+    change probably will produce slightly different results. This change
+    required the addition of a new slot `annotationsChanged` to
+    `featureGroupsSet` for internal usage by the `adducts()<-` method.
+- Feature annotations
+  - For sets workflows, scorings that are considered set specific
+    (e.g. MS/MS match) are now *not* averaged anymore. Instead, these
+    scorings are stored per set, which improves estimation of set
+    specific ID levels. The old behaviour can be enabled by setting the
+    new `setAvgSpecificScores` arguments of
+    [`generateFormulas()`](https://rickhelmus.github.io/patRoon/reference/generateFormulas.md)/[`generateCompounds()`](https://rickhelmus.github.io/patRoon/reference/generateCompounds.md)
+    to `TRUE`.
+- Chemical data from e.g. suspects and TPs can now be automatically
+  ‘neutralized’ by addition/subtraction of protons, by setting the
+  `neutralChemProps`/`neutralizeTPs` arguments. Whether a structure was
+  neutralized is marked by the new `molNeutralized` column.
+  - If `neutralizeTPs` is set and a neutralization of a TP results in a
+    duplicate structure (i.e. in case the algorithm also generated the
+    neutral form of the TP) then the neutralized TP is removed.
+
+### Minor new functionality
+
+- [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md):
+  added possibility to exclude analyses out of folder (issue
+  [\#60](https://github.com/rickhelmus/patRoon/issues/60),
+  [\#63](https://github.com/rickhelmus/patRoon/issues/63))
+- Features
+  - [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    for `featureGroups`
+    - if `regression=TRUE`: add column with p values
+    - if `features=TRUE`: add replicate group column
+  - [`plotChroms()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+    `analysis`, `groupName` and `intMax` arguments
+- Feature annotation
+  - A
+    [`delete()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    method function was added to modify MS peak lists
+  - GenForm: `thrMS`, `thrMSMS`, `thrComb` and `maxCandidates`
+    arguments, which can be used to tweak calculations for features with
+    many candidates, e.g., to limit calculation times.
+- Suspects
+  - Multiple conditions for ID level estimation can now be combined with
+    the `and` keyword in the `YAML` configuration file. This is
+    especially useful when combined with the `or` keyword.
+- Componentization
+  - Feature components: add `adduct_abundance` column
+  - [`plotInt()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    method for components: `index` argument can now also be component
+    name
+- TPs
+  - [`generateTPsCTS()`](https://rickhelmus.github.io/patRoon/reference/generateTPsCTS.md):
+    support new PFAS libraries (set `"pfas_environmental"` or
+    `"pfas_metabolism"` as the `transLibrary` argument).
+  - [`generateTPsLibrary()`](https://rickhelmus.github.io/patRoon/reference/generateTPsLibrary.md):
+    the `matchParentsBy` argument now also accepts `"formula"` and
+    `"name"`.
+  - TP libraries may contain a `retDir` column that specifies the
+    retention time direction of the TP compared to its parent
+    (alternative to specifying `log P` values).
+  - New argument `matchGenerationsBy` to the `library` (and
+    `library_formula`) algorithm for
+    [`generateTPs()`](https://rickhelmus.github.io/patRoon/reference/generateTPs.md),
+    which controls how parents/TPs are matched when searching multiple
+    transformation generations.
+  - Added `maxExpGenerations` argument to `generateTPsBiotransformer` to
+    avoid excessive TP hierarchy expansions.
+  - [`generateTPsCTS()`](https://rickhelmus.github.io/patRoon/reference/generateTPsCTS.md):
+    support new PFAS libraries (set `"pfas_environmental"` or
+    `"pfas_metabolism"` as the `transLibrary` argument).
+  - [`generateComponentsTPs()`](https://rickhelmus.github.io/patRoon/reference/generateComponentsTPs.md)
+    the `formulaDiff` column now splits elemental losses and gains,
+    similar as the
+    [`plotGraph()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    method already did for TPs.
+  - A
+    [`delete()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    method function was added to modify `transformationProducts`
+- [`plotInt()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  methods: `plotArgs` and `linesArgs` to pass additional arguments to
+  [`plot()`](https://rickhelmus.github.io/patRoon/reference/generics.md)/[`lines()`](https://rdrr.io/r/graphics/lines.html).
+  The latter replaces the dots argument.
+- [`plotGraph()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  methods
+  - `width` and `height` arguments.
+  - methods for `transformationProductsStructure` now draw structures in
+    SVG format to improve quality
+- [`clearCache()`](https://rickhelmus.github.io/patRoon/reference/caching.md):
+  `vacuum` option to speed up clearing large cache files.
+
+### Minor changes
+
+- Features
+  - [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    for `featureGroups` with `regression=TRUE`: treat missing features
+    as `NA`
+  - [`plotChord()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    method for `featureGroups`: significantly optimized some old code
+  - [`plotChroms()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    / EIC loading
+    - refactor and minor improvements
+    - The plot y limit is now determined from EIC data to improve
+      accuracy
+    - various optimizations to load (cached) EIC data
+- Feature annotations
+  - [`plotScores()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    - split bars for sets
+    - only split bars if results are present for \>1 sets and/or
+      consensus algorithms
+  - [`plotSpectrum()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    for sets workflows better handles missing data from one or more sets
+    when making a comparison, which avoids empty plots in such cases.
+  - Several optimizations for `annotatedPeakLists()`, especially with
+    sets workflows.
+- Suspects
+  - Annotation similarities are now calculated with spectral similarity
+    C++ code used by other functionality in patRoon, which is faster and
+    allows more configuration options. Consequently, the `specSimParams`
+    argument replaces the `relMinMSMSIntensity` and `simMSMSMethod`
+    arguments.
+  - [`annotateSuspects()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md):
+    log if the suspect formula/compound data could not be matched with
+    feature annotations
+- TPs
+  - The format of the `formulaDiff` column in TP component results was
+    changed to more easily identify elemental losses/gains.
+  - The `fromTPs` slot was added to TP components and is `TRUE` if a
+    `transformationProducts` object was used during componentization.
+    This is primarily for internal use.
+- [`plotGraph()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  methods: show empty plot instead of throwing an error if results are
+  empty
+- Loosened strictness of centroided data verification to speed it up,
+  especially when dealing with many analyses.
+- Updated PubChem transformations to April 2023 release (0.1.5)
+- Updated MetFrag to 2.5.0
+- Validation of formula data in e.g. suspect lists is now much faster
+  when `prefCalcChemProps=FALSE`
+
+### Fixes
+
+- [`reportHTML()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md)
+  - Fixed: `EICOnlyPresent` argument to
+    [`reportHTML()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md)
+    is effective again
+  - Fixed:
+    [`reportHTML()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md)
+    could show plots of wrong TP results
+- [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md)
+  - Fixed: code generated by
+    [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md)
+    for sets mode used [`c()`](https://rdrr.io/r/base/c.html) instead of
+    [`list()`](https://rdrr.io/r/base/list.html) to specify
+    positive+negative suspect lists to
+    [`screenSuspects()`](https://rickhelmus.github.io/patRoon/reference/suspect-screening.md)
+  - Fixed: newProject(): properly call
+    [`rstudioapi::getSourceEditorContext()`](https://rstudio.github.io/rstudioapi/reference/rstudio-editors.html)
+    (issue [\#62](https://github.com/rickhelmus/patRoon/issues/62))
+  - Fixed:
+    [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md)
+    used wrong variable name for suspect list under some conditions
+    (issue [\#69](https://github.com/rickhelmus/patRoon/issues/69))
+  - Fixed: only check if `analysis.csv` already exists when needed
+  - Fixed: `norm_conc` field for analysis information was ignored
+    (reported by Geert Franken)
+  - Fixed:
+    [`checkFeatures()`](https://rickhelmus.github.io/patRoon/reference/check-GUI.md)/[`checkComponents()`](https://rickhelmus.github.io/patRoon/reference/check-GUI.md):
+    disabling a feature/featureGroup in a sorted table would lead to
+    wrong selections
+- Features
+  - Fix: OpenMS featureXML files exported for feature grouping now
+    contain analysis file names, which prevents warnings about MS runs
+    not being annotated.
+  - Fixed: blank filter didn’t properly handle differing blank
+    assignments per analysis
+  - [`selectIons()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)
+    does not throw an error anymore if there is no suitable
+    adduct/isotope information in the given components, which would
+    result in incorrect behavior with sets mode if e.g. no annotations
+    were found for one of the sets.
+  - Fixed:
+    [`predictCheckFeaturesSession()`](https://rickhelmus.github.io/patRoon/reference/check-GUI.md)
+    marked passing peaks to be removed instead of the other way around
+    (issue [\#59](https://github.com/rickhelmus/patRoon/issues/59))
+  - Fixed:
+    [`selectIons()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)
+    didn’t properly handle empty components objects
+  - Fixed: `chromPeaks()` from `xcms` was sometimes not found (issue
+    [\#68](https://github.com/rickhelmus/patRoon/issues/68))
+  - Fixed:
+    [`calculatePeakQualities()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    would throw errors for empty feature results (reported by Louise
+    Malm)
+  - Analysis information
+    - Ensure no duplicate analysis names are present.
+    - Allow NA values for blanks
+  - [`plotChroms()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    / EIC loading: group rectangle with topMost set didn’t consider
+    retention times and intensities from other features
+  - Fixed: The `traceSNRFiltering` argument could not be set for
+    [`findFeaturesOpenMS()`](https://rickhelmus.github.io/patRoon/reference/findFeaturesOpenMS.md)
+  - [`plotChroms()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    now better supports plotting chromatograms for analysis without
+    feature data (ie when `onlyPresent=FALSE`) in sets workflows. This
+    now correctly works for cases where a feature is completely absent
+    in a set.
+- Feature annotation
+  - Fixed regression where the
+    [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    method for `MSPeakLists` where precursor isolation (`isolatePrec`
+    argument) also applied to MS/MS data (issue
+    [\#56](https://github.com/rickhelmus/patRoon/issues/56)).
+  - Fixed: filtered sets data (peak lists/annotations) could sometimes
+    lead to errors
+  - Fixed:
+    [`generateCompoundsMetFrag()`](https://rickhelmus.github.io/patRoon/reference/generateCompoundsMetFrag.md)
+    didn’t properly detect changes in local database files when
+    considering cached data.
+  - Fixed: in rare case `MSPeakLists` without any results could lead to
+    errors.
+  - Fixed: `scoreTypes` slot could contain scorings not actually used,
+    e.g. if the `scoreTypes` argument to
+    [`generateCompoundsMetFrag()`](https://rickhelmus.github.io/patRoon/reference/generateCompoundsMetFrag.md)
+    contained scorings not actually present in the used database.
+  - Custom MetFrag scorings specified that were not in
+    compoundScorings() are now saved in compounds results and recognized
+    by e.g. score normalization and plotScores()
+  - Fixed:
+    [`addFormulaScoring()`](https://rickhelmus.github.io/patRoon/reference/compounds-class.md):
+    `updateScore` argument was ignored and treated always as `TRUE`
+  - SIRUS
+    - Fixed: Features with data offsets are now properly loaded.
+    - Fixed: zero intensity precursor peaks returned by SIRIUS compound
+      annotation were not removed, resulting in errors with
+      [`annotateSuspects()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md)
+      (issue [\#54](https://github.com/rickhelmus/patRoon/issues/54)).
+      Suspects
+  - Fixed: warnings generated during suspect screening for very large
+    suspect list could lead to very high memory usage and R errors.
+  - remove bogus `higherThanNext` setting from estimated ID level 4a
+  - Fixed:
+    [`screenSuspects()`](https://rickhelmus.github.io/patRoon/reference/suspect-screening.md)
+    would fail if the adduct column contains partially `NA` data.
+  - Formulae with isotopes in e.g. suspect lists are now not normalized
+    anymore, as this would remove the isotope designations
+  - Fixed:
+    [`unset()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    for `featureGroupsScreeningSet` resulted in loss of group quality
+    scores and internal standard assignments
+  - Fix: If a suspect list does not contain SMILES and formulas then
+    InChIs were not used to calculate the missing formula data. (issue
+    [\#54](https://github.com/rickhelmus/patRoon/issues/54))
+  - [`annotateSuspects()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md)
+    - Fixes for consensus annotation results (issue
+      [\#54](https://github.com/rickhelmus/patRoon/issues/54))
+    - Sets workflows now separate log files for each set.
+    - Fixed: annotation similarities didn’t properly handle results from
+      [`generateCompoundsLibrary()`](https://rickhelmus.github.io/patRoon/reference/generateCompoundsLibrary.md)
+      if the library did not contain peak formula annotations.
+  - Fixed: In sets workflows the `fragments_formula` was not split per
+    set in the screening results.
+- TPs
+  - Fixed: Set specific spectral similarities were not assigned
+    correctly during TP componentization if a feature group occurs
+    multiple times in the same component
+- Fix: multiprocessing with classic: don’t try to capture output when
+  logging is disabled
+- Small fixes and improvements for verification of parameter lists
+- Fixed:
+  [`convertMSFiles()`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md)
+  if the `analysisInfo` argument is set and `outPath` is set with a
+  length \>1 then the wrong output path could be used.
+- Installation script: increase download timeout to avoid (unclear)
+  errors when the script is downloading large file (issue
+  [\#76](https://github.com/rickhelmus/patRoon/issues/76)).
+
+## patRoon 2.1
+
+This release extends version `2.0` with new functionality, several
+important changes and bug fixes. The
+[`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md)
+function was updated for the new functionality. Please see the updated
+Handbook and sections below for more information.
+
+Users of previous `patRoon` versions should inform themselves with the
+important changes highlighted in the next section. Furthermore, it is
+highly recommended to remove any cached data, i.e. by running
+`clearCache("all")` or manually removing the `cache.sqlite` file from
+your project directory.
+
+### Important new functionality and changes
+
+- Transformation product (TP) screening
+  - The
+    [`generateTPs()`](https://rickhelmus.github.io/patRoon/reference/generateTPs.md)
+    function now supports an additional algorithm that interfaces with
+    the [Chemical Transformation Simulator](https://qed.epa.gov/cts)
+    (CTS). An important advantage of this algorithm is that it supports
+    several abiotic transformation pathway libraries.
+  - Functionality was added to generate interactive plots of
+    transformation pathways using the
+    [`plotGraph()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    generic function. Furthermore, this function can incorporate
+    componentization results to easily display which TPs are present in
+    the screening results.
+  - A new class, `transformationProductsStructure`, is now used to store
+    results for algorithms that provide structural information
+    (`biotransformer`, `library` and `cts`). This better harmonizes the
+    functionality between algorithms (e.g. with the
+    [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    method function).
+  - [`plotVenn()`](https://rickhelmus.github.io/patRoon/reference/generics.md),
+    [`plotUpSet()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    and
+    [`consensus()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    methods are now available to compare and combine TP data.
+  - TPs with equal structures but originating from different pathways
+    are now handled differently to ease data interpretation
+    - The names for these TPs are now the same (but still unique per
+      parent).
+    - These TPs are only included once in components, reports, suspect
+      list conversion etc. to simplify data processing.
+    - For this reason
+      [`convertToMFDB()`](https://rickhelmus.github.io/patRoon/reference/generics.md)/[`generateComponentsTPs()`](https://rickhelmus.github.io/patRoon/reference/generateComponentsTPs.md)
+      don’t include any columns anymore that are specific to the
+      transformation pathway.
+  - Hierarchy expansion takes place for BioTransformer results to
+    estimate full pathways. Please see the reference manual
+    (`?generateTPsBiotransformer()`) for details.
+- Feature intensity normalization
+  - The functionality to normalize feature intensities was significantly
+    extended in this release of `patRoon`. A new method function,
+    [`normInts()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)
+    now supports various normalization methods, such as normalization by
+    internal standards and the TIC. With internal standard
+    normalization, the
+    [`plotGraph()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    function can be used to interactively evaluate which internal
+    standards were automatically assigned to each feature group.
+  - Major changes
+    - The
+      [`normInts()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)
+      function now handles all normalization and stores normalized
+      intensities/areas in the feature data.
+    - Functions that can use normalized data
+      ([`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md),
+      [`plotInt()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+      etc) now have a new `normalized` argument, which should be `TRUE`
+      to use normalized data. The `normFunc` argument to these functions
+      was removed since it is not necessary anymore.
+    - If `normalized=TRUE` and
+      [`normInts()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)
+      was not called on the feature data, a simple automatic default
+      normalization is done. This is primarily for backwards
+      compatibility.
+  - Minor changes/additions
+    - [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+      can now report normalized values for averaged feature data (if
+      (`features` && `average` && `normalized`) == TRUE)
+    - `removeISTDs` argument for
+      [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+      to remove feature groups that are assigned as internal standards.
+    - The analysis information can contain a normalization concentration
+      column (`norm_conc`) that influences normalization calculations.
+      The
+      [`generateAnalysisInfo()`](https://rickhelmus.github.io/patRoon/reference/analysis-information.md)
+      function can now initialize this data.
+    - `ISTDs` and `ISTDAssignments` slots and their accessor methods
+      [`internalStandards()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)
+      and
+      [`internalStandardAssignments()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)
+      to store/access the internal standard assignment data.
+- MS libraries
+  - This release adds support for loading and post-processing MS
+    libraries (e.g. MSP or JSON files from MassBank) and using them for
+    compound annotation. An important advantage is that annotation may
+    be more reliable since experimental spectra are matched, and the
+    process is much faster since no online database search or in-silico
+    annotation need to be performed. The rules for identification level
+    estimation were updated accordingly to support the new spectral
+    match score (`libMatch`).
+- The functionality to automatically curate and calculate chemical
+  properties such as `SMILES`, `InChI` and formulas for e.g. suspect
+  lists was significantly changed. More data is now verified, and
+  several optimizations were implemented to better handle large suspect
+  lists or MS libraries. Note that minor changes in `neutralMass` values
+  may be observed. For more details please see the reference manual
+  (e.g. [`?screenSuspects`](https://rickhelmus.github.io/patRoon/reference/suspect-screening.md)).
+
+### Other new functionality
+
+- Transformation products (TPs)
+  - A new
+    [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    method was defined for the `transformationProducts` class to filter
+    generic properties.
+  - New `calcSims` argument to the `generateTPs` functions: if `TRUE`
+    then structural similarities will be calculated between parents/TPs.
+  - The `library` algorithm now caches its results and supports multiple
+    transformation generations (`generations` argument).
+- [`reportHTML()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md)
+  - Improved layout for TP reporting
+  - Plotting of transformation hierarchies (requires setting the new
+    `TPs` argument).
+  - All reported feature information (chromatograms etc) are now placed
+    inside a new menu
+- [`generateFormulasSIRIUS()`](https://rickhelmus.github.io/patRoon/reference/generateFormulasSIRIUS.md)/[`generateCompoundsSIRIUS()`](https://rickhelmus.github.io/patRoon/reference/generateCompoundsSIRIUS.md):
+  `projectPath` and `dryRun` arguments. These are mainly for internal
+  use.
+- [`getEICs()`](https://rickhelmus.github.io/patRoon/reference/getEICs.md)
+  utility to obtain raw EIC data (suggested by Ricardo Cunha).
+
+### Minor changes
+
+- Transformation products (TPs)
+  - `biotransformer`
+    - Does not automatically calculate structural similarities anymore.
+      This now requires setting the `calcSims` argument to `TRUE` (see
+      above).
+    - Simplified/Harmonized several column names
+    - Converted ID and parent IDs to integer values. This was primarily
+      done for consistency with other algorithms.
+    - Removed several unnecessary `parent_` columns (parent_SMILES, etc)
+    - The `steps` argument was renamed to `generations` for consistency
+      with other algorithms.
+  - `library` algorithm: naming of TPs is similarly done as other
+    algorithms. The library TP names are now stored in the `name_lib`
+    column.
+- Removed the `onlyLinked` argument from the
+  [`plotGraph()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  generic. This was done as the new
+  [`plotGraph()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  methods don’t support this argument. Note that the argument was only
+  removed from the generic, the original
+  [`plotGraph()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  methods still support the argument.
+- [`generateCompoundsSIRIUS()`](https://rickhelmus.github.io/patRoon/reference/generateCompoundsSIRIUS.md):
+  removed unused `errorRetries` argument
+- Updated used versions of PubChemLite, MetFrag and pugixml
+- Support for the MetFrag OECD PFAS compound database
+  (<https://zenodo.org/record/6385954>). Should be configured like
+  PubChemLite.
+- More consistent installation suggestion message when an R package from
+  GitHub is found missing
+- Optimized `topMost` filter applied during MS peak list averaging
+
+### Fixes
+
+- Transformation products (TPs)
+  - Fixed: `convertMFDB()` now always collapses duplicates, not just for
+    `biotransformer` results.
+  - Fixed: `biotransformer`: `retDir` is now derived from the *original*
+    parent, i.e. not its direct parent
+- Fixed:
+  [`reportHTML()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md)
+  now properly subscripts negative element counts in formulas
+- Fixed:
+  [`reportHTML()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md)
+  improve handling of missing or split compound identifiers when
+  generating URL links
+- Fixed: annotatedPeakList() for `compounds`: avoid \_unset suffixes in
+  mergedBy column from data of sets workflows
+- Fixed:
+  [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md):
+  loading analysis info from CSV now works again on Windows
+- More workarounds to avoid `NA` exit codes on Linux systems
+- Fixed:
+  [`generateCompoundsSIRIUS()`](https://rickhelmus.github.io/patRoon/reference/generateCompoundsSIRIUS.md):
+  `topMost` argument was used where `topMostFormulas` was supposed to be
+  used
+- Fixed:
+  [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  method for `featureAnnotations` would throw an error for empty results
+  with `OM=TRUE`
+
+## patRoon 2.0.2
+
+- Fixed: `removeBlanks` feature groups filter would not handle analyses
+  with multiple blanks.
+- Made `enviPick` optional dependency and added instructions to install
+  from GitHub, as it was removed from CRAN.
+
+## patRoon 2.0.1
+
+- Fixed:
+  [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md)
+  would not add suspect annotation to the output script if the example
+  suspect list or sets workflows were chosen.
+- Fixed: Default optimization range for KPIC2 `min_width` was incorrect
+  (PR [\#31](https://github.com/rickhelmus/patRoon/issues/31), thanks to
+  @@coltonlloyd)
+- `installPatRoon()` improvements in determining what is already
+  installed
+- Fixed: Group qualities/scores were not transferred to new
+  `featureGroups` objects after calling
+  [`screenSuspects()`](https://rickhelmus.github.io/patRoon/reference/suspect-screening.md)
+  or
+  [`unset()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+- Checking of MS file extensions (e.g. for
+  [`generateAnalysisInfo()`](https://rickhelmus.github.io/patRoon/reference/analysis-information.md))
+  is now case insensitive (see issue
+  [\#34](https://github.com/rickhelmus/patRoon/issues/34) and
+  [\#43](https://github.com/rickhelmus/patRoon/issues/43))
+- Fixed:
+  [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md):
+  [`reportCSV()`](https://rickhelmus.github.io/patRoon/reference/reporting-legacy.md)
+  call in generated script included non-existing `MSPeakLists` argument.
+- Fixed: Suspect screening would result in an error if the `adduct`
+  argument was specified (Corey Griffith)
+- Refactoring of the reference documentation pages (issue
+  [\#35](https://github.com/rickhelmus/patRoon/issues/35))
+  - Workflow data generation functions and their algorithms specific
+    counterparts (e.g. `findFeatures`, `findFeaturesKPIC2`) are now
+    documented on separate pages.
+  - The plotting functions for `featureGroups` are now documented in a
+    separate page (?`feature-plotting`)
+  - Many small textual improvements were made in the process
+- Fixed: the
+  [`findFeaturesKPIC2()`](https://rickhelmus.github.io/patRoon/reference/findFeaturesKPIC2.md)
+  and
+  [`importFeaturesKPIC2()`](https://rickhelmus.github.io/patRoon/reference/importFeaturesKPIC2.md)
+  now have correct casing (was lower case ‘f’)
+- Fixed: some function arguments for
+  [`convertMSFiles()`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md)
+  were not properly verified
+- More checks to verify if input mzML/mzXML data actually exists
+- Improved reference documentation for `analysis-information` (issue
+  [\#33](https://github.com/rickhelmus/patRoon/issues/33))
+- Handbook: detailed overview of all workflow functions and classes
+  (issue [\#41](https://github.com/rickhelmus/patRoon/issues/41),
+  special thanks to @@hechth)
+- Fixed: annotations slot for `featureGroups` was not updated when
+  removing groups with
+  [`delete()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  (except sets workflows)
+- Fixed: better handle missing spectrum data with spectrumSimilarity()
+- Made `nontarget` an optional dependency and install it from GitHub
+  with CI and in the installation docs (see issue
+  [\#48](https://github.com/rickhelmus/patRoon/issues/48))
+- Fixed: MS files were not always correctly found
+- Fixed:
+  [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md)
+  ignored group/blank input for sets workflows
+- Fixed: better error handling for suspect lists with only one valid
+  column
+- Improve suspect list handling when input `mz`/`rt` columns are not
+  numeric
+- [`checkFeatures()`](https://rickhelmus.github.io/patRoon/reference/check-GUI.md):
+  don’t show multiple rows if a suspect was matched with multiple
+  feature groups. This change removed the option to show specific
+  suspect columns.
+- Fixed:
+  [`checkFeatures()`](https://rickhelmus.github.io/patRoon/reference/check-GUI.md)
+  errored if Plot mode was ‘Top most replicates’ or ‘All’
+- Fixed: several issues with `topMost` plotting of EICs for sets data
+- Fixed:
+  [`plotChroms()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+  peak area filling (`showPeakAreas=TRUE`) didn’t work if the peak
+  height exceeded `ylim`
+- [`screenSuspects()`](https://rickhelmus.github.io/patRoon/reference/suspect-screening.md)
+  with sets workflows: don’t warn about set specific suspect data if all
+  data is NA
+- [`checkFeatures()`](https://rickhelmus.github.io/patRoon/reference/check-GUI.md)/[`checkComponents()`](https://rickhelmus.github.io/patRoon/reference/check-GUI.md)
+  now cleanup unavailable selections when saving the session
+- Fixed:
+  [`reportHTML()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md):
+  Don’t try to report TP components if no data is available
+- `formulasSet` method for
+  [`plotSpectrum()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+  don’t try to plot a comparison plot for candidates without MS/MS data
+- [`reportHTML()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md)
+  don’t try to plot a comparison plot for formula candidates without
+  MS/MS data
+
+## patRoon 2.0
+
+This release adds a significant amount of new functionality and changes.
+Please see the updated Handbook and sections below for more information.
+
+Users of previous `patRoon` versions should inform themselves with the
+important changes highlighted in the next section. Furthermore, it is
+highly recommended to remove any cached data, i.e. by running
+`clearCache("all")` or manually removing the `cache.sqlite` file from
+your project directory.
+
+### Important changes
+
+- Features
+  - XMCS(3): Renamed argument `exportedData` to `loadRawData`.
+  - The `mzWindow` and `EICMzWindow` arguments were renamed to
+    `mzExpWindow` / `EICMzExpWindow` and are now with slightly different
+    meaning (please see the reference manual).
+  - OpenMS: `minFWHM`/`maxFWHM` defaults lowered for `findFeatures` and
+    feature optimization.
+- Annotation
+  - ggplot2 support for several plotting functions (i.e. `useGGPlot2`
+    argument) is removed (not often used and a maintenance burden).
+  - the `precursor` argument to the
+    [`plotSpectrum()`](https://rickhelmus.github.io/patRoon/reference/generics.md),
+    `annotatedSpectrum()` and
+    [`plotScores()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    methods for `formulas` now expects the neutral formula instead of
+    the ionized formula. This change was done for consistency with
+    compound annotations and sets workflows.
+  - The way of obtaining candidate formulae from different features in
+    the same group (i.e. *feature formula* consensus) was changed.
+    - Fixes were applied to improve thresholding with `featThreshold`.
+    - A second and new threshold, `featThresholdAnn`, only takes
+      annotated features into account.
+    - The default of `featThreshold` is now `0`, for `featThresholdAnn`
+      it is the same as the previous default for `featThreshold`.
+    - Candidate results: renamed `analysis` column to `analysis_from`
+      and added `analyses` column that lists all analyses from which the
+      consensus was made.
+    - if multiple annotations are available for a single MS/MS peak (eg
+      due to differences between feature annotations) then only the
+      annotation with lowest m/z deviation is kept (and a warning is
+      emitted).
+    - Scores of annotated fragments from different features are now
+      averaged.
+  - The storage classes and interface for formula and compound
+    annotation was harmonized
+    - The `formulas` and `compounds` classes now derive from the new
+      `featureAnnotations` class. Most of the functionality common to
+      formulas/compounds are defined for this class.
+    - Storage of formula annotation results mostly follow the format
+      that was already used for compound annotations.
+    - The `maxFormulas`/`maxFragFormulas` argument for
+      [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+      were removed, as these don’t make much sense with the new format.
+    - The `elements` filter now applies to neutral formulae for both
+      formula and compound annotations (`fragElements` still applies to
+      the ionized fragment formula).
+  - Formula annotation with Bruker now require `MSPeakLists`. Since all
+    algorithms now require peak lists, `generateFormulas` now has a
+    mandatory `MSPeakLists` argument (similar to `generateCompounds`).
+  - Formula candidates (formula and compound annotations) are now
+    reported in the `ion_formula` (ionized) and `neutral_formula`
+    (neutral) columns. Similarly, the `formula_mz` column was renamed to
+    `ion_formula_mz`.
+- Suspect screening
+  - The methodology to match m/z values of suspects and features was
+    changed. This was mainly for consistency and compatibility with sets
+    workflows. Please see the updated section on suspect screening in
+    the Handbook.
+
+### Major new functionality
+
+#### Transformation product screening
+
+The most important new functionality in `patRoon 2.0` are transformation
+product (TP) screening workflows. This release adds functionality to
+predict TPs (with `BioTransformer` or metabolic logic) or search TPs in
+`PubChem` or custom databases. Furthermore, other data such as MS/MS
+similarity or feature classification data can be used to relate
+parent/TP features. Other TP screening functionality includes TP
+prioritization and automatic generation of TP compound database for
+`MetFrag` annotation. The workflows follow the classical design of
+`patRoon`, where flexible workflows can be executed with a combination
+of established algorithms and new functionality. For more information,
+please see the dedicated chapter about TP screening in the Handbook.
+
+#### Sets workflows
+
+Another major change in this release is the addition of sets workflows.
+These workflows are typically used to simultaneously process positive
+and negative ionization data. Advantages of sets workflows include
+simplification of data processing, combining positive and negative data
+to improve e.g. feature annotations and easily comparing features across
+polarities. A sets workflow requires minimal changes to a ‘classical
+workflow’, and most of the additional work needed to process both
+polarities is done automatically behind the scenes. For more
+information, please see the dedicated chapter about sets workflows in
+the Handbook.
+
+#### Features
+
+The following new feature detection/grouping algorithms were integrated:
+`SIRIUS`, `KPIC2` and `SAFD`. Furthermore, integration with `MetaClean`
+was implemented for the calculation of peak qualities and machine
+learning based classification of pass/fail peaks. In addition, the peak
+qualities are used to calculate peak scores, which can be used for quick
+assessment and prioritization.
+
+#### Data curation
+
+Interactive curation of feature data with `checkChromatograms()` was
+replaced with
+[`checkFeatures()`](https://rickhelmus.github.io/patRoon/reference/check-GUI.md),
+which is much faster, is better suitable for larger datasets,
+customizable and has an improved user interface. Furthermore, this tool
+can be used for training/assessing `MetaClean` models. Similarly,
+[`checkComponents()`](https://rickhelmus.github.io/patRoon/reference/check-GUI.md)
+is a function that allows interactive curation of component data.
+
+The
+[`delete()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+generic function allows straightforward deletion of parts of the
+workflow data, such as features, components and annotations.
+Furthermore, this function makes it easy to implement customized
+filters.
+
+#### Adduct annotation
+
+The algorithms of `OpenMS` (`MetaboliteAdductDecharger`) and `cliqueMS`
+were integrated for additional ways to detect adducts/isotopes through
+componentization. Furthermore, the new
+[`selectIons()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)
+method uses these annotations to prioritize features (e.g. by only
+retaining those with preferable adducts). In addition, this function
+stores the adduct annotations for the remaining feature groups, which
+can then be automatically used for e.g. formula and compound annotation.
+
+### Other new functionality
+
+- `newProject`
+  - Updated for new functionality such as sets and TP workflows and
+    adduct annotation.
+  - Completely re-designed code generation to improve extensibility. The
+    generated code will have a slightly different layout and some
+    parameter defaults were changed.
+- Features
+  - [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    - intensity normalization (`normFunc` argument)
+    - customized averaging (`averageFunc` argument)
+    - calculation of Fold-changes (`FCParams` argument)
+    - report peak qualities/scores (`qualities` argument)
+  - New
+    [`plotVolcano()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    method function to plot fold changes.
+  - `topMostByRGroup/EICTopMostByRGroup` arguments for
+    plotting/reporting EIC data of only the top most intense
+    replicate(s).
+  - [`reportHTML()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md)
+    now only plots the EIC of the most intense feature of each replicate
+    group (i.e. `EICTopMostByRGroup=TRUE` and `EICTopMost=1`).
+  - `XCMS3`
+    - `loadRawData` argument for feature grouping and
+      [`comparison()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-compare.md)
+    - `...` argument for `findFeaturesXCMS3`
+    - `preGroupParam` to specify grouping parameters used prior to RT
+      alignment (suggested by Ricardo Cunha)
+  - The internal `XCMS` feature (group) objects are synchronized as much
+    as possible when feature data is changed.
+  - Feature groups: print feature counts with
+    [`show()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    and
+    [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    methods.
+  - `OpenMS` feature finding: `useFFMIntensities` argument to speed up
+    intensity loading (experimental).
+  - [`reportHTML()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md)
+    now reports general feature information in a separate tab.
+  - Feature groups: `results` argument to `[` (subset) and
+    [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    to quickly synchronize feature groups between objects (e.g. to
+    quickly remove feature groups without annotation results).
+- Annotation
+  - The methodology of
+    [`plotSpectrum()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    to automatically calculate the space necessary for formula
+    annotation texts and candidate structures was improved. Annotation
+    texts are now automatically resized if there is insufficient space,
+    and the maximum size and resolution for candidate structures can be
+    controlled with the `maxMolSize`/`molRes` parameters.
+  - [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    method for `MSPeakLists`: `minMSMSPeaks` filter to only retain MSMS
+    peak lists with a minimum number of peaks.
+  - [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    method for `MSPeakLists`: `annotatedBy` filter to only keep peaks
+    with formula/compound annotations.
+- Suspect screening
+  - The
+    [`screenSuspects()`](https://rickhelmus.github.io/patRoon/reference/suspect-screening.md)
+    method now supports the `amend` argument, which allows combining
+    results of different
+    [`screenSuspects()`](https://rickhelmus.github.io/patRoon/reference/suspect-screening.md)
+    calls (see the Handbook for details).
+- Components
+  - A new algorithm, `specclust`, which generates components based on
+    hierarchically clustering feature groups with high MS/MS
+    similarities.
+
+### Minor changes
+
+- Features
+  - `groupFeatures`: renamed the `feat` argument to `obj`.
+  - Improved performance for some feature group filters.
+  - [`reportHTML()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md):
+    EICs are shared between tabs to avoid duplicated plotting
+  - The `features` object embedded in `featureGroups` objects is now
+    synchronized, and any features not present in any group are removed
+    accordingly. This reduces memory usage and indirectly causes
+    [`reportCSV()`](https://rickhelmus.github.io/patRoon/reference/reporting-legacy.md)
+    to only report features still present.
+  - [`plotInt()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+    now has `xnames` and `showLegend` arguments to adjust plotting.
+- Annotation
+  - The `[` (subset) and
+    [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    methods for `MSPeakLists` now only re-average peak lists if the new
+    `reAverage` argument is set to `TRUE` (default `FALSE`). This change
+    was mainly done as (1) the effects are usually minor and (2)
+    re-averaging invalidates any formula/compound annotations done prior
+    to filtering.
+  - [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    method for `MSPeakLists`: the `withMSMS` filter is now applied after
+    all other filters.
+  - `MetFrag`: the raw unprocessed annotation formulas are now
+    additionally stored in the `fragInfo` tables (`formula_MF` column).
+  - `MetFrag`: the precursor ion m/z is now taken from peak list data
+    instead of the feature group to improve annotation.
+  - `MetFrag`: the `useSmiles` parameter is now set to `true` as this
+    seems to improve results sometimes.
+  - [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    method for `formulas`: if `average=TRUE` then all column data that
+    cannot be reasonably averaged are excluded.
+  - [`annotatedPeakList()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+    also add annotation columns for missing results (for consistency).
+  - Compound MS/MS annotations do not include peak intensities anymore
+    (already stored in MS peak lists).
+  - The `minMaxNormalization` argument to the
+    [`consensus()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    method for `compounds` was removed (unused).
+  - [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    for `formulas`/`compounds`: if algorithm consensus results are
+    filtered with `scoreLimits`, and a score term exists multiple times
+    for a candidate, only one of the terms needs to fall within the
+    specified limits for the candidate to be kept (was all).
+  - [`plotSpectrum()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    for `compounds`: `plotStruct` is now defaulted to `FALSE`.
+  - `MSPeakLists` data now store an unique identifier for each mass peak
+    in the `ID` column. These IDs are used by e.g. formula/compound
+    annotations, and stored in the `PLID` column in their `fragInfo`
+    data. This replaces the `PLIndex` column in `fragInfo` data, which
+    was only row based, and therefore invalidated in case peak lists
+    were filtered afterwards.
+- Adducts
+  - [`GenFormAdducts()`](https://rickhelmus.github.io/patRoon/reference/adduct-utils.md)
+    and
+    [`MetFragAdducts()`](https://rickhelmus.github.io/patRoon/reference/adduct-utils.md)
+    now additionally return adducts in generic format and use cached
+    data for efficiency.
+  - `err` argument to
+    [`as.character()`](https://rdrr.io/r/base/character.html) to control
+    if an error or `NA` should returned if conversion fails.
+  - [`as.adduct()`](https://rickhelmus.github.io/patRoon/reference/adduct-utils.md)
+    now removes any whitespace and performs stricter format checks to
+    make conversion more robust.
+  - Standardized GenForm/MetFrag element addition/subtraction data to
+    improve consistency for conversions (eg NH4 –\> H4N).
+  - Conversion from/to adduct formats of OpenMS
+    (`MetaboliteAdductDecharger`) and `cliqueMS`.
+  - [`calculateIonFormula()`](https://rickhelmus.github.io/patRoon/reference/adduct-utils.md)
+    and
+    [`calculateNeutralFormula()`](https://rickhelmus.github.io/patRoon/reference/adduct-utils.md)
+    now Hill sort their result
+  - The embedded GenForm code was updated to the latest version.
+- Suspect screening
+  - [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+    Suspect screening specific columns are now prefixed with `susp_`.
+  - The `suspFormRank` and `suspCompRank` suspect annotation data
+    columns were renamed to `formRank`/`suspCompRank` (the previous
+    change made prefixing unnecessary).
+  - Several updates for Bruker TASQ import.
+  - `logPath` argument for
+    [`annotateSuspects()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md)
+    to specify the file path for log files are disable logging
+    completely.
+  - suspect names are now trimmed to 150 characters to avoid logging
+    issues on e.g. Windows
+- Components
+  - Intensity clusters now use `fastcluster` for hierarchical
+    clustering.
+  - Changed column `rt` to `ret` for consistency.
+  - [`show()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+    show unique feature group counts.
+  - [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+    allow negative `rtIncrement` values.
+  - `nontarget`: replaced `extraOpts` argument with `...`.
+  - `nontarget`: store links as character string indices instead of
+    numeric indices.
+  - `RAMClustR`: moved position of `ionization` argument to improve
+    consistency.
+  - The ‘reduced components’ mechanism, where a components object was
+    returned without any algorithm specific data (using the
+    `componentsReduced` class) when filtering/subsetting components, was
+    removed. This system was quite unintuitive and imposed unnecessary
+    limitations. Instead, functions that cannot work after component
+    data is changed (e.g. those specific to intensity clustering) will
+    throw an error if needed.
+  - The objects returned from `intclust` components are now derived from
+    a general `componentsClust` class, which is shared with `specclust`
+    components. The common functionality for both algorithms is
+    implemented for this class.
+- Misc
+  - [`show()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    methods now print class inheritance tree
+  - The `progressr` package is not used anymore, thus, it is not
+    necessary to set up progress bars with `future` based
+    multiprocessing.
+  - `newProject`: Moved order of componentization step (now before
+    annotation & suspect screening).
+  - Plots of chromatograms, spectra etc that are without data now
+    reflect this in the generated plot.
+
+### Fixes
+
+- Features
+  - Blank filter: don’t subtract blanks from each other
+  - Fixed: when `xlim`/`ylim` was used with `plotChroms` then peaks were
+    not always correctly filled
+  - `retMin` argument to
+    [`plot()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    method for `featureGroupsComparison` wasn’t properly used/defaulted.
+- Annotations
+  - Fixed:
+    [`plotSpectrum()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    if `xlim` is set and this yields no data then an empty plot is
+    shown.
+  - Fixed:
+    [`plotSpectrum()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    automatic `ylim` determination was incorrect if only one peak is
+    shown.
+  - Fixed: consensus from feature formulas possibly could have fragment
+    m/zs not in group MS/MS peak lists.
+  - Fixed: consensus from feature formulas possibly could have fragment
+    m/zs that deviated from those in in group MS/MS peaklists.
+  - Fixed: formula algorithm consensus wrongly ranked candidates not
+    ubiquitously present in all algorithms.
+  - Fixed: the `scoreLimits` filter for formulas could ignore results
+    not obtained with MS/MS data.
+  - Fixed: MetFrag was using a wrong/inconsistent cache name.
+  - Fixed: `as.data.table(compounds, fragments=TRUE)` returned empty
+    results for candidates without fragment annotations.
+  - Fixed: `topX` arguments for the `MSPeakLists` method for
+    [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    would re-order peak lists, thereby invaliding any annotations.
+  - Fixed: conversion of adducts with multiple additions/subtractions to
+    GenForm/MetFrag format failed.
+  - Fixed: Hill ordering: H wasn’t sorted alphabetically if no C is
+    present.
+  - Several fixes were applied to improve handling of `SIRIUS` ‘adduct
+    fragments’.
+  - formula/compound annotation consensus ranking is now properly
+    scaled.
+  - Fixed:
+    [`generateMSPeakListsDAFMF()`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakListsDAFMF.md)
+    potentially used wrong DA compound data in case features were
+    filtered.
+- Suspect screening
+  - Fixed:
+    [`numericIDLevel()`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)
+    now properly handles `NA` values.
+  - [`importFeatureGroupsBrukerTASQ()`](https://rickhelmus.github.io/patRoon/reference/importFeatureGroupsBrukerTASQ.md):
+    Improved handling of absent analyses in imported results files.
+  - Fixed: Automatic *m/z* calculation for suspects
+    - Improperly handled electron masses for adducts involving element
+      subtract (e.g. `[M-H]-`), resulting in ~1.5 mDa deviations
+    - Adduct conversion didn’t handle multiple molecules
+      (e.g. `[2M+H]+`) and multiple charges (e.g. `[M+2H]2+`)
+- Components
+  - `RAMClustR`: ensure that columns are the right type if all values
+    are NA.
+  - `CAMERA`: correctly handle cases when `minSize` filter results in
+    zero components.
+  - [`plotGraph()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+    improve error handling with empty objects.
+- Misc
+  - Future multiprocessing: make sure that logs are created even when an
+    error occurs.
+  - Classic multiprocessing: intermediate results are cached again.
+  - Fixed: parallelization issues with cached data (thanks to
+    <https://blog.r-hub.io/2021/03/13/rsqlite-parallel/>)
+  - [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md):
+    correctly handle DIA with Bruker MS peak lists.
+
+## patRoon 1.2.1
+
+- Fixed: XCMS feature grouping didn’t work when the `peakgroups`
+  alignment method was used (fixes issue
+  [\#22](https://github.com/rickhelmus/patRoon/issues/22))
+- Fixed: (harmless) `mapply` warning was shown with
+  [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md)
+- [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md):
+  don’t show *Remove* button in analyses select screen when the script
+  option is selected, as this will not work properly.
+- `IPO`: add default limits for OpenMS `traceTermOutliers`
+- `IPO` optimization fix: integer parameters are properly rounded
+- Fixed: `generateFeatureOptPSet("xcms3", method="matchedFilter")` would
+  return a parameter set with `step` instead of `binSize` (issue
+  [\#23](https://github.com/rickhelmus/patRoon/issues/23))
+- Fixed:
+  [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md)
+  would generate an ID levels configuration file even when no suspect
+  list was selected.
+- MCS calculation: handle `NULL` values that may occasionally be
+  returned by
+  [`rcdk::get.mcs`](https://rdrr.io/pkg/rcdk/man/get.mcs.html)
+- Fixed: intensity filter failed if previous filters lead to zero
+  feature groups.
+- Fixed:
+  [`reportHTML()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md)
+  annotation table was paged.
+- Fixed: Check final path lengths of log files and truncate where
+  necessary (reported by Corey Griffith)
+- Fixed: in some cases the checking of `analysisInfo` validity may
+  result in an error (reported by Tiago Sobreira)
+- Fixed:
+  [`convertMSFiles()`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md)
+  error with `dirs=TRUE` (reported by Tiago Sobreira)
+- Small updates/fixes for `installPatRoon()`
+- Fixed:
+  [`screenSuspects()`](https://rickhelmus.github.io/patRoon/reference/suspect-screening.md)
+  did not take `onlyHits` into account for caching
+- [`screenSuspects()`](https://rickhelmus.github.io/patRoon/reference/suspect-screening.md):
+  The original suspect name is stored in the `name_orig` column
+- `XCMS3` feature group optimization: `binSize` and `minFraction` values
+  were rounded while they shouldn’t (issue
+  [\#27](https://github.com/rickhelmus/patRoon/issues/27))
+
+## patRoon 1.2.0
+
+This releases focuses on a significantly changed suspect screening
+interface, which brings several utilities to assist suspect annotation,
+prioritization, mixing of suspect and full NTA workflows and other
+general improvements.
+
+**IMPORTANT**: The suspect screening interface has changed
+significantly. Please read the documentation
+([`?screenSuspects`](https://rickhelmus.github.io/patRoon/reference/suspect-screening.md)
+and the handbook) for more details. If you want to quickly update your
+code without using any new functionality:
+
+Change your existing code, e.g.
+
+``` r
+
+scr <- screenSuspects(fGroups, suspectList, ...)
+fGroupsScr <- groupFeaturesScreening(fGroups, scr)
+```
+
+to
+
+``` r
+
+fGroupsScr <- screenSuspects(fGroups, suspectList, ..., onlyHits = TRUE)
+```
+
+**Major changes**
+
+- New suspect screening interface
+  - By default, feature groups without suspect hit are *not* removed
+    (unless `onlyHits=TRUE`). This allows straightforward mixing of
+    suspect and full non-target workflows.
+  - The feature groups are *not* renamed tot the suspect name anymore.
+    If you quickly want to assess which suspects were found, use the
+    [`screenInfo()`](https://rickhelmus.github.io/patRoon/reference/featureGroupsScreening-class.md)
+    or
+    [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    methods.
+  - Subsetting of suspsect screening results can be done with the
+    `suspects` argument to `[`,
+    e.g. `fGroupsScr[, suspects = "carbamazepine"]`
+  - A new method,
+    [`annotateSuspects()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md),
+    allows combining the annotation workflow data (peak lists, formulas,
+    compounds) to perform a detailed annotation for the suspects found
+    during the workflow. This method calculates properties such as
+    - Rankings: where is the suspect formula/compound ranked in the
+      candidates from the workflow data
+    - Annotation similarity: how well does the MS/MS spectrum of the
+      suspect matches with formula/compound annotations.
+    - An *estimation* of identification levels to assist in quickly
+      evaluating how well the suspect was annotated. The rules for
+      identification levels are fully configurable.
+  - A dedicated
+    [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    method for suspect screening results, which allows you to easily
+    prioritize data, for instance, by selecting minimum annotation ranks
+    and similarities, identification levels and automatically choosing
+    the best match in case multiple suspects are assigned to one feature
+    (and vice versa).
+  - A dedicated
+    [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    method and reporting functionality for suspect screening results to
+    quickly inspect their annotation data.
+  - Please refer to the updated suspect screening sections in the
+    handbook and
+    [`?screenSuspects`](https://rickhelmus.github.io/patRoon/reference/suspect-screening.md)
+    and
+    [`?annotateSuspects`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md)
+    for more information.
+- Changes to suspect lists
+  - Whenever possible, suspect information such as formulae, neutral
+    masses, InChIKeys etc will be calculated for the input suspect list
+    (obtainable afterwards with
+    [`screenInfo()`](https://rickhelmus.github.io/patRoon/reference/featureGroupsScreening-class.md)).
+  - The suspect names will be checked to be file compatible, and
+    automatically adjusted if necessary.
+  - If MS/MS fragments are known for a suspect (formula or `m/z`), these
+    can be included in the suspect list to improve suspect annotation.
+  - The old suspect screening support for `features` objects was
+    removed. The same and much more functionality can be obtained by the
+    workflow for feature groups.
+- The
+  [`reportCSV()`](https://rickhelmus.github.io/patRoon/reference/reporting-legacy.md)
+  function was simplified and uses
+  [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  to generate the CSV data. This should give more consistent results.
+- The `individualMoNAScore` MetFrag scoring is now enabled by default.
+
+Other changes
+
+- [`reportHTML()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md)
+  now allows toggling visibility for the columns shown in the feature
+  annotation table.
+- The
+  [`plotVenn()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  method for `featureGroups` now allows to compare combinations of
+  multiple replicate groups with each other. See
+  [`?plotVenn`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  for more information.
+- Fix: locating `SIRIUS` binary on `macOS` did not work properly
+- Fix: timeout warning for `GenForm` resulted in an error
+  (<https://github.com/rickhelmus/patRoon/issues/18>)
+- Fix: plotting structures resulted in a Java error on the RStudio
+  Docker image (<https://github.com/rickhelmus/patRoon/issues/18>)
+
+## patRoon 1.1
+
+- **IMPORTANT**: The `plotEIC()`, `groups()` and `plotSpec()` methods
+  were renamed to
+  [`plotChroms()`](https://rickhelmus.github.io/patRoon/reference/generics.md),
+  [`groupTable()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)
+  and
+  [`plotSpectrum()`](https://rickhelmus.github.io/patRoon/reference/generics.md).
+  This was done to avoid name clashes with `XCMS` and `CAMERA`. The old
+  functions still work (with a warning), but please update your scripts
+  as these will be removed in the future.
+- **IMPORTANT**: Major changes to the parallelization functionality
+  - `patRoon` now supports an additional method to perform
+    parallelization for tools such as `MetFrag`, `SIRIUS` etc. The main
+    purpose of this method is to allow you to perform such calculations
+    on external computer clusters. Please see the updated
+    parallelization section in the handbook for more details.
+  - The `logPath` and `maxProcAmount` arguments to functions such
+    `generateFormulas`, `generateCompounds` etc were removed. These
+    should now solely be configured through package options (see
+    [`?patRoon`](https://rickhelmus.github.io/patRoon/reference/patRoon-package.md)).
+  - The `patRoon.maxProcAmount` package option was renamed to
+    `patRoon.MP.maxProcs`.
+- Changes related to `SIRIUS`
+  - **IMPORTANT:** Support for SIRIUS 4.5.0. Please update to this
+    version since these changes break support for older versions.
+  - Fix: SIRIUS formula calculation with `calculateFeatures=TRUE` would
+    try to calculate formulas for features even if not present (eg after
+    being removed by subsetting or filtering steps).
+  - The `SIRBatchSize` argument to formula and compound generation
+    functions was renamed to `splitBatches` and its meaning has slightly
+    changed. Please see the reference manual
+    (e.g. [`?generateFormulas`](https://rickhelmus.github.io/patRoon/reference/generateFormulas.md))
+    for more details.
+- Changes related to MetFrag
+  - Paths to local database files for MetFrag are now normalized, which
+    makes handling of relative paths more reliable.
+  - Changes in the specified local MetFrag database files are now
+    inspected to improve caching.
+  - Consistency: `generateCompoundsMetfrag` was renamed to
+    `generateCompoundsMetFrag`.
+- Optimized loading of spectra and EIC data.
+- New utility functions
+  - [`withOpt()`](https://rickhelmus.github.io/patRoon/reference/withOpt.md)
+    to temporarily change (`patRoon`) package options.
+  - [`printPackageOpts()`](https://rickhelmus.github.io/patRoon/reference/printPackageOpts.md):
+    display current package options of `patRoon`.
+- Finding features with `OpenMS`: potentially large temporary files are
+  removed when possible to avoid clogging up disk space (especially
+  relevant on some Linux systems where `/tmp` is small).
+- Several packages such as `XCMS` are not attached by default, which
+  significantly speeds up loading `patRoon` (e.g. with
+  [`library()`](https://rdrr.io/r/base/library.html)).
+- The
+  [`compoundViewer()`](https://rickhelmus.github.io/patRoon/reference/patRoon-defunct.md)
+  function was marked as defunct, as it hasn;t been working for some
+  time and its functionality is largely replaced by
+  [`reportHTML()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md).
+- [`generateComponentsNontarget()`](https://rickhelmus.github.io/patRoon/reference/generateComponentsNontarget.md):
+  update homolog statistics for merged series.
+- `checkChromatograms()`: fix error when `fGroups` has only one
+  replicate group
+- [`convertMSFiles()`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md):
+  If `algorithm="pwiz"` and vendor centroiding is used then any extra
+  filters are now correctly put after the `peakPicking` filter.
+- [`getXCMSnExp()`](https://rickhelmus.github.io/patRoon/reference/xcms-conv.md)
+  is now properly exported and documented.
+
+## patRoon 1.0.4
+
+- Small compatibility fixes for macOS
+- Updated support for latest PubChemLite
+- The `annoTypeCount` score for annotated compounds with PubChemLite is
+  now not normalized by default anymore when reporting results.
+- [`reportHTML()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md)
+  now correctly handles relative paths while opening the final report in
+  a browser.
+
+## patRoon 1.0.3
+
+- `componentsNT`: include algorithm data returned by
+  [`nontarget::homol.search`](https://rdrr.io/pkg/nontarget/man/homol.search.html)
+  in `homol` slot (suggested by Vittorio Albergamo)
+- several
+  [`convertMSFiles()`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md)
+  fixes (issue [\#14](https://github.com/rickhelmus/patRoon/issues/14))
+  - prevent error when no input files are found
+  - only allow one input/output format (didn’t properly work before)
+  - recognize that Waters files are directories
+  - `cwt` option is now available for conversion with ProteoWizard
+- minor fixes for subsetting XCMS `features` objects
+- Fixed:
+  [`generateCompoundsMetFrag()`](https://rickhelmus.github.io/patRoon/reference/generateCompoundsMetFrag.md):
+  compound names could be sometimes be interpreted as dates (reported by
+  Corey Griffith)
+- Fixed: on very rare cases empty peaklists could be present after
+  averaging.
+- Fixed: `SIRIUS` annotation didn’t use set adduct but used default
+  instead
+- `SIRIUS` results are better handled if choosen adduct is not `[M+H]+`
+  or `[M+H]+`
+- More fixes for loading `data.table` objects properly from cache.
+- RStudio Docker image: see the updated installation instructions in the
+  handbook (thanks to Thanh Wang for some last minute fixes!)
+
+## patRoon 1.0.2
+
+- Fixed: avoid errors when SIRIUS returns zero results (reported by
+  Vittorio Albergamo)
+- Fixed:
+  [`plotGraph()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  didn’t properly handle components without linked series (reported by
+  Vittorio Albergamo)
+- Keep signal to noise data when importing/exporting XCMS data (`sn`
+  column) (suggested by Ricardo Cunha)
+- Reversed argument order of `exportedData`/`verbose` to
+  [`getXCMSSet()`](https://rickhelmus.github.io/patRoon/reference/xcms-conv.md)
+  functions to avoid ambiguities
+- Automated tests for importing/exporting XCMS(3) data + small fixes for
+  surfaced bugs
+- [`generateComponentsNontarget()`](https://rickhelmus.github.io/patRoon/reference/generateComponentsNontarget.md):
+  allow wider *m/z* deviation for proper linkage of different series
+  (controlled by `absMzDevLink` argument).
+- Fixed:
+  [`addAllDAEICs()`](https://rickhelmus.github.io/patRoon/reference/bruker-utils.md)
+  sometimes used wrong names for EICs
+- Improved handling of empty feature groups objects when reporting
+- Fixed:
+  [`reportPDF()`](https://rickhelmus.github.io/patRoon/reference/reporting-legacy.md)
+  may report formula annotated spectra of results not present in input
+  `featureGroups`
+- Fixed: Loading `data.table` data from cache now calls
+  [`data.table::setalloccol()`](https://rdrr.io/pkg/data.table/man/truelength.html)
+  to ensure proper behavior if
+  [`data.table::set()`](https://rdrr.io/pkg/data.table/man/assign.html)
+  is called on cached data.
+- Fixed: plotSpec() for `compounds` with `useGGPlot2=TRUE` would try to
+  plot formulas for non-annotated peaks (resulting in many extra
+  diagonal lines)\
+- Fixed: some functions involved in caching plot data for HTML reports
+  sometimes returned invalid data.
+- Fixed: EICs plotted by
+  [`reportPDF()`](https://rickhelmus.github.io/patRoon/reference/reporting-legacy.md)
+  where not properly placed in a grid (as specified by `EICGrid`
+  argument)
+- Small tweaks/fixes for
+  [`reportHTML()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md)
+  - now displays subscripted neutral formulae
+  - Fixed: x axis title of EICs in annotation tab was cut-off
+  - Fixed: The rt vs mz plot in the summary page now uses minutes for
+    retention times if `retMin=TRUE`
+- Updates for SIRIUS 4.4.29
+
+## patRoon 1.0.1
+
+- Perform neutral mass calculation for suspect screening with OpenBabel
+  to avoid some possible Java/RCDK bugs on Linux.
+
+## patRoon 1.0
+
+### June 2020
+
+- Fixed:
+  [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md)
+  didn’t show polarity selection if only a compound identification
+  algorithm was selected.
+- Updated external dependency versions in installer script.
+- Fixed:
+  [`groupFeaturesXCMS3()`](https://rickhelmus.github.io/patRoon/reference/groupFeaturesXCMS3.md)
+  didn’t properly cache results.
+- `MSPeakLists`: results for averaged peak lists are now the same order
+  as the input feature groups
+- Fixed: XCMS(3) feature group import used wrong variable name
+  internally (reported by Ricardo Cunha)
+
+### May 2020
+
+- **IMPORTANT** Major changes were made related to `SIRIUS` support
+  - Multiple features can now be annotated at once by `SIRIUS`
+    (configurable with new `SIRBatchSize` function argument). This
+    dramatically improves overal calculation times (thanks to Markus
+    Fleischauer for pointing out this possibility!).
+  - `generateFormulasSirius()` and `generateCompoundsSirius()` are now
+    properly capitalized to
+    [`generateFormulasSIRIUS()`](https://rickhelmus.github.io/patRoon/reference/generateFormulasSIRIUS.md)
+    and
+    [`generateCompoundsSIRIUS()`](https://rickhelmus.github.io/patRoon/reference/generateCompoundsSIRIUS.md)
+  - Support for `SIRIUS` 4.4.
+  - If all features are annotated at once then `SIRIUS` output is
+    directly shown on the console.
+  - The amount of cores used by `SIRIUS` can be specified with the
+    `cores` function arguments.
+  - More extra commandline options can be given to `SIRIUS`
+- Fixed:
+  [`groupNames()`](https://rickhelmus.github.io/patRoon/reference/generics.md),
+  [`analyses()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  and similar methods sometimes returned `NULL` instead of an empty
+  `character` vector for empty objects.
+- [`plotHeatMap()`](https://rickhelmus.github.io/patRoon/reference/componentsIntClust-class.md)
+  with `interactive=TRUE`: switch from now removed `d3heatmap` package
+  to `heatmaply`
+- Fixed:
+  [`reportHTML()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md)
+  didn’t split PubChem URLs when multiple identifiers were reported.
+- `PWizBatchSize` argument for
+  [`convertMSFiles()`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md)
+
+### April 2020
+
+- `extraOptsRT`/`extraOptsGroup` arguments for OpenMS feature grouping
+  to allow custom command line options.
+- `importFeatureGroupsBrukerTASQ`
+  - now correctly takes retention times of suspects into account when
+    creating feature groups.
+  - retention times / *m/z* values are now averaged over grouped
+    suspects.
+- The
+  [`plot()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  method for `featureGroups` now allows drawing legends when
+  `colourBy="fGroups"` and sets `colourBy="none"` by default, both for
+  consistency with `plotEIC()`.
+- All documentation is now available as PDF files on the website
+  (<https://rickhelmus.github.io/patRoon/>)
+- [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md)
+  now uses XCMS3 algorithms instead of the older XCMS interface.
+- Fixed: features in objects generated by `xcms` (not `xcms3`) could not
+  be subset with zero analyses (which resulted in errors by
+  e.g. [`unique()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)
+  and
+  [`reportHTML()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md)).
+  Reported by Corey Griffith.
+
+### March 2020
+
+- Fixed: Normalization of scorings for formulae/compounds potentially
+  uses wrong data after subsetting/filtering of `formulas`/`compounds`
+  objects
+- Suspect screening
+  - Fixed: Errors/Warnings of missing data in suspect list were not
+    shown if using cached data
+  - If a value is missing in any of the columns from the suspect list
+    used for automatic ion mass calculation (e.g. SMILES, formula, …)
+    then data from another suitable column is tried.
+  - Fixed: invalid neutral mass calculation for suspects with charged
+    SMILES/InChIs
+  - Default adduct can be specified in
+    [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md)
+    dialog
+- Small compatibility fix for feature finding with OpenMS 2.5 (reported
+  by Thanh Wang)
+- RAMClustR is now supported from CRAN and no need to install github
+  package anymore
+- pubchemlite identifiers are now URL linked in HTML reports
+- related CIDs are now reported for PubChemLite results.
+- MetFrag compound generation: removed `addTrivialNames` option as it
+  never worked very well.
+- [`reportHTML()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md):
+  only components with reported feature groups are now reported.
+
+### February 2020
+
+- Several small improvements and fixes for TASQ import
+- Suspect screening:
+  - now also support chemical formula for automatic m/z calculation
+  - more robust loading of suspect lists (e.g. skip suspects with
+    missing/invalid data)
+
+### January 2020
+
+- Ignore user specified scorings for local databases such as CompTox
+  that are not actually present in the DB. This makes it easier to use
+  e.g. different DB versions with differing scorings.
+- Add scorings from wastewater and smoking metadata comptox MetFrag
+  databases
+- Windows install script now install latest (March2019) CompTox
+- Updates for latest PubChemLite relaease (Jan2020)
+- Suspect screening now doesn’t require pre-calculated ion `m/z` values.
+  Instead, suspect lists can contain SMILES, InChI or neutral mass
+  values which are used for automatic ion `m/z` calculation. See
+  [`?screenSuspects`](https://rickhelmus.github.io/patRoon/reference/suspect-screening.md)
+  for more details.
+
+### December 2019
+
+- Added missing score terms for latest CompTox MetFrag database
+- labels parameter for formulas/compounds methods of
+  [`consensus()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+- Fixed: colour assignment for scores plotting of merged
+  formulae/compound results might be incorrect (reported by Emma
+  Schymanski)
+- Fixed: analysis table in
+  [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md)
+  UI only showed partial amount of rows.
+- Fixed: don’t print normalized instead of absolute design parameters
+  when only one parameter is optimized in DoEs (fixes issue
+  [\#10](https://github.com/rickhelmus/patRoon/issues/10))
+
+### November 2019
+
+- **IMPORTANT** The
+  [`addFormulaScoring()`](https://rickhelmus.github.io/patRoon/reference/compounds-class.md)
+  function now uses a different algorithm to calculate formula scores
+  for compound candidates. The score is now based on the actual formula
+  ranking in the provided `formulas` object, and is fixed between *zero*
+  (no match) and *one* (best match).
+- Formula feature consensus:
+  - All scorings are now averaged, including those that are not fragment
+    specific (e.g. precursor m/z error)
+  - This also improves ranking in certain specific cases
+- Vectorized plotting of MS spectra to make it potentially faster
+- Added PubChemLite support for MetFrag
+
+### October 2019
+
+- Fixed: `convertMSFiles` correctly checks if input exists
+- Specific optimizations after benchmarking results:
+  - `maxProcAmount` (i.e. number of parallel processes) now defaults to
+    amount of physical cores instead of total number of CPU threads.
+  - Decreased `batchSize` to `8` for GenForm formula calculation.
+- [`plot()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  for `featureGroups` can now highlight unique/shared features across
+  replicates (suggested by V Albergamo)
+- Linking of homologous series:
+  - Improved info descriptions for
+    [`plotGraph()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  - Series are now properly unlinked when merging (was too greedy)
+  - Better algorithm to detect conflicting series
+  - Fixed bug when updating removed links
+- `concs` option for
+  [`generateAnalysisInfo()`](https://rickhelmus.github.io/patRoon/reference/analysis-information.md)
+  to set concentration data
+
+### September 2019
+
+- Labels for objects in a `featureGroupsComparison` can be customized
+  (useful for e.g. plotting)
+- Caching and progress bar support for suspect screening
+- Updated/Fixed JDK installation for installation script
+- Fixed missing pipe operator import (`%>%`)
+
+### August 2019
+
+- `topMost` argument for GenForm formula calculation.
+- Added XCMS3 support for finding and grouping features,
+  importing/exisiting data and parameter optimization (i.e. mostly
+  on-par with classic XCMS support).
+- Changed compound result column name from InChi to InChI
+
+### June 2019
+
+- **IMPORTANT** Several things are renamed for clarity/consistency
+  - The column to specify replicate groups for blank subtraction in the
+    analysis information is re-named from `ref` to `blank`. Similarly,
+    the `refs` argument to
+    [`generateAnalysisInfo()`](https://rickhelmus.github.io/patRoon/reference/analysis-information.md)
+    is now called `blanks`.
+  - `reportMD()` is renamed to
+    [`reportHTML()`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md)
+  - [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    method for `formulas`: `minExplainedFragPeaks` is now called
+    `minExplainedPeaks`
+  - `screenTargets` and its `targets` parameter have been renamed to
+    [`screenSuspects()`](https://rickhelmus.github.io/patRoon/reference/suspect-screening.md)
+    / `suspects`
+- Fixed incorrect selection after feature table (or other interactive
+  tables) have been manually re-ordered (reported by Thanh Wang)
+- `groups()` and
+  [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  methods for `featureGroups`: optionally consider feature areas instead
+  of peak intensities.
+- [`plotSilhouettes()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  method for `compoundsCluster`
+- Added `rGroups` argument to subset operator for `featureGroups` to
+  subset by replicate groups (equivalent to `rGroups` argument to
+  [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)).
+- Improved logging of output from CLI tools (e.g. OpenMS, MetFrag,
+  SIRUS, …)
+
+### May 2019
+
+- Formula updates
+  - `GenForm` formula calculation with `MSMode="both"` (the default):
+    instead of repeating calculations with and without MS/MS data and
+    combining the data, it now simply does either of the two depending
+    on MS/MS data availability. The old behavior turned out to be
+    redundant, hence, calculation is now a bit faster.
+  - `GenForm` now perform *precursor isolation* to cleanup MS1 data
+    prior to formula calculation. During this step any mass peaks that
+    are unlikely part of the isotopic pattern of the feature are
+    removed, which otherwise would penalize the isotopic scoring. The
+    result is that isotopic scoring is dramatically improved now. This
+    filter step is part of new filter functionality for `MSPeakLists`,
+    see
+    [`?MSPeakLists`](https://rickhelmus.github.io/patRoon/reference/MSPeakLists-class.md)
+    and
+    [`?generateFormulas`](https://rickhelmus.github.io/patRoon/reference/generateFormulas.md)
+    for more information.
+  - When formula consensus are made from multiple features the scorings
+    and mass errors are now averaged (instead of taking the values from
+    the best ranked feature).
+  - Improved ranking of candidates from a consensus of multiple formula
+    objects (see
+    [`?formulas`](https://rickhelmus.github.io/patRoon/reference/formulas-class.md)).
+- Consensus for compounds are now similarly ranked as formulas.
+- More consistent minimum abundance arguments for
+  [`consensus()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  (`absMinAbundance` and `relMinAbundance`)
+- `MetFrag`: for-ident database and new statistical scores are now
+  supported
+- [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  /
+  [`as.data.frame()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  for `featureGroups` now optionally reports regression information,
+  which may be useful for quantitative purposes. This replaces the
+  (defunct) `regression()` method and limited support from
+  `screenTargets()`.
+- [`plotGraph()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  method to visually inspect linked homologous series.
+
+### April 2019
+
+- Misc small tweaks and fixes for
+  [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md)
+  (e.g. loading of example data).
+- Improved graphical output of various common plotting functions.
+- Updated tutorial vignette and added handbook
+
+### March 2019
+
+- `reportMD()`: most time consuming plots are now cached. Hence,
+  re-reporting should be signficiantly faster now.
+- Updates to MS data file conversion:
+  - [`convertMSFiles()`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md)
+    now (optionally) takes analysis information (`anaInfo`) for file
+    input.
+  - [`convertMSFiles()`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md)
+    now supports Bruker DataAnalysis as conversion algorithm (replaces
+    now deprecated `exportDAFiles()` function).
+  - `MSFileFormats()` function to list supported input conversion
+    formats.
+  - [`generateAnalysisInfo()`](https://rickhelmus.github.io/patRoon/reference/analysis-information.md)
+    now recognizes more file formats. This is mainly useful so its
+    output can be used with
+    [`convertMSFiles()`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md).
+  - [`convertMSFiles()`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md)
+    now has the `centroid` argument to more easily perform centroiding.
+- Updates to
+  [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md):
+  - The analyses selector recognizes more data file formats. This way
+    you can select analyses that have not been converted yet.
+  - Data pre-treatment options now include more sophisticated file
+    conversion options (*e.g.* using ProteoWizard). This and the new
+    analysis selector functionality ensures that data files in all major
+    vendor formats do not have to be converted prior to generating a
+    script.
+  - Re-organized tabs to mirror non-target workflow.
+  - Suspect screening support.
+  - Improved layout of output script.
+- `withMSMS` filter for MS peak lists.
+- Timeout for formula calculation with GenForm to avoid excessive
+  calculation times.
+- [`importFeatures()`](https://rickhelmus.github.io/patRoon/reference/importFeatures.md)
+  generic function
+- Reporting functions renamed arguments related to compounds reporting
+  (e.g. compoundTopMost to compound**s**TopMost)
+
+### February 2019
+
+- Compound scorings are now normalized towards their original min/max
+  values. This ensures that the `score` column of MetFrag results stays
+  correct.
+- plotScores(): Option to only report scorings that have been used for
+  ranking
+- as.data.table()/as.data.frame() method for compounds: optionally
+  normalize scores.
+- [`reportPDF()`](https://rickhelmus.github.io/patRoon/reference/reporting-legacy.md)/`reportMD()`
+  now report only 5 top most candidate compounds by default (controlled
+  by `compoundsTopMost` argument).
+- metadata for MS peak lists
+- `plotSpec()` now displays subscripted formulae
+- **IMPORTANT** Several major changes were made to the
+  [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  methods for `features` and `featureGroups`. Please carefully read the
+  updated documentation for these methods!
+  (i.e. [`` ?`filter,features-method` ``](https://rickhelmus.github.io/patRoon/reference/features-class.md)
+  and
+  [`` ?`filter,featureGroups-method` ``](https://rickhelmus.github.io/patRoon/reference/feature-filtering.md)).
+  - Most argument have been renamed for consistency, simplicity and
+    clarity.
+  - The order when multiple filters are specified to the `featureGroups`
+    method was adjusted, notably to improve reliability of blank
+    filtration. Again, please see
+    [`` ?`filter,featureGroups-method` ``](https://rickhelmus.github.io/patRoon/reference/feature-filtering.md).
+  - The following new filters were added:
+    - mass defect range (`mzDefectRange` argument)
+    - maximum relative standard deviation (RSD) of intensities between
+      replicates (`maxReplicateIntRSD` argument)
+    - minimum number of features within analyses (`absMinFeatures` and
+      `relMinFeatures` arguments).
+    - pre-intensity filters (`preAbsMinIntensity` and
+      `preRelMinIntensity` arguments)
+    - most existing filters now accept both relative and absolute
+      values.
+  - The script generation functionality of `newScript()` has been
+    updated and supports more filter types.
+  - The `repetitions` argument is not needed anymore for the new
+    algorithm and has been removed.
+  - `Inf` values now should be used to specify no maximum for range
+    filters (was `-1`).
+- Fixed: GenForm now always uses Hill sorting.
+- [`annotatedPeakList()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  method for `formulas` and `compounds`. Also used by `reportMD` for
+  improved annotation peak tables.
+- Tweaked default mzR MS peak lists settings (halved `maxRtMSWidth` and
+  `precursorMzWindow`)
+- Fixed: Make sure that MetFrag web doesn’t try to set unsupported
+  database
+- **IMPORTANT** Several changes were made to improve clarity and
+  consensistency for arguments that specify retention/mz windows or
+  allowable deviations.
+  - Functions with changed argument names:
+    `generateComponentsNontarget`, `generateComponentsRAMClustR`,
+    `generateCompoundsSirius`, `generateFormulasGenForm`,
+    `generateFormulasSirius`, `generateMSPeakListsDA`,
+    `generateMSPeakListsMzR`, `importFeatureGroupsBrukerPA`
+  - The `maxRtMSWidth` argument to `generateMSPeakListsDA`,
+    `generateMSPeakListsMzR` (now `maxMSRtWindow`) now specifies a
+    retention time window ( +/- retention time feature) instead of total
+    retention width around a feature. Hence, *current input values
+    should be halved*.
+- CAMERA and RAMClustR components: both now have `minSize` and
+  `relMinReplicates` (replaces `ubiquitous` for CAMERA) arguments. Note
+  that their defaults may filter out (feature groups from) components.
+  See their documentation for more info.
+- Changed capitalisation of MetFrag CL location option from
+  `patRoon.path.metFragCL` to `patRoon.path.MetFragCL`. The old name
+  still works for backward compatability.
+- Documented usage of the CompTox database with MetFrag. See
+  [`?generateCompounds`](https://rickhelmus.github.io/patRoon/reference/generateCompounds.md).
+- Default normalization of MetFrag scorings now follows MetFrag web
+  behaviour.
+- `topMostFormulas` argument for SIRIUS compound generation.
+- Fixed GenForm ranking in case both MS and MS/MS formulae are present.
+- [`reportPDF()`](https://rickhelmus.github.io/patRoon/reference/reporting-legacy.md)/`reportMD()`
+  now report only 5 top most candidate formulae by default (controlled
+  by `formulasTopMost` argument).
+- Added
+  [`verifyDependencies()`](https://rickhelmus.github.io/patRoon/reference/verifyDependencies.md)
+  function to let the user verify if external tools can be found.
+- The meaning of the `dirs` argument to
+  [`convertMSFiles()`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md)
+  was slightly changed: if `TRUE` (the default) the input can either be
+  paths to analyses files or to directories containing the analyses
+  files.
+- More effective locating ProteoWizard binaries by using the Windows
+  registry.
+- Nicer default graphics for `featureGroups` method for
+  [`plot()`](https://rickhelmus.github.io/patRoon/reference/generics.md).
+- `reportMD()`: Don’t plot Chord if \<3 (non-empty) replicate groups are
+  available.
+- All
+  [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  methods now support negation by `negate` argument.
+
+### January 2019
+
+- minSize and ubiquitous arguments for CAMERA component generation. See
+  ?generateComponentsCamera.
+- Various tweaks for plotEIC() and plotSpec() methods
+- Various small additions to newProject()
+- `reportMD()`: added table with annotated fragments for
+  compounds/formulas
+- [`consensus()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  updates
+  - [`consensus()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    methods now support extracting unique data. This also replaces the
+    [`unique()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)
+    method that was defined for `featureGroupsComparison`.
+  - [`comparison()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-compare.md)
+    now automatically determines object names from algorithm
+    (consistency with
+    [`consensus()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    method for other objects).
+  - Fixed: coverage calculation for consensus formulas now correctly
+    based on precursor overlap (was overlap of precursor+fragment).\
+- [`plotVenn()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  and
+  [`plotUpSet()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  methods to compare different compounds or formulas objects.
+- [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  method for components.
+- DataAnalysis formula generation: fixed neutral formula calculation if
+  `MSMode="msms"`, now needs `adduct` argument.
+- Neutral loss filter for compounds.
+- **IMPORTANT** Adduct specification is now simplified and more generic
+  by usage of a new `adduct` class. This means that
+  [`generateCompounds()`](https://rickhelmus.github.io/patRoon/reference/generateCompounds.md)
+  and
+  [`generateFormulas()`](https://rickhelmus.github.io/patRoon/reference/generateFormulas.md)
+  now expect slightly differing arguments. Please see their manual
+  pages.
+- Workaround for homologous series generation with nontarget (see
+  <https://github.com/blosloos/nontarget/issues/6>)
+- Improvements to terminate background commandline processes when e.g. R
+  is terminated.
+- [`clearCache()`](https://rickhelmus.github.io/patRoon/reference/caching.md)
+  now supports removal of caches via regular expressions.
+- Added/Improved `topMost` and `extraOpts` arguments for SIRIUS
+  formula/compound generation.
+- Annotated fragments from SIRIUS compounds now correctly contain
+  charged molecular form.
+- [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  method for compounds now support generic scoring filtering and on
+  elements of precursor and fragment formulae.
+- **IMPORTANT** Several changes were made to the MetFrag compound
+  generation interface in order to simplify it and make it more generic.
+  See
+  [`?generateCompounds`](https://rickhelmus.github.io/patRoon/reference/generateCompounds.md)
+  for more details (notably the Scorings section).
+- More MS peak list updates
+  - Precursor peaks are now flagged in MS peak list data and
+    `plotSpec()`
+  - Prune MS peak lists (not MS/MS) if no precursor could be determined
+    (enabled by default, see `pruneMissingPrecursorMS` option in
+    [`?generateMSPeakLists`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakLists.md)).
+  - Better retain precursor peaks after filtering steps: only intensity
+    thresholds may remove precursors (always for MS data, optional for
+    MS/MS with `retainPrecursorMSMS` function arguments, see
+    [`?MSPeakLists`](https://rickhelmus.github.io/patRoon/reference/MSPeakLists-class.md)
+    and
+    [`?generateMSPeakLists`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakLists.md)).
+- All major workflow classes now have
+  [`algorithm()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  and `as.data.table()/as.data.frame()` methods. The latter replaces and
+  enhances the `makeTable()` (`formulas` class) and
+  [`groupTable()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)
+  (`featureGroups` class) methods.
+
+### December 2018
+
+- Moved OpenMS XML writing code from `R` to `C++`: significantly reduces
+  time required for grouping large amount of features.
+- Several updates for functionality that uses Bruker DataAnalyses
+  - Improved verification and consistency for handling processed data
+    from DataAnalysis
+  - Automatic saving & closing of analyses processed with DataAnalysis.
+    Files are now generally closed by default to limit the resources
+    needed by DataAnalysis.
+  - [`revertDAAnalyses()`](https://rickhelmus.github.io/patRoon/reference/bruker-utils.md)
+    function: brings back set of Bruker analyses to their unprocessed
+    state.
+  - Minimum intensity arguments for Bruker DataAnalysis MS peak lists.
+  - Slightly different `doFMF` behaviour for DataAnalysis feature
+    finding.
+- Several important updates were made to fomula calculation
+  functionality.
+  - The interface has been simplified as the functionality from the
+    `formula` and `formulaConsensus` classes are now merged: there is no
+    need to call
+    [`consensus()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    anymore after
+    [`generateFormulas()`](https://rickhelmus.github.io/patRoon/reference/generateFormulas.md).
+  - Formulae can now directly be calculated for feature groups by using
+    group averaged MS peak lists (by setting `calculateFeatures=FALSE`).
+    This can greatly speed up calulcation, especially with many
+    analyses.
+  - The new
+    [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+    and
+    [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md)/`as.data.frame`
+    methods bring new functionalities related to filtering, extracting
+    data and performing several processing steps commonly performed for
+    organic matter (OM) characterization.
+  - Other updates on formulas
+    - length now returns number of unique precursor formulas (was total
+      number of results)
+    - Fixed: Reported fragment formulas from SIRIUS were incorrectly
+      assumed to be charged. Charged fragment formulas are now
+      calculated manually (the neutral form is stored in the
+      `frag_neutral_formula` column). This ensures correct comparison
+      when a consensus is made.
+    - [`reportCSV()`](https://rickhelmus.github.io/patRoon/reference/reporting-legacy.md)
+      now splits formulas for each feature group in separate CSV files
+      (similar to `compounds` reporting).
+    - Fixed:
+      [`reportPDF()`](https://rickhelmus.github.io/patRoon/reference/reporting-legacy.md)
+      now actually includes formula annotations in annotated compound
+      spectra when formulas are specified.
+    - New oc argument when using GenForm: if enabled only organic
+      formulae are accepted (i.e. with at least one carbon atom). Also
+      incorporated a small fix for the actual GenForm binary to make
+      this option work (<https://sourceforge.net/p/genform/tickets/1/>).
+    - Fixed: coverage calculation of formulae across features treated
+      formulae calculated only from MS data separately.
+    - GenForm now also includes precursor annotation from MS/MS data.
+- `file` argument for
+  [`clearCache()`](https://rickhelmus.github.io/patRoon/reference/caching.md)
+- Updates on MS peak lists
+  - More consistent naming for algorithm specific MS peak list
+    generators (i.e. `generateMSPeakListsX` where X is the algo).
+  - Additional MS peak lists are generated by averaging the lists of
+    features within a feature group.
+  - [`generateCompounds()`](https://rickhelmus.github.io/patRoon/reference/generateCompounds.md)
+    and plotting functionality now uses averaged group peak lists
+    instead of peak list of most intense analysis.
+  - `plotSpec()` method for MSPeakLists: plot (non-annotated) MS and
+    MS/MS spectra.
+  - Minimum intensity filter option that is applied after averaging.
+  - Now uses “hclust” method for averaging by default, which now uses
+    the
+    [fastcluster](https://cran.r-project.org/web/packages/fastcluster/index.html)
+    package.
+
+### November 2018
+
+- Default value for `maxRtMSWidth` argument used for peak list
+  generation.
+- Fixed: `maxRtMSWidth` argument for mzR peak list generation had no
+  effect.
+- Preliminary EPA DSSTox support (via LocalCSV).
+- Added
+  [`addAllDAEICs()`](https://rickhelmus.github.io/patRoon/reference/bruker-utils.md)
+  function.
+- Renamed `mzWidth` argument of
+  [`addDAEIC()`](https://rickhelmus.github.io/patRoon/reference/bruker-utils.md)
+  to `mzWindow`.
+- Normalization of compound scores: normalization method can now be set
+  and specified scorings can be excluded.
+- Store/report IUPACName (as compoundName) from MetFrag PubChem data.
+- Renamed trivialName to compoundName for compound tables.
+- `convertMSFiles`: changed interface with more options, parallelization
+  and ProteoWizard support.
+- Automatic optimization of parameters necessary for feature finding and
+  grouping. Heavily based on the IPO R package. See the
+  ‘feature-optimization’ manual page.
+- **IMPORTANT** `getXcmsSet()` is renamed to
+  [`getXCMSSet()`](https://rickhelmus.github.io/patRoon/reference/xcms-conv.md)
+- verbose option for
+  [`findFeatures()`](https://rickhelmus.github.io/patRoon/reference/findFeatures.md)
+  /
+  [`groupFeatures()`](https://rickhelmus.github.io/patRoon/reference/groupFeatures.md)
+- Changed `nintersects` default for plotUpSet so that all intersections
+  are plotted by default.
+- plotChord() now properly stops if nothing overlaps.
+- replicateGroupSubtract() now removes replicate groups that were
+  subtracted.
+- Fixed: replicateGroupSubtract() now correctly takes maximum mean
+  intensity for threshold determination when multiple rGroups are
+  specified.
+- Fixed: Wrong compound clusters plotted in reportMD().
+- Fixed: Added timeout after restarting failed command (e.g. MetFrag CL)
+  to prevent rare error “The requested operation cannot be performed on
+  a file with a user-mapped section open”.
+
+### October 2018
+
+- OpenMS `features` class objects now store number of isotopes found for
+  each feature.
+- **IMPORTANT** Added all relevant options of FeatureFinderMetabo as
+  function arguments to findFeaturesOpenMS() and renamed/reordered
+  current options for more conistent style. Please check ?findFeatures
+  for the updated function arguments!
+- openReport option for reportMD(). If TRUE the generated report will be
+  opened with a web browser.
+- reportPlots option for reportMD() which collapses reportFGroups,
+  reportChord and reportFormulaSpectra and adds control to plot Venn and
+  UpSet diagrams.
+- plotUpSet() methods to compare feature groups by UpSet plots. See
+  e.g. <http://caleydo.org/tools/upset/>
+- filter() method for features.
+- EICs now loaded via faster C++ code thats uses mzR instead of XCMS
+- Moved feature intensity loading code for OpenMS features to C++. This
+  results in much faster feature finding.
+
+### September 2018
+
+- Removed filterBy methods: these are now deprecated with new subset
+  operators and groupNames()/analyses() methods. Example:
+  `fGroups <- fGroups[, groupNames(compounds)]`
+- subset/extraction operators (“\[”, “\[\[” and “\$”) for features,
+  featureGroups, MSPeakLists, formulas, formulaConsensus, compounds,
+  compoundsCluster and components classes.
+- analyses() and groupNames() generics to get analyses and feature group
+  names of the data within an object.
+- “\[” method for featureGroups: empty feature groups now always
+  dropped, drop argument now ignored.
+- reportMD(): The layout to show compounds, formulas and components is
+  now done with DataTables (DT package). This change allows faster
+  initial loading of results. Furthermore, several small tweaks were
+  done to improve general design.
+- plotSpec() (compounds method): remove unused normalizeScores flag
+- plotSpec() (compounds method): plotting of embedded structure now
+  optional (plotStruct argument)
+- plotSpec() (compounds method): automatic calculation of necessary
+  extra height to plot labels/structure
+
+### Augustus 2018
+
+- The XML code required to load feature (group) data generated by OpenMS
+  is now moved to a C++ interface that uses [Rcpp](http://www.rcpp.org/)
+  and [pugixml](https://pugixml.org/). This results in a significant
+  reduction of required processing time. In addition, files are now
+  processed in chunks, allowing even very large feature sets (\>10000)
+  without clogging up system memory.
+- Improved general numeric comparisons, resulting in e.g. improved EIC
+  generation.
+- Tweaked OpenMS feature intensity loading: now takes intensity from
+  data point closest to retention time instead of max intensity from
+  datapoints in the search window. Furthermore, the search window for
+  datapoints was reduced and made configurable.
+
+### July 2018
+
+- getMCS() method for compounds
+- plotStructure() method for compounds will draw MCS when mutiple
+  indices are specified
+
+### June 2018
+
+- Added removeRefAnalyses argument to filter() (featureGroups method) to
+  easily remove e.g. analyses that are used as blanks after blank
+  subtraction.
+- Added filterBy() method which removes any feature groups from a
+  featureGroups object of which no results are present in a specified
+  object. Methods are defined for MSPeakLists, formulaConsenus,
+  compounds and components. This method replaces some of the
+  functionality of the filter() method for featureGroups (formConsensus
+  and compounds arguments).
+- Added mz and chromatographic peak width range options to filter()
+  method for feature groups.
+- Moved intensity clustering code (makeHCluster) to new component type
+  (see componentsIntClust class documentation).
+
+### May 2018
+
+- Added compound clustering (see makeHCluster method for compounds).
+  This is an useful tool to get an overview of all the candidate
+  chemical structures after compound identification. The clustering will
+  reduce data complexity. Furthermore, maximum common sucstructures
+  (MCS) can be calculated and plotted for each cluster to get a quick
+  impression of the different structures of candidates.
+- Added function arguments checks using
+  [checkmate](https://github.com/mllg/checkmate). This guards all
+  exported functions and methods from wrong user input arguments. If any
+  problems are found (e.g. a wrong data type or range was specified)
+  then the user is informed about this and what kind of input is to be
+  expected.
+- Added workaround (removed latex dependencies added automatically by
+  `kableExtra` package) that may cause memory leakage when `reportMD()`
+  is called repeatedly.
+
+### April 2018
+
+- Added unit tests (using [testthat](https://github.com/r-lib/testthat))
+  and fixed several small bugs that were revealed in the process.
+- Continuous integration (CI) with running tests on
+  [CircleCI](https://circleci.com/gh/rickhelmus/patRoon) (Linux builds)
+  and
+  [AppVeyor](https://ci.appveyor.com/project/rickhelmus/patroon/branch/master)
+  (Windows builds) and testing coverage on
+  [Codecov](https://codecov.io/gh/rickhelmus/patRoon). Docker images
+  with patRoon and all its dependencies are automatically pushed on
+  [Docker Hub](https://hub.docker.com/r/patroonorg/patroon/).
+- Many small bug fixes.

@@ -608,8 +608,8 @@ setMethod("consensus", "components", function(obj, ...)
 #' @templateVar what generate components
 #' @templateVar ex1 generateComponentsRAMClustR
 #' @templateVar ex2 generateComponentsNontarget
-#' @templateVar algos ramclustr,camera,nontarget,intclust,openms,cliquems,specclust,tp
-#' @templateVar algosSuffix RAMClustR,CAMERA,Nontarget,IntClust,OpenMS,CliqueMS,SpecClust,TPs
+#' @templateVar algos ramclustr,camera,nontarget,intclust,openms,cliquems,specclust,tp,net
+#' @templateVar algosSuffix RAMClustR,CAMERA,Nontarget,IntClust,OpenMS,CliqueMS,SpecClust,TPs,Net
 #' @templateVar ret components
 #' @template generic-algo
 #'
@@ -627,7 +627,7 @@ setMethod("consensus", "components", function(obj, ...)
 setMethod("generateComponents", "featureGroups", function(fGroups, algorithm, ...)
 {
     checkmate::assertChoice(algorithm, c("ramclustr", "camera", "nontarget", "intclust",
-                                         "openms", "cliquems", "specclust", "tp"))
+                                         "openms", "cliquems", "specclust", "tp", "net"))
     
     f <- switch(algorithm,
                 ramclustr = generateComponentsRAMClustR,
@@ -637,7 +637,8 @@ setMethod("generateComponents", "featureGroups", function(fGroups, algorithm, ..
                 openms = generateComponentsOpenMS,
                 cliquems = generateComponentsCliqueMS,
                 specclust = generateComponentsSpecClust,
-                tp = generateComponentsTPs)
+                tp = generateComponentsTPs,
+                net = generateComponentsNet)
 
     f(fGroups, ...)
 })

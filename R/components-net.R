@@ -378,7 +378,7 @@ componentsNet <- setClass("componentsNet", slots = c(featureComponents = "list",
                           contains = "components")
 
 setMethod("initialize", "componentsNet",
-          function(.Object, ...) callNextMethod(.Object, algorithm = "compnet", ...))
+          function(.Object, ...) callNextMethod(.Object, algorithm = "net", ...))
 
 #' @rdname components-class
 #' @export

@@ -48,6 +48,7 @@ getNetCompCliques <- function(graph, ...)
     return(cliquesF)
 }
 
+# NOTE: this function is called by a withProg() block, so handles progression updates
 makeCompNetFeatures <- function(fTable, EICs, sim, minSim, maxP, method, ...)
 {
     eicm <- do.call(cbind, lapply(EICs, \(eic) eic[, "intensity"]))
@@ -85,6 +86,8 @@ makeCompNetFeatures <- function(fTable, EICs, sim, minSim, maxP, method, ...)
         tab[, c("corMin", "corMax", "corMean") := .(sapply(weights, min), sapply(weights, max), sapply(weights, mean))]
         return(tab)
     })
+    
+    doProgress()
     
     return(list(graph = graph, components = compTabs))
 }
@@ -138,10 +141,12 @@ annotateCompNetNontarget <- function(componList, mzWindow, adducts, prefAdducts,
     objects <- lapply(componList, function(comp)
     {
         compS <- comp[, c("mz", "intensity", "ret"), with = FALSE]
-        ps <- do.call(nontarget::pattern.search, c(list(compS, ppm = FALSE, mztol = mzWindow), patArgs))
+        utils::capture.output(ps <- do.call(nontarget::pattern.search, c(list(compS, ppm = FALSE, mztol = mzWindow), patArgs)))
         # NOTE: nontarget::adduct.search() calls stop() when there are no results ...
-        as <- tryCatch(do.call(nontarget::adduct.search, c(list(compS, ppm = FALSE, mztol = mzWindow,
+        utils::capture.output(
+            as <- tryCatch(do.call(nontarget::adduct.search, c(list(compS, ppm = FALSE, mztol = mzWindow,
                                                                 use_adducts = adducts), addArgs)), error = \(e) e)
+        )
         if (inherits(as, "error"))
         {
             if (!grepl("No matches found", as$message))
@@ -538,8 +543,6 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
                                                              annotPrefAdducts = c("[M+H]+", "[M-H]-"),
                                                              annotArgs = list())
 {
-    # UNDONE: nicer output, clustering progress and other updates
-    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     ionization <- checkAndGetIonization(ionization, fGroups, add = ac)
@@ -593,6 +596,8 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     
     fTable <- featureTable(fGroups)
     
+    printf("Getting EICs and correlation matrices for %d analyses...\n", length(fTable))
+    
     # EICs: get complete chromatograms so these can be compared, however, only keep the feature signal so other peaks
     # will not interfere correlation calculations.
     EICs <- getFeatureEIXs(fGroups, "EIC", EIXParams = getDefEICParams(window = Inf))
@@ -610,12 +615,15 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
         }))
     })
 
-    compsFeats <- Map(fTable, EICs, f = makeCompNetFeatures,
-                      MoreArgs = c(list(sim = componSim, minSim = componMinSim, maxP = componMaxP,
-                                        method = componMethod), componArgs))
+    printf("Generating feature components for %d analyses...\n", length(fTable))
+    compsFeats <- withProg(length(fTable), FALSE, Map(fTable, EICs, f = makeCompNetFeatures,
+                                                      MoreArgs = c(list(sim = componSim, minSim = componMinSim,
+                                                                        maxP = componMaxP, method = componMethod),
+                                                                   componArgs)))
     compsFeatsTabs <- sapply(compsFeats, "[[", "components", simplify = FALSE)
     
     # generate consensus components: calculate pairwise grouping of features across analyses
+    printf("Generating consensus components across analyses...")
     compsGroupsList <- sapply(compsFeatsTabs, \(x) lapply(x, "[[", "group"), simplify = FALSE)
     featGroupsList <- sapply(fTable, "[[", "group", simplify = FALSE)
     coCount <- getComponNetCoMatrix(compsGroupsList, featGroupsList, names(fGroups))
@@ -653,6 +661,9 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     # UNDONE: also filter feature components by size? Then also need to update graphs for plotting
     componList <- componList[sapply(componList, nrow) >= minSize]
     
+    printf("Done! Generated %d components\n", length(componList))
+    
+    printf("Annotating components using %s... ", annotAlgo)
     annotResult <- if (annotAlgo == "nontarget")
     {
         if (length(annotArgs) == 0)
@@ -663,6 +674,7 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     else
         do.call(annotateCompNetFM, c(list(componList, mzWindow = mzWindow, ionization = ionization,
                                           adducts = annotAdducts), annotArgs))
+    printf("Done!\n")
     
     componList <- annotResult$components
     

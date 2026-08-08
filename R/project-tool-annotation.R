@@ -21,7 +21,7 @@ newProjectAnnotationUI <- function(id)
             fillCol(
                 height = 55,
                 selectInput(ns("componAlgo"), "Component generation",
-                            c("None" = "", "RAMClustR", "CAMERA", "OpenMS", "CliqueMS", "nontarget"),
+                            c("None" = "", "Network" = "net", "RAMClustR", "CAMERA", "OpenMS", "cliqueMS", "nontarget"),
                             multiple = FALSE, width = "97.5%")
             ),
             conditionalPanel(

@@ -361,6 +361,7 @@ test_that("annotation settings", {
     testNewProj(annotations = list(componAlgo = "CAMERA", selectIons = FALSE),
                 name = "annotations-compon_camera_nosel")
     testNewProj(annotations = list(componAlgo = "nontarget"), name = "annotations-compon_nt")
+    testNewProj(annotations = list(componAlgo = "net"), name = "annotations-compon_net")
     
     testNewProj(annotations = list(formulasAlgo = "GenForm"), name = "annotations-formulas_genform")
     testNewProj(annotations = list(formulasAlgo = "SIRIUS", estIDConf = character()),

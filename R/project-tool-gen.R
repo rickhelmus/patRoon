@@ -531,7 +531,9 @@ genScriptComponBlock <- function(ionization, settingsAnnon, generator)
         list(name = "ionization", value = ionization, quote = TRUE, condition = ionization != "both"),
         list(name = "rtRange", value = c(-120, 120), condition = settingsAnnon$componAlgo == "nontarget"),
         list(name = "mzRange", value = c(5, 120), condition = settingsAnnon$componAlgo == "nontarget"),
-        list(name = "elements", value = c("C", "H", "O"), quote = TRUE, condition = settingsAnnon$componAlgo == "nontarget")
+        list(name = "elements", value = c("C", "H", "O"), quote = TRUE, condition = settingsAnnon$componAlgo == "nontarget"),
+        list(name = "componMethod", value = "community", quote = TRUE, condition = settingsAnnon$componAlgo == "net"),
+        list(name = "annotAlgo", value = "imss", quote = TRUE, condition = settingsAnnon$componAlgo == "net")
     ))
     
     if (settingsAnnon$selectIons && settingsAnnon$componAlgo != "nontarget")

@@ -975,8 +975,9 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
 #'   Obviously, the components must be created with algorithms that support adduct/isotope annotations, such as those
 #'   from \pkg{RAMClustR} and \pkg{cliqueMS}.
 #' @param prefAdduct The 'preferred adduct' (see method description). This is often \code{"[M+H]+"} or \code{"[M-H]-"}.
-#' @param onlyMonoIso Set to \code{TRUE} to only keep feature groups that were annotated as monoisotopic. Feature groups
-#'   are never removed by this setting if no isotope annotations are available.
+#' @param onlyMonoIso Set to \code{TRUE} to only keep feature groups that were annotated as monoisotopic. If multiple
+#'   annotations are available, any monoisotopic annotation is sufficient for the feature group to be kept. Feature
+#'   groups are never removed by this setting if no isotope annotations are available.
 #' @param chargeMismatch Specifies how to deal with a mismatch in charge between adduct and isotope annotations. Valid
 #'   values are: \code{"adduct"} (ignore isotope annotation), \code{"isotope"} (ignore adduct annotation), \code{"none"}
 #'   (ignore both annotations) and \code{"ignore"} (don't check for charge mismatches). \emph{Important}: when
@@ -1016,34 +1017,36 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
     
     cTab <- as.data.table(components)
     cTab <- cTab[group %in% names(fGroups)]
-    hasIsos <- !is.null(cTab[["isonr"]]) & !all(is.na(cTab$isonr))
-    if (hasIsos)
-        cTab <- cTab[!is.na(isonr) | !is.na(adduct_ion)]
-    else
-        cTab <- cTab[!is.na(adduct_ion)]
+    
+    cTab[, isIsoMono := NA]
+    if (!is.null(cTab[["isonr"]]) & !all(is.na(cTab$isonr)))
+        cTab[!is.na(isonr), isIsoMono := isonr == 0]
+    else if (!is.null(cTab[["isotope"]]) & !all(is.na(cTab$isotope)))
+        cTab[!is.na(isotope), isIsoMono := grepl("mono", isotope)]
+    cTab <- cTab[!is.na(isIsoMono) | !is.na(adduct_ion)]
     
     cTab[, remove := FALSE]
     
-    if (hasIsos && chargeMismatch != "ignore")
+    if (any(!is.na(cTab$charge) & !is.na(cTab$adduct_ion)) && chargeMismatch != "ignore")
     {
         cTab[!is.na(charge) & !is.na(adduct_ion),
              chMismatch := charge != sapply(lapply(adduct_ion, as.adduct), slot, "charge")]
         if (chargeMismatch == "isotope")
             cTab[chMismatch == TRUE, adduct_ion := NA_character_]
         else if (chargeMismatch == "adduct")
-            cTab[chMismatch == TRUE, isonr := NA_integer_]
+            cTab[chMismatch == TRUE, isIsoMono := NA]
         else # "none"
             cTab[chMismatch == TRUE, remove := TRUE]
     }
     
     if (onlyMonoIso)
     {
-        if (!hasIsos)
+        if (all(is.na(cTab$isIsoMono)))
             cat("No isotope annotations available!\n")
         else
-            cTab[remove == FALSE & !is.na(isonr), remove := isonr != 0]
+            cTab[remove == FALSE & !is.na(isIsoMono), remove := isIsoMono == FALSE]
     }
-    
+
     cTab[!is.na(adduct_ion) & remove == FALSE, remove := {
         if (.N == 1)
             FALSE

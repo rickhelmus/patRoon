@@ -534,7 +534,8 @@ setMethod("expandForIMS", "componentsNet", function(obj, ...) cannotExpandCompon
 #'   }
 #'
 #'   The \code{\link{componentInfo}} table contains the columns \code{name} (component name), \code{cmp_ret} (mean
-#'   retention time), \code{cmp_retsd} (retention time standard deviation) and \code{size} (number of features).
+#'   retention time), \code{cmp_retsd} (retention time standard deviation), \code{neutral_mass} (mean neutral mass) and
+#'   \code{size} (number of features).
 #'
 #' @template compon_ims_unsupported
 #'
@@ -702,6 +703,7 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     
     cInfo <- data.table(name = names(componList), cmp_ret = sapply(componList, function(cmp) mean(cmp$ret)),
                         cmp_retsd = sapply(componList, function(cmp) sd(cmp$ret)),
+                        neutral_mass = sapply(componList, function(cmp) if (all(is.na(cmp$neutralMass))) NA_real_ else mean(cmp$neutralMass, na.rm = TRUE)),
                         size = sapply(componList, nrow))
     
     ret <- componentsNet(featureComponents = compsFeatsTabs,

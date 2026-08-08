@@ -91,6 +91,8 @@ makeCompNetFeatures <- function(fTable, EICs, sim, minSim, maxP, method, ...)
 
 annotateCompNetFM <- function(componList, mzWindow, ionization, adducts, ...)
 {
+    adducts <- sapply(adducts, as.character)
+    
     objects <- lapply(componList, function(comp)
     {
         list(fm = InterpretMSSpectrum::findMAIN(comp[, c("mz", "intensity"), with = FALSE], mzabs = mzWindow,

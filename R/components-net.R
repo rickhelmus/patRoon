@@ -106,8 +106,8 @@ annotateCompNetFM <- function(componList, mzWindow, ionization, adducts, ...)
     {
         comp <- copy(componList[[i]])
         fmtab <- as.data.table(objects[[i]]$fm[[1]]) # HACK: [[1]] is how the print() method gets the table
-        comp[, c("isogroup", "isonr", "charge", "adduct", "ppm") := .(fmtab$isogr, fmtab$iso, fmtab$charge, fmtab$adduct, fmtab$ppm)]
-        comp[!is.na(adduct), neutralMass := mapply(mz, adduct, FUN = \(m, a) calculateMasses(m, as.adduct(a), type = "neutral"))]
+        comp[, c("isogroup", "isonr", "charge", "adduct_ion", "ppm") := .(fmtab$isogr, fmtab$iso, fmtab$charge, fmtab$adduct, fmtab$ppm)]
+        comp[!is.na(adduct_ion), neutralMass := mapply(mz, adduct_ion, FUN = \(m, a) calculateMasses(m, as.adduct(a), type = "neutral"))]
         return(comp)
     })
     
@@ -270,42 +270,42 @@ annotateCompNetNontarget <- function(componList, mzWindow, adducts, prefAdducts,
 
             addTab <- as.data.table(as$adducts[, setdiff(names(as$adducts), rmCols)])
             setnames(addTab, c("peak ID", "group ID", "to ID", "adduct(s)", "mass tolerance"),
-                     c("ID", "addgroup", "add_to", "adduct", "add_mz_tol"))
+                     c("ID", "addgroup", "add_to", "adduct_ion", "add_mz_tol"))
             addTab <- addTab[addgroup != 0]
             addTabLong <- rbindlist(lapply(seq_len(nrow(addTab)), function(row)
             {
                 ret <- data.table(ID = addTab$ID[row],
-                                  adduct = strsplit(addTab$adduct[row], "//")[[1]],
+                                  adduct_ion = strsplit(addTab$adduct_ion[row], "//")[[1]],
                                   add_mz_tol = strsplit(addTab$add_mz_tol[row], "/")[[1]],
                                   add_to = strsplit(addTab$add_to[row], "/")[[1]])
                 ret[, addgroup := addTab$addgroup[match(ID, addTab$ID)]]
-                ret[, adduct_other := sub(".*>", "", adduct)]
-                ret[, adduct := sub("<.*", "", adduct)]
+                ret[, adduct_ion_other := sub(".*>", "", adduct_ion)]
+                ret[, adduct_ion := sub("<.*", "", adduct_ion)]
                 return(ret)
             }))
             
             # add adduct groups per neutral mass: for each ID, assign unique IDs per adduct and assign the same ID to
             # the IDs of corresponding add_to/adduct_to pairs.
             
-            addTabLong[, addgroup2 := .GRP, by = .(ID, adduct)]
+            addTabLong[, addgroup2 := .GRP, by = .(ID, adduct_ion)]
             for (row in seq_len(nrow(addTabLong)))
             {
                 if (addTabLong$ID[row] < addTabLong$add_to[row])
                 {
                     wh <- which(addTabLong$ID == addTabLong$add_to[row] &
-                                    addTabLong$adduct == addTabLong$adduct_other[row])
+                                    addTabLong$adduct_ion == addTabLong$adduct_ion_other[row])
                     set(addTabLong, i = wh, j = "addgroup2", value = addTabLong$addgroup2[row])
                 }
             }
             
             # convert adduct and calculate neutral masses
-            addObjs <- lapply(addTabLong$adduct, as.adduct, format = "nontarget", adductInfo = addArgs$adducts)
-            addTabLong[, adduct := sapply(addObjs, as.character)]
-            addTabLong[, adduct_other := sapply(adduct_other, \(ao) as.character(as.adduct(ao, format = "nontarget", adductInfo = addArgs$adducts)))]
+            addObjs <- lapply(addTabLong$adduct_ion, as.adduct, format = "nontarget", adductInfo = addArgs$adducts)
+            addTabLong[, adduct_ion := sapply(addObjs, as.character)]
+            addTabLong[, adduct_ion_other := sapply(adduct_ion_other, \(ao) as.character(as.adduct(ao, format = "nontarget", adductInfo = addArgs$adducts)))]
             addTabLong[, neutralMass := calculateMasses(comp$mz[match(ID, comp$ID)], addObjs, type = "neutral")]
             
             addGroups <- addTabLong[, .(size = .N,
-                                        prefMatch = min(match(adduct, prefAdducts, nomatch = length(prefAdducts) + 1))),
+                                        prefMatch = min(match(adduct_ion, prefAdducts, nomatch = length(prefAdducts) + 1))),
                                     by = "addgroup2"]
             # select 'best' adduct group in case there are neutral mass conflicts.
             addTabLong[, sel := {
@@ -329,23 +329,23 @@ annotateCompNetNontarget <- function(componList, mzWindow, adducts, prefAdducts,
             
             # make sure both in an adduct pair are (de)selected
             addTabLong[sel == TRUE, sel := {
-                addTabLong[adduct_other == .SD$adduct & ID == .SD$add_to & adduct == .SD$adduct_other & addgroup2 == .SD$addgroup2]$sel
-            }, .SDcols = c("adduct", "add_to", "adduct_other", "addgroup2"), by = .I]
+                addTabLong[adduct_ion_other == .SD$adduct_ion & ID == .SD$add_to & adduct_ion == .SD$adduct_ion_other & addgroup2 == .SD$addgroup2]$sel
+            }, .SDcols = c("adduct_ion", "add_to", "adduct_ion_other", "addgroup2"), by = .I]
             addTabLong <- addTabLong[sel == TRUE]
             setorderv(addTabLong, c("ID", "addgroup2", "add_to"))
 
             addTab <- addTabLong[, .(addgroup = as.integer(unique(addgroup2)),
-                                     adduct = unique(adduct),
+                                     adduct_ion = unique(adduct_ion),
                                      neutralMass = unique(neutralMass),
                                      add_link = paste0(comp[match(add_to, ID)]$group, collapse = "/"),
-                                     add_link_adduct = paste0(adduct_other, collapse = "/"),
+                                     add_link_adduct_ion = paste0(adduct_ion_other, collapse = "/"),
                                      add_link_mz_tol = paste0(add_mz_tol, collapse = "/")), by = ID]
         }
         else
         {
-            addTab <- data.table(ID = integer(), addgroup = integer(), adduct = character(),
+            addTab <- data.table(ID = integer(), addgroup = integer(), adduct_ion = character(),
                                  neutralMass = numeric(), add_link = character(),
-                                 add_link_adduct = character(), add_link_mz_tol = character())
+                                 add_link_adduct_ion = character(), add_link_mz_tol = character())
         }
         
         comp <- merge(comp, isoTab, by = "ID", all.x = TRUE, sort = FALSE)
@@ -504,7 +504,7 @@ setMethod("expandForIMS", "componentsNet", function(obj, ...) cannotExpandCompon
 #'   \item{\code{isogroup}}{The isotope group.}
 #'   \item{\code{isonr}}{The isotope number within the group.}
 #'   \item{\code{charge}}{The charge.}
-#'   \item{\code{adduct}}{The assigned adduct.}
+#'   \item{\code{adduct_ion}}{The assigned adduct.}
 #'   \item{\code{ppm}}{The mass error in ppm.}
 #'   \item{\code{neutralMass}}{The calculated neutral mass.}
 #'   }
@@ -525,11 +525,11 @@ setMethod("expandForIMS", "componentsNet", function(obj, ...) cannotExpandCompon
 #'   \item{\code{iso_link}}{The feature group name(s) of the origin (monoisotope) peak(s) that this feature is an
 #'     isotope of. \code{NA} for monoisotope peaks or features not part of an isotope pattern.}
 #'   \item{\code{addgroup}}{The adduct group ID, grouping features that share the same neutral mass.}
-#'   \item{\code{adduct}}{The assigned adduct.}
+#'   \item{\code{adduct_ion}}{The assigned adduct.}
 #'   \item{\code{neutralMass}}{The calculated neutral mass.}
 #'   \item{\code{add_link}}{The feature group name(s) of the peak(s) linked to this feature via an adduct
 #'     relationship.}
-#'   \item{\code{add_link_adduct}}{The adduct(s) of the linked peak(s).}
+#'   \item{\code{add_link_adduct_ion}}{The adduct(s) of the linked peak(s).}
 #'   \item{\code{add_link_mz_tol}}{The mass tolerance(s) for the adduct assignment.}
 #'   }
 #'

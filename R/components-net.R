@@ -19,7 +19,7 @@ getNetCompHCS <- function(graph, ...)
     return(RBGL::highlyConnSG(igraph::as_graphnel(graph), ...)$clusters)
 }
 
-getNetCompCommunity <- function(graph, func = igraph::cluster_leiden, ...)
+getNetCompCommunity <- function(graph, func = igraph::cluster_walktrap, ...)
 {
     return(unname(igraph::communities(func(graph, ...))))
 }
@@ -424,7 +424,7 @@ setMethod("expandForIMS", "componentsNet", function(obj, ...) cannotExpandCompon
 #' @param componArgs A \code{list} with additional arguments passed to the network componentization function.
 #'
 #'   For \code{componMethod="community"}, arguments are passed to the \CRANpkg{igraph} clustering function. The default
-#'   function is \code{\link[igraph:cluster_leiden]{igraph::cluster_leiden}} and can be changed by setting the
+#'   function is \code{\link[igraph:cluster_walktrap]{igraph::cluster_walktrap}} and can be changed by setting the
 #'   \code{func} argument.
 #'
 #'   For \code{componMethod="cliques"}: arguments are passed to \code{\link[igraph:max_cliques]{igraph::max_cliques}}.

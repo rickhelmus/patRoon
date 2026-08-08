@@ -403,14 +403,34 @@ setMethod("expandForIMS", "componentsNet", function(obj, ...) cannotExpandCompon
 #'   using either the \pkg{InterpretMSSpectrum} or \pkg{nontarget} package to identify isotopes, in-source fragments and
 #'   adducts.
 #'
+#'   Compared to other componentization algorithms supported in \pkg{patRoon}, \code{generateComponentsNet()} \itemize{
+#'
+#'     \item does not need rely on \pkg{XCMS} and uses \link{msdata} for EIC extraction, which avoids the need of object
+#'     conversions and is generally faster.
+#'
+#'     \item feature based: this is more sensible where samples are not expected to be very similar, e.g. in
+#'     environmental studies.
+#'
+#'     \item uses a different approach to convert feature components across analyses into consensus components, which
+#'     should (hopefully) perform better than other feature-based algorithms (\code{\link{generateComponentsOpenMS}} and
+#'     \code{\link{generateComponentsCliqueMS}})).
+#'     
+#'     \item supports isotope annotation that is not based on 13C differences thanks to the \pkg{nontarget} package, eg
+#'     useful for halogenated compounds.
+#'
+#'   }
+#'   
+#'   It is recommended to use the \code{\link[=plotGraph,componentsNet]{plotGraph()}} method to evaluate the feature
+#'   componentization, e.g. to evaluate different methods (\code{componMethod} argument) or relevant parameters.
+#'
 #' @section \code{nontarget} annotation: When \code{annotAlgo="nontarget"}, annotation is performed using
 #'   \pkg{nontarget}'s \code{\link[nontarget:pattern.search]{pattern.search}} and
 #'   \code{\link[nontarget:adduct.search]{adduct.search}} functions.
 #'
 #'   \strong{Isotope annotation}: \code{pattern.search} identifies isotope patterns. Peaks are grouped by isotope
 #'   patterns and charge levels. When multiple charge levels are found for the same isotope group, the "best" grouping
-#'   is selected using the following priority: (1) groups containing a 13C isotope, (2) the largest group,
-#'   or (3) the lowest charge level.
+#'   is selected using the following priority: (1) groups containing a 13C isotope, (2) the largest group, or (3) the
+#'   lowest charge level.
 #'
 #'   \strong{Adduct annotation}: \code{adduct.search} identifies adduct relationships between peaks. Adducts are grouped
 #'   by their calculated neutral mass. If there is a conflict in neutral mass assignment, the "best" adduct group is
@@ -520,6 +540,8 @@ setMethod("expandForIMS", "componentsNet", function(obj, ...) cannotExpandCompon
 #'
 #' @templateVar class componentsSet
 #' @template compon_gen-sets-merged
+#' 
+#' @note The \code{generateComponentsNet} function is still experimental. Any feedback is welcome!
 #'
 #' @source The componentization approach was inspired by \pkg{CAMERA} and \pkg{cliqueMS}.
 #'

@@ -557,7 +557,7 @@ setMethod("expandForIMS", "componentsNet", function(obj, ...) cannotExpandCompon
 #' @export
 setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization = NULL, minSize = 2,
                                                              mzWindow = defaultLim("mz", "medium"),
-                                                             componSim = "cosine", componMinSim = 0.95,
+                                                             componSim = "pearson", componMinSim = 0.95,
                                                              componMaxP = 0.05, componMethod = "community",
                                                              componArgs = list(), groupClust = "complete",
                                                              groupClustH = 0.5, annotAlgo = "imss",

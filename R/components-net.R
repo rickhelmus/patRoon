@@ -538,7 +538,6 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
                                                              annotPrefAdducts = c("[M+H]+", "[M-H]-"),
                                                              annotArgs = list())
 {
-    # UNDONE: caching
     # UNDONE: nicer output, clustering progress and other updates
     
     ac <- checkmate::makeAssertCollection()
@@ -585,6 +584,12 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
         stop("Need at least two adducts for annotation, but only ", length(annotAdducts),
              " were provided for ionization '", ionization, "'", call. = FALSE)
     }
+    
+    hash <- makeHash(fGroups, ionization, minSize, mzWindow, componSim, componMinSim, componMaxP, componMethod,
+                     componArgs, groupClust, groupClustH, annotAlgo, annotAdducts, annotPrefAdducts, annotArgs)
+    cd <- loadCacheData("componentsNet", hash)
+    if (!is.null(cd))
+        return(cd)
     
     fTable <- featureTable(fGroups)
     
@@ -665,10 +670,12 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
                         cmp_retsd = sapply(componList, function(cmp) sd(cmp$ret)),
                         size = sapply(componList, nrow))
     
-    return(componentsNet(featureComponents = compsFeatsTabs,
+    ret <- componentsNet(featureComponents = compsFeatsTabs,
                          featureGraphs = sapply(compsFeats, "[[", "graph", simplify = FALSE),
                          annotationObjects = annotResult$objects,
-                         componentInfo = cInfo, components = componList))
+                         componentInfo = cInfo, components = componList)
+    saveCacheData("componentsNet", ret, hash)
+    return(ret)
 })
 
 #' @describeIn componentsNet Plots an interactive network graph for the feature components of an analysis.

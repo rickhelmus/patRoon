@@ -415,6 +415,8 @@ setMethod("expandForIMS", "componentsNet", function(obj, ...) cannotExpandCompon
 #'     should (hopefully) perform better than other feature-based algorithms (\code{\link{generateComponentsOpenMS}} and
 #'     \code{\link{generateComponentsCliqueMS}})).
 #'     
+#'     \item supports different and configurable componentization methods (see \code{componMethod} argument).
+#'     
 #'     \item supports isotope annotation that is not based on 13C differences thanks to the \pkg{nontarget} package, eg
 #'     useful for halogenated compounds.
 #'

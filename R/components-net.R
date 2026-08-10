@@ -102,10 +102,10 @@ annotateCompNetFM <- function(componList, mzWindow, ionization, adducts, ...)
                                                 ionmode = ionization, rules = adducts, ...))
     })
     
-    componList <- lapply(seq_along(componList), function(i)
+    componList <- Map(componList, objects, f = function(comp, obj)
     {
-        comp <- copy(componList[[i]])
-        fmtab <- as.data.table(objects[[i]]$fm[[1]]) # HACK: [[1]] is how the print() method gets the table
+        comp <- copy(comp)
+        fmtab <- as.data.table(obj$fm[[1]]) # HACK: [[1]] is how the print() method gets the table
         comp[, c("isogroup", "isonr", "charge", "adduct_ion", "ppm") := .(fmtab$isogr, fmtab$iso, fmtab$charge, fmtab$adduct, fmtab$ppm)]
         comp[!is.na(adduct_ion), neutralMass := mapply(mz, adduct_ion, FUN = \(m, a) calculateMasses(m, as.adduct(a), type = "neutral"))]
         return(comp)
@@ -114,7 +114,7 @@ annotateCompNetFM <- function(componList, mzWindow, ionization, adducts, ...)
     return(list(components = componList, objects = objects))
 }
 
-annotateCompNetNontarget <- function(componList, mzWindow, adducts, prefAdducts, patArgs, addArgs)
+annotateCompNetNontarget <- function(componList, mzWindow, ionization, adducts, prefAdducts, patArgs, addArgs)
 {
     # UNDONE: ignore ret
     
@@ -145,7 +145,8 @@ annotateCompNetNontarget <- function(componList, mzWindow, adducts, prefAdducts,
         # NOTE: nontarget::adduct.search() calls stop() when there are no results ...
         utils::capture.output(
             as <- tryCatch(do.call(nontarget::adduct.search, c(list(compS, ppm = FALSE, mztol = mzWindow,
-                                                                use_adducts = adducts), addArgs)), error = \(e) e)
+                                                                    ion_mode = ionization,
+                                                                    use_adducts = adducts), addArgs)), error = \(e) e)
         )
         if (inherits(as, "error"))
         {
@@ -156,12 +157,12 @@ annotateCompNetNontarget <- function(componList, mzWindow, adducts, prefAdducts,
         return(list(ps = ps, as = as))
     })
     
-    componList <- lapply(seq_along(componList), function(i)
+    componList <- Map(componList, objects, f = function(comp, obj)
     {
-        comp <- copy(componList[[i]])
+        comp <- copy(comp)
         compS <- comp[, c("mz", "intensity", "ret"), with = FALSE]
-        ps <- objects[[i]]$ps
-        as <- objects[[i]]$as
+        ps <- obj$ps
+        as <- obj$as
         
         comp[, ID := .I]
         
@@ -590,6 +591,10 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     checkmate::assertList(annotArgs, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
+    if (length(fGroups) == 0)
+        return(componentsNet(featureComponents = list(), featureGraphs = list(), annotationObjects = list(),
+                             componentInfo = data.table(), components = list()))
+    
     # Check optional dependencies
     if (componSim == "pearson")
         checkPackage("Hmisc")
@@ -652,6 +657,7 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     compsGroupsList <- sapply(compsFeatsTabs, \(x) lapply(x, "[[", "group"), simplify = FALSE)
     featGroupsList <- sapply(fTable, "[[", "group", simplify = FALSE)
     coCount <- getComponNetCoMatrix(compsGroupsList, featGroupsList, names(fGroups))
+    coCount[is.nan(coCount)] <- 0 # handle groups that never co-occur in any analysis
     
     distm <- as.dist(1 - coCount)
     hc <- fastcluster::hclust(distm, method = groupClust)
@@ -693,7 +699,7 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     {
         if (length(annotArgs) == 0)
             annotArgs <- list(pattern = list(), adduct = list())
-        annotateCompNetNontarget(componList, mzWindow = mzWindow, adducts = annotAdducts,
+        annotateCompNetNontarget(componList, mzWindow = mzWindow, ionization = ionization, adducts = annotAdducts,
                                  prefAdducts = annotPrefAdducts, patArgs = annotArgs$pattern, addArgs = annotArgs$adduct)
     }
     else
@@ -714,6 +720,13 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
                          componentInfo = cInfo, components = componList)
     saveCacheData("componentsNet", ret, hash)
     return(ret)
+})
+
+#' @rdname generateComponentsNet
+#' @export
+setMethod("generateComponentsNet", "featureGroupsSet", function(fGroups, ionization = NULL, ...)
+{
+    generateComponentsSet(fGroups, ionization, generateComponentsNet, setIonization = TRUE, ...)
 })
 
 #' @describeIn componentsNet Plots an interactive network graph for the feature components of an analysis.

@@ -28,6 +28,13 @@ suppressWarnings({
                                                           adductConflictsUsePref = FALSE, parallel = FALSE))
 })
 
+compsNet <- generateComponents(fGroups, "net") # default: pearson + community + imss
+compsNetCos <- generateComponents(fGroups, "net", componSim = "cosine")
+compsNetCliques <- generateComponents(fGroups, "net", componMethod = "cliques")
+compsNetHCS <- generateComponents(fGroups, "net", componMethod = "hcs")
+compsNetHclust <- generateComponents(fGroups, "net", componMethod = "hclust")
+compsNetNT <- generateComponents(fGroups, "net", annotAlgo = "nontarget")
+
 fGroupsEmpty <- getEmptyTestFGroups()
 compsEmpty <- componentsSet(algorithm = "none", componentInfo = data.table())
 compsEmpty2 <- componentsSet(algorithm = "none2", componentInfo = data.table())
@@ -43,6 +50,12 @@ test_that("components generation works", {
     expect_known_val(compsInt, "components-int")
     expect_known_val(compsSpec, "components-spec")
     expect_known_val(compsOpenMS, "components-om")
+    expect_known_val(list(componentTable(compsNet), componentInfo(compsNet)), "components-net")
+    expect_known_val(list(componentTable(compsNetCos), componentInfo(compsNetCos)), "components-net-cos")
+    expect_known_val(list(componentTable(compsNetCliques), componentInfo(compsNetCliques)), "components-net-cliques")
+    expect_known_val(list(componentTable(compsNetHCS), componentInfo(compsNetHCS)), "components-net-hcs")
+    expect_known_val(list(componentTable(compsNetHclust), componentInfo(compsNetHclust)), "components-net-hclust")
+    expect_known_val(list(componentTable(compsNetNT), componentInfo(compsNetNT)), "components-net-nt")
 
     expect_length(compsEmpty, 0)
     expect_length(generateComponents(fGroupsEmpty, "ramclustr"), 0)
@@ -51,6 +64,7 @@ test_that("components generation works", {
     expect_length(generateComponents(fGroupsEmpty, "nontarget"), 0)
     expect_length(generateComponents(fGroupsEmpty, "openms"), 0)
     expect_length(generateComponents(fGroupsEmpty, "cliquems"), 0)
+    expect_length(generateComponents(fGroupsEmpty, "net"), 0)
 
     expect_lt(length(groupNames(compsRCMR)), length(groupNames(compsRC)))
     expect_lt(length(groupNames(compsCAMMR)), length(groupNames(compsCAM)))
@@ -71,8 +85,14 @@ test_that("verify components show", {
     expect_known_show(compsInt, "components-int")
     expect_known_show(compsSpec, "components-spec")
     expect_known_show(compsOpenMS, "components-om")
+    expect_known_show(compsNet, "components-net")
     
     expect_known_show(compsClMS, "components-cm")
+})
+
+test_that("network components columns", {
+    checkmate::expect_names(names(componentInfo(compsNet)), must.include = c("name", "cmp_ret", "cmp_retsd", "neutral_mass", "size"))
+    checkmate::expect_names(names(compsNet[[1]]), must.include = c("group", "ret", "mz", "degreeMin", "degreeMax", "degreeMean", "corMin", "corMax", "corMean"))
 })
 
 test_that("basic subsetting", {
@@ -211,6 +231,8 @@ test_that("plotting works", {
     expect_doppel("component-ic-int", function() plotInt(compsInt, index = 1))
     expect_doppel("component-ic-sil", function() plotSilhouettes(compsInt, 2:6))
     expect_doppel("component-ic-heat", function() plotHeatMap(compsInt, interactive = FALSE))
+
+    expect_HTML(plotGraph(compsNet, analysis = analyses(fGroups)[1]))
 })
 
 fGroupsSI <- selectIons(fGroups, compsRC, prefAdduct = c("[M+H]+", "[M-H]-"), onlyMonoIso = TRUE)
@@ -327,4 +349,5 @@ test_that("IMS tests", {
     expect_error(expandForIMS(compsOpenMS, fGroupsSimple), "not supported for this class")
     expect_error(expandForIMS(compsNT, fGroups), "not supported for this class")
     expect_error(expandForIMS(compsClMS, fGroupsSimple), "not supported for this class")
+    expect_error(expandForIMS(compsNet, fGroupsSimple), "not supported for this class")
 })

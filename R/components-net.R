@@ -484,7 +484,6 @@ setMethod("expandForIMS", "componentsNet", function(obj, ...) cannotExpandCompon
 #' @templateVar ion TRUE
 #' @templateVar minSize TRUE
 #' @template compon_algo-args
-#' @template parallel-arg
 #'
 #' @inheritParams generateComponents
 #'
@@ -542,7 +541,7 @@ setMethod("expandForIMS", "componentsNet", function(obj, ...) cannotExpandCompon
 #'
 #' @template compon_ims_unsupported
 #'
-#' @templateVar class componentsSet
+#' @templateVar class componentsNetSet
 #' @template compon_gen-sets-merged
 #' 
 #' @note The \code{generateComponentsNet} function is still experimental. Any feedback is welcome!
@@ -726,7 +725,8 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
 #' @export
 setMethod("generateComponentsNet", "featureGroupsSet", function(fGroups, ionization = NULL, ...)
 {
-    generateComponentsSet(fGroups, ionization, generateComponentsNet, setIonization = TRUE, ...)
+    generateComponentsSet(fGroups, ionization, generateComponentsNet, setIonization = TRUE, ...,
+                          classGenerator = componentsNetSet)
 })
 
 #' @describeIn componentsNet Plots an interactive network graph for the feature components of an analysis.

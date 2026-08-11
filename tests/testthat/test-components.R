@@ -232,7 +232,7 @@ test_that("plotting works", {
     expect_doppel("component-ic-sil", function() plotSilhouettes(compsInt, 2:6))
     expect_doppel("component-ic-heat", function() plotHeatMap(compsInt, interactive = FALSE))
 
-    expect_HTML(plotGraph(compsNet, analysis = analyses(fGroups)[1]))
+    expect_HTML(plotGraph(compsNet, analysis = analyses(fGroups)[1], set = "positive"))
 })
 
 fGroupsSI <- selectIons(fGroups, compsRC, prefAdduct = c("[M+H]+", "[M-H]-"), onlyMonoIso = TRUE)

@@ -16,7 +16,13 @@ getNetCompHClust <- function(rmat, method = "complete", h = 0.95)
 
 getNetCompHCS <- function(graph, ...)
 {
-    return(RBGL::highlyConnSG(igraph::as_graphnel(graph), ...)$clusters)
+    ret <- RBGL::highlyConnSG(igraph::as_graphnel(graph), ...)$clusters
+    
+    # add singletons for unclustered groups (UNDONE?)
+    allGroups <- unlist(ret)
+    ret <- c(ret, as.list(setdiff(names(igraph::V(graph)), allGroups)))
+    
+    return(ret)
 }
 
 getNetCompCommunity <- function(graph, func = igraph::cluster_walktrap, ...)
@@ -43,7 +49,7 @@ getNetCompCliques <- function(graph, ...)
     }
     
     # add singletons as their own cliques (UNDONE?)
-    cliquesF <- c(cliquesF, lapply(setdiff(names(igraph::V(graph)), assigned), list))
+    cliquesF <- c(cliquesF, as.list(setdiff(names(igraph::V(graph)), assigned)))
     
     return(cliquesF)
 }
@@ -378,9 +384,6 @@ componentsNet <- setClass("componentsNet", slots = c(featureComponents = "list",
                                                      annotationObjects = "list"),
                           contains = "components")
 
-setMethod("initialize", "componentsNet",
-          function(.Object, ...) callNextMethod(.Object, algorithm = "net", ...))
-
 #' @rdname components-class
 #' @export
 setMethod("expandForIMS", "componentsNet", function(obj, ...) cannotExpandComponIMS(obj))
@@ -591,8 +594,8 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     checkmate::reportAssertions(ac)
     
     if (length(fGroups) == 0)
-        return(componentsNet(featureComponents = list(), featureGraphs = list(), annotationObjects = list(),
-                             componentInfo = data.table(), components = list()))
+        return(componentsNet(algorithm = "net", featureComponents = list(), featureGraphs = list(),
+                             annotationObjects = list(), componentInfo = data.table(), components = list()))
     
     # Check optional dependencies
     if (componSim == "pearson")
@@ -713,7 +716,7 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
                         neutral_mass = sapply(componList, function(cmp) if (all(is.na(cmp$neutralMass))) NA_real_ else mean(cmp$neutralMass, na.rm = TRUE)),
                         size = sapply(componList, nrow))
     
-    ret <- componentsNet(featureComponents = compsFeatsTabs,
+    ret <- componentsNet(algorithm = "net", featureComponents = compsFeatsTabs,
                          featureGraphs = sapply(compsFeats, "[[", "graph", simplify = FALSE),
                          annotationObjects = annotResult$objects,
                          componentInfo = cInfo, components = componList)

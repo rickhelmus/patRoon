@@ -286,7 +286,7 @@ recursiveApplyDT <- function(l, f, appl = lapply, ...)
         {
             if (is.data.table(x))
                 x <- f(x)
-            else
+            else if (identical(class(x), "list")) # only do lists, not S3
             {
                 # retain attributes: https://stackoverflow.com/a/48905113
                 x <- "attributes<-"(appl(x, rec, ...), attributes(x))

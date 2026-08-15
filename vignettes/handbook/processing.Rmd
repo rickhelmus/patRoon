@@ -786,7 +786,7 @@ Generic           | Classes                                              | Remar
 `plotStructure()` | `compounds`                                          | Draws candidate structures
 `plotScores()`    | `formulas`, `compounds`                              | Barplot with candidate scoring
 `plot()`          | `componentsClust`                                    | Creates a dendrogram for the clustered components
-`plotGraph()`     | `componentsNT`                                       | Draws interactive graphs of linked homologous series
+`plotGraph()`     | `componentsNT`, `componentsNet`                      | Visualization linked homologous series or network of components
 
 The most common plotting functions are `plotChroms()`, which plots chromatographic data for features, and `plotSpectrum()`, which will plot (annotated) spectra. An overview of their most important function arguments are shown below.
 
@@ -857,6 +857,7 @@ plotSpectrum(components, index = 7) # component spectrum
 ```{r plotHomol,eval=runData}
 # Inspect homologous series
 plotGraph(componNT)
+plotGraph(componNet, analysis = "standard-pos-1") # inspect network of components
 ```
 
 #### Extracted Ion Chromatogram parameters

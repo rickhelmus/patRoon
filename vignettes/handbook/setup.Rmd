@@ -68,6 +68,7 @@ if (runData)
     componCAM <- components <- generateComponents(fGroups, "camera", ionization = "positive")
     componInt <- generateComponents(fGroupsRep, "intclust")
     componNT <- generateComponents(fGroupsUF[, 1:200], "nontarget", minlength = 3, ionization = "positive")
+    componNet <- generateComponents(fGroups, "net", ionization = "positive")
     
     compsClust <- makeHCluster(compsMF)
     

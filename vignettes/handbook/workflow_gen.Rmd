@@ -591,23 +591,24 @@ In `patRoon` _componentization_ refers to grouping related feature groups togeth
 
 The following algorithms are currently supported:
 
-Algorithm               | Usage                                              | Remarks
------------------------ | -------------------------------------------------- | --------------------------------------------
-[CAMERA]                | `generateComponents(algorithm = "camera", ...)`    | Clusters feature groups with similar chromatographic elution profiles and annotate by known chemical rules (adducts, isotopologues, in-source fragments).
-[RAMClustR]             | `generateComponents(algorithm = "ramclustr", ...)` | As above.
-[cliqueMS]              | `generateComponents(algorithm = "cliquems", ...)`  | As above, but using _feature components_.
-[OpenMS]                | `generateComponents(algorithm = "openms", ...)`    | As above. Uses [MetaboliteAdductDecharger].
-[nontarget]             | `generateComponents(algorithm = "nontarget", ...)` | Uses the [nontarget] R package to perform unsupervised homologous series detection.
-Intensity clustering    | `generateComponents(algorithm = "intclust", ...)`  | Groups features with similar intensity profiles across analyses by hierarchical clustering.
-MS/MS clustering        | `generateComponents(algorithm = "specclust", ...)` | Clusters feature groups with similar MS/MS spectra.
-Transformation products | `generateComponents(algorithm = "tp", ...)`        | Discussed in [its own chapter](#TPs).
+Algorithm                | Usage                                              | Remarks
+------------------------ | -------------------------------------------------- | --------------------------------------------
+[CAMERA]                 | `generateComponents(algorithm = "camera", ...)`    | Clusters feature groups with similar chromatographic elution profiles and annotate by known chemical rules (adducts, isotopologues, in-source fragments).
+[RAMClustR]              | `generateComponents(algorithm = "ramclustr", ...)` | As above.
+[cliqueMS]               | `generateComponents(algorithm = "cliquems", ...)`  | As above, but using _feature components_.
+[OpenMS]                 | `generateComponents(algorithm = "openms", ...)`    | As above. Uses [MetaboliteAdductDecharger].
+Network                  | `generateComponents(algorithm = "net", ...)`       | As above. Feature based network clustering, internal algorithm.
+[nontarget]              | `generateComponents(algorithm = "nontarget", ...)` | Uses the [nontarget] R package to perform unsupervised homologous series detection.
+Intensity clustering     | `generateComponents(algorithm = "intclust", ...)`  | Groups features with similar intensity profiles across analyses by hierarchical clustering.
+MS/MS clustering         | `generateComponents(algorithm = "specclust", ...)` | Clusters feature groups with similar MS/MS spectra.
+Transformation products  | `generateComponents(algorithm = "tp", ...)`        | Discussed in [its own chapter](#TPs).
 
 
 ### Features with similar chromatographic behaviour {#componentsChrom}
 
-Isotopes, adducts and in-source fragments typically result in detection of multiple mass peaks by the mass spectrometer for a single chemical compound. While some feature finding algorithms already try to collapse (some of) these in to a single feature, this process is often incomplete (if performed at all) and it is not uncommon that multiple features will describe the same compound. To overcome this complexity several algorithms can be used to group features that undergo highly similar chromatographic behavior but have different _m/z_ values. Basic chemical rules are then applied to the resulting components to annotate adducts, in-source fragments and isotopologues, which may be highly useful for general identification purposes.
+Isotopes, adducts and in-source fragments typically result in detection of multiple mass peaks by the mass spectrometer for a single chemical compound. Although some feature finding algorithms already collapse (some of) these in to a single feature, this process may be incomplete. Therefore, it is common that multiple features describe the same compound. To overcome this complexity several algorithms can be used to group features that undergo highly similar chromatographic behavior but have different _m/z_ values. Basic chemical rules are then applied to the resulting components to annotate adducts, in-source fragments and isotopologues, and are therefore useful for identification purposes.
 
-Note that some algorithms were primarily designed for datasets where features are generally present in the majority of the analyses (as is relatively common in metabolomics). For environmental analyses, however, this is often not the case. For instance, consider the following situation with three feature groups that chromatographically overlap and therefore could be considered a component:
+Note that some algorithms were primarily designed for datasets where features are present in the majority of the analyses (common in e.g. metabolomics). For environmental analysis, however, this is often not the case. For instance, consider the following situation with three feature groups with similar chromatography that could be considered a component:
 
 Feature group | _m/z_      | analysis 1 | analysis 2 | analysis 3
 ------------- | ---------- | ---------- | ---------- | ----------
@@ -615,13 +616,13 @@ Feature group | _m/z_      | analysis 1 | analysis 2 | analysis 3
 \#2           | 122.07021  | Present    | Present    | Absent
 \#3           | 138.04415  | Absent     | Absent     | Present
 
-Based on the mass differences from this example a cluster of `[M+H]+`, `[M+Na]+` and `[M+K]+` could be assumed. However, no features of the first two feature groups were detected in the third sample analysis, whereas the third feature group wasn't detected in the first two sample analysis. Based on this it seems unlikely that feature group _#3_ should be part of the component.
+Based on the mass differences this could be a cluster of `[M+H]+`, `[M+Na]+` and `[M+K]+`. However, no features of the first two feature groups were detected in the third sample analysis, whereas no feature of the third feature group was detected in the first two sample analyses. Based on this it seems unlikely that feature group _#3_ should be part of the component.
 
-For the algorithms that operate on a 'feature group level' ([CAMERA] and [RAMClustR]), the `relMinReplicates` argument can be used to remove feature groups from a component that are not abundant. For instance, when this value is _0.5_ (the default), and all the features of a component were detected in four different replicates in total, then only those feature groups are kept for which its features were detected in at least two different replicates (_i.e._ half of four).
+For the algorithms that assume a more 'homogeneous' feature dataset ([CAMERA] and [RAMClustR]), the `relMinReplicates` argument can be used to remove feature groups from a component that are not uniformly present. For instance, when this value is _0.5_ (the default), and all the features of a component were detected in four different replicates in total, then only those feature groups are kept in the component for which its features were detected in at least two different replicates (_i.e._ half of four).
 
-Another approach to reduce unlikely adduct annotations is to use algorithms that operate on a 'feature level' ([cliqueMS] and [OpenMS]). These algorithms generate components for each sample analysis individually. The 'feature components' are then merged by a consensus approach where unlikely annotations are removed (the algorithm is described further in the reference manual, `?generateComponents`).
+The other algorithms interfaced in `patRoon` operate on a 'feature level' (`Network`, [cliqueMS] and [OpenMS]). These algorithms first generate components for each sample analysis individually. The resulting 'feature components' are then merged by a consensus approach to generate the final components and eliminate unlikely feature groups in a component. The `Network` algorithm is a new internal algorithm that combines approaches from e.g. [CAMERA], [cliqueMS], and [nontarget] to implement a fast, flexible and feature level componentization algorithm. For more details see the reference manual, (`?generateComponents`).
 
-Each algorithm supports many different parameters that may significantly influence the (quality of the) output. For instance, care has to be taken to avoid 'over-clustering' of feature groups which do not belong in the same component. This is often easily visible since the chromatographic peaks poorly overlap or are shaped differently. The `checkComponents` function (discussed [here](#intReview)) can be used to quickly verify componentization results. For a complete listing all arguments see the reference manual (e.g. `?generateComponents`).
+Each algorithm supports many different parameters that may significantly influence the (quality of the) output. For instance, care has to be taken to avoid 'over-clustering' of feature groups which do not belong in the same component. This is often easily visible since the chromatographic peaks poorly overlap or are shaped differently. The `checkComponents` function (discussed [here](#intReview)) can be used to quickly verify componentization results. For a complete listing all arguments see the reference manual (e.g. `?generateComponents`). Furthermore, the `plotGraph()` function (discussed [here](#vis_feat_ann)) can be used to visualize the networking results for the `Network` algorithm.
 
 Once the components with adduct and isotopes annotations are generated this data can be [used to prioritize and improve the workflow](#incorpAdductIso).
 
@@ -646,6 +647,10 @@ componOpenMS <- generateComponents(fGroups, "openms", ionization = "positive", c
 
 # cliqueMS with default parameters
 componCliqueMS <- generateComponents(fGroups, "cliquems", ionization = "negative")
+
+# Network with customized parameters
+componNet <- generateComponents(fGroups, "net", ionization = "positive", componMinSim = 0.97, annotAlgo = "nontarget",
+                                componMethod = "hcs", annotAdducts = c("[M+H]+", "[M+Na]+", "[M+NH4]+"))
 ```
 
 

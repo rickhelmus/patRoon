@@ -13,7 +13,7 @@ generateComponents(fGroups, algorithm, ...)
 \item{fGroups}{\code{\link{featureGroups}} object for which components should be generated.}
 
 \item{algorithm}{A character string describing the algorithm that should be
-used: \code{"ramclustr"}, \code{"camera"}, \code{"nontarget"}, \code{"intclust"}, \code{"openms"}, \code{"cliquems"}, \code{"specclust"}, \code{"tp"}}
+used: \code{"ramclustr"}, \code{"camera"}, \code{"nontarget"}, \code{"intclust"}, \code{"openms"}, \code{"cliquems"}, \code{"specclust"}, \code{"tp"}, \code{"net"}}
 
 \item{\dots}{Any parameters to be passed to the selected component generation algorithm.}
 }
@@ -40,5 +40,5 @@ products. The linking of this data is generally useful for annotation purposes a
 
 \seealso{
 The \code{\link{components}} output class and its methods and the algorithm specific functions:
-  \code{\link{generateComponentsRAMClustR}}, \code{\link{generateComponentsCAMERA}}, \code{\link{generateComponentsNontarget}}, \code{\link{generateComponentsIntClust}}, \code{\link{generateComponentsOpenMS}}, \code{\link{generateComponentsCliqueMS}}, \code{\link{generateComponentsSpecClust}}, \code{\link{generateComponentsTPs}}
+  \code{\link{generateComponentsRAMClustR}}, \code{\link{generateComponentsCAMERA}}, \code{\link{generateComponentsNontarget}}, \code{\link{generateComponentsIntClust}}, \code{\link{generateComponentsOpenMS}}, \code{\link{generateComponentsCliqueMS}}, \code{\link{generateComponentsSpecClust}}, \code{\link{generateComponentsTPs}}, \code{\link{generateComponentsNet}}
 }

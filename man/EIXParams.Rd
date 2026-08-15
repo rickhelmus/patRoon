@@ -28,7 +28,7 @@ mobilograms (EIMs):
 \item \code{window} A value that is subtracted or added to the minimum and maximum retention time (EICs) or mobility
 (EIMs) of the feature. Thus, setting this value to \samp{>0} will 'zoom out' on the x-axis of a chromatogram or
 mobilogram. Defaults to \code{defaultLim("retention", "wide")} (EICs) or \code{defaultLim("mobility", "wide")} (EIMs)
-(see \link{limits}).
+(see \link{limits}). Set to \code{Inf} to use the full retention time or mobility range.
 
 \item \code{topMost} Only create EICs/EIMs for this number of top most intense features. If \code{NULL} then
 EICs/EIMs are created for all features.

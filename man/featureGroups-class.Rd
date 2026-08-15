@@ -455,8 +455,9 @@ qualities), a \code{character} vector with names of qualities to calculate (e.g.
 \item{parallel}{If set to \code{TRUE} then code is executed in parallel through the \CRANpkg{future} package. Please
 see the parallelization section in the handbook for more details.}
 
-\item{onlyMonoIso}{Set to \code{TRUE} to only keep feature groups that were annotated as monoisotopic. Feature groups
-are never removed by this setting if no isotope annotations are available.}
+\item{onlyMonoIso}{Set to \code{TRUE} to only keep feature groups that were annotated as monoisotopic. If multiple
+annotations are available, any monoisotopic annotation is sufficient for the feature group to be kept. Feature
+groups are never removed by this setting if no isotope annotations are available.}
 
 \item{chargeMismatch}{Specifies how to deal with a mismatch in charge between adduct and isotope annotations. Valid
 values are: \code{"adduct"} (ignore isotope annotation), \code{"isotope"} (ignore adduct annotation), \code{"none"}

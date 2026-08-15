@@ -416,7 +416,7 @@ please refer to the linked method documentation for each generic.
 \code{plotGraph} Plots an interactive network graph.
 
 \itemize{
-    \item Methods are defined for: \code{\link[=plotGraph,componentsNT-method]{componentsNT}}; \code{\link[=plotGraph,componentsNTSet-method]{componentsNTSet}}; \code{\link[=plotGraph,componentsTPs-method]{componentsTPs}}; \code{\link[=plotGraph,featureGroups-method]{featureGroups}}; \code{\link[=plotGraph,featureGroupsSet-method]{featureGroupsSet}}; \code{\link[=plotGraph,transformationProductsFormula-method]{transformationProductsFormula}}; \code{\link[=plotGraph,transformationProductsStructure-method]{transformationProductsStructure}}.
+    \item Methods are defined for: \code{\link[=plotGraph,componentsNet-method]{componentsNet}}; \code{\link[=plotGraph,componentsNetSet-method]{componentsNetSet}}; \code{\link[=plotGraph,componentsNT-method]{componentsNT}}; \code{\link[=plotGraph,componentsNTSet-method]{componentsNTSet}}; \code{\link[=plotGraph,componentsTPs-method]{componentsTPs}}; \code{\link[=plotGraph,featureGroups-method]{featureGroups}}; \code{\link[=plotGraph,featureGroupsSet-method]{featureGroupsSet}}; \code{\link[=plotGraph,transformationProductsFormula-method]{transformationProductsFormula}}; \code{\link[=plotGraph,transformationProductsStructure-method]{transformationProductsStructure}}.
 }
 
 \code{plotInt} plots the intensity of all contained features.
@@ -524,7 +524,7 @@ please refer to the linked method documentation for each generic.
 \code{unset} Converts this object to a regular non-set object. See the documentation for \link[=sets-workflow]{sets workflows}.
 
 \itemize{
-    \item Methods are defined for: \code{\link[=unset,componentsNTSet-method]{componentsNTSet}}; \code{\link[=unset,componentsSet-method]{componentsSet}}; \code{\link[=unset,compoundsConsensusSet-method]{compoundsConsensusSet}}; \code{\link[=unset,compoundsSet-method]{compoundsSet}}; \code{\link[=unset,featureGroupsScreeningSet-method]{featureGroupsScreeningSet}}; \code{\link[=unset,featureGroupsSet-method]{featureGroupsSet}}; \code{\link[=unset,featuresSet-method]{featuresSet}}; \code{\link[=unset,formulasConsensusSet-method]{formulasConsensusSet}}; \code{\link[=unset,formulasSet-method]{formulasSet}}; \code{\link[=unset,MSPeakListsSet-method]{MSPeakListsSet}}.
+    \item Methods are defined for: \code{\link[=unset,componentsNetSet-method]{componentsNetSet}}; \code{\link[=unset,componentsNTSet-method]{componentsNTSet}}; \code{\link[=unset,componentsSet-method]{componentsSet}}; \code{\link[=unset,compoundsConsensusSet-method]{compoundsConsensusSet}}; \code{\link[=unset,compoundsSet-method]{compoundsSet}}; \code{\link[=unset,featureGroupsScreeningSet-method]{featureGroupsScreeningSet}}; \code{\link[=unset,featureGroupsSet-method]{featureGroupsSet}}; \code{\link[=unset,featuresSet-method]{featuresSet}}; \code{\link[=unset,formulasConsensusSet-method]{formulasConsensusSet}}; \code{\link[=unset,formulasSet-method]{formulasSet}}; \code{\link[=unset,MSPeakListsSet-method]{MSPeakListsSet}}.
 }
 }
 \section{Other generics}{

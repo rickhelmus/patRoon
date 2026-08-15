@@ -12,7 +12,7 @@ adduct(...)
 
 \S4method{show}{adduct}(object)
 
-\S4method{as.character}{adduct}(x, format = "generic", err = TRUE)
+\S4method{as.character}{adduct}(x, format = "generic", adductInfo = NULL, err = TRUE)
 }
 \arguments{
 \item{x, object}{An \code{adduct} object.}
@@ -33,7 +33,12 @@ adduct(...)
   
   \code{"openms"} is the format used by the \command{MetaboliteAdductDecharger} tool.
   
-  \code{"cliquems"} is the format used by \pkg{cliqueMS}.}
+  \code{"cliquems"} is the format used by \pkg{cliqueMS}.
+  
+  \code{"nontarget"} is the format used by \pkg{nontarget}/\pkg{enviPat} and requires \code{adductInfo} to be set.}
+
+\item{adductInfo}{A \code{data.frame} with adduct info from \emph{e.g.} \link[enviPat:adducts]{enviPat::adducts}.
+Only needs to be set when \code{format="nontarget"}.}
 
 \item{err}{If \code{TRUE} then an error will be thrown if conversion fails,
 otherwise returns without data.}

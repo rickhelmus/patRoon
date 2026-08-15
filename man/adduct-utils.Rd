@@ -13,7 +13,14 @@ GenFormAdducts()
 
 MetFragAdducts()
 
-as.adduct(x, format = "generic", isPositive = NULL, charge = NULL, err = TRUE)
+as.adduct(
+  x,
+  format = "generic",
+  isPositive = NULL,
+  charge = NULL,
+  adductInfo = NULL,
+  err = TRUE
+)
 
 calculateIonFormula(formula, adduct)
 
@@ -41,13 +48,18 @@ string, a \code{numeric} \command{MetFrag} adduct identifier
   
   \code{"openms"} is the format used by the \command{MetaboliteAdductDecharger} tool.
   
-  \code{"cliquems"} is the format used by \pkg{cliqueMS}.}
+  \code{"cliquems"} is the format used by \pkg{cliqueMS}.
+  
+  \code{"nontarget"} is the format used by \pkg{nontarget}/\pkg{enviPat} and requires \code{adductInfo} to be set.}
 
 \item{isPositive}{A logical that specifies whether the adduct should be
 positive. Should only be set when \code{format="metfrag"} and \code{x} is a
 \code{numeric} identifier.}
 
 \item{charge}{The final charge. Only needs to be set when \code{format="openms"}.}
+
+\item{adductInfo}{A \code{data.frame} with adduct info from \emph{e.g.} \link[enviPat:adducts]{enviPat::adducts}.
+Only needs to be set when \code{format="nontarget"}.}
 
 \item{err}{If \code{TRUE} then an error will be thrown if conversion fails,
 otherwise returns without data.}

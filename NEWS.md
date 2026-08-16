@@ -1,24 +1,29 @@
 # DEVEL
 
-**Important changes**
+**New functionality**
 
-* The cumulative intensity filters for MS peak list averaging and filtering were changed to address issue #160. The
+* New network-based algorithm for fast, flexible and feature-based componentization. See `?generateComponentsNet` for details.
+* `fixedIsolationWindow` can now be a two-sized vector to specify asymmetric isolation windows (issue #161)
+* Added the `maxReplicateIntRSDPres` filter that ignores absent (zero intensity) filters in its RSD calculation, and clarified in the docs that the legacy `maxReplicateIntRSD` filter doesn't (issue #162)
+
+**Changes**
+
+* **Important** The cumulative intensity filters for MS peak list averaging and filtering were changed to address issue #160. The
 filters now correctly prioritize the most intense peaks and remove the lower intensity peaks that are above the filter
 threshold. For this reason the `minRelCumIntensity` and `relMinCumIntensity` (latter was named incorrectly) are renamed
 to `maxRelCumIntensity`.
+* Optimizations for very large datasets (issue #154)
+* The `window` EIC and EIM parameter can now be `Inf` to include the data points for the entire chromatogram or mobility trace
 
-**Other changes**
+**Fixes**
 
 * Fixed: `getEICs()` output was returned as nested matrices when `output="fill"`
 * Fixed: `report()`: component table lacked ret and m/z columns
 * Fixed: `newProject()`: misc fixes when creating a project that loads analyses from a table (issue #154).
 * Fixed: Improve handling of raw data without exported MS2 isolation windows in `piek` and `generateMSPeakLists()` (issue #156)
-* Optimizations for very large datasets (issue #154)
 * `as.data.table()`: Support non numeric columns for `anaInfoCols` when averaging (issue #158)
 * Fixed: `topMost` argument for `generateMSPeakLists()` threw an error (issue #159)
 * Fixed: `fixedIsolationWindow` was incorrectly handled for eg Agilent DDA data (issue #161)
-* Added the `maxReplicateIntRSDPres` filter that ignores absent (zero intensity) filters in its RSD calculation, and clarified in the docs that the legacy `maxReplicateIntRSD` filter doesn't (issue #162)
-* `fixedIsolationWindow` can now be a two-sized vector to specify asymmetric isolation windows (issue #161)
 
 
 # patRoon 3.0

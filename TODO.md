@@ -3,11 +3,6 @@
 - add deps to patRoonDeps
 
 
-## NEWS
-
-- EIXParam window param can be Inf
-
-
 # Priority
 
 ## general

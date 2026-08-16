@@ -110,7 +110,8 @@ setMethod("plotBPCs", "data.table", function(obj, retentionRange = NULL, MSLevel
 #' @describeIn getEICs-methods Generates one or more EIC(s) for given retention time, \emph{m/z} and optionally
 #'   mobility ranges (method for \code{data.table}).
 #' @export
-setMethod("getEICs", "data.table", function(obj, ranges, gapFactor = 3, output = "fill", minIntensityIMS = 25)
+setMethod("getEICs", "data.table", function(obj, ranges, gapFactor = 3, output = "fill", minIntensityIMS = 25,
+                                            MSLevel = 1)
 {
     ac <- checkmate::makeAssertCollection()
     obj <- assertAndPrepareAnaInfo(obj, add = ac)
@@ -122,6 +123,7 @@ setMethod("getEICs", "data.table", function(obj, ranges, gapFactor = 3, output =
     aapply(checkmate::assertNumber, . ~ gapFactor + minIntensityIMS, lower = 0, finite = TRUE, na.ok = FALSE,
            fixed = list(add = ac))
     checkmate::assertChoice(output, c("fill", "pad", "raw"), add = ac)
+    checkmate::assertChoice(MSLevel, 1:2, add = ac)
     checkmate::reportAssertions(ac)
     
     if (checkmate::testDataFrame(ranges))
@@ -136,9 +138,12 @@ setMethod("getEICs", "data.table", function(obj, ranges, gapFactor = 3, output =
     {
         checkmate::assertDataFrame(r, types = "numeric", any.missing = FALSE)
         assertHasNames(r, c("mzmin", "mzmax", "retmin", "retmax"))
+        if ("mobmin" %in% names(r) || "mobmax" %in% names(r))
+            assertHasNames(r, c("mobmin", "mobmax"))
     }
-    ret <- doGetEICs(obj, ranges, gapFactor, mode = if (output == "raw") "full" else "simple",
-                     minIntensityIMS = minIntensityIMS, pad = output == "pad")
+    
+    ret <- doGetEICs(obj, ranges, gapFactor, minIntensityIMS = minIntensityIMS, MSLevel = MSLevel,
+                     mode = if (output == "raw") "full" else "simple", pad = output == "pad")
     if (output == "fill")
         ret <- doFillEICOutput(ret)
     return(ret)

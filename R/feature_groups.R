@@ -1625,7 +1625,7 @@ setMethod("getBPCs", "featureGroups", function(obj, retentionRange = NULL, MSLev
 #'   \code{featureGroups}).
 #' @export
 setMethod("getEICs", "featureGroups", function(obj, analysis = analyses(obj), groupName = names(obj),
-                                               EICParams = getDefEICParams(), output = "fill")
+                                               EICParams = getDefEICParams(), output = "fill", MSLevel = 1)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertSubset, . ~ analysis + groupName, list(analyses(obj), names(obj)),
@@ -1634,10 +1634,12 @@ setMethod("getEICs", "featureGroups", function(obj, analysis = analyses(obj), gr
     checkmate::assertCharacter(groupName, any.missing = FALSE, min.chars = 1, add = ac)
     assertEICParams(EICParams, add = ac)
     checkmate::assertChoice(output, c("fill", "pad", "raw"), add = ac)
+    checkmate::assertChoice(MSLevel, 1:2, add = ac)
+    
     checkmate::reportAssertions(ac)
     
     ret <- getFeatureEIXs(obj, "EIC", analysis = analysis, groupName = groupName, EIXParams = EICParams,
-                          mode = if (output == "raw") "full" else "simple", pad = output == "pad")
+                          MSLevel = MSLevel, mode = if (output == "raw") "full" else "simple", pad = output == "pad")
     if (output == "fill")
         ret <- doFillEICOutput(ret)
     return(ret)

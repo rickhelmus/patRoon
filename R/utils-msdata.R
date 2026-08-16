@@ -176,7 +176,7 @@ getProfileMSFilesFromAnaInfo <- function(anaInfo, formats = c("mzML", "mzXML"), 
     return(setNames(msf, anaInfo$analysis))
 }
 
-doGetEICs <- function(anaInfo, EICInfoList, gapFactor, minIntensityIMS = 0, mode = "simple",
+doGetEICs <- function(anaInfo, EICInfoList, gapFactor, minIntensityIMS = 0, MSLevel = 1, mode = "simple",
                       sumWindowMZ = defaultLim("retention", "very_narrow"),
                       sumWindowMob = defaultLim("retention", "very_narrow"), smoothWindowMZ = 0, smoothWindowMob = 0,
                       smoothExtMZ = 0, smoothExtMob = 0, saveMZProfiles = FALSE, saveEIMs = FALSE, minEICIntensity = 0,
@@ -198,7 +198,7 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, minIntensityIMS = 0, mode
         if (is.null(cacheDB))
             cacheDB <- openCacheDBScope()
         anaHashes <- getMSFileHashesFromAvailBackend(anaInfo, needTypes = if (needIMS) "ims")
-        baseHash <- makeHash(gapFactor, minIntensityIMS, mode, sumWindowMZ, sumWindowMob,
+        baseHash <- makeHash(gapFactor, minIntensityIMS, MSLevel, mode, sumWindowMZ, sumWindowMob,
                              smoothWindowMZ, smoothWindowMob, smoothExtMZ, smoothExtMob, saveMZProfiles,
                              saveEIMs, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity, pad,
                              topMost)
@@ -215,6 +215,9 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, minIntensityIMS = 0, mode
             else
                 setnafill(EICInfo, fill = 0, cols = col)
         }
+        
+        if (is.null(EICInfo[["precursorMZ"]]) && MSLevel == 2)
+            EICInfo[, precursorMZ := rep(0, .N)]
         
         EICs <- isCached <- anaHash <- anaEICHash <- NULL
         if (doCache)
@@ -242,8 +245,9 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, minIntensityIMS = 0, mode
             ToDo <- EICInfo[isCached == FALSE]
             openMSReadBackend(backend, path, genMobilities = needIMS && mode == "full")
             
+            precursorMZs <- if (MSLevel == 2) ToDo$precursorMZ else numeric(0)
             newEICs <- getEICList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin,
-                                  ToDo$mobmax, gapFactor, minIntensityIMS, mode, sumWindowMZ, sumWindowMob,
+                                  ToDo$mobmax, gapFactor, minIntensityIMS, MSLevel, precursorMZs, mode, sumWindowMZ, sumWindowMob,
                                   smoothWindowMZ, smoothWindowMob, smoothExtMZ, smoothExtMob, saveMZProfiles, saveEIMs,
                                   pad, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity, topMost)
             EICs[!isCached] <- newEICs

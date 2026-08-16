@@ -917,6 +917,7 @@ NULL
 #'   any zero intensity data points. If \code{output="fill"} then the zero intensity points are re-added to obtain
 #'   continuous chromatograms. If \code{output="pad"} then zero intensity points are only re-added that surround others,
 #'   which is sufficient for \emph{e.g.} plotting. If \code{output="raw"} then the original compressed data is returned.
+#' @param MSLevel The MS level of the data to be used for EIC generation. This should be \samp{1} or \samp{2}.
 #'
 #' @template minIntensityIMS-arg
 #'

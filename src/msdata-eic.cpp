@@ -430,7 +430,7 @@ void EIC::commit(SpectrumRawTypes::Scan curScanInd, SpectrumRawTypes::Time curTi
         if (curPoint.intensity == 0.0 || scanInds.size() == 1 || prevScanInd != (curScanInd - 1) ||
             !numberGTE(curPoint.intensity, minAdjIntensity))
         {
-            // Rcpp::Rcout << "Stop! EIC: " << i << "/" << j << "/" << specMeta.first.scans[curScanInd] << "/" << curTime << "/" << curPoint.intensity << "/" << minEICAdjPoints << "/" << adjPointsAboveThr << "\n";
+            // Rcpp::Rcout << "Stop! EIC: " << i << "/" << j << "/" << specMetaMS.scans[curScanInd] << "/" << curTime << "/" << curPoint.intensity << "/" << minEICAdjPoints << "/" << adjPointsAboveThr << "\n";
             startTimeAboveThr = 0.0;
             adjPointsAboveThr = 0;   
         }
@@ -448,7 +448,7 @@ void EIC::commit(SpectrumRawTypes::Scan curScanInd, SpectrumRawTypes::Time curTi
             if (minAdjPoints > 0)
             {
                 ++adjPointsAboveThr;
-                // Rcpp::Rcout << "above: EIC: " << i << "/" << j << "/" << specMeta.first.scans[curScanInd] << "/" << curTime << "/" << curPoint.intensity << "/" << minEICAdjPoints << "/" << adjPointsAboveThr << "\n";
+                // Rcpp::Rcout << "above: EIC: " << i << "/" << j << "/" << specMetaMS.scans[curScanInd] << "/" << curTime << "/" << curPoint.intensity << "/" << minEICAdjPoints << "/" << adjPointsAboveThr << "\n";
                 if (adjPointsAboveThr >= minAdjPoints)
                     enoughPointsAboveThr = true;
             }
@@ -587,6 +587,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::vector<SpectrumRawTypes::Mobility> &startMobs,
                       const std::vector<SpectrumRawTypes::Mobility> &endMobs,
                       SpectrumRawTypes::Time gapFactor,  SpectrumRawTypes::Intensity minIntensityIMS,
+                      int MSLevel, const std::vector<SpectrumRawTypes::Mass> &precursorMZs,
                       const std::string &mode = "simple", SpectrumRawTypes::Time sumWindowMZ = 0,
                       SpectrumRawTypes::Time sumWindowMob = 0, unsigned smoothWindowMZ = 3,
                       unsigned smoothWindowMob = 3, SpectrumRawTypes::Mass smoothExtMZ = 0,
@@ -621,6 +622,8 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     const auto eicMode = (mode == "simple") ? EICMode::SIMPLE : (mode == "full") ? EICMode::FULL : (mode == "full_mz") ? EICMode::FULL_MZ : EICMode::TEST;
     
     const auto &specMeta = backend.getSpecMetadata();
+    const auto MSLev = (MSLevel == 1) ? SpectrumRawTypes::MSLevel::MS1 : SpectrumRawTypes::MSLevel::MS2;
+    const auto &specMetaMS = (MSLev == SpectrumRawTypes::MSLevel::MS1) ? specMeta.first : specMeta.second;
     
     if (smoothWindowMZ == 0 || (eicMode != EICMode::FULL && eicMode != EICMode::FULL_MZ))
         smoothExtMZ = 0;
@@ -673,7 +676,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         for (size_t i=0; i<startTimes.size(); ++i)
         {
             const auto sels = getSpecRawSelections(specMeta, makeNumRange(startTimes[i], endTimes[i]),
-                                                   SpectrumRawTypes::MSLevel::MS1, 0);
+                                                   MSLev, (MSLev == SpectrumRawTypes::MSLevel::MS2) ? precursorMZs[i] : 0);
             for (const auto &sel : sels)
                 allScans.insert(sel.index);
         }
@@ -686,12 +689,12 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         timer.start("Collecting all scans (range)");
         scanSels[0] = getSpecRawSelections(specMeta, makeNumRange(*std::min_element(startTimes.begin(), startTimes.end()),
                                                                   *std::max_element(endTimes.begin(), endTimes.end())),
-                                                                  SpectrumRawTypes::MSLevel::MS1, 0);
+                                                                  MSLev, 0);
         timer.stop();
     }
     
     timer.start("Loading all MS spectra");
-    auto allSpectra = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc,
+    auto allSpectra = applyMSData<SpectrumRaw>(backend, MSLev, scanSels, sfunc,
                                                minIntensityIMS, SpectrumRawTypes::MSSortType::MZ);
     timer.stop();
     if (allSpectra.empty())
@@ -763,7 +766,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     
     allEICs.reserve(EICCount);
     for (size_t i=0; i<EICCount; ++i)
-        allEICs.emplace_back(specMeta.first.times, eicMode, anySpecHasMob, minEICAdjIntensity, minEICAdjTime,
+        allEICs.emplace_back(specMetaMS.times, eicMode, anySpecHasMob, minEICAdjIntensity, minEICAdjTime,
                              minEICAdjPoints, backend.getMobilities(), sumWindowMZ, sumWindowMob, smoothWindowMZ,
                              smoothWindowMob, smoothExtMZ, smoothExtMob, saveMZProfiles, saveEIMs);
     
@@ -814,22 +817,22 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             const auto allPeaksSortedInd = (ended) ? 0 : (startInd + sortedInds[j]);
             const auto scanInd = allPeaksSorted.indices[allPeaksSortedInd];
             
-            //Rcpp::Rcout << "EIC: " << j << "/" << sortedInds.size() << "/" << specMeta.first.scans[curScanInd] << "/" << curScanInd << "/" << init << "/" << ended << "/" << startInd << "/" << endInd << "\n";
+            //Rcpp::Rcout << "EIC: " << j << "/" << sortedInds.size() << "/" << specMetaMS.scans[curScanInd] << "/" << curScanInd << "/" << init << "/" << ended << "/" << startInd << "/" << endInd << "\n";
             
             if (ended || (!init && scanInd != curScanInd))
             {
-                const auto curTime = specMeta.first.times[curScanInd];
+                const auto curTime = specMetaMS.times[curScanInd];
                 eic.commit(curScanInd, curTime);
                 if (ended)
                     break;
                 curScanInd = scanInd;
             }
             
-            const auto time = specMeta.first.times[scanInd];
+            const auto time = specMetaMS.times[scanInd];
             if (!timeGTE(time, timeStart) || (timeEnd != 0.0 && !timeLTE(time, timeEnd)))
                 continue;
             
-            //Rcpp::Rcout << "EIC: " << allPeaksSortedInd << "/" << j << "/" << specMeta.first.times[allPeaksSorted.indices[allPeaksSortedInd]] << "/" << mz << "/" << mzStart << "/" << mzEnd << "\n";
+            //Rcpp::Rcout << "EIC: " << allPeaksSortedInd << "/" << j << "/" << specMetaMS.times[allPeaksSorted.indices[allPeaksSortedInd]] << "/" << mz << "/" << mzStart << "/" << mzEnd << "\n";
             const auto mz = allPeaksSorted.mzs[allPeaksSortedInd];
             const auto mob = (anySpecHasMob) ? allPeaksSorted.mobilities[allPeaksSortedInd] : 0;
             const auto inten = allPeaksSorted.intensities[allPeaksSortedInd];
@@ -864,14 +867,14 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         if (eicMode == EICMode::SIMPLE && pad)
         {
             // figure out start/stop scans
-            auto startIt = std::lower_bound(specMeta.first.times.begin(), specMeta.first.times.end(), timeStart);
-            if (startIt == specMeta.first.times.end())
-                startIt = specMeta.first.times.begin();
-            auto endIt = (timeEnd == 0.0) ? specMeta.first.times.end() : std::lower_bound(startIt, specMeta.first.times.end(), timeEnd);
-            if (endIt == specMeta.first.times.end() || (endIt != specMeta.first.times.begin() && *endIt > timeEnd))
+            auto startIt = std::lower_bound(specMetaMS.times.begin(), specMetaMS.times.end(), timeStart);
+            if (startIt == specMetaMS.times.end())
+                startIt = specMetaMS.times.begin();
+            auto endIt = (timeEnd == 0.0) ? specMetaMS.times.end() : std::lower_bound(startIt, specMetaMS.times.end(), timeEnd);
+            if (endIt == specMetaMS.times.end() || (endIt != specMetaMS.times.begin() && *endIt > timeEnd))
                 --endIt;
-            eic.pad(std::distance(specMeta.first.times.begin(), startIt),
-                    std::distance(specMeta.first.times.begin(), endIt));
+            eic.pad(std::distance(specMetaMS.times.begin(), startIt),
+                    std::distance(specMetaMS.times.begin(), endIt));
         }
         
         eic.finalize();
@@ -894,7 +897,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     }
     
     timer.start("Converting EICs to R data");
-    const auto medRTDiff = medianRTDiff(specMeta.first.times);
+    const auto medRTDiff = medianRTDiff(specMetaMS.times);
     Rcpp::List ret(EICCount);
     for (size_t i=0; i<EICCount; ++i)
     {
@@ -911,13 +914,13 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         
         if (eicMode == EICMode::SIMPLE)
         {
-            SimpleEIC simpleEIC(eic, specMeta.first.times);
+            SimpleEIC simpleEIC(eic, specMetaMS.times);
             if (gapFactor > 0.0)
             {
                 const auto timeStart = (startTimes.size() == 1) ? startTimes[0] : startTimes[i];
                 const auto timeEnd = (endTimes.size() == 1) ? endTimes[0] : endTimes[i];
                 simpleEIC.fillGaps(medRTDiff, gapFactor, pad, timeStart,
-                                   (timeEnd == 0.0) ? specMeta.first.times.back() : timeEnd);
+                                   (timeEnd == 0.0) ? specMetaMS.times.back() : timeEnd);
             }
             
             auto mat = Rcpp::NumericMatrix(simpleEIC.size(), 2);
@@ -934,7 +937,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             auto mat = Rcpp::NumericMatrix(eic.size(), 12);
             for (size_t i=0; i<eic.size(); ++i)
             {
-                mat(i, 0) = specMeta.first.times[eic.getScanIndices()[i]];
+                mat(i, 0) = specMetaMS.times[eic.getScanIndices()[i]];
                 mat(i, 1) = eic.getIntensities()[i];
                 mat(i, 2) = eic.getIntensitiesBP()[i];
                 mat(i, 3) = eic.getIntensitiesBPMob()[i];
@@ -957,7 +960,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             auto mat = Rcpp::NumericMatrix(eic.size(), 7);
             for (size_t i=0; i<eic.size(); ++i)
             {
-                mat(i, 0) = specMeta.first.times[eic.getScanIndices()[i]];
+                mat(i, 0) = specMetaMS.times[eic.getScanIndices()[i]];
                 mat(i, 1) = eic.getIntensities()[i];
                 mat(i, 2) = eic.getIntensitiesBP()[i];
                 mat(i, 3) = eic.getMZs()[i];
@@ -980,7 +983,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     {
         // For padding we just have to add additional time points, EIC decompression will assume these are zero
         // intensity points.
-        ret.attr("allXValues") = (fillRTGaps(specMeta.first.times, medRTDiff, gapFactor)).second;
+        ret.attr("allXValues") = (fillRTGaps(specMetaMS.times, medRTDiff, gapFactor)).second;
     }
     
     if (anySpecHasMob && (eicMode == EICMode::FULL || eicMode == EICMode::FULL_MZ) && saveMZProfiles)

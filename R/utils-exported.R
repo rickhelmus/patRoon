@@ -428,6 +428,7 @@ getFCParams <- function(replicates, ...)
 #'   any zero intensity data points. If \code{output="fill"} then the zero intensity points are re-added to obtain
 #'   continuous chromatograms. If \code{output="pad"} then zero intensity points are only re-added that surround others,
 #'   which is sufficient for \emph{e.g.} plotting. If \code{output="raw"} then the original compressed data is returned.
+#' @param MSLevel The MS level of the data to be used for EIC generation. This should be \samp{1} or \samp{2}.
 #' 
 #' @template minIntensityIMS-arg
 #'
@@ -441,7 +442,7 @@ getFCParams <- function(replicates, ...)
 #' @template uses-msdata
 #'
 #' @export
-getEICs <- function(analysisInfo, ranges, gapFactor = 3, output = "fill", minIntensityIMS = 25)
+getEICs <- function(analysisInfo, ranges, gapFactor = 3, output = "fill", minIntensityIMS = 25, MSLevel = 1)
 {
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
@@ -453,6 +454,7 @@ getEICs <- function(analysisInfo, ranges, gapFactor = 3, output = "fill", minInt
     aapply(checkmate::assertNumber, . ~ gapFactor + minIntensityIMS, lower = 0, finite = TRUE, na.ok = FALSE,
            fixed = list(add = ac))
     checkmate::assertChoice(output, c("fill", "pad", "raw"), add = ac)
+    checkmate::assertChoice(MSLevel, 1:2, add = ac)
     checkmate::reportAssertions(ac)
 
     if (checkmate::testDataFrame(ranges))
@@ -467,9 +469,11 @@ getEICs <- function(analysisInfo, ranges, gapFactor = 3, output = "fill", minInt
     {
         checkmate::assertDataFrame(r, types = "numeric", any.missing = FALSE)
         assertHasNames(r, c("mzmin", "mzmax", "retmin", "retmax"))
+        if ("mobmin" %in% names(r) || "mobmax" %in% names(r))
+            assertHasNames(r, c("mobmin", "mobmax"))
     }
-    ret <- doGetEICs(analysisInfo, ranges, gapFactor, mode = if (output == "raw") "full" else "simple",
-                     minIntensityIMS = minIntensityIMS, pad = output == "pad")
+    ret <- doGetEICs(analysisInfo, ranges, gapFactor, minIntensityIMS = minIntensityIMS, MSLevel = MSLevel,
+                     mode = if (output == "raw") "full" else "simple", pad = output == "pad")
     if (output == "fill")
     {
         ret <- lapply(ret, function(anaEICs)

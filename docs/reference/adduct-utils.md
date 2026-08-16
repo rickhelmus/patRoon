@@ -9,7 +9,14 @@ GenFormAdducts()
 
 MetFragAdducts()
 
-as.adduct(x, format = "generic", isPositive = NULL, charge = NULL, err = TRUE)
+as.adduct(
+  x,
+  format = "generic",
+  isPositive = NULL,
+  charge = NULL,
+  adductInfo = NULL,
+  err = TRUE
+)
 
 calculateIonFormula(formula, adduct)
 
@@ -45,6 +52,9 @@ calculateNeutralFormula(formula, adduct)
 
   `"cliquems"` is the format used by cliqueMS.
 
+  `"nontarget"` is the format used by nontarget/enviPat and requires
+  `adductInfo` to be set.
+
 - isPositive:
 
   A logical that specifies whether the adduct should be positive. Should
@@ -53,6 +63,12 @@ calculateNeutralFormula(formula, adduct)
 - charge:
 
   The final charge. Only needs to be set when `format="openms"`.
+
+- adductInfo:
+
+  A `data.frame` with adduct info from *e.g.*
+  [enviPat::adducts](https://rdrr.io/pkg/enviPat/man/adducts.html). Only
+  needs to be set when `format="nontarget"`.
 
 - err:
 

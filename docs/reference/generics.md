@@ -441,6 +441,8 @@ groups for which data is present in this object.
 `plotGraph` Plots an interactive network graph.
 
 - Methods are defined for:
+  [`componentsNet`](https://rickhelmus.github.io/patRoon/reference/componentsNet-class.md);
+  [`componentsNetSet`](https://rickhelmus.github.io/patRoon/reference/componentsNet-class.md);
   [`componentsNT`](https://rickhelmus.github.io/patRoon/reference/componentsNT-class.md);
   [`componentsNTSet`](https://rickhelmus.github.io/patRoon/reference/componentsNT-class.md);
   [`componentsTPs`](https://rickhelmus.github.io/patRoon/reference/componentsTPs-class.md);
@@ -604,6 +606,7 @@ documentation for [sets
 workflows](https://rickhelmus.github.io/patRoon/reference/sets-workflow.md).
 
 - Methods are defined for:
+  [`componentsNetSet`](https://rickhelmus.github.io/patRoon/reference/componentsNet-class.md);
   [`componentsNTSet`](https://rickhelmus.github.io/patRoon/reference/componentsNT-class.md);
   [`componentsSet`](https://rickhelmus.github.io/patRoon/reference/components-class.md);
   [`compoundsConsensusSet`](https://rickhelmus.github.io/patRoon/reference/compounds-class.md);

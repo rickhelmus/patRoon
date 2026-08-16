@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-08-13" />
+<meta name="date" content="2026-08-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -421,7 +421,7 @@ div.csl-indent {
 <p>The following algorithms are currently supported:</p>
 <table>
 <colgroup>
-<col width="19%" />
+<col width="20%" />
 <col width="42%" />
 <col width="37%" />
 </colgroup>
@@ -454,21 +454,26 @@ div.csl-indent {
 <td>As above. Uses <a href="https://abibuilder.cs.uni-tuebingen.de/archive/openms/Documentation/nightly/html/TOPP_MetaboliteAdductDecharger.html">MetaboliteAdductDecharger</a>.</td>
 </tr>
 <tr class="odd">
+<td>Network</td>
+<td><code>generateComponents(algorithm = "net", ...)</code></td>
+<td>As above. Feature based network clustering, internal algorithm.</td>
+</tr>
+<tr class="even">
 <td><a href="https://cran.r-project.org/web/packages/nontarget/index.html">nontarget</a></td>
 <td><code>generateComponents(algorithm = "nontarget", ...)</code></td>
 <td>Uses the <a href="https://cran.r-project.org/web/packages/nontarget/index.html">nontarget</a> R package to perform unsupervised homologous series detection.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Intensity clustering</td>
 <td><code>generateComponents(algorithm = "intclust", ...)</code></td>
 <td>Groups features with similar intensity profiles across analyses by hierarchical clustering.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>MS/MS clustering</td>
 <td><code>generateComponents(algorithm = "specclust", ...)</code></td>
 <td>Clusters feature groups with similar MS/MS spectra.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Transformation products</td>
 <td><code>generateComponents(algorithm = "tp", ...)</code></td>
 <td>Discussed in <a href="TPs.html#TPs">its own chapter</a>.</td>
@@ -477,8 +482,8 @@ div.csl-indent {
 </table>
 <div id="componentsChrom" class="section level3 hasAnchor" number="4.6.1">
 <h3><span class="header-section-number">4.6.1</span> Features with similar chromatographic behaviour<a href="componentization.html#componentsChrom" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Isotopes, adducts and in-source fragments typically result in detection of multiple mass peaks by the mass spectrometer for a single chemical compound. While some feature finding algorithms already try to collapse (some of) these in to a single feature, this process is often incomplete (if performed at all) and it is not uncommon that multiple features will describe the same compound. To overcome this complexity several algorithms can be used to group features that undergo highly similar chromatographic behavior but have different <em>m/z</em> values. Basic chemical rules are then applied to the resulting components to annotate adducts, in-source fragments and isotopologues, which may be highly useful for general identification purposes.</p>
-<p>Note that some algorithms were primarily designed for datasets where features are generally present in the majority of the analyses (as is relatively common in metabolomics). For environmental analyses, however, this is often not the case. For instance, consider the following situation with three feature groups that chromatographically overlap and therefore could be considered a component:</p>
+<p>Isotopes, adducts and in-source fragments typically result in detection of multiple mass peaks by the mass spectrometer for a single chemical compound. Although some feature finding algorithms already collapse (some of) these in to a single feature, this process may be incomplete. Therefore, it is common that multiple features describe the same compound. To overcome this complexity several algorithms can be used to group features that undergo highly similar chromatographic behavior but have different <em>m/z</em> values. Basic chemical rules are then applied to the resulting components to annotate adducts, in-source fragments and isotopologues, and are therefore useful for identification purposes.</p>
+<p>Note that some algorithms were primarily designed for datasets where features are present in the majority of the analyses (common in e.g. metabolomics). For environmental analysis, however, this is often not the case. For instance, consider the following situation with three feature groups with similar chromatography that could be considered a component:</p>
 <table>
 <thead>
 <tr class="header">
@@ -513,10 +518,10 @@ div.csl-indent {
 </tr>
 </tbody>
 </table>
-<p>Based on the mass differences from this example a cluster of <code>[M+H]+</code>, <code>[M+Na]+</code> and <code>[M+K]+</code> could be assumed. However, no features of the first two feature groups were detected in the third sample analysis, whereas the third feature group wasn’t detected in the first two sample analysis. Based on this it seems unlikely that feature group <em>#3</em> should be part of the component.</p>
-<p>For the algorithms that operate on a ‘feature group level’ (<a href="http://msbi.ipb-halle.de/msbi/CAMERA/">CAMERA</a> and <a href="https://github.com/sneumann/RAMClustR">RAMClustR</a>), the <code>relMinReplicates</code> argument can be used to remove feature groups from a component that are not abundant. For instance, when this value is <em>0.5</em> (the default), and all the features of a component were detected in four different replicates in total, then only those feature groups are kept for which its features were detected in at least two different replicates (<em>i.e.</em> half of four).</p>
-<p>Another approach to reduce unlikely adduct annotations is to use algorithms that operate on a ‘feature level’ (<a href="https://github.com/osenan/cliqueMS">cliqueMS</a> and <a href="http://openms.de/">OpenMS</a>). These algorithms generate components for each sample analysis individually. The ‘feature components’ are then merged by a consensus approach where unlikely annotations are removed (the algorithm is described further in the reference manual, <code>?generateComponents</code>).</p>
-<p>Each algorithm supports many different parameters that may significantly influence the (quality of the) output. For instance, care has to be taken to avoid ‘over-clustering’ of feature groups which do not belong in the same component. This is often easily visible since the chromatographic peaks poorly overlap or are shaped differently. The <code>checkComponents</code> function (discussed <a href="intReview.html#intReview">here</a>) can be used to quickly verify componentization results. For a complete listing all arguments see the reference manual (e.g. <code>?generateComponents</code>).</p>
+<p>Based on the mass differences this could be a cluster of <code>[M+H]+</code>, <code>[M+Na]+</code> and <code>[M+K]+</code>. However, no features of the first two feature groups were detected in the third sample analysis, whereas no feature of the third feature group was detected in the first two sample analyses. Based on this it seems unlikely that feature group <em>#3</em> should be part of the component.</p>
+<p>For the algorithms that assume a more ‘homogeneous’ feature dataset (<a href="http://msbi.ipb-halle.de/msbi/CAMERA/">CAMERA</a> and <a href="https://github.com/sneumann/RAMClustR">RAMClustR</a>), the <code>relMinReplicates</code> argument can be used to remove feature groups from a component that are not uniformly present. For instance, when this value is <em>0.5</em> (the default), and all the features of a component were detected in four different replicates in total, then only those feature groups are kept in the component for which its features were detected in at least two different replicates (<em>i.e.</em> half of four).</p>
+<p>The other algorithms interfaced in <code>patRoon</code> operate on a ‘feature level’ (<code>Network</code>, <a href="https://github.com/osenan/cliqueMS">cliqueMS</a> and <a href="http://openms.de/">OpenMS</a>). These algorithms first generate components for each sample analysis individually. The resulting ‘feature components’ are then merged by a consensus approach to generate the final components and eliminate unlikely feature groups in a component. The <code>Network</code> algorithm is a new internal algorithm that combines approaches from e.g. <a href="http://msbi.ipb-halle.de/msbi/CAMERA/">CAMERA</a>, <a href="https://github.com/osenan/cliqueMS">cliqueMS</a>, and <a href="https://cran.r-project.org/web/packages/nontarget/index.html">nontarget</a> to implement a fast, flexible and feature level componentization algorithm. For more details see the reference manual, (<code>?generateComponents</code>).</p>
+<p>Each algorithm supports many different parameters that may significantly influence the (quality of the) output. For instance, care has to be taken to avoid ‘over-clustering’ of feature groups which do not belong in the same component. This is often easily visible since the chromatographic peaks poorly overlap or are shaped differently. The <code>checkComponents</code> function (discussed <a href="intReview.html#intReview">here</a>) can be used to quickly verify componentization results. For a complete listing all arguments see the reference manual (e.g. <code>?generateComponents</code>). Furthermore, the <code>plotGraph()</code> function (discussed <a href="visualization.html#vis_feat_ann">here</a>) can be used to visualize the networking results for the <code>Network</code> algorithm.</p>
 <p>Once the components with adduct and isotopes annotations are generated this data can be <a href="incorpAdductIso.html#incorpAdductIso">used to prioritize and improve the workflow</a>.</p>
 <p>Some example usage is shown below.</p>
 <div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="componentization.html#cb41-1" tabindex="-1"></a><span class="co"># Use CAMERA with defaults</span></span>
@@ -536,14 +541,18 @@ div.csl-indent {
 <span id="cb41-15"><a href="componentization.html#cb41-15" tabindex="-1"></a>                                   <span class="at">absMzDev =</span> <span class="fl">0.002</span>)</span>
 <span id="cb41-16"><a href="componentization.html#cb41-16" tabindex="-1"></a></span>
 <span id="cb41-17"><a href="componentization.html#cb41-17" tabindex="-1"></a><span class="co"># cliqueMS with default parameters</span></span>
-<span id="cb41-18"><a href="componentization.html#cb41-18" tabindex="-1"></a>componCliqueMS <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;cliquems&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;negative&quot;</span>)</span></code></pre></div>
+<span id="cb41-18"><a href="componentization.html#cb41-18" tabindex="-1"></a>componCliqueMS <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;cliquems&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;negative&quot;</span>)</span>
+<span id="cb41-19"><a href="componentization.html#cb41-19" tabindex="-1"></a></span>
+<span id="cb41-20"><a href="componentization.html#cb41-20" tabindex="-1"></a><span class="co"># Network with customized parameters</span></span>
+<span id="cb41-21"><a href="componentization.html#cb41-21" tabindex="-1"></a>componNet <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;net&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;positive&quot;</span>, <span class="at">componMinSim =</span> <span class="fl">0.97</span>, <span class="at">annotAlgo =</span> <span class="st">&quot;nontarget&quot;</span>,</span>
+<span id="cb41-22"><a href="componentization.html#cb41-22" tabindex="-1"></a>                                <span class="at">componMethod =</span> <span class="st">&quot;hcs&quot;</span>, <span class="at">annotAdducts =</span> <span class="fu">c</span>(<span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M+Na]+&quot;</span>, <span class="st">&quot;[M+NH4]+&quot;</span>))</span></code></pre></div>
 </div>
 <div id="homologues-series" class="section level3 hasAnchor" number="4.6.2">
 <h3><span class="header-section-number">4.6.2</span> Homologues series<a href="componentization.html#homologues-series" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Homologues series can be automatically detected by interfacing with the <a href="https://cran.r-project.org/web/packages/nontarget/index.html">nontarget</a> R package. Components are made from feature groups that show increasing <em>m/z</em> and retention time values. Series are first detected within each replicate. Afterwards, series from all replicates are linked in case (partial) overlap occurs and this overlap consists of the <em>same</em> feature groups (see figure below). Linked series are then finally merged if this will not cause any conflicts with other series: such a conflict typically occurs when two series are not only linked to each other.</p>
 <div class="figure"><span style="display:block;" id="fig:HS"></span>
-<div id="htmlwidget-ecc4095927cab4303512" style="width:600px;height:250px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-ecc4095927cab4303512">{"x":{"diagram":"\ndigraph Homologs {\n  graph [ rankdir = LR, compound = true, style = invis ]\n  node [ shape = oval,\n         fixedsize = true,\n         width = 2.3,\n         height = 0.8,\n         fontsize = 25,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n  subgraph cluster3 {\n    I [fillcolor=skyblue]; J [fillcolor=skyblue]; K [fillcolor=skyblue]\n    G -> H -> I -> J -> K [style=invis]\n  }\n\n  subgraph cluster4 {\n    _I [label=I, fillcolor=skyblue]; X [fillcolor=indianred1]; _K [label=K, fillcolor=skyblue]\n    _I -> X -> _K -> L [style=invis]\n  }\n\n  H -> _I [ltail=cluster3, lhead=cluster4, style=invis]\n  \n  I -> _I [constraint=false, style=dashed, arrowhead=none]\n  K -> _K [constraint=false, style=dashed, arrowhead=none]\n  \n  subgraph cluster1 {\n    C [fillcolor=skyblue]; D [fillcolor=skyblue]\n    A -> B -> C -> D [style=invis]\n  }\n\n  subgraph cluster2 {\n    _C [label=C, fillcolor=skyblue]; _D [label=D, fillcolor=skyblue]\n    _C -> _D -> E -> F [style=invis]\n  }\n  \n  B -> _C [ltail=cluster1, lhead=cluster2, style=invis]\n\n  C -> _C [constraint=false, style=dashed, arrowhead=none]\n  D -> _D [constraint=false, style=dashed, arrowhead=none]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-ae474fdda313f563302a" style="width:600px;height:250px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-ae474fdda313f563302a">{"x":{"diagram":"\ndigraph Homologs {\n  graph [ rankdir = LR, compound = true, style = invis ]\n  node [ shape = oval,\n         fixedsize = true,\n         width = 2.3,\n         height = 0.8,\n         fontsize = 25,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n  subgraph cluster3 {\n    I [fillcolor=skyblue]; J [fillcolor=skyblue]; K [fillcolor=skyblue]\n    G -> H -> I -> J -> K [style=invis]\n  }\n\n  subgraph cluster4 {\n    _I [label=I, fillcolor=skyblue]; X [fillcolor=indianred1]; _K [label=K, fillcolor=skyblue]\n    _I -> X -> _K -> L [style=invis]\n  }\n\n  H -> _I [ltail=cluster3, lhead=cluster4, style=invis]\n  \n  I -> _I [constraint=false, style=dashed, arrowhead=none]\n  K -> _K [constraint=false, style=dashed, arrowhead=none]\n  \n  subgraph cluster1 {\n    C [fillcolor=skyblue]; D [fillcolor=skyblue]\n    A -> B -> C -> D [style=invis]\n  }\n\n  subgraph cluster2 {\n    _C [label=C, fillcolor=skyblue]; _D [label=D, fillcolor=skyblue]\n    _C -> _D -> E -> F [style=invis]\n  }\n  \n  B -> _C [ltail=cluster1, lhead=cluster2, style=invis]\n\n  C -> _C [constraint=false, style=dashed, arrowhead=none]\n  D -> _D [constraint=false, style=dashed, arrowhead=none]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p class="caption">
 Figure 4.2: <strong>Linking of homologues series</strong> top: partial overlap and will be linked; bottom: no linkage due to different feature in overlapping series.
 </p>

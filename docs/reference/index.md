@@ -183,6 +183,11 @@
   [`unset(`*`<componentsNTSet>`*`)`](https://rickhelmus.github.io/patRoon/reference/componentsNT-class.md)
   : Components class for homologous series.
 
+- [`plotGraph(`*`<componentsNet>`*`)`](https://rickhelmus.github.io/patRoon/reference/componentsNet-class.md)
+  [`plotGraph(`*`<componentsNetSet>`*`)`](https://rickhelmus.github.io/patRoon/reference/componentsNet-class.md)
+  [`unset(`*`<componentsNetSet>`*`)`](https://rickhelmus.github.io/patRoon/reference/componentsNet-class.md)
+  : Components class for network-based componentization.
+
 - [`componentsSpecClust-class`](https://rickhelmus.github.io/patRoon/reference/componentsSpecClust-class.md)
   [`componentsSpecClust`](https://rickhelmus.github.io/patRoon/reference/componentsSpecClust-class.md)
   : Components based on MS/MS similarity.
@@ -491,6 +496,9 @@
 
 - [`generateComponentsIntClust()`](https://rickhelmus.github.io/patRoon/reference/generateComponentsIntClust.md)
   : Generate components based on intensity profiles
+
+- [`generateComponentsNet()`](https://rickhelmus.github.io/patRoon/reference/generateComponentsNet.md)
+  : Network-based componentization
 
 - [`generateComponentsNontarget()`](https://rickhelmus.github.io/patRoon/reference/generateComponentsNontarget.md)
   : Componentization of homologous series with nontarget

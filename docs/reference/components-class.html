@@ -44,7 +44,7 @@ isotopes and homologues."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Component class</h1>
-      <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/generics.R" class="external-link"><code>R/generics.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/components.R" class="external-link"><code>R/components.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/components-camera.R" class="external-link"><code>R/components-camera.R</code></a>, and 7 more</small>
+      <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/generics.R" class="external-link"><code>R/generics.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/components.R" class="external-link"><code>R/components.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/components-camera.R" class="external-link"><code>R/components-camera.R</code></a>, and 9 more</small>
       <div class="d-none name"><code>components-class.Rd</code></div>
     </div>
 
@@ -153,6 +153,12 @@ isotopes and homologues.</p>
 <span></span>
 <span><span class="co"># S4 method for class 'componentsSet'</span></span>
 <span><span class="fu"><a href="generics.html">unset</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">set</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'componentsNet'</span></span>
+<span><span class="fu">expandForIMS</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'componentsNetSet'</span></span>
+<span><span class="fu">expandForIMS</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'componentsNT'</span></span>
 <span><span class="fu">expandForIMS</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -352,9 +358,12 @@ merge similar components.</p></li>
 <li><p><code><a href="componentsClust-class.html">componentsClust</a></code></p><ul><li><p><code><a href="componentsIntClust-class.html">componentsIntClust</a></code></p></li>
 <li><p><code><a href="componentsSpecClust-class.html">componentsSpecClust</a></code></p></li>
 </ul></li>
-<li><p><code>componentsSet</code></p><ul><li><p><code><a href="componentsNT-class.html">componentsNTSet</a></code></p></li>
+<li><p><code>componentsSet</code></p><ul><li><p><code><a href="componentsNet-class.html">componentsNetSet</a></code></p></li>
+<li><p><code><a href="componentsNT-class.html">componentsNTSet</a></code></p></li>
 </ul></li>
 <li><p><code>componentsUnset</code></p></li>
+<li><p><code><a href="componentsNet-class.html">componentsNet</a></code></p><ul><li><p><code><a href="componentsNet-class.html">componentsNetUnset</a></code></p></li>
+</ul></li>
 <li><p><code><a href="componentsNT-class.html">componentsNT</a></code></p><ul><li><p><code><a href="componentsNT-class.html">componentsNTUnset</a></code></p></li>
 </ul></li>
 <li><p><code>componentsRC</code></p></li>

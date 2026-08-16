@@ -58,6 +58,8 @@ directly with the `setObjects` method (described below).
 
   - [`componentsSet`](https://rickhelmus.github.io/patRoon/reference/components-class.md)
 
+    - [`componentsNetSet`](https://rickhelmus.github.io/patRoon/reference/componentsNet-class.md)
+
     - [`componentsNTSet`](https://rickhelmus.github.io/patRoon/reference/componentsNT-class.md)
 
   - [`compoundsSet`](https://rickhelmus.github.io/patRoon/reference/compounds-class.md)

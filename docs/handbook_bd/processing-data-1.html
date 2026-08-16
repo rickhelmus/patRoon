@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-08-13" />
+<meta name="date" content="2026-08-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -414,10 +414,10 @@ div.csl-indent {
 <div id="updating-feature-group-properties" class="section level3 hasAnchor" number="8.3.1">
 <h3><span class="header-section-number">8.3.1</span> Updating feature group properties<a href="processing-data-1.html#updating-feature-group-properties" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The <code>updateGroups()</code> function to update feature group properties (retention time and <em>m/z</em>) was <a href="updFG.html#updFG">briefly introduced before</a>. This function can also be used to update the assigned mobilities and CCS values to e.g. improve their accuracy after eliminating unwanted features:</p>
-<div class="sourceCode" id="cb278"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb278-1"><a href="processing-data-1.html#cb278-1" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, ...) <span class="co"># perform filtering steps</span></span>
-<span id="cb278-2"><a href="processing-data-1.html#cb278-2" tabindex="-1"></a></span>
-<span id="cb278-3"><a href="processing-data-1.html#cb278-3" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">updateGroups</span>(fGroups) <span class="co"># update all by default: retention time, m/z, mobility and CCS (if present)</span></span>
-<span id="cb278-4"><a href="processing-data-1.html#cb278-4" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">updateGroups</span>(fGroups, <span class="at">what =</span> <span class="fu">c</span>(<span class="st">&quot;mobility&quot;</span>, <span class="st">&quot;CCS&quot;</span>)) <span class="co"># only update mobility and CCS</span></span></code></pre></div>
+<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb279-1"><a href="processing-data-1.html#cb279-1" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, ...) <span class="co"># perform filtering steps</span></span>
+<span id="cb279-2"><a href="processing-data-1.html#cb279-2" tabindex="-1"></a></span>
+<span id="cb279-3"><a href="processing-data-1.html#cb279-3" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">updateGroups</span>(fGroups) <span class="co"># update all by default: retention time, m/z, mobility and CCS (if present)</span></span>
+<span id="cb279-4"><a href="processing-data-1.html#cb279-4" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">updateGroups</span>(fGroups, <span class="at">what =</span> <span class="fu">c</span>(<span class="st">&quot;mobility&quot;</span>, <span class="st">&quot;CCS&quot;</span>)) <span class="co"># only update mobility and CCS</span></span></code></pre></div>
 </div>
 <div id="inspecting-and-plotting-data" class="section level3 hasAnchor" number="8.3.2">
 <h3><span class="header-section-number">8.3.2</span> Inspecting and plotting data<a href="processing-data-1.html#inspecting-and-plotting-data" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -433,21 +433,21 @@ div.csl-indent {
 <p>The <code>spectrumSimilarityIMS()</code> method function calculates the spectrum similarity between MS (or MS/MS) data of a IMS feature and its IMS precursor. This function is internally used by feature annotation if the <code>minIMSSpecSim</code> argument is set, and uses the <code>spectrumSimilarity()</code> function <a href="specSim.html#specSim">introduced earlier</a>.</p>
 <p>The <a href="report.html#report">reporting functionality</a> of <code>patRoon</code> contains various functionality that facilitates processing of IMS data.</p>
 <p>Some examples are shown below:</p>
-<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb279-1"><a href="processing-data-1.html#cb279-1" tabindex="-1"></a><span class="co"># plot mobilogram for first IMS precursor</span></span>
-<span id="cb279-2"><a href="processing-data-1.html#cb279-2" tabindex="-1"></a><span class="fu">plotMobilograms</span>(fGroups[<span class="dv">1</span>, <span class="st">&quot;M146_R301_22&quot;</span>])</span></code></pre></div>
+<div class="sourceCode" id="cb280"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb280-1"><a href="processing-data-1.html#cb280-1" tabindex="-1"></a><span class="co"># plot mobilogram for first IMS precursor</span></span>
+<span id="cb280-2"><a href="processing-data-1.html#cb280-2" tabindex="-1"></a><span class="fu">plotMobilograms</span>(fGroups[<span class="dv">1</span>, <span class="st">&quot;M146_R301_22&quot;</span>])</span></code></pre></div>
 <pre><code>#&gt; Using &#39;mstoolkit&#39; backend for reading MS data.
 #&gt; ================================================================================</code></pre>
 <p><img src="handbook_files/figure-html/exInspPlotIMS-1.png" alt="" width="50%" /></p>
-<div class="sourceCode" id="cb281"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb281-1"><a href="processing-data-1.html#cb281-1" tabindex="-1"></a><span class="co"># plot mobilogram for an IMS feature: this highlights the mobility (range) assigned to the feature</span></span>
-<span id="cb281-2"><a href="processing-data-1.html#cb281-2" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: the mobility is appended to the feature group name</span></span>
-<span id="cb281-3"><a href="processing-data-1.html#cb281-3" tabindex="-1"></a><span class="fu">plotMobilograms</span>(fGroups[<span class="dv">1</span>, <span class="st">&quot;M146_R301_22_I0.57&quot;</span>], <span class="at">showPeakArea =</span> <span class="cn">TRUE</span>, <span class="at">showFGroupRect =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb282"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb282-1"><a href="processing-data-1.html#cb282-1" tabindex="-1"></a><span class="co"># plot mobilogram for an IMS feature: this highlights the mobility (range) assigned to the feature</span></span>
+<span id="cb282-2"><a href="processing-data-1.html#cb282-2" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: the mobility is appended to the feature group name</span></span>
+<span id="cb282-3"><a href="processing-data-1.html#cb282-3" tabindex="-1"></a><span class="fu">plotMobilograms</span>(fGroups[<span class="dv">1</span>, <span class="st">&quot;M146_R301_22_I0.57&quot;</span>], <span class="at">showPeakArea =</span> <span class="cn">TRUE</span>, <span class="at">showFGroupRect =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>#&gt; Using &#39;mstoolkit&#39; backend for reading MS data.
 #&gt; ================================================================================</code></pre>
 <p><img src="handbook_files/figure-html/exInspPlotIMS-2.png" alt="" width="50%" /></p>
-<div class="sourceCode" id="cb283"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb283-1"><a href="processing-data-1.html#cb283-1" tabindex="-1"></a><span class="fu">plot</span>(fGroups, <span class="at">IMS =</span> <span class="cn">TRUE</span>) <span class="co"># make a scatter plot with only IMS features</span></span></code></pre></div>
+<div class="sourceCode" id="cb284"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb284-1"><a href="processing-data-1.html#cb284-1" tabindex="-1"></a><span class="fu">plot</span>(fGroups, <span class="at">IMS =</span> <span class="cn">TRUE</span>) <span class="co"># make a scatter plot with only IMS features</span></span></code></pre></div>
 <p><img src="handbook_files/figure-html/exInspPlotIMS-3.png" alt="" width="50%" /></p>
-<div class="sourceCode" id="cb284"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb284-1"><a href="processing-data-1.html#cb284-1" tabindex="-1"></a><span class="co"># returns a table with spectral similarities between IMS features and their IMS precursors</span></span>
-<span id="cb284-2"><a href="processing-data-1.html#cb284-2" tabindex="-1"></a><span class="fu">spectrumSimilarityIMS</span>(mslists, fGroups)</span></code></pre></div>
+<div class="sourceCode" id="cb285"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb285-1"><a href="processing-data-1.html#cb285-1" tabindex="-1"></a><span class="co"># returns a table with spectral similarities between IMS features and their IMS precursors</span></span>
+<span id="cb285-2"><a href="processing-data-1.html#cb285-2" tabindex="-1"></a><span class="fu">spectrumSimilarityIMS</span>(mslists, fGroups)</span></code></pre></div>
 <pre><code>#&gt;                   group ims_precursor_group similarity
 #&gt;                  &lt;char&gt;              &lt;char&gt;      &lt;num&gt;
 #&gt;  1:  M146_R301_22_I0.57        M146_R301_22  0.4591192
@@ -507,28 +507,28 @@ div.csl-indent {
 </tbody>
 </table>
 <p>Some examples are shown below:</p>
-<div class="sourceCode" id="cb286"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb286-1"><a href="processing-data-1.html#cb286-1" tabindex="-1"></a><span class="co"># keep only IMS features</span></span>
-<span id="cb286-2"><a href="processing-data-1.html#cb286-2" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: this effectively results in data that is equal to a direct IMS workflow</span></span>
-<span id="cb286-3"><a href="processing-data-1.html#cb286-3" tabindex="-1"></a>fGroupsMob <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">IMS =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb286-4"><a href="processing-data-1.html#cb286-4" tabindex="-1"></a>fGroupsMob <span class="ot">&lt;-</span> fGroups[IMS <span class="ot">=</span> <span class="cn">TRUE</span>] <span class="co"># same as above</span></span>
-<span id="cb286-5"><a href="processing-data-1.html#cb286-5" tabindex="-1"></a></span>
-<span id="cb286-6"><a href="processing-data-1.html#cb286-6" tabindex="-1"></a><span class="co"># only keep IMS precursors (post mobility assignment workflows only)</span></span>
-<span id="cb286-7"><a href="processing-data-1.html#cb286-7" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: this effectively results in data that is equal to before `assignMobilities()` was called</span></span>
-<span id="cb286-8"><a href="processing-data-1.html#cb286-8" tabindex="-1"></a>fGroupsIMSPar <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">IMS =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb286-9"><a href="processing-data-1.html#cb286-9" tabindex="-1"></a></span>
-<span id="cb286-10"><a href="processing-data-1.html#cb286-10" tabindex="-1"></a><span class="co"># perform various filtering steps and ensure that only IMS features with an IMS precursor are kept</span></span>
-<span id="cb286-11"><a href="processing-data-1.html#cb286-11" tabindex="-1"></a>fGroupsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">absMinIntensity =</span> <span class="fl">1E5</span>, <span class="at">relMinReplicateAbundance =</span> <span class="dv">1</span>,</span>
-<span id="cb286-12"><a href="processing-data-1.html#cb286-12" tabindex="-1"></a>                   <span class="at">withIMSPrecursor =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb286-13"><a href="processing-data-1.html#cb286-13" tabindex="-1"></a></span>
-<span id="cb286-14"><a href="processing-data-1.html#cb286-14" tabindex="-1"></a><span class="co"># perform various filtering steps, but not on IMS features</span></span>
-<span id="cb286-15"><a href="processing-data-1.html#cb286-15" tabindex="-1"></a>fGroupsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">absMinIntensity =</span> <span class="fl">1E5</span>, <span class="at">relMinReplicateAbundance =</span> <span class="dv">1</span>,</span>
-<span id="cb286-16"><a href="processing-data-1.html#cb286-16" tabindex="-1"></a>                   <span class="at">applyIMS =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb286-17"><a href="processing-data-1.html#cb286-17" tabindex="-1"></a></span>
-<span id="cb286-18"><a href="processing-data-1.html#cb286-18" tabindex="-1"></a><span class="co"># only keep compound candidates within a defined CCS range</span></span>
-<span id="cb286-19"><a href="processing-data-1.html#cb286-19" tabindex="-1"></a>compoundsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(compounds, <span class="at">IMSRangeParams =</span> <span class="fu">getIMSRangeParams</span>(<span class="st">&quot;CCS&quot;</span>, <span class="dv">150</span>, <span class="dv">200</span>))</span>
-<span id="cb286-20"><a href="processing-data-1.html#cb286-20" tabindex="-1"></a></span>
-<span id="cb286-21"><a href="processing-data-1.html#cb286-21" tabindex="-1"></a><span class="co"># only keep compound candidates with matching CCS (6% tolerance)</span></span>
-<span id="cb286-22"><a href="processing-data-1.html#cb286-22" tabindex="-1"></a>compoundsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(compounds, <span class="at">IMSMatchParams =</span> <span class="fu">getIMSMatchParams</span>(<span class="st">&quot;CCS&quot;</span>, <span class="at">window =</span> <span class="fl">0.06</span>, <span class="at">relative =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb287"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb287-1"><a href="processing-data-1.html#cb287-1" tabindex="-1"></a><span class="co"># keep only IMS features</span></span>
+<span id="cb287-2"><a href="processing-data-1.html#cb287-2" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: this effectively results in data that is equal to a direct IMS workflow</span></span>
+<span id="cb287-3"><a href="processing-data-1.html#cb287-3" tabindex="-1"></a>fGroupsMob <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">IMS =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb287-4"><a href="processing-data-1.html#cb287-4" tabindex="-1"></a>fGroupsMob <span class="ot">&lt;-</span> fGroups[IMS <span class="ot">=</span> <span class="cn">TRUE</span>] <span class="co"># same as above</span></span>
+<span id="cb287-5"><a href="processing-data-1.html#cb287-5" tabindex="-1"></a></span>
+<span id="cb287-6"><a href="processing-data-1.html#cb287-6" tabindex="-1"></a><span class="co"># only keep IMS precursors (post mobility assignment workflows only)</span></span>
+<span id="cb287-7"><a href="processing-data-1.html#cb287-7" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: this effectively results in data that is equal to before `assignMobilities()` was called</span></span>
+<span id="cb287-8"><a href="processing-data-1.html#cb287-8" tabindex="-1"></a>fGroupsIMSPar <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">IMS =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb287-9"><a href="processing-data-1.html#cb287-9" tabindex="-1"></a></span>
+<span id="cb287-10"><a href="processing-data-1.html#cb287-10" tabindex="-1"></a><span class="co"># perform various filtering steps and ensure that only IMS features with an IMS precursor are kept</span></span>
+<span id="cb287-11"><a href="processing-data-1.html#cb287-11" tabindex="-1"></a>fGroupsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">absMinIntensity =</span> <span class="fl">1E5</span>, <span class="at">relMinReplicateAbundance =</span> <span class="dv">1</span>,</span>
+<span id="cb287-12"><a href="processing-data-1.html#cb287-12" tabindex="-1"></a>                   <span class="at">withIMSPrecursor =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb287-13"><a href="processing-data-1.html#cb287-13" tabindex="-1"></a></span>
+<span id="cb287-14"><a href="processing-data-1.html#cb287-14" tabindex="-1"></a><span class="co"># perform various filtering steps, but not on IMS features</span></span>
+<span id="cb287-15"><a href="processing-data-1.html#cb287-15" tabindex="-1"></a>fGroupsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">absMinIntensity =</span> <span class="fl">1E5</span>, <span class="at">relMinReplicateAbundance =</span> <span class="dv">1</span>,</span>
+<span id="cb287-16"><a href="processing-data-1.html#cb287-16" tabindex="-1"></a>                   <span class="at">applyIMS =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb287-17"><a href="processing-data-1.html#cb287-17" tabindex="-1"></a></span>
+<span id="cb287-18"><a href="processing-data-1.html#cb287-18" tabindex="-1"></a><span class="co"># only keep compound candidates within a defined CCS range</span></span>
+<span id="cb287-19"><a href="processing-data-1.html#cb287-19" tabindex="-1"></a>compoundsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(compounds, <span class="at">IMSRangeParams =</span> <span class="fu">getIMSRangeParams</span>(<span class="st">&quot;CCS&quot;</span>, <span class="dv">150</span>, <span class="dv">200</span>))</span>
+<span id="cb287-20"><a href="processing-data-1.html#cb287-20" tabindex="-1"></a></span>
+<span id="cb287-21"><a href="processing-data-1.html#cb287-21" tabindex="-1"></a><span class="co"># only keep compound candidates with matching CCS (6% tolerance)</span></span>
+<span id="cb287-22"><a href="processing-data-1.html#cb287-22" tabindex="-1"></a>compoundsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(compounds, <span class="at">IMSMatchParams =</span> <span class="fu">getIMSMatchParams</span>(<span class="st">&quot;CCS&quot;</span>, <span class="at">window =</span> <span class="fl">0.06</span>, <span class="at">relative =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
 </div>
 </div>
             </section>

@@ -35,6 +35,7 @@ ion chromatograms (EICs) and extracted ion mobilograms (EIMs):
   `defaultLim("retention", "wide")` (EICs) or
   `defaultLim("mobility", "wide")` (EIMs) (see
   [limits](https://rickhelmus.github.io/patRoon/reference/limits.md)).
+  Set to `Inf` to use the full retention time or mobility range.
 
 - `topMost` Only create EICs/EIMs for this number of top most intense
   features. If `NULL` then EICs/EIMs are created for all features.

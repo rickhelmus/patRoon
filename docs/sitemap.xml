@@ -31,6 +31,7 @@
 <url><loc>https://rickhelmus.github.io/patRoon/reference/componentsClust-class.html</loc></url>
 <url><loc>https://rickhelmus.github.io/patRoon/reference/componentsIntClust-class.html</loc></url>
 <url><loc>https://rickhelmus.github.io/patRoon/reference/componentsNT-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/componentsNet-class.html</loc></url>
 <url><loc>https://rickhelmus.github.io/patRoon/reference/componentsSpecClust-class.html</loc></url>
 <url><loc>https://rickhelmus.github.io/patRoon/reference/componentsTPs-class.html</loc></url>
 <url><loc>https://rickhelmus.github.io/patRoon/reference/compoundScorings.html</loc></url>
@@ -71,6 +72,7 @@
 <url><loc>https://rickhelmus.github.io/patRoon/reference/generateComponentsCAMERA.html</loc></url>
 <url><loc>https://rickhelmus.github.io/patRoon/reference/generateComponentsCliqueMS.html</loc></url>
 <url><loc>https://rickhelmus.github.io/patRoon/reference/generateComponentsIntClust.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateComponentsNet.html</loc></url>
 <url><loc>https://rickhelmus.github.io/patRoon/reference/generateComponentsNontarget.html</loc></url>
 <url><loc>https://rickhelmus.github.io/patRoon/reference/generateComponentsOpenMS.html</loc></url>
 <url><loc>https://rickhelmus.github.io/patRoon/reference/generateComponentsRAMClustR.html</loc></url>

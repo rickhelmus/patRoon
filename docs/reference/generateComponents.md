@@ -23,7 +23,7 @@ generateComponents(fGroups, algorithm, ...)
 
   A character string describing the algorithm that should be used:
   `"ramclustr"`, `"camera"`, `"nontarget"`, `"intclust"`, `"openms"`,
-  `"cliquems"`, `"specclust"`, `"tp"`
+  `"cliquems"`, `"specclust"`, `"tp"`, `"net"`
 
 - ...:
 
@@ -71,4 +71,5 @@ output class and its methods and the algorithm specific functions:
 [`generateComponentsOpenMS`](https://rickhelmus.github.io/patRoon/reference/generateComponentsOpenMS.md),
 [`generateComponentsCliqueMS`](https://rickhelmus.github.io/patRoon/reference/generateComponentsCliqueMS.md),
 [`generateComponentsSpecClust`](https://rickhelmus.github.io/patRoon/reference/generateComponentsSpecClust.md),
-[`generateComponentsTPs`](https://rickhelmus.github.io/patRoon/reference/generateComponentsTPs.md)
+[`generateComponentsTPs`](https://rickhelmus.github.io/patRoon/reference/generateComponentsTPs.md),
+[`generateComponentsNet`](https://rickhelmus.github.io/patRoon/reference/generateComponentsNet.md)

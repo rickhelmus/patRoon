@@ -173,9 +173,15 @@ show(object)
 
     - [`componentsSet`](https://rickhelmus.github.io/patRoon/reference/components-class.md)
 
+      - [`componentsNetSet`](https://rickhelmus.github.io/patRoon/reference/componentsNet-class.md)
+
       - [`componentsNTSet`](https://rickhelmus.github.io/patRoon/reference/componentsNT-class.md)
 
     - [`componentsUnset`](https://rickhelmus.github.io/patRoon/reference/components-class.md)
+
+    - [`componentsNet`](https://rickhelmus.github.io/patRoon/reference/componentsNet-class.md)
+
+      - [`componentsNetUnset`](https://rickhelmus.github.io/patRoon/reference/componentsNet-class.md)
 
     - [`componentsNT`](https://rickhelmus.github.io/patRoon/reference/componentsNT-class.md)
 

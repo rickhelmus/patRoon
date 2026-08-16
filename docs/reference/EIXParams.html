@@ -77,7 +77,7 @@ mobilograms (EIMs):</p>
 <ul><li><p><code>window</code> A value that is subtracted or added to the minimum and maximum retention time (EICs) or mobility
 (EIMs) of the feature. Thus, setting this value to <samp>&gt;0</samp> will 'zoom out' on the x-axis of a chromatogram or
 mobilogram. Defaults to <code>defaultLim("retention", "wide")</code> (EICs) or <code>defaultLim("mobility", "wide")</code> (EIMs)
-(see <a href="limits.html">limits</a>).</p></li>
+(see <a href="limits.html">limits</a>). Set to <code>Inf</code> to use the full retention time or mobility range.</p></li>
 <li><p><code>topMost</code> Only create EICs/EIMs for this number of top most intense features. If <code>NULL</code> then
 EICs/EIMs are created for all features.</p></li>
 <li><p><code>topMostByReplicate</code> If set to <code>TRUE</code> and <code>topMost</code> is set: only create EICs/EIMs for the top

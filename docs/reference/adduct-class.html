@@ -61,7 +61,7 @@ algorithm independent way.</p>
 <span><span class="fu"><a href="generics.html">show</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'adduct'</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">x</span>, format <span class="op">=</span> <span class="st">"generic"</span>, err <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">x</span>, format <span class="op">=</span> <span class="st">"generic"</span>, adductInfo <span class="op">=</span> <span class="cn">NULL</span>, err <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -84,7 +84,13 @@ algorithm independent way.</p>
   which can be obtained with the <code>GenFormAdducts</code> and
   <code>MetFragAdducts</code> functions, respectively.</p>
 <p><code>"openms"</code> is the format used by the <code class="command">MetaboliteAdductDecharger</code> tool.</p>
-<p><code>"cliquems"</code> is the format used by <span class="pkg">cliqueMS</span>.</p></dd>
+<p><code>"cliquems"</code> is the format used by <span class="pkg">cliqueMS</span>.</p>
+<p><code>"nontarget"</code> is the format used by <span class="pkg">nontarget</span>/<span class="pkg">enviPat</span> and requires <code>adductInfo</code> to be set.</p></dd>
+
+
+<dt id="arg-adductinfo">adductInfo<a class="anchor" aria-label="anchor" href="#arg-adductinfo"></a></dt>
+<dd><p>A <code>data.frame</code> with adduct info from <em>e.g.</em> <a href="https://rdrr.io/pkg/enviPat/man/adducts.html" class="external-link">enviPat::adducts</a>.
+Only needs to be set when <code>format="nontarget"</code>.</p></dd>
 
 
 <dt id="arg-err">err<a class="anchor" aria-label="anchor" href="#arg-err"></a></dt>

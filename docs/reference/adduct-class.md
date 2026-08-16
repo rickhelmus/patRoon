@@ -12,7 +12,7 @@ adduct(...)
 show(object)
 
 # S4 method for class 'adduct'
-as.character(x, format = "generic", err = TRUE)
+as.character(x, format = "generic", adductInfo = NULL, err = TRUE)
 ```
 
 ## Arguments
@@ -39,6 +39,15 @@ as.character(x, format = "generic", err = TRUE)
   `"openms"` is the format used by the `MetaboliteAdductDecharger` tool.
 
   `"cliquems"` is the format used by cliqueMS.
+
+  `"nontarget"` is the format used by nontarget/enviPat and requires
+  `adductInfo` to be set.
+
+- adductInfo:
+
+  A `data.frame` with adduct info from *e.g.*
+  [enviPat::adducts](https://rdrr.io/pkg/enviPat/man/adducts.html). Only
+  needs to be set when `format="nontarget"`.
 
 - err:
 

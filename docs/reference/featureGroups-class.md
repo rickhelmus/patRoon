@@ -556,8 +556,10 @@ delete(obj, ...)
 - onlyMonoIso:
 
   Set to `TRUE` to only keep feature groups that were annotated as
-  monoisotopic. Feature groups are never removed by this setting if no
-  isotope annotations are available.
+  monoisotopic. If multiple annotations are available, any monoisotopic
+  annotation is sufficient for the feature group to be kept. Feature
+  groups are never removed by this setting if no isotope annotations are
+  available.
 
 - chargeMismatch:
 

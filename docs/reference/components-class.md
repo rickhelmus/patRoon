@@ -105,6 +105,12 @@ expandForIMS(obj, fGroups)
 # S4 method for class 'componentsSet'
 unset(obj, set)
 
+# S4 method for class 'componentsNet'
+expandForIMS(obj, ...)
+
+# S4 method for class 'componentsNetSet'
+expandForIMS(obj, ...)
+
 # S4 method for class 'componentsNT'
 expandForIMS(obj, ...)
 
@@ -376,9 +382,15 @@ are ignored unless the components are from homologous series.
 
     - `componentsSet`
 
+      - [`componentsNetSet`](https://rickhelmus.github.io/patRoon/reference/componentsNet-class.md)
+
       - [`componentsNTSet`](https://rickhelmus.github.io/patRoon/reference/componentsNT-class.md)
 
     - `componentsUnset`
+
+    - [`componentsNet`](https://rickhelmus.github.io/patRoon/reference/componentsNet-class.md)
+
+      - [`componentsNetUnset`](https://rickhelmus.github.io/patRoon/reference/componentsNet-class.md)
 
     - [`componentsNT`](https://rickhelmus.github.io/patRoon/reference/componentsNT-class.md)
 

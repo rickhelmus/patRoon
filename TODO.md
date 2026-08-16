@@ -1,8 +1,3 @@
-# Compon
-
-- add deps to patRoonDeps
-
-
 # Priority
 
 ## general

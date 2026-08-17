@@ -183,6 +183,7 @@ std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata
                                                        SpectrumRawTypes::Mass precursor,
                                                        NumRange<SpectrumRawTypes::Mass> fixedIsoWidth = { },
                                                        SpectrumRawTypes::Intensity minBPIntensity = 0);
+NumRange<SpectrumRawTypes::Mass> makeIsolationWidthRange(const std::vector<SpectrumRawTypes::Mass> &fixedIsoWidth);
 SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilter &filter,
                               SpectrumRawTypes::Mass precursor);
 SpectrumRaw filterIMSFrame(const SpectrumRaw &spectrum, const SpectrumRawFilter &filter,

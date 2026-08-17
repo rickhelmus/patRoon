@@ -436,12 +436,7 @@ Rcpp::DataFrame getScans(const MSReadBackend &backend, SpectrumRawTypes::Time ti
                          int MSLevel, SpectrumRawTypes::Mass prec,
                          const std::vector<SpectrumRawTypes::Mass> &fixedIsoWidth)
 {
-    NumRange<SpectrumRawTypes::Mass> fixedIsoWidthRange;
-    if (fixedIsoWidth.size() == 1)
-        fixedIsoWidthRange.set(fixedIsoWidth[0], fixedIsoWidth[0]);
-    else if (fixedIsoWidth.size() == 2)
-        fixedIsoWidthRange.set(fixedIsoWidth[0], fixedIsoWidth[1]);
-    
+    const auto fixedIsoWidthRange = makeIsolationWidthRange(fixedIsoWidth);
     const auto sels = getSpecRawSelections(backend.getSpecMetadata(), makeNumRange(timeStart, timeEnd),
                                            (MSLevel == 1) ? SpectrumRawTypes::MSLevel::MS1 : SpectrumRawTypes::MSLevel::MS2,
                                            prec, fixedIsoWidthRange);
@@ -661,12 +656,7 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
     const auto specFilter = SpectrumRawFilter(baseSpecFilter).setMinIntensity(minIntensityPre);
     //const auto specFilterIMS = SpectrumRawFilter(baseSpecFilter);
     
-    // convert fixedIsolationWidth to a range: single value -> symmetric range, two values -> min/max range
-    NumRange<SpectrumRawTypes::Mass> fixedIsoWidthRange;
-    if (fixedIsolationWidth.size() == 1)
-        fixedIsoWidthRange.set(fixedIsolationWidth[0], fixedIsolationWidth[0]);
-    else if (fixedIsolationWidth.size() == 2)
-        fixedIsoWidthRange.set(fixedIsolationWidth[0], fixedIsolationWidth[1]);
+    const auto fixedIsoWidthRange = makeIsolationWidthRange(fixedIsolationWidth);
     
     // NOTE: for IMS data, averageSpectraRaw() is called which returns a SpectrumRawAveraged. Since we don't care about
     // the additional metadata from this class, we purposely slice it by explicitly specifying the lambda's return type.

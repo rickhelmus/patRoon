@@ -448,13 +448,13 @@ findFeaturesPiek <- function(analysisInfo, genEICParams = getPiekEICParams(),
     {
         ret <- getEICList(backend, EICInfo$mzmin, EICInfo$mzmax, genEICParams$retRange[1], genEICParams$retRange[2],
                           EICInfo$mobmin, EICInfo$mobmax, gapFactor = genEICParams$gapFactor,
-                          minIntensityIMS = minIntensityIMS, MSLevel = 1, precursorMZs = numeric(0), mode = mode,
-                          sumWindowMZ = genEICParams$sumWindowMZ, sumWindowMob = genEICParams$sumWindowMob,
-                          smoothWindowMZ = genEICParams$smoothWindowMZ, smoothExtMZ = genEICParams$smoothExtMZ,
-                          smoothWindowMob = genEICParams$smoothWindowMob, smoothExtMob = genEICParams$smoothExtMob,
-                          saveMZProfiles = genEICParams$saveMZProfiles, saveEIMs = genEICParams$saveEIMs, pad = FALSE,
-                          minEICIntensity = genEICParams$minEICIntensity, minEICAdjTime = genEICParams$minEICAdjTime,
-                          minEICAdjPoints = genEICParams$minEICAdjPoints,
+                          minIntensityIMS = minIntensityIMS, MSLevel = 1, precursorMZs = numeric(0),
+                          fixedIsolationWidth = 0, mode = mode, sumWindowMZ = genEICParams$sumWindowMZ,
+                          sumWindowMob = genEICParams$sumWindowMob, smoothWindowMZ = genEICParams$smoothWindowMZ,
+                          smoothExtMZ = genEICParams$smoothExtMZ, smoothWindowMob = genEICParams$smoothWindowMob,
+                          smoothExtMob = genEICParams$smoothExtMob, saveMZProfiles = genEICParams$saveMZProfiles,
+                          saveEIMs = genEICParams$saveEIMs, pad = FALSE, minEICIntensity = genEICParams$minEICIntensity,
+                          minEICAdjTime = genEICParams$minEICAdjTime, minEICAdjPoints = genEICParams$minEICAdjPoints,
                           minEICAdjIntensity = genEICParams$minEICAdjIntensity, topMost = topMost)
         names(ret) <- EICInfo$EIC_ID
         if (mode != "test")

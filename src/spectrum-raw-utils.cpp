@@ -98,6 +98,17 @@ std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata
     return ret;
 }
 
+NumRange<SpectrumRawTypes::Mass> makeIsolationWidthRange(const std::vector<SpectrumRawTypes::Mass> &fixedIsoWidth)
+{
+    // convert isolation width vector to a range: single value -> symmetric range, two values -> min/max range
+    NumRange<SpectrumRawTypes::Mass> ret;
+    if (fixedIsoWidth.size() == 1)
+        ret.set(fixedIsoWidth[0], fixedIsoWidth[0]);
+    else if (fixedIsoWidth.size() == 2)
+        ret.set(fixedIsoWidth[0], fixedIsoWidth[1]);
+    return ret;
+}
+
 SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilter &filter,
                               SpectrumRawTypes::Mass precursor)
 {

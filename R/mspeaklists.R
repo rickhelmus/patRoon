@@ -910,32 +910,13 @@ setMethod("spectrumSimilarityIMS", "MSPeakLists", function(obj, fGroups, doFGrou
 #' averaged peak lists.
 #'
 #' @param fGroups The \code{\link{featureGroups}} object for which MS peak lists should be generated.
-#' @param fixedIsolationWidth Configures how MS/MS spectra are selected for a feature: \itemize{
-#'
-#'   \item \code{NA}: select all spectra unconditionally, \emph{i.e.} ignoring any precursor information of spectra.
-#'
-#'   \item \code{FALSE}: select the spectra that were recorded for the feature m/z, using the instrumental precursor
-#'   isolation window (\emph{e.g.} quadrupole m/z width) as the selection tolerance.
-#'
-#'   \item A numeric value: select the spectra that were recorded for the feature m/z within this tolerance window (+/-
-#'   precursor m/z).
-#'
-#'   \item A two-sized \code{numeric} vector: select the spectra that were recorded for the feature m/z within the
-#'   specified minimum and maximum tolerance window (relative to the precursor m/z).
-#'
-#'   }
-#'
-#'   If no isolation was applied to record MS/MS data (\emph{e.g.} data-independent MS/MS), then all MS/MS spectra will
-#'   be always be selected.
-#'   
-#'   \strong{NOTE}: Sometimes the isolation windows are not exported and cannot be deduced automatically (e.g. Agilent
-#'   data). In that case, \code{fixedIsolationWidth} needs to be set to a numeric or \code{NA} value.
 #' @param topMost Only extract MS peak lists from a maximum of \code{topMost} features with highest intensity. If
 #'   \code{NULL} all features will be used.
 #' @param avgFeatParams Parameters used for averaging MS peak lists of individual features. Analogous to
 #'   \code{avgFGroupParams}.
 #'
 #' @template mspl_algo-args
+#' @template fixedIso-arg
 #'
 #' @section Deprecated algorithms: Prior to \pkg{patRoon} 3.0 the \code{generateMSPeakLists} function was a wrapper to
 #'   the now deprecated functions \code{\link{generateMSPeakListsMzR}}, \code{\link{generateMSPeakListsDA}} and
@@ -967,13 +948,7 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRTWindo
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertNumber(maxMSRTWindow, lower = 0.01, finite = TRUE, null.ok = TRUE, add = ac)
-    checkmate::assert(
-        checkmate::checkFALSE(fixedIsolationWidth),
-        checkmate::checkScalarNA(fixedIsolationWidth),
-        checkmate::checkNumber(fixedIsolationWidth, lower = 0, finite = TRUE),
-        checkmate::checkNumeric(fixedIsolationWidth, len = 2, lower = 0, finite = TRUE, any.missing = FALSE),
-        .var.name = "fixedIsolationWidth", add = ac
-    )
+    assertFixedIsoArg(fixedIsolationWidth, add = ac)
     checkmate::assertCount(topMost, positive = TRUE, null.ok = TRUE, add = ac)
     assertAvgPListParams(avgFeatParams, add = ac)
     assertAvgPListParams(avgFGroupParams, add = ac)

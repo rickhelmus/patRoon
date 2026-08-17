@@ -1289,6 +1289,17 @@ assertIMSType <- function(x, .var.name = checkmate::vname(x), add = NULL)
     checkmate::assertChoice(x, c("bruker", "agilent"), .var.name = .var.name, add = add)
 }
 
+assertFixedIsoArg <- function(x, .var.name = checkmate::vname(x), add = NULL)
+{
+    checkmate::assert(
+        checkmate::checkFALSE(x),
+        checkmate::checkScalarNA(x),
+        checkmate::checkNumber(x, lower = 0, finite = TRUE),
+        checkmate::checkNumeric(x, len = 2, lower = 0, finite = TRUE, any.missing = FALSE),
+        .var.name = .var.name, add = add
+    )
+}
+
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())
 {

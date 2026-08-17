@@ -423,6 +423,8 @@ getFCParams <- function(replicates, ...)
 #' @param ranges A \code{list} with for each analysis a \code{data.frame} with \code{numeric} columns \code{"retmin"},
 #'   \code{"retmax"}, \code{"mzmin"}, \code{"mzmax"} with the lower/upper ranges of the retention time and \emph{m/z}.
 #'   Furthermore, columns \code{"mobmin"} and \code{"mobmax"} can be added for mobility lower/upper ranges in IMS data.
+#'   Finally, if \code{MSLevel=2} then a column \code{"precursorMZ"} should be added to specify the precursor \emph{m/z}
+#'   value for MS/MS data.
 #' @param gapFactor A \code{numeric} that configures gap filling. See \code{\link{getDefEICParams}} for more details.
 #' @param output Should be \code{"fill"}, \code{"pad"} or \code{"raw"}. Internally, EIC data is compressed by omitting
 #'   any zero intensity data points. If \code{output="fill"} then the zero intensity points are re-added to obtain
@@ -430,6 +432,7 @@ getFCParams <- function(replicates, ...)
 #'   which is sufficient for \emph{e.g.} plotting. If \code{output="raw"} then the original compressed data is returned.
 #' @param MSLevel The MS level of the data to be used for EIC generation. This should be \samp{1} or \samp{2}.
 #' 
+#' @template fixedIso-arg
 #' @template minIntensityIMS-arg
 #'
 #' @return A \code{list} with for each analysis a \code{list} with EIC data for each of the rows in \code{ranges}.
@@ -442,7 +445,8 @@ getFCParams <- function(replicates, ...)
 #' @template uses-msdata
 #'
 #' @export
-getEICs <- function(analysisInfo, ranges, gapFactor = 3, output = "fill", minIntensityIMS = 25, MSLevel = 1)
+getEICs <- function(analysisInfo, ranges, gapFactor = 3, output = "fill", minIntensityIMS = 25, MSLevel = 1,
+                    fixedIsolationWidth = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
@@ -455,6 +459,7 @@ getEICs <- function(analysisInfo, ranges, gapFactor = 3, output = "fill", minInt
            fixed = list(add = ac))
     checkmate::assertChoice(output, c("fill", "pad", "raw"), add = ac)
     checkmate::assertChoice(MSLevel, 1:2, add = ac)
+    assertFixedIsoArg(fixedIsolationWidth, add = ac)
     checkmate::reportAssertions(ac)
 
     if (checkmate::testDataFrame(ranges))
@@ -469,11 +474,14 @@ getEICs <- function(analysisInfo, ranges, gapFactor = 3, output = "fill", minInt
     {
         checkmate::assertDataFrame(r, types = "numeric", any.missing = FALSE)
         assertHasNames(r, c("mzmin", "mzmax", "retmin", "retmax"))
+        if (MSLevel == 2)
+            assertHasNames(r, "precursorMZ")
         if ("mobmin" %in% names(r) || "mobmax" %in% names(r))
             assertHasNames(r, c("mobmin", "mobmax"))
     }
     ret <- doGetEICs(analysisInfo, ranges, gapFactor, minIntensityIMS = minIntensityIMS, MSLevel = MSLevel,
-                     mode = if (output == "raw") "full" else "simple", pad = output == "pad")
+                     fixedIsolationWidth = fixedIsolationWidth, mode = if (output == "raw") "full" else "simple",
+                     pad = output == "pad")
     if (output == "fill")
     {
         ret <- lapply(ret, function(anaEICs)

@@ -588,6 +588,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::vector<SpectrumRawTypes::Mobility> &endMobs,
                       SpectrumRawTypes::Time gapFactor,  SpectrumRawTypes::Intensity minIntensityIMS,
                       int MSLevel, const std::vector<SpectrumRawTypes::Mass> &precursorMZs,
+                      const std::vector<SpectrumRawTypes::Mass> &fixedIsolationWidth,
                       const std::string &mode = "simple", SpectrumRawTypes::Time sumWindowMZ = 0,
                       SpectrumRawTypes::Time sumWindowMob = 0, unsigned smoothWindowMZ = 3,
                       unsigned smoothWindowMob = 3, SpectrumRawTypes::Mass smoothExtMZ = 0,
@@ -624,6 +625,8 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     const auto &specMeta = backend.getSpecMetadata();
     const auto MSLev = (MSLevel == 1) ? SpectrumRawTypes::MSLevel::MS1 : SpectrumRawTypes::MSLevel::MS2;
     const auto &specMetaMS = (MSLev == SpectrumRawTypes::MSLevel::MS1) ? specMeta.first : specMeta.second;
+    
+    const auto fixedIsoWidthRange = makeIsolationWidthRange(fixedIsolationWidth);
     
     if (smoothWindowMZ == 0 || (eicMode != EICMode::FULL && eicMode != EICMode::FULL_MZ))
         smoothExtMZ = 0;
@@ -676,7 +679,8 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         for (size_t i=0; i<startTimes.size(); ++i)
         {
             const auto sels = getSpecRawSelections(specMeta, makeNumRange(startTimes[i], endTimes[i]),
-                                                   MSLev, (MSLev == SpectrumRawTypes::MSLevel::MS2) ? precursorMZs[i] : 0);
+                                                   MSLev, (MSLev == SpectrumRawTypes::MSLevel::MS2) ? precursorMZs[i] : 0,
+                                                   fixedIsoWidthRange);
             for (const auto &sel : sels)
                 allScans.insert(sel.index);
         }
@@ -689,7 +693,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         timer.start("Collecting all scans (range)");
         scanSels[0] = getSpecRawSelections(specMeta, makeNumRange(*std::min_element(startTimes.begin(), startTimes.end()),
                                                                   *std::max_element(endTimes.begin(), endTimes.end())),
-                                                                  MSLev, 0);
+                                                          MSLev, 0, fixedIsoWidthRange);
         timer.stop();
     }
     

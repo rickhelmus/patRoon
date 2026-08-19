@@ -85,8 +85,8 @@ getMSPeakLists <- function(backend, startTimes, endTimes, precursorMZs, fixedIso
     .Call(`_patRoon_getMSPeakLists`, backend, startTimes, endTimes, precursorMZs, fixedIsolationWidth, withPrecursor, retainPrecursor, MSLevel, method, mzWindow, startMobs, endMobs, relMinAbundance, absMinAbundance, maxRelCumIntensity, smoothWindowIMS, halfWindowIMS, maxGapIMS, topMost, minIntensityIMS, minIntensityPre, minIntensityPost, minBPIntensity)
 }
 
-getEIMList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, minIntensity, compress) {
-    .Call(`_patRoon_getEIMList`, backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, minIntensity, compress)
+getEIMList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, minIntensity, MSLevel, precursorMZs, fixedIsolationWidth, compress) {
+    .Call(`_patRoon_getEIMList`, backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, minIntensity, MSLevel, precursorMZs, fixedIsolationWidth, compress)
 }
 
 compressEIM <- function(mobilities, intensities) {

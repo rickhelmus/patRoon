@@ -720,10 +720,15 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::vector<SpectrumRawTypes::Time> &endTimes,
                       const std::vector<SpectrumRawTypes::Mobility> &startMobs,
                       const std::vector<SpectrumRawTypes::Mobility> &endMobs,
-                      SpectrumRawTypes::Intensity minIntensity, bool compress)
+                      SpectrumRawTypes::Intensity minIntensity, int MSLevel,
+                      const std::vector<SpectrumRawTypes::Mass> &precursorMZs,
+                      const std::vector<SpectrumRawTypes::Mass> &fixedIsolationWidth, bool compress)
 {
     const auto entries = startTimes.size();
     const auto specMeta = backend.getSpecMetadata();
+    
+    const auto MSLev = (MSLevel == 1) ? SpectrumRawTypes::MSLevel::MS1 : SpectrumRawTypes::MSLevel::MS2;
+    const auto fixedIsoWidthRange = makeIsolationWidthRange(fixedIsolationWidth);
     
     struct EIM
     {
@@ -772,10 +777,11 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
     for (size_t i=0; i<entries; ++i)
     {
         scanSels.push_back(getSpecRawSelections(specMeta, makeNumRange(startTimes[i], endTimes[i]),
-                                                SpectrumRawTypes::MSLevel::MS1, 0, NumRange<SpectrumRawTypes::Mass>()));
+                                                MSLev, (MSLev == SpectrumRawTypes::MSLevel::MS2) ? precursorMZs[i] : 0,
+                                                fixedIsoWidthRange));
     }
     
-    const auto allEIMs = applyMSData<EIM>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc, minIntensity,
+    const auto allEIMs = applyMSData<EIM>(backend, MSLev, scanSels, sfunc, minIntensity,
                                           SpectrumRawTypes::MSSortType::MOBILITY_MZ);
 
     std::vector<EIM> summedEIMs(entries);

@@ -269,13 +269,16 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, minIntensityIMS = 0, MSLe
     return(allEICs)
 }
 
-doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, smooth, smLength, sgOrder, compress = TRUE, cacheDB = NULL)
+doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, smooth, smLength, sgOrder, MSLevel = 1, fixedIsolationWidth = FALSE,
+                      compress = TRUE, cacheDB = NULL)
 {
     if (length(EIMInfoList) == 0)
         return(list())
     
     anaInfo <- anaInfo[analysis %in% names(EIMInfoList)]
     doSmooth <- smooth != "none" && smLength > 0 && (sgOrder > 0 || smooth != "sg")
+    
+    fixedIsolationWidth <- if (isFALSE(fixedIsolationWidth)) 0 else if (anyNA(fixedIsolationWidth)) -1 else fixedIsolationWidth
     
     anaHashes <- NULL
     if (is.null(cacheDB))
@@ -293,8 +296,12 @@ doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, smooth, smLength, sgOr
                 setnafill(EIMInfo, fill = 0, cols = col)
         }
         
+        if (is.null(EIMInfo[["precursorMZ"]]) && MSLevel == 2)
+            EIMInfo[, precursorMZ := rep(0, .N)]
+        
         # NOTE: subset columns here, so any additional columns from e.g. feature tables are not considered
-        hashes <- EIMInfo[, makeHash(anaHashes[[ana]], minIntensity, smooth, smLength, sgOrder, compress, .SD),
+        hashes <- EIMInfo[, makeHash(anaHashes[[ana]], minIntensity, smooth, smLength, sgOrder, MSLevel,
+                                     fixedIsolationWidth, compress, .SD),
                           by = seq_len(nrow(EIMInfo)), .SDcols = c("retmin", "retmax", "mzmin", "mzmax", "mobmin",
                                                                    "mobmax")][[2]]
         
@@ -313,8 +320,9 @@ doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, smooth, smLength, sgOr
         # NOTE: getEIMList() return lists, which are converted to data.frames and is a lot faster than returning
         # data.frames directly.
         # NOTE: compression is only done here if we're not smoothing below, otherwise data is compressed after smoothing
+        precursorMZs <- if (MSLevel == 2) ToDo$precursorMZ else numeric(0)
         newEIMs <- getEIMList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin, ToDo$mobmax,
-                              minIntensity, compress && !doSmooth)
+                              minIntensity, MSLevel, precursorMZs, fixedIsolationWidth, compress && !doSmooth)
         
         if (doSmooth)
         {

@@ -533,6 +533,15 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
     return(obj)
 })
 
+#' @export
+setMethod("calculatePeakQualitiesP", "features", function(obj, param = NULL, ...)
+{
+    # Only pass parameters that the features method accepts
+    paramList <- prepAndVerifyParamForCall(param, "CalculatePeakQualitiesParam", ...)
+    paramList <- paramList[names(paramList) %in% c("weights", "flatnessFactor", "featureQualities", "EICParams", "parallel")]
+    do.call(calculatePeakQualities, c(list(obj), paramList))
+})
+
 #' @describeIn features Obtain the total ion chromatogram/s (TICs) of the analyses.
 #' @inheritParams getTICs,data.frame-method
 #' @export

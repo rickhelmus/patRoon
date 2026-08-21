@@ -312,6 +312,17 @@ setMethod("selectIonsP", "workflow",
           \(obj, param = NULL, ...) doWfStep(func = "selectIonsP", slotNameIn = c("fGroups", "components"), slotNameOut = "fGroups",
                                              paramClass = "SelectIonsParam", obj, param = param, ...))
 
+#' @rdname featureGroups-class
+setMethod("normIntsP", "workflow",
+          \(obj, param = NULL, ...) doWfStep(func = "normIntsP", slotNameIn = "fGroups", slotNameOut = "fGroups",
+                                             paramClass = "NormIntsParam", obj, param = param, ...))
+
+#' @rdname featureGroups-class
+setMethod("calculatePeakQualitiesP", "workflow",
+          \(obj, param = NULL, ...) doWfStep(func = "calculatePeakQualitiesP", slotNameIn = "fGroups",
+                                             slotNameOut = "fGroups", paramClass = "CalculatePeakQualitiesParam",
+                                             obj, param = param, ...))
+
 
 setMethod("wfWrap", "workflow", function(obj, expr)
 {

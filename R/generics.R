@@ -72,6 +72,9 @@ setGeneric("overlap", function(fGroups, which = NULL, aggregate = TRUE, exclusiv
 #' @name featureGroups-class
 setGeneric("selectIons", function(fGroups, components, prefAdduct, ...) standardGeneric("selectIons"))
 
+#' @name featureGroups-class
+setGeneric("selectIonsP", function(obj, ...) standardGeneric("selectIonsP"))
+
 #' @name featureGroups-compare
 setGeneric("comparison", function(..., groupAlgo,
                                   groupArgs = list(rtalign = FALSE)) standardGeneric("comparison"), signature = "...")

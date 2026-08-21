@@ -1095,6 +1095,13 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
     return(fGroups)
 })
 
+#' @export
+setMethod("selectIonsP", "featureGroups", function(obj, param = NULL, ..., components, prefAdduct)
+{
+    param <- prepAndVerifyParamForCall(param, "SelectIonsParam", ...)
+    do.call(selectIons, c(list(obj, components = components, prefAdduct = prefAdduct), param))
+})
+
 #' @describeIn featureGroups Provides various methods to normalizes feature intensities for each sample analysis or of
 #'   all features within a feature group. See the \verb{Feature intensity normalization} section below.
 #'

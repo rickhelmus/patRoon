@@ -258,6 +258,7 @@ Collate:
     'feature_groups-optimize-openms.R'
     'feature_groups-optimize-xcms.R'
     'feature_groups-optimize-xcms3.R'
+    'feature_groups-param.R'
     'feature_groups-plot.R'
     'feature_groups-sirius.R'
     'feature_groups-table.R'

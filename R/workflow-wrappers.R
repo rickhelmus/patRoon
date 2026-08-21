@@ -307,6 +307,11 @@ setMethod("screenSuspectsP", "workflow",
           \(obj, param = NULL, ...) doWfStep(func = "screenSuspectsP", slotNameIn = "fGroups", slotNameOut = "fGroups",
                                              paramClass = "ScreenSuspectsParam", obj, param = param, ...))
 
+#' @rdname featureGroups-class
+setMethod("selectIonsP", "workflow",
+          \(obj, param = NULL, ...) doWfStep(func = "selectIonsP", slotNameIn = c("fGroups", "components"), slotNameOut = "fGroups",
+                                             paramClass = "SelectIonsParam", obj, param = param, ...))
+
 
 setMethod("wfWrap", "workflow", function(obj, expr)
 {

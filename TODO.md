@@ -12,6 +12,10 @@
     - define findFeatures(..., set) methods
     - define sets in constructor
     - call makeSet() automatically for groupFeatures()? Can still define it for completeness
+    - OR:
+        - construct workflowSets directly by eg workflowSets(positive = anaInfoPos1, negative = anaInfoNeg)
+        - findFeatures() will be ran for each set and call makeSet() automatically
+        - easier, but cannot use makeSet(fGroups) anymore
 
 
 ## Params
@@ -28,6 +32,7 @@
 - add suspect lists, TP libraries, logic transformations etc to params?
     - in any case: add string option to load from CSV
 - screenSuspectsP(): keep onlyHits and amend in params?
+- selectIonsP(): somehow add prefAdduct to param? Maybe split for sets and non sets workflows?
 
 
 # Priority

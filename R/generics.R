@@ -98,6 +98,9 @@ setGeneric("internalStandardAssignments", function(fGroups, ...) standardGeneric
 setGeneric("normInts", function(fGroups, featNorm = "none", groupNorm = FALSE, normFunc = max, standards = NULL,
                                 ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 3, ...) standardGeneric("normInts"))
 
+#' @rdname featureGroups-class
+setGeneric("normIntsP", function(fGroups, ...) standardGeneric("normIntsP"))
+
 #' @name featureGroups-class
 setGeneric("concentrations", function(fGroups, ...) standardGeneric("concentrations"))
 
@@ -578,6 +581,11 @@ setGeneric("assignMobilities", function(obj, ...) standardGeneric("assignMobilit
 #' @param weights,flatnessFactor,featureQualities,featureGroupQualities See method documentation.
 setGeneric("calculatePeakQualities", function(obj, weights = NULL,
                                               flatnessFactor = 0.05, featureQualities = NULL, featureGroupQualities = NULL, ...) standardGeneric("calculatePeakQualities"))
+
+#' @templateVar func calculatePeakQualitiesP
+#' @templateVar desc calculates chromatographic peak qualities and scores.
+#' @template generics
+setGeneric("calculatePeakQualitiesP", function(obj, ...) standardGeneric("calculatePeakQualitiesP"))
 
 #' @templateVar func clusterProperties
 #' @templateVar desc Obtain a list with properties of the generated cluster(s).

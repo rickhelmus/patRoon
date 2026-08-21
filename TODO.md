@@ -29,10 +29,14 @@
 - intclust components: should normalized and average still be flags?
 - generateFormulasP: doc that bruker is not supported, add SIRIUS support
 - generateTPsBioTransformer(): maxExpGenerations is now additional to generations -->update NEWS and test
-- add suspect lists, TP libraries, logic transformations etc to params?
+- add suspect lists, ISTD lists, TP libraries, logic transformations etc to params?
     - in any case: add string option to load from CSV
 - screenSuspectsP(): keep onlyHits and amend in params?
 - selectIonsP(): somehow add prefAdduct to param? Maybe split for sets and non sets workflows?
+- normIntsP/calculatePeakQualitiesP()
+    - make normFunc/avgFunc also be able to be a string so the param object can be serialized
+    - test and check
+    - make workflow wrapper also be able to call features method only of calculatePeakQualities()?
 
 
 # Priority

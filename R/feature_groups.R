@@ -650,6 +650,14 @@ setMethod("removeEmptyAnalyses", "featureGroups", function(fGroups)
     return(fGroups)
 })
 
+#' @export
+setMethod("normIntsP", "featureGroups", function(fGroups, param = NULL, ..., standards = NULL)
+{
+    paramList <- prepAndVerifyParamForCall(param, "NormIntsParam", ...)
+    do.call(normInts, c(list(fGroups), paramList))
+})
+
+
 setMethod("averageGroups", "featureGroups", function(fGroups, areas, normalized, by, func)
 {
     gTable <- copy(groupTable(fGroups, areas, normalized))
@@ -957,6 +965,14 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
     return(obj)
 })
 
+#' @export
+#' @rdname featureGroups-class
+setMethod("calculatePeakQualitiesP", "featureGroups", function(obj, param = NULL, ...)
+{
+    param <- prepAndVerifyParamForCall(param, "CalculatePeakQualitiesParam", ...)
+    do.call(calculatePeakQualities, c(list(obj), param))
+})
+
 #' @describeIn featureGroups uses \link[=generateComponents]{componentization} results to select feature groups with
 #'   preferred adduct ion and/or isotope annotation. Typically, this means that only feature groups are kept if they are
 #'   (de-)protonated adducts and are monoisotopic. The adduct annotation assignments for the selected feature groups are
@@ -1096,6 +1112,7 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
 })
 
 #' @export
+#' @rdname featureGroups-class
 setMethod("selectIonsP", "featureGroups", function(obj, param = NULL, ..., components, prefAdduct)
 {
     param <- prepAndVerifyParamForCall(param, "SelectIonsParam", ...)
@@ -1365,6 +1382,14 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
     featureTable(fGroups) <- updatedFeatures
     
     return(fGroups)
+})
+
+#' @export
+#' @rdname featureGroups-class
+setMethod("normIntsP", "featureGroups", function(fGroups, param = NULL, ..., standards = NULL)
+{
+    paramList <- prepAndVerifyParamForCall(param, "NormIntsParam", ..., exOptsToDots = TRUE)
+    do.call(normInts, c(list(fGroups, standards = standards), paramList))
 })
 
 #' @aliases calculateConcs

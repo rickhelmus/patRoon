@@ -1,5 +1,10 @@
 # Priority
 
+- doc/NEWS: mzPeakWindow
+- doc that topMost is always for feature intensities and not MSPL (UNDONE?)
+- split EIXParams in base and feat classes so the former can also used by DT and MSPL methods?
+    - feat EIC params inherit from base EIC params
+
 ## general
 
 

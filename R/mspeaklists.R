@@ -755,6 +755,82 @@ setMethod("plotSpectrumHash", "MSPeakLists", function(obj, groupName, analysis =
     return(makeHash(sp, title, normalized, specSimParams, ...))
 })
 
+#' @export
+setMethod("plotChroms", "MSPeakLists", function(obj, fGroups, groupName, analysis, MSLevel, fixedIsolationWidth = FALSE,
+                                                rtWindow = defaultLim("retention", "wide"),
+                                                mzWindow = defaultLim("mz", "medium"),
+                                                retMin = FALSE, title = NULL, showLegend = TRUE, IMS = "maybe",
+                                                xlim = NULL, ylim = NULL, gapFactor = 3, ...)
+{
+    # UNDONE: checkmates
+    # UNDONE: allow analysis==NULL: take topMost
+    
+    if (!identical(IMS, "both") && !setequal(groupName, names(obj)))
+        IMS <- "both" # make sure selection is always plotted
+    
+    fGroups <- prepIMSFGroupsForPlot(fGroups, IMS)
+    if (IMS != "both")
+    {
+        analysis <- intersect(analysis, analyses(fGroups))
+        groupName <- intersect(groupName, names(fGroups))
+    }
+    
+    if (is.null(title))
+        title <- getMSPeakListPlotTitle(MSLevel, analysis, groupName)
+    xlab <- if (retMin) "Retention Time (min)" else "Retention Time (s)"
+    
+    # UNDONE: EICParams; check if it should be used and fix things below
+    EICs <- getMSPLEICs(obj, fGroups, groupName, analysis, gapFactor = gapFactor, MSLevel = MSLevel,
+                        fixedIsolationWidth = fixedIsolationWidth, rtWindow = rtWindow, mzWindow = mzWindow, pad = TRUE)
+    
+    # prepare EICs for plotting
+    if (retMin)
+    {
+        EICs <- lapply(EICs, function(ea)
+        {
+            eg[, "time"] <- eg[, "time"] / 60
+            return(eg)
+        })
+    }
+    
+    cols <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(EICs))
+    
+    if (showLegend)
+    {
+        spec <- getSpec(obj, groupName, MSLevel, analysis)
+        legTxts <- sprintf("%.4f", spec$mz)
+        if (any(spec$precursor))
+            legTxts[spec$precursor] <- paste0(legTxts[spec$precursor], " (precursor)")
+        
+        makeLegend <- function(x, y, ...)
+        {
+            return(legend(x, y, legTxts, col = cols, text.col = cols, lty = 1, xpd = NA, ncol = 1, cex = 0.75,
+                          bty = "n", ...))
+        }
+        
+        plot.new()
+        leg <- makeLegend(0, 0, plot = FALSE)
+        lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
+        lw <- min(lw, 0.5) # don't make it too wide
+        withr::local_par(list(omd = c(0, 1 - lw, 0, 1), new = TRUE))
+    }
+    
+    if (is.null(xlim))
+        xlim <- range(unlist(lapply(EICs, \(ea) range(ea[, "time"]))))
+    if (is.null(ylim))
+        ylim <- c(0, max(unlist(lapply(EICs, \(ea) max(ea[, "intensity"])))))
+    
+    plot(0, type = "n", main = title, xlab = xlab, ylab = "Intensity", xlim = xlim, ylim = ylim, ...)
+    
+    for (i in seq_along(EICs))
+        lines(EICs[[i]][, "time"], EICs[[i]][, "intensity"], col = cols[i])
+    
+    if (showLegend)
+        makeLegend(par("usr")[2], par("usr")[4])
+    
+    invisible(NULL)
+})
+
 #' @describeIn MSPeakLists Calculates the spectral similarity between two or more spectra.
 #'
 #' @param groupName1,groupName2 The names of the feature groups for which the comparison should be made. If both

@@ -781,3 +781,40 @@ mergeBinnedAndAnnPL <- function(binPL, annPL, which)
     annPL[, which := which]
     return(annPL)
 }
+
+getMSPLEICsInfo <- function(MSPeakLists, fGroups, groupName, analysis, MSLevel, fixedIsolationWidth, rtWindow, mzWindow)
+{
+    pl <- copy(getSpec(MSPeakLists, groupName, MSLevel, analysis))
+    pl <- pl[, c("ID", "mz", "precursor"), with = FALSE]
+    precMZ <- pl[precursor == TRUE]$mz
+    if (length(precMZ) == 0)
+        precMZ <- groupInfo(fGroups)[group == groupName]$mz # UNDONE: doc
+    pl[, precursorMZ := precMZ]
+    
+    ftab <- getFeatures(fGroups)[[analysis]][group == groupName]
+    for (col in c("retmin", "retmax", "mobmin", "mobmax"))
+    {
+        if (col %in% names(ftab))
+            pl[, (col) := ftab[[col]]]
+    }
+ 
+    if (is.infinite(rtWindow))
+        pl[, c("retmin", "retmax") := 0]
+    else
+        pl[, c("retmin", "retmax") := .(retmin - rtWindow, retmax + rtWindow)]
+    
+    pl[, c("mzmin", "mzmax") := .(mz - mzWindow, mz + mzWindow)]
+    
+    return(pl[])
+}
+
+getMSPLEICs <- function(MSPeakLists, fGroups, groupName, analysis, gapFactor = 3, MSLevel, fixedIsolationWidth = FALSE,
+                        rtWindow = defaultLim("retention", "wide"), mzWindow = defaultLim("mz", "medium"), ...)
+{
+    inputTab <- getMSPLEICsInfo(MSPeakLists, fGroups, groupName, analysis, MSLevel, fixedIsolationWidth, rtWindow,
+                                mzWindow)
+    inputTabList <- setNames(list(inputTab), analysis)
+    EICs <- doGetEICs(analysisInfo(fGroups), inputTabList, gapFactor = gapFactor, MSLevel = MSLevel,
+                      fixedIsolationWidth = fixedIsolationWidth, ...)
+    return(EICs[[1]])
+}

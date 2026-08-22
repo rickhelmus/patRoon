@@ -664,7 +664,6 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
     anaInfo <- analysisInfo(obj)
     anaInfo <- anaInfo[analysis %chin% takeAnalysis & analysis %chin% names(EICs)]
     gInfo <- groupInfo(obj)
-    gCount <- length(groupName)
     featTab <- as.data.table(getFeatures(obj))[group %chin% groupName]
     
     setnames(featTab, c("ret", "retmin", "retmax"), c("x", "xmin", "xmax"))
@@ -881,7 +880,6 @@ setMethod("plotMobilograms", "featureGroups", function(obj, analysis = analyses(
     anaInfo <- analysisInfo(obj)
     anaInfo <- anaInfo[analysis %chin% takeAnalysis & analysis %chin% names(EIMs)]
     gInfo <- groupInfo(obj)
-    gCount <- length(groupName)
     featTab <- as.data.table(getFeatures(obj))[group %chin% groupName]
     
     setnames(featTab, c("mobility", "mobmin", "mobmax"), c("x", "xmin", "xmax"))

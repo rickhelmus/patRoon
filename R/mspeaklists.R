@@ -47,8 +47,7 @@ NULL
 #' @templateVar delj MS peaks
 #' @templateVar deljtype numeric indices (rows)
 #' @templateVar delfwhat feature group
-#' @templateVar delfa the peak list table (a \code{data.table}), feature group name, analysis (\code{NULL} if averaged
-#'   peak list), type (\code{"MS"} or \code{"MSMS"})
+#' @templateVar delfa the peak list table (a \code{data.table}), feature group name, analysis (\code{NULL} if averaged peak list), type (\code{"MS"} or \code{"MSMS"})
 #' @templateVar delfr the peak list indices (rows) to be removed (specified as an \code{integer} or \code{logical}
 #'   vector)
 #' @templateVar dollarOpName feature group

@@ -1621,6 +1621,28 @@ setMethod("getBPCs", "featureGroups", function(obj, retentionRange = NULL, MSLev
     getBPCs(obj@features, retentionRange, MSLevel)
 })
 
+#' @describeIn getEICs-methods Generates EICs for all (or selected) feature groups (method for
+#'   \code{featureGroups}).
+#' @export
+setMethod("getEICs", "featureGroups", function(obj, analysis = analyses(obj), groupName = names(obj),
+                                               EICParams = getDefEICParams(), output = "fill")
+{
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertSubset, . ~ analysis + groupName, list(analyses(obj), names(obj)),
+           fixed = list(add = ac))
+    checkmate::assertCharacter(analysis, any.missing = FALSE, min.chars = 1, add = ac)
+    checkmate::assertCharacter(groupName, any.missing = FALSE, min.chars = 1, add = ac)
+    assertEICParams(EICParams, add = ac)
+    checkmate::assertChoice(output, c("fill", "pad", "raw"), add = ac)
+    checkmate::reportAssertions(ac)
+    
+    ret <- getFeatureEIXs(obj, "EIC", analysis = analysis, groupName = groupName, EIXParams = EICParams,
+                          mode = if (output == "raw") "full" else "simple", pad = output == "pad")
+    if (output == "fill")
+        ret <- doFillEICOutput(ret)
+    return(ret)
+})
+
 #' @describeIn featureGroups Recalculate group information from feature data.
 #' @param what A \code{character} vector specifying which group-wise values to update. Valid values are \code{"ret"}
 #'   (retention time, in seconds), \code{"mz"} and \code{"mobility"}. At least one must be specified. If

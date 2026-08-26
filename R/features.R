@@ -567,6 +567,23 @@ setMethod("plotBPCs", "features", function(obj, retentionRange = NULL, MSLevel =
     plotBPCs(analysisInfo(obj), retentionRange, MSLevel, retMin, title, groupBy, showLegend, xlim, ylim, ...)
 })
 
+#' @describeIn getEICs-methods Generates EICs for all (or selected) features (method for \code{features}).
+#' @export
+setMethod("getEICs", "features", function(obj, analysis = analyses(obj), EICParams = getDefEICParams(), output = "fill")
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertSubset(analysis, analyses(obj), add = ac)
+    assertEICParams(EICParams, add = ac)
+    checkmate::assertChoice(output, c("fill", "pad", "raw"), add = ac)
+    checkmate::reportAssertions(ac)
+    
+    ret <- getFeatureEIXs(obj, "EIC", analysis = analysis, EIXParams = EICParams,
+                          mode = if (output == "raw") "full" else "simple", pad = output == "pad")
+    if (output == "fill")
+        ret <- doFillEICOutput(ret)
+    return(ret)
+})
+
 
 #' Finding features
 #'

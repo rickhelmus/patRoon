@@ -111,10 +111,11 @@ setMethod("getFeatureEIXInputTab", "featureGroupsSet", function(obj, type, analy
     }))
 })
 
-setMethod("getFeatureEIXs", "featuresSet", function(obj, type, ...)
+setMethod("getFeatureEIXs", "featuresSet", function(obj, type, analysis = analyses(obj), ...)
 {
     unsetFeatList <- sapply(sets(obj), unset, obj = obj, simplify = FALSE)
-    EIXList <- sapply(unsetFeatList, getFeatureEIXs, type = type, ..., simplify = FALSE)
+    analysisSets <- sapply(sets(obj), \(s) intersect(analysisInfo(obj)[set == s]$analysis, analysis), simplify = FALSE)
+    EIXList <- Map(unsetFeatList, analysisSets, f = \(ufl, as) getFeatureEIXs(ufl, type = type, analysis = as, ...))
     EIXs <- unlist(EIXList, recursive = FALSE, use.names = FALSE) # use.names gives combined set/ana name, we just want ana
     names(EIXs) <- unlist(lapply(EIXList, names))
     EIXs <- EIXs[intersect(analyses(obj), names(EIXs))] # sync order

@@ -648,6 +648,16 @@ test_that("verify feature group comparison", {
     expect_true(hasIMS(comparison(fgIMS, fgAMInt, groupAlgo = "greedy")@comparedFGroups))
 })
 
+test_that("EIC generation", {
+    EICs <- getEICs(fgOpenMS, analysis = analyses(fgOpenMS)[1], groupName = names(fgOpenMS)[1:10], output = "raw")
+    checkmate::expect_list(EICs)
+    checkmate::expect_names(names(EICs), identical.to = analyses(fgOpenMS)[1])
+    checkmate::expect_names(names(EICs[[1]]), subset.of = names(fgOpenMS))
+    EICsFilled <- getEICs(fgOpenMS, analysis = analyses(fgOpenMS)[1], groupName = names(fgOpenMS)[1:10], output = "fill")
+    expect_all_false(EICs[[1]][[1]][, "intensity"] == 0)
+    expect_true(any(EICsFilled[[1]][[1]][, "intensity"] == 0))
+})
+
 subFGroups <- fgOpenMS[, 1:25]
 subFGroupsIMS <- filter(fgAMInt, removeBlanks = TRUE)
 subFGroupsIMSOnly <- subFGroupsIMS[IMS = TRUE][, 1:25]

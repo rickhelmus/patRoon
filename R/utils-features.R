@@ -349,9 +349,9 @@ getEICsOREIMs <- function(obj, type, inputTab, EIXParams, ...)
                   EIXParams$sgOrder, ...)
 }
 
-setMethod("getFeatureEIXInputTab", "features", function(obj, type, EIXParams, selectFunc)
+setMethod("getFeatureEIXInputTab", "features", function(obj, type, analysis, EIXParams, selectFunc)
 {
-    return(lapply(featureTable(obj), function(tab)
+    return(lapply(featureTable(obj)[analysis], function(tab)
     {
         if (!is.null(selectFunc))
             tab <- selectFunc(tab)
@@ -457,13 +457,18 @@ setMethod("getFeatureEIXInputTab", "featureGroups", function(obj, type, analysis
 
 setMethod("getFeatureEIXs", "features", function(obj, type, analysis = analyses(obj), EIXParams, selectFunc = NULL, ...)
 {
-    inputTab <- getFeatureEIXInputTab(obj, type, EIXParams, selectFunc)
+    if (length(analysis) == 0)
+        return(list())
+    
+    inputTab <- getFeatureEIXInputTab(obj, type, analysis, EIXParams, selectFunc)
     EIXs <- getEICsOREIMs(obj, type, inputTab, EIXParams, ...)
-    EIXs <- Map(EIXs, featureTable(obj), f = function(eics, ft)
+    EIXs <- Map(EIXs, featureTable(obj)[analysis], f = function(eics, ft)
     {
         names(eics) <- if (!is.null(selectFunc)) selectFunc(ft)$ID else ft$ID
         return(eics)
     })
+    EIXs <- EIXs[intersect(analysisInfo(obj)$analysis, names(EIXs))] # sync order
+    
     return(pruneList(EIXs))
 })
 
@@ -479,7 +484,6 @@ setMethod("getFeatureEIXs", "featureGroups", function(obj, type, analysis = anal
     inputTab <- getFeatureEIXInputTab(obj, type, analysis, groupName, EIXParams)
     inputTab <- split(rbindlist(inputTab, idcol = "group"), by = "analysis")
     inputTab <- inputTab[intersect(anaInfo$analysis, names(inputTab))] # sync order
-    anaInfoEIXs <- anaInfo[analysis %in% names(inputTab)]
     
     EIXs <- getEICsOREIMs(obj, type, inputTab, EIXParams, ...)
     EIXs <- Map(EIXs, lapply(inputTab, "[[", "group"), f = setNames)

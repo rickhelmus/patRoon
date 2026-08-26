@@ -66,6 +66,8 @@ test_that("availableBackends", {
 })
 
 test_that("EICs", {
+    # NOTE: doGetEICs() is called here in case functionality is tested that getEICs() does not (yet) expose
+    
     anaInfoIMSOne <- as.data.table(getTestAnaInfoIMS()[4, ])
     susps <- as.data.table(patRoonDataIMS::suspectsPos)[name %in% c("Sulfamethoxazole", "Benzotriazole", "Metoprolol")]
     
@@ -75,7 +77,7 @@ test_that("EICs", {
     EICInfoListOne <- EICInfoList
     EICInfoListOne[[1]] <- EICInfoListOne[[1]][1]
     
-    eicsRef <- doGetEICs(anaInfoIMSOne, EICInfoList[1], gapFactor = 3, mode = "full")
+    eicsRef <- getEICs(anaInfoIMSOne, EICInfoList[1], gapFactor = 3, output = "raw")
     
     # Test adjacency and intensity filters
     # NOTE: the thresholds were based on manual EIC inspection...
@@ -106,7 +108,7 @@ test_that("EICs", {
     expect_length(pruneList(eicsTop1[[1]], checkZeroRows = TRUE), 1)
     
     # Test pad=TRUE
-    eicsPadded <- doGetEICs(anaInfoIMSOne, EICInfoListOne, gapFactor = 3, pad = TRUE, mode = "simple")
+    eicsPadded <- getEICs(anaInfoIMSOne, EICInfoListOne, gapFactor = 3, output = "pad")
     expect_true(nrow(eicsPadded[[1]][[1]]) >= nrow(eicsRef[[1]][[1]]))
     expect_false(any(eicsRef[[1]][[1]][, "intensity"] == 0))
     expect_true(any(eicsPadded[[1]][[1]][, "intensity"] == 0))
@@ -131,7 +133,7 @@ test_that("EICs", {
     backEICsHRMS <- lapply(c("mstoolkit", "streamcraft", "mzr"), function(backend)
     {
         withOpt(MS.backends = backend, {
-            doGetEICs(anaInfoHRMSOne, EICInfoListHRMS[1], gapFactor = 3, mode = "full")
+            getEICs(anaInfoHRMSOne, EICInfoListHRMS[1], gapFactor = 3, output = "raw")
         })
     })
     expect_equal(backEICsHRMS[["mstoolkit"]], backEICsHRMS[["streamcraft"]])
@@ -142,7 +144,7 @@ test_that("EICs", {
         if (!backend %in% availableBackends(verbose = FALSE))
             return(NULL)
         withOpt(MS.backends = backend, {
-            doGetEICs(anaInfoIMSOne, EICInfoList[1], gapFactor = 3, mode = "full")
+            getEICs(anaInfoIMSOne, EICInfoList[1], gapFactor = 3, output = "raw")
         })
     })
     expect_equal(backEICsIMS[["mstoolkit"]], backEICsIMS[["streamcraft"]])

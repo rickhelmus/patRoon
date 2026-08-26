@@ -386,6 +386,16 @@ test_that("anaInfo modification", {
                  KPIC2ImpOpenMS[seq(length(KPIC2ImpOpenMS), 1)])
 })
 
+test_that("EIC generation", {
+    EICs <- getEICs(ffOpenMS, analysis = analyses(ffOpenMS)[1], output = "raw")
+    checkmate::expect_list(EICs)
+    checkmate::expect_names(names(EICs), identical.to = analyses(ffOpenMS)[1])
+    checkmate::expect_names(names(EICs[[1]]), subset.of = ffOpenMS[[1]]$ID)
+    EICsFilled <- getEICs(ffOpenMS, analysis = analyses(ffOpenMS)[1], output = "fill")
+    expect_all_false(EICs[[1]][[1]][, "intensity"] == 0)
+    expect_true(any(EICsFilled[[1]][[1]][, "intensity"] == 0))
+})
+
 test_that("Sets functionality", {
     # proper (de)neutralization
     expect_equal(patRoon:::calculateMasses(unset(ffOpenMS, "positive")[[1]]$mz, as.adduct("[M+H]+"), "neutral"),

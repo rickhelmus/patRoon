@@ -181,11 +181,7 @@ for more information.
 
 For a very quick start:
 
-``` r
-
-library(patRoon)
-newProject()
-```
+[`library`](https://rdrr.io/r/base/library.html)`(`[`patRoon`](https://github.com/rickhelmus/patRoon)`)`` `[`newProject`](https://rickhelmus.github.io/patRoon/reference/newProject.md)`(``)`
 
 The
 [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md)

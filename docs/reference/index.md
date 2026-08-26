@@ -589,6 +589,7 @@
   [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
   [`fromIMS()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
   [`getBPCs()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  [`getEICs()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
   [`getFeatures()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
   [`getFeatureQualityNames()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
   [`getMCS()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
@@ -635,7 +636,10 @@
 - [`getDefTPStructParams()`](https://rickhelmus.github.io/patRoon/reference/getDefTPStructParams.md)
   : Parameters to handle TP data with structural information
 
-- [`getEICs()`](https://rickhelmus.github.io/patRoon/reference/getEICs.md)
+- [`getEICs(`*`<features>`*`)`](https://rickhelmus.github.io/patRoon/reference/getEICs-methods.md)
+  [`getEICs(`*`<featureGroups>`*`)`](https://rickhelmus.github.io/patRoon/reference/getEICs-methods.md)
+  [`getEICs(`*`<data.table>`*`)`](https://rickhelmus.github.io/patRoon/reference/getEICs-methods.md)
+  [`getEICs(`*`<data.frame>`*`)`](https://rickhelmus.github.io/patRoon/reference/getEICs-methods.md)
   : Obtains extracted ion chromatograms (EICs)
 
 - [`getFCParams()`](https://rickhelmus.github.io/patRoon/reference/getFCParams.md)

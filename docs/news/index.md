@@ -58,15 +58,7 @@ of important points.
   interface has various small changes to simplify its usage and extend
   support. For instance:
 
-  ``` r
-
-  # pre 3.0
-  convertMSFiles(anaInfo = anaInfo, from = "bruker", to = "mzML", algorithm = "pwiz", centroid = "vendor",
-                 overWrite = FALSE)
-  # 3.0
-  convertMSFiles(anaInfo, typeFrom = "raw", formatFrom = "bruker", typeTo = "centroid", formatTo = "mzML",
-                 algorithm = "pwiz", overwrite = FALSE)
-  ```
+  `# pre 3.0`` `[`convertMSFiles`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md)`(``anaInfo ``=`` ``anaInfo``, from ``=`` ``"bruker"``, to ``=`` ``"mzML"``, algorithm ``=`` ``"pwiz"``, centroid ``=`` ``"vendor"``,`` `` overWrite ``=`` ``FALSE``)`` ``# 3.0`` `[`convertMSFiles`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md)`(``anaInfo``, typeFrom ``=`` ``"raw"``, formatFrom ``=`` ``"bruker"``, typeTo ``=`` ``"centroid"``, formatTo ``=`` ``"mzML"``,`` `` algorithm ``=`` ``"pwiz"``, overwrite ``=`` ``FALSE``)`
 
   Please see
   [`?convertMSFiles`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md)
@@ -78,27 +70,14 @@ of important points.
   ([`?generateMSPeakLists`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakLists.md)
   for details). E.g.:
 
-  ``` r
-
-  # pre 3.0
-  mslists <- generateMSPeakLists(fGroups, "mzr", maxMSRtWindow = 5, precursorMzWindow = 4, avgFeatParams = ...,
-                                 avgFGroupParams = ...)
-  # 3.0
-  mslists <- generateMSPeakLists(fGroups, maxMSRTWindow = 5, avgFeatParams = ..., avgFGroupParams = ...)
-  ```
+  `# pre 3.0`` ``mslists`` ``<-`` `[`generateMSPeakLists`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakLists.md)`(``fGroups``, ``"mzr"``, maxMSRtWindow ``=`` ``5``, precursorMzWindow ``=`` ``4``, avgFeatParams ``=`` ``...``,`` `` avgFGroupParams ``=`` ``...``)`` ``# 3.0`` ``mslists`` ``<-`` `[`generateMSPeakLists`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakLists.md)`(``fGroups``, maxMSRTWindow ``=`` ``5``, avgFeatParams ``=`` ``...``, avgFGroupParams ``=`` ``...``)`
 
 - The filtering of MS peak lists is simplified and is now done per MS
   level (see
   [`?MSPeakLists`](https://rickhelmus.github.io/patRoon/reference/MSPeakLists-class.md)
   for details):
 
-  ``` r
-
-  # pre 3.0
-  mslists <- filter(mslists, relMSMSIntThr = 0.05, topMSMSPeaks = 25, ...)
-  # 3.0
-  mslists <- filter(mslists, msLevel = 2, relMinIntensity = 0.05, topMost = 25, ...)
-  ```
+  `# pre 3.0`` ``mslists`` ``<-`` `[`filter`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``mslists``, relMSMSIntThr ``=`` ``0.05``, topMSMSPeaks ``=`` ``25``, ``...``)`` ``# 3.0`` ``mslists`` ``<-`` `[`filter`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``mslists``, msLevel ``=`` ``2``, relMinIntensity ``=`` ``0.05``, topMost ``=`` ``25``, ``...``)`
 
 - The estimation of identification confidence levels was extended beyond
   suspect screening workflows. The
@@ -110,17 +89,7 @@ of important points.
   [`?estimateIDConfidence`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)
   for details. Eg:
 
-  ``` r
-
-  # pre 3.0
-  fGroups <- annotateSuspects(fGroups, formulas = formulas, compounds = compounds, MSPeakLists = mslists,
-                              IDFile = "idlevelrules.yml")
-  # 3.0
-  formulas <- estimateIDConfidence(formulas, IDFile = "idlevelrules.yml")
-  compounds <- estimateIDConfidence(compounds, MSPeakLists = mslists, formulas = formulas, IDFile = "idlevelrules.yml")
-  fGroups <- estimateIDConfidence(fGroups, formulas = formulas, compounds = compounds, MSPeakLists = mslists,
-                                  IDFile = "idlevelrules.yml")
-  ```
+  `# pre 3.0`` ``fGroups`` ``<-`` `[`annotateSuspects`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md)`(``fGroups``, formulas ``=`` ``formulas``, compounds ``=`` ``compounds``, MSPeakLists ``=`` ``mslists``,`` `` IDFile ``=`` ``"idlevelrules.yml"``)`` ``# 3.0`` ``formulas`` ``<-`` `[`estimateIDConfidence`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)`(``formulas``, IDFile ``=`` ``"idlevelrules.yml"``)`` ``compounds`` ``<-`` `[`estimateIDConfidence`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)`(``compounds``, MSPeakLists ``=`` ``mslists``, formulas ``=`` ``formulas``, IDFile ``=`` ``"idlevelrules.yml"``)`` ``fGroups`` ``<-`` `[`estimateIDConfidence`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)`(``fGroups``, formulas ``=`` ``formulas``, compounds ``=`` ``compounds``, MSPeakLists ``=`` ``mslists``,`` `` IDFile ``=`` ``"idlevelrules.yml"``)`
 
 - The default rules for ID level estimation was changed for level 3a.
   Either re-generate the file by running
@@ -131,18 +100,12 @@ of important points.
 - The report configuration file was updated. Run the following to update
   an existing file:
 
-  ``` r
-
-  genReportSettingsFile("report.yml", baseFrom = "report.yml")
-  ```
+  [`genReportSettingsFile`](https://rickhelmus.github.io/patRoon/reference/reporting.md)`(``"report.yml"``, baseFrom ``=`` ``"report.yml"``)`
 
 - The default numeric limits were centralized (discussed further below).
   To generate a new file for configuration:
 
-  ``` r
-
-  genLimitsFile()
-  ```
+  [`genLimitsFile`](https://rickhelmus.github.io/patRoon/reference/limits.md)`(``)`
 
   See
   [`?limits`](https://rickhelmus.github.io/patRoon/reference/limits.md)
@@ -1688,7 +1651,7 @@ your project directory.
 - [`generateFormulasSIRIUS()`](https://rickhelmus.github.io/patRoon/reference/generateFormulasSIRIUS.md)/[`generateCompoundsSIRIUS()`](https://rickhelmus.github.io/patRoon/reference/generateCompoundsSIRIUS.md):
   `projectPath` and `dryRun` arguments. These are mainly for internal
   use.
-- [`getEICs()`](https://rickhelmus.github.io/patRoon/reference/getEICs.md)
+- [`getEICs()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
   utility to obtain raw EIC data (suggested by Ricardo Cunha).
 
 ### Minor changes
@@ -2315,18 +2278,11 @@ code without using any new functionality:
 
 Change your existing code, e.g.
 
-``` r
-
-scr <- screenSuspects(fGroups, suspectList, ...)
-fGroupsScr <- groupFeaturesScreening(fGroups, scr)
-```
+`scr`` ``<-`` `[`screenSuspects`](https://rickhelmus.github.io/patRoon/reference/suspect-screening.md)`(``fGroups``, ``suspectList``, ``...``)`` ``fGroupsScr`` ``<-`` ``groupFeaturesScreening``(``fGroups``, ``scr``)`
 
 to
 
-``` r
-
-fGroupsScr <- screenSuspects(fGroups, suspectList, ..., onlyHits = TRUE)
-```
+`fGroupsScr`` ``<-`` `[`screenSuspects`](https://rickhelmus.github.io/patRoon/reference/suspect-screening.md)`(``fGroups``, ``suspectList``, ``...``, onlyHits ``=`` ``TRUE``)`
 
 **Major changes**
 

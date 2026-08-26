@@ -60,6 +60,8 @@ fromIMS(obj)
 
 getBPCs(obj, ...)
 
+getEICs(obj, ...)
+
 getFeatures(obj)
 
 getFeatureQualityNames(obj, ...)
@@ -258,6 +260,8 @@ data.
 - Methods are defined for:
   [`compounds`](https://rickhelmus.github.io/patRoon/reference/assignMobilities_comp.md);
   [`compoundsSet`](https://rickhelmus.github.io/patRoon/reference/assignMobilities_comp.md);
+  [`data.frame`](https://rickhelmus.github.io/patRoon/reference/assignMobilities_susp.md);
+  [`data.table`](https://rickhelmus.github.io/patRoon/reference/assignMobilities_susp.md);
   [`featureGroups`](https://rickhelmus.github.io/patRoon/reference/assignMobilities_feat.md);
   [`featureGroupsScreening`](https://rickhelmus.github.io/patRoon/reference/assignMobilities_feat.md);
   [`featureGroupsScreeningSet`](https://rickhelmus.github.io/patRoon/reference/assignMobilities_feat.md);
@@ -300,7 +304,8 @@ a consensus.
 `convertToMFDB` Exports the object to a local database that can be used
 with `MetFrag`.
 
-- Methods are defined for: .
+- Methods are defined for:
+  [`transformationProductsStructure`](https://rickhelmus.github.io/patRoon/reference/transformationProductsStructure-class.md).
 
 `convertToSuspects` Converts an object to a suspect list.
 
@@ -369,8 +374,17 @@ data.
 `getBPCs` gets base peak chromatogram(s).
 
 - Methods are defined for:
+  [`data.frame`](https://rickhelmus.github.io/patRoon/reference/analysisinfo-dataframe.md);
   [`featureGroups`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md);
   [`features`](https://rickhelmus.github.io/patRoon/reference/features-class.md).
+
+`getEICs` obtains extracted ion chromatogram(s) (EICs).
+
+- Methods are defined for:
+  [`data.frame`](https://rickhelmus.github.io/patRoon/reference/getEICs-methods.md);
+  [`data.table`](https://rickhelmus.github.io/patRoon/reference/getEICs-methods.md);
+  [`featureGroups`](https://rickhelmus.github.io/patRoon/reference/getEICs-methods.md);
+  [`features`](https://rickhelmus.github.io/patRoon/reference/getEICs-methods.md).
 
 `getFeatures` returns the object's
 [`features`](https://rickhelmus.github.io/patRoon/reference/features-class.md)
@@ -394,6 +408,7 @@ object.
 `getTICs` gets total ion chromatogram(s).
 
 - Methods are defined for:
+  [`data.frame`](https://rickhelmus.github.io/patRoon/reference/analysisinfo-dataframe.md);
   [`featureGroups`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md);
   [`features`](https://rickhelmus.github.io/patRoon/reference/features-class.md).
 
@@ -417,6 +432,8 @@ groups for which data is present in this object.
 `plotBPCs` plots base peak chromatogram(s).
 
 - Methods are defined for:
+  [`data.frame`](https://rickhelmus.github.io/patRoon/reference/analysisinfo-dataframe.md);
+  [`data.table`](https://rickhelmus.github.io/patRoon/reference/analysisinfo-dataframe.md);
   [`featureGroups`](https://rickhelmus.github.io/patRoon/reference/feature-plotting.md);
   [`features`](https://rickhelmus.github.io/patRoon/reference/features-class.md).
 
@@ -490,6 +507,8 @@ cluster size.
 `plotTICs` plots total ion chromatogram(s).
 
 - Methods are defined for:
+  [`data.frame`](https://rickhelmus.github.io/patRoon/reference/analysisinfo-dataframe.md);
+  [`data.table`](https://rickhelmus.github.io/patRoon/reference/analysisinfo-dataframe.md);
   [`featureGroups`](https://rickhelmus.github.io/patRoon/reference/feature-plotting.md);
   [`features`](https://rickhelmus.github.io/patRoon/reference/features-class.md).
 
@@ -734,7 +753,6 @@ in `base`). Please see method specific documentation for more details.
 
 - Methods are defined for:
   [`adduct`](https://rickhelmus.github.io/patRoon/reference/adduct-class.md);
-  `C++Object`;
   [`components`](https://rickhelmus.github.io/patRoon/reference/components-class.md);
   [`componentsFeatures`](https://rickhelmus.github.io/patRoon/reference/components-class.md);
   [`componentsSet`](https://rickhelmus.github.io/patRoon/reference/components-class.md);

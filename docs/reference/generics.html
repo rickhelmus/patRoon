@@ -112,6 +112,8 @@ please refer to the linked method documentation for each generic.</p>
 <span></span>
 <span><span class="fu">getBPCs</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu">getEICs</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu">getFeatures</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">getFeatureQualityNames</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -261,7 +263,7 @@ average silhouette width calculation.</p></dd>
 </ul><p><code>annotations</code> returns annotations.</p>
 <ul><li><p>Methods are defined for: <code><a href="featureAnnotations-class.html">featureAnnotations</a></code>; <code><a href="featureGroups-class.html">featureGroups</a></code>; <code><a href="formulas-class.html">formulas</a></code>.</p></li>
 </ul><p><code>assignMobilities</code> assigns ion mobility and/or <acronym>CCS</acronym> values to workflow data.</p>
-<ul><li><p>Methods are defined for: <code><a href="assignMobilities_comp.html">compounds</a></code>; <code><a href="assignMobilities_comp.html">compoundsSet</a></code>; <code><a href="assignMobilities_feat.html">featureGroups</a></code>; <code><a href="assignMobilities_feat.html">featureGroupsScreening</a></code>; <code><a href="assignMobilities_feat.html">featureGroupsScreeningSet</a></code>; <code><a href="assignMobilities_feat.html">featureGroupsSet</a></code>.</p></li>
+<ul><li><p>Methods are defined for: <code><a href="assignMobilities_comp.html">compounds</a></code>; <code><a href="assignMobilities_comp.html">compoundsSet</a></code>; <code><a href="assignMobilities_susp.html">data.frame</a></code>; <code><a href="assignMobilities_susp.html">data.table</a></code>; <code><a href="assignMobilities_feat.html">featureGroups</a></code>; <code><a href="assignMobilities_feat.html">featureGroupsScreening</a></code>; <code><a href="assignMobilities_feat.html">featureGroupsScreeningSet</a></code>; <code><a href="assignMobilities_feat.html">featureGroupsSet</a></code>.</p></li>
 </ul><p><code>calculatePeakQualities</code> calculates chromatographic peak qualities and scores.</p>
 <ul><li><p>Methods are defined for: <code><a href="featureGroups-class.html">featureGroups</a></code>; <code><a href="features-class.html">features</a></code>.</p></li>
 </ul><p><code>clusterProperties</code> Obtain a list with properties of the generated cluster(s).</p>
@@ -271,7 +273,7 @@ average silhouette width calculation.</p></dd>
 </ul><p><code>consensus</code> combines and merges data from various algorithms to generate a consensus.</p>
 <ul><li><p>Methods are defined for: <code><a href="components-class.html">components</a></code>; <code><a href="components-class.html">componentsSet</a></code>; <code><a href="compounds-class.html">compounds</a></code>; <code><a href="compounds-class.html">compoundsSet</a></code>; <code><a href="featureGroups-compare.html">featureGroupsComparison</a></code>; <code><a href="featureGroups-compare.html">featureGroupsComparisonSet</a></code>; <code><a href="formulas-class.html">formulas</a></code>; <code><a href="formulas-class.html">formulasSet</a></code>; <code><a href="transformationProductsStructure-class.html">transformationProductsStructure</a></code>.</p></li>
 </ul><p><code>convertToMFDB</code> Exports the object to a local database that can be used with <code class="command">MetFrag</code>.</p>
-<ul><li><p>Methods are defined for: .</p></li>
+<ul><li><p>Methods are defined for: <code><a href="transformationProductsStructure-class.html">transformationProductsStructure</a></code>.</p></li>
 </ul><p><code>convertToSuspects</code> Converts an object to a suspect list.</p>
 <ul><li><p>Methods are defined for: <code><a href="MSLibrary-class.html">MSLibrary</a></code>; <code><a href="transformationProducts-class.html">transformationProducts</a></code>.</p></li>
 </ul><p><code>cutClusters</code> Returns assigned cluster indices of a cut cluster.</p>
@@ -287,7 +289,9 @@ average silhouette width calculation.</p></dd>
 </ul><p><code>fromIMS</code> returns <code>TRUE</code> if the object was directly created from IMS data.</p>
 <ul><li><p>Methods are defined for: <code><a href="featureGroups-class.html">featureGroups</a></code>; <code><a href="features-class.html">features</a></code>.</p></li>
 </ul><p><code>getBPCs</code> gets base peak chromatogram(s).</p>
-<ul><li><p>Methods are defined for: <code><a href="featureGroups-class.html">featureGroups</a></code>; <code><a href="features-class.html">features</a></code>.</p></li>
+<ul><li><p>Methods are defined for: <code><a href="analysisinfo-dataframe.html">data.frame</a></code>; <code><a href="featureGroups-class.html">featureGroups</a></code>; <code><a href="features-class.html">features</a></code>.</p></li>
+</ul><p><code>getEICs</code> obtains extracted ion chromatogram(s) (EICs).</p>
+<ul><li><p>Methods are defined for: <code><a href="getEICs-methods.html">data.frame</a></code>; <code><a href="getEICs-methods.html">data.table</a></code>; <code><a href="getEICs-methods.html">featureGroups</a></code>; <code><a href="getEICs-methods.html">features</a></code>.</p></li>
 </ul><p><code>getFeatures</code> returns the object's <code><a href="features-class.html">features</a></code> object.</p>
 <ul><li><p>Methods are defined for: <code><a href="featureGroups-class.html">featureGroups</a></code>.</p></li>
 </ul><p><code>getFeatureQualityNames</code> returns the object's feature quality names.</p>
@@ -295,13 +299,13 @@ average silhouette width calculation.</p></dd>
 </ul><p><code>getMCS</code> Calculates the maximum common substructure.</p>
 <ul><li><p>Methods are defined for: <code><a href="compounds-class.html">compounds</a></code>; <code><a href="compoundsCluster-class.html">compoundsCluster</a></code>.</p></li>
 </ul><p><code>getTICs</code> gets total ion chromatogram(s).</p>
-<ul><li><p>Methods are defined for: <code><a href="featureGroups-class.html">featureGroups</a></code>; <code><a href="features-class.html">features</a></code>.</p></li>
+<ul><li><p>Methods are defined for: <code><a href="analysisinfo-dataframe.html">data.frame</a></code>; <code><a href="featureGroups-class.html">featureGroups</a></code>; <code><a href="features-class.html">features</a></code>.</p></li>
 </ul><p><code>groupNames</code> returns a <code>character</code> vector with the names of the feature groups for which data is present in this object.</p>
 <ul><li><p>Methods are defined for: <code><a href="components-class.html">components</a></code>; <code><a href="compoundsCluster-class.html">compoundsCluster</a></code>; <code><a href="featureAnnotations-class.html">featureAnnotations</a></code>; <code><a href="featureGroups-class.html">featureGroups</a></code>; <code><a href="MSPeakLists-class.html">MSPeakLists</a></code>.</p></li>
 </ul><p><code>hasIMS</code> returns <code>TRUE</code> if the object has ion mobility values</p>
 <ul><li><p>Methods are defined for: <code><a href="featureGroups-class.html">featureGroups</a></code>; <code><a href="featureGroups-compare.html">featureGroupsComparison</a></code>; <code><a href="features-class.html">features</a></code>.</p></li>
 </ul><p><code>plotBPCs</code> plots base peak chromatogram(s).</p>
-<ul><li><p>Methods are defined for: <code><a href="feature-plotting.html">featureGroups</a></code>; <code><a href="features-class.html">features</a></code>.</p></li>
+<ul><li><p>Methods are defined for: <code><a href="analysisinfo-dataframe.html">data.frame</a></code>; <code><a href="analysisinfo-dataframe.html">data.table</a></code>; <code><a href="feature-plotting.html">featureGroups</a></code>; <code><a href="features-class.html">features</a></code>.</p></li>
 </ul><p><code>plotChord</code> plots a Chord diagram to assess overlapping data.</p>
 <ul><li><p>Methods are defined for: <code><a href="feature-plotting.html">featureGroups</a></code>; <code><a href="featureGroups-compare.html">featureGroupsComparison</a></code>.</p></li>
 </ul><p><code>plotChroms</code> plots extracted ion chromatogram(s).</p>
@@ -321,7 +325,7 @@ average silhouette width calculation.</p></dd>
 </ul><p><code>plotStructure</code> plots a chemical structure.</p>
 <ul><li><p>Methods are defined for: <code><a href="compounds-class.html">compounds</a></code>; <code><a href="compoundsCluster-class.html">compoundsCluster</a></code>.</p></li>
 </ul><p><code>plotTICs</code> plots total ion chromatogram(s).</p>
-<ul><li><p>Methods are defined for: <code><a href="feature-plotting.html">featureGroups</a></code>; <code><a href="features-class.html">features</a></code>.</p></li>
+<ul><li><p>Methods are defined for: <code><a href="analysisinfo-dataframe.html">data.frame</a></code>; <code><a href="analysisinfo-dataframe.html">data.table</a></code>; <code><a href="feature-plotting.html">featureGroups</a></code>; <code><a href="features-class.html">features</a></code>.</p></li>
 </ul><p><code>plotVenn</code> plots a Venn diagram to assess unique and overlapping data.</p>
 <ul><li><p>Methods are defined for: <code><a href="featureAnnotations-class.html">featureAnnotations</a></code>; <code><a href="feature-plotting.html">featureGroups</a></code>; <code><a href="featureGroups-compare.html">featureGroupsComparison</a></code>; <code><a href="transformationProductsStructure-class.html">transformationProductsStructure</a></code>.</p></li>
 </ul><p><code>plotUpSet</code> plots an UpSet diagram to assess unique and overlapping data.</p>
@@ -371,7 +375,7 @@ average silhouette width calculation.</p></dd>
 </ul><p><code>plot</code> Generates a plot for an object.</p>
 <ul><li><p>Methods are defined for: <code><a href="componentsClust-class.html">componentsClust,missing</a></code>; <code><a href="compoundsCluster-class.html">compoundsCluster,missing</a></code>; <code><a href="feature-plotting.html">featureGroups,missing</a></code>; <code><a href="featureGroups-compare.html">featureGroupsComparison,missing</a></code>; <code><a href="optimizationResult-class.html">optimizationResult,missing</a></code>.</p></li>
 </ul><p><code>show</code> Prints information about this object.</p>
-<ul><li><p>Methods are defined for: <code><a href="adduct-class.html">adduct</a></code>; <code>C++Object</code>; <code><a href="components-class.html">components</a></code>; <code><a href="components-class.html">componentsFeatures</a></code>; <code><a href="components-class.html">componentsSet</a></code>; <code><a href="compounds-class.html">compounds</a></code>; <code><a href="compoundsCluster-class.html">compoundsCluster</a></code>; <code><a href="compounds-class.html">compoundsSet</a></code>; <code><a href="featureGroups-class.html">featureGroups</a></code>; <code><a href="featureGroupsScreening-class.html">featureGroupsScreening</a></code>; <code><a href="featureGroupsScreening-class.html">featureGroupsScreeningSet</a></code>; <code><a href="featureGroups-class.html">featureGroupsSet</a></code>; <code><a href="features-class.html">features</a></code>; <code><a href="features-class.html">featuresSet</a></code>; <code><a href="formulas-class.html">formulas</a></code>; <code><a href="formulas-class.html">formulasSet</a></code>; <code><a href="MSLibrary-class.html">MSLibrary</a></code>; <code><a href="MSPeakLists-class.html">MSPeakLists</a></code>; <code><a href="MSPeakLists-class.html">MSPeakListsSet</a></code>; <code><a href="optimizationResult-class.html">optimizationResult</a></code>; <code><a href="transformationProducts-class.html">transformationProducts</a></code>; <code><a href="workflowStep-class.html">workflowStep</a></code>; <code><a href="workflowStepSet-class.html">workflowStepSet</a></code>.</p></li>
+<ul><li><p>Methods are defined for: <code><a href="adduct-class.html">adduct</a></code>; <code><a href="components-class.html">components</a></code>; <code><a href="components-class.html">componentsFeatures</a></code>; <code><a href="components-class.html">componentsSet</a></code>; <code><a href="compounds-class.html">compounds</a></code>; <code><a href="compoundsCluster-class.html">compoundsCluster</a></code>; <code><a href="compounds-class.html">compoundsSet</a></code>; <code><a href="featureGroups-class.html">featureGroups</a></code>; <code><a href="featureGroupsScreening-class.html">featureGroupsScreening</a></code>; <code><a href="featureGroupsScreening-class.html">featureGroupsScreeningSet</a></code>; <code><a href="featureGroups-class.html">featureGroupsSet</a></code>; <code><a href="features-class.html">features</a></code>; <code><a href="features-class.html">featuresSet</a></code>; <code><a href="formulas-class.html">formulas</a></code>; <code><a href="formulas-class.html">formulasSet</a></code>; <code><a href="MSLibrary-class.html">MSLibrary</a></code>; <code><a href="MSPeakLists-class.html">MSPeakLists</a></code>; <code><a href="MSPeakLists-class.html">MSPeakListsSet</a></code>; <code><a href="optimizationResult-class.html">optimizationResult</a></code>; <code><a href="transformationProducts-class.html">transformationProducts</a></code>; <code><a href="workflowStep-class.html">workflowStep</a></code>; <code><a href="workflowStepSet-class.html">workflowStepSet</a></code>.</p></li>
 </ul></div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

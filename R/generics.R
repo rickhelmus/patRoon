@@ -99,7 +99,7 @@ setGeneric("normInts", function(fGroups, featNorm = "none", groupNorm = FALSE, n
                                 ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 3, ...) standardGeneric("normInts"))
 
 #' @rdname featureGroups-class
-setGeneric("normIntsP", function(fGroups, ...) standardGeneric("normIntsP"))
+setGeneric("normIntsP", function(obj, ...) standardGeneric("normIntsP"))
 
 #' @name featureGroups-class
 setGeneric("concentrations", function(fGroups, ...) standardGeneric("concentrations"))

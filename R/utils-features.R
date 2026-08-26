@@ -343,8 +343,7 @@ extendEIXInputTab <- function(tab, type, EIXParams, hasIMS, fromIMS)
 getEICsOREIMs <- function(obj, type, inputTab, EIXParams, ...)
 {
     if (type == "EIC")
-        doGetEICs(analysisInfo(obj), inputTab, EIXParams$gapFactor, EIXParams$minIntensityIMS,
-                  ...)
+        doGetEICs(analysisInfo(obj), inputTab, EIXParams$gapFactor, EIXParams$minIntensityIMS, ...)
     else # EIM
         doGetEIMs(analysisInfo(obj), inputTab, EIXParams$minIntensityIMS, EIXParams$smooth, EIXParams$smLength,
                   EIXParams$sgOrder, ...)

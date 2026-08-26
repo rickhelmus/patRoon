@@ -24,6 +24,7 @@
 \alias{filter}
 \alias{fromIMS}
 \alias{getBPCs}
+\alias{getEICs}
 \alias{getFeatures}
 \alias{getFeatureQualityNames}
 \alias{getMCS}
@@ -115,6 +116,8 @@ filter(obj, ...)
 fromIMS(obj)
 
 getBPCs(obj, ...)
+
+getEICs(obj, ...)
 
 getFeatures(obj)
 
@@ -272,7 +275,7 @@ please refer to the linked method documentation for each generic.
 \code{assignMobilities} assigns ion mobility and/or \acronym{CCS} values to workflow data.
 
 \itemize{
-    \item Methods are defined for: \code{\link[=assignMobilities,compounds-method]{compounds}}; \code{\link[=assignMobilities,compoundsSet-method]{compoundsSet}}; \code{\link[=assignMobilities,featureGroups-method]{featureGroups}}; \code{\link[=assignMobilities,featureGroupsScreening-method]{featureGroupsScreening}}; \code{\link[=assignMobilities,featureGroupsScreeningSet-method]{featureGroupsScreeningSet}}; \code{\link[=assignMobilities,featureGroupsSet-method]{featureGroupsSet}}.
+    \item Methods are defined for: \code{\link[=assignMobilities,compounds-method]{compounds}}; \code{\link[=assignMobilities,compoundsSet-method]{compoundsSet}}; \code{\link[=assignMobilities,data.frame-method]{data.frame}}; \code{\link[=assignMobilities,data.table-method]{data.table}}; \code{\link[=assignMobilities,featureGroups-method]{featureGroups}}; \code{\link[=assignMobilities,featureGroupsScreening-method]{featureGroupsScreening}}; \code{\link[=assignMobilities,featureGroupsScreeningSet-method]{featureGroupsScreeningSet}}; \code{\link[=assignMobilities,featureGroupsSet-method]{featureGroupsSet}}.
 }
 
 \code{calculatePeakQualities} calculates chromatographic peak qualities and scores.
@@ -302,7 +305,7 @@ please refer to the linked method documentation for each generic.
 \code{convertToMFDB} Exports the object to a local database that can be used with \command{MetFrag}.
 
 \itemize{
-    \item Methods are defined for: .
+    \item Methods are defined for: \code{\link[=convertToMFDB,transformationProductsStructure-method]{transformationProductsStructure}}.
 }
 
 \code{convertToSuspects} Converts an object to a suspect list.
@@ -350,7 +353,13 @@ please refer to the linked method documentation for each generic.
 \code{getBPCs} gets base peak chromatogram(s).
 
 \itemize{
-    \item Methods are defined for: \code{\link[=getBPCs,featureGroups-method]{featureGroups}}; \code{\link[=getBPCs,features-method]{features}}.
+    \item Methods are defined for: \code{\link[=getBPCs,data.frame-method]{data.frame}}; \code{\link[=getBPCs,featureGroups-method]{featureGroups}}; \code{\link[=getBPCs,features-method]{features}}.
+}
+
+\code{getEICs} obtains extracted ion chromatogram(s) (EICs).
+
+\itemize{
+    \item Methods are defined for: \code{\link[=getEICs,data.frame-method]{data.frame}}; \code{\link[=getEICs,data.table-method]{data.table}}; \code{\link[=getEICs,featureGroups-method]{featureGroups}}; \code{\link[=getEICs,features-method]{features}}.
 }
 
 \code{getFeatures} returns the object's \code{\link{features}} object.
@@ -374,7 +383,7 @@ please refer to the linked method documentation for each generic.
 \code{getTICs} gets total ion chromatogram(s).
 
 \itemize{
-    \item Methods are defined for: \code{\link[=getTICs,featureGroups-method]{featureGroups}}; \code{\link[=getTICs,features-method]{features}}.
+    \item Methods are defined for: \code{\link[=getTICs,data.frame-method]{data.frame}}; \code{\link[=getTICs,featureGroups-method]{featureGroups}}; \code{\link[=getTICs,features-method]{features}}.
 }
 
 \code{groupNames} returns a \code{character} vector with the names of the feature groups for which data is present in this object.
@@ -392,7 +401,7 @@ please refer to the linked method documentation for each generic.
 \code{plotBPCs} plots base peak chromatogram(s).
 
 \itemize{
-    \item Methods are defined for: \code{\link[=plotBPCs,featureGroups-method]{featureGroups}}; \code{\link[=plotBPCs,features-method]{features}}.
+    \item Methods are defined for: \code{\link[=plotBPCs,data.frame-method]{data.frame}}; \code{\link[=plotBPCs,data.table-method]{data.table}}; \code{\link[=plotBPCs,featureGroups-method]{featureGroups}}; \code{\link[=plotBPCs,features-method]{features}}.
 }
 
 \code{plotChord} plots a Chord diagram to assess overlapping data.
@@ -452,7 +461,7 @@ please refer to the linked method documentation for each generic.
 \code{plotTICs} plots total ion chromatogram(s).
 
 \itemize{
-    \item Methods are defined for: \code{\link[=plotTICs,featureGroups-method]{featureGroups}}; \code{\link[=plotTICs,features-method]{features}}.
+    \item Methods are defined for: \code{\link[=plotTICs,data.frame-method]{data.frame}}; \code{\link[=plotTICs,data.table-method]{data.table}}; \code{\link[=plotTICs,featureGroups-method]{featureGroups}}; \code{\link[=plotTICs,features-method]{features}}.
 }
 
 \code{plotVenn} plots a Venn diagram to assess unique and overlapping data.
@@ -589,7 +598,7 @@ please refer to the linked method documentation for each generic.
  \code{show} Prints information about this object.
 
 \itemize{
-    \item Methods are defined for: \code{\link[=show,adduct-method]{adduct}}; \code{\link[=show,C++Object-method]{C++Object}}; \code{\link[=show,components-method]{components}}; \code{\link[=show,componentsFeatures-method]{componentsFeatures}}; \code{\link[=show,componentsSet-method]{componentsSet}}; \code{\link[=show,compounds-method]{compounds}}; \code{\link[=show,compoundsCluster-method]{compoundsCluster}}; \code{\link[=show,compoundsSet-method]{compoundsSet}}; \code{\link[=show,featureGroups-method]{featureGroups}}; \code{\link[=show,featureGroupsScreening-method]{featureGroupsScreening}}; \code{\link[=show,featureGroupsScreeningSet-method]{featureGroupsScreeningSet}}; \code{\link[=show,featureGroupsSet-method]{featureGroupsSet}}; \code{\link[=show,features-method]{features}}; \code{\link[=show,featuresSet-method]{featuresSet}}; \code{\link[=show,formulas-method]{formulas}}; \code{\link[=show,formulasSet-method]{formulasSet}}; \code{\link[=show,MSLibrary-method]{MSLibrary}}; \code{\link[=show,MSPeakLists-method]{MSPeakLists}}; \code{\link[=show,MSPeakListsSet-method]{MSPeakListsSet}}; \code{\link[=show,optimizationResult-method]{optimizationResult}}; \code{\link[=show,transformationProducts-method]{transformationProducts}}; \code{\link[=show,workflowStep-method]{workflowStep}}; \code{\link[=show,workflowStepSet-method]{workflowStepSet}}.
+    \item Methods are defined for: \code{\link[=show,adduct-method]{adduct}}; \code{\link[=show,components-method]{components}}; \code{\link[=show,componentsFeatures-method]{componentsFeatures}}; \code{\link[=show,componentsSet-method]{componentsSet}}; \code{\link[=show,compounds-method]{compounds}}; \code{\link[=show,compoundsCluster-method]{compoundsCluster}}; \code{\link[=show,compoundsSet-method]{compoundsSet}}; \code{\link[=show,featureGroups-method]{featureGroups}}; \code{\link[=show,featureGroupsScreening-method]{featureGroupsScreening}}; \code{\link[=show,featureGroupsScreeningSet-method]{featureGroupsScreeningSet}}; \code{\link[=show,featureGroupsSet-method]{featureGroupsSet}}; \code{\link[=show,features-method]{features}}; \code{\link[=show,featuresSet-method]{featuresSet}}; \code{\link[=show,formulas-method]{formulas}}; \code{\link[=show,formulasSet-method]{formulasSet}}; \code{\link[=show,MSLibrary-method]{MSLibrary}}; \code{\link[=show,MSPeakLists-method]{MSPeakLists}}; \code{\link[=show,MSPeakListsSet-method]{MSPeakListsSet}}; \code{\link[=show,optimizationResult-method]{optimizationResult}}; \code{\link[=show,transformationProducts-method]{transformationProducts}}; \code{\link[=show,workflowStep-method]{workflowStep}}; \code{\link[=show,workflowStepSet-method]{workflowStepSet}}.
 }
 }
 

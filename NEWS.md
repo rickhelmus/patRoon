@@ -6,6 +6,7 @@
 * `fixedIsolationWindow` can now be a two-sized vector to specify asymmetric isolation windows (issue #161)
 * Added the `maxReplicateIntRSDPres` filter that ignores absent (zero intensity) filters in its RSD calculation, and clarified in the docs that the legacy `maxReplicateIntRSD` filter doesn't (issue #162)
 * Adduct conversion (`as.adduct()`/`as.character()`) now support `nontarget` format
+* Added `getEICs()` methods for `features` and `featureGroups` objects to easily extract EICs for (selected) features/feature groups (`getEICs()` is now an S4 generic)
 
 **Changes**
 
@@ -25,6 +26,7 @@ to `maxRelCumIntensity`.
 * `as.data.table()`: Support non numeric columns for `anaInfoCols` when averaging (issue #158)
 * Fixed: `topMost` argument for `generateMSPeakLists()` threw an error (issue #159)
 * Fixed: `fixedIsolationWindow` was incorrectly handled for eg Agilent DDA data (issue #161)
+* Fixed: Some links in the reference documentation for generics (`?generics`) were missing or wrong
 
 
 # patRoon 3.0

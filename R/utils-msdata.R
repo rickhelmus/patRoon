@@ -399,6 +399,18 @@ doGetChromPoints <- function(anaInfo, pointsInfoList)
     return(allChromPoints)
 }
 
+doFillEICOutput <- function(ret)
+{
+    return(lapply(ret, function(anaEICs)
+    {
+        at <- attr(anaEICs, "allXValues")
+        if (is.null(at))
+            return(anaEICs) # no EICs
+        
+        return(lapply(anaEICs, \(eic) cbind(time = at, intensity = doFillEIXIntensities(at, eic[, "time"], eic[, "intensity"]))))
+    }))
+}
+
 prepareAgilentIMSCalib <- function(calibrant, massGas)
 {
     if (is.list(calibrant))

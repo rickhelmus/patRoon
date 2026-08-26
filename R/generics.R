@@ -533,6 +533,11 @@ setGeneric("fromIMS", function(obj) standardGeneric("fromIMS"))
 #' @template generics
 setGeneric("getBPCs", function(obj, ...) standardGeneric("getBPCs"))
 
+#' @templateVar func getEICs
+#' @templateVar desc obtains extracted ion chromatogram(s) (EICs).
+#' @template generics
+setGeneric("getEICs", function(obj, ...) standardGeneric("getEICs"))
+
 #' @templateVar func getFeatures
 #' @templateVar desc returns the object's \code{\link{features}} object.
 #' @template generics

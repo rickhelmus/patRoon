@@ -547,19 +547,14 @@ printClassHierarchy <- function(class, showParents = TRUE, RD = FALSE)
 
 getAllMethods <- function(gen)
 {
-    # automatically retrieve defined methods for a generic and create document
-    # links. This only works if the arguments of the method are named obj, objX or x.
-
-    cl <- showMethods(gen, where = "package:patRoon", inherited = FALSE, printTo = FALSE,
-                      classes = getClasses(asNamespace("patRoon")))
-    cl <- cl[grepl("obj.*|x=", cl)]
-    cl <- gsub("[^\"]*\"([^\"]*)\"[^\"]*", "\\1,", cl)
-    # cl <- cl[!grepl("ANY", cl)]
-    cl <- gsub(" ", "", cl)
-    cl <- gsub(",$", "", cl)
-
-    return(cl[order(tolower(cl))])
+    # NOTE: don't set the package argument below, it somehow errors with as.data.table
+    meths <- findMethods(gen, where = "package:patRoon", inherited = FALSE)
+    meths <- meths[sapply(names(meths), \(mn) getNamespaceName(environment(meths[[mn]])) == "patRoon")]
+    meths <- gsub("#", ",", names(meths), fixed = TRUE) # convert to names and replace # with , for multiple dispatch
+    meths <- meths[meths != "ANY"]
+    return(meths[order(tolower(meths))])
 }
+
 # nocov end
 
 callAllNextMethods <- function(obj, f, ..., firstClass = NULL, startFrom = class(obj))

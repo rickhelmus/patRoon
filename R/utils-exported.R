@@ -414,39 +414,15 @@ getFCParams <- function(replicates, ...)
     return(modifyList(def, list(...)))
 }
 
-#' Obtains extracted ion chromatograms (EICs)
-#'
-#' This function generates one or more EIC(s) for given retention time, \emph{m/z} and optionally mobility ranges.
-#'
-#' @template analysisInfo-arg
-#'
-#' @param ranges A \code{list} with for each analysis a \code{data.frame} with \code{numeric} columns \code{"retmin"},
-#'   \code{"retmax"}, \code{"mzmin"}, \code{"mzmax"} with the lower/upper ranges of the retention time and \emph{m/z}.
-#'   Furthermore, columns \code{"mobmin"} and \code{"mobmax"} can be added for mobility lower/upper ranges in IMS data.
-#' @param gapFactor A \code{numeric} that configures gap filling. See \code{\link{getDefEICParams}} for more details.
-#' @param output Should be \code{"fill"}, \code{"pad"} or \code{"raw"}. Internally, EIC data is compressed by omitting
-#'   any zero intensity data points. If \code{output="fill"} then the zero intensity points are re-added to obtain
-#'   continuous chromatograms. If \code{output="pad"} then zero intensity points are only re-added that surround others,
-#'   which is sufficient for \emph{e.g.} plotting. If \code{output="raw"} then the original compressed data is returned.
-#' 
-#' @template minIntensityIMS-arg
-#'
-#' @return A \code{list} with for each analysis a \code{list} with EIC data for each of the rows in \code{ranges}.
-#' 
-#'   If \code{output="raw"} then additional columns with \emph{e.g.} mean-averaged and base peak \emph{m/z} values for
-#'   each data point are returned. Furthermore, the \code{allXValues} attribute is set that can be used to obtain the
-#'   original retention time values to reconstruct the original complete chromatogram.
-#'
-#' @templateVar what \code{getEICs}
-#' @template uses-msdata
-#'
+#' @describeIn getEICs-methods Generates one or more EIC(s) for given retention time, \emph{m/z} and optionally
+#'   mobility ranges (method for \code{data.table}).
 #' @export
-getEICs <- function(analysisInfo, ranges, gapFactor = 3, output = "fill", minIntensityIMS = 25)
+setMethod("getEICs", "data.table", function(obj, ranges, gapFactor = 3, output = "fill", minIntensityIMS = 25)
 {
     ac <- checkmate::makeAssertCollection()
-    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
+    obj <- assertAndPrepareAnaInfo(obj, add = ac)
     checkmate::assert(
-        checkmate::checkList(ranges, len = nrow(analysisInfo)),
+        checkmate::checkList(ranges, len = nrow(obj)),
         checkmate::checkDataFrame(ranges, types = "numeric", any.missing = FALSE),
         .var.name = "ranges", add = ac
     )
@@ -456,33 +432,70 @@ getEICs <- function(analysisInfo, ranges, gapFactor = 3, output = "fill", minInt
     checkmate::reportAssertions(ac)
 
     if (checkmate::testDataFrame(ranges))
-        ranges <- rep(list(as.data.table(ranges)), nrow(analysisInfo))
+        ranges <- rep(list(as.data.table(ranges)), nrow(obj))
     
     if (!checkmate::testNamed(ranges))
-        names(ranges) <- analysisInfo$analysis
+        names(ranges) <- obj$analysis
     else
-        checkmate::assertSetEqual(names(ranges), analysisInfo$analysis)
+        checkmate::assertSetEqual(names(ranges), obj$analysis)
     
     for (r in ranges)
     {
         checkmate::assertDataFrame(r, types = "numeric", any.missing = FALSE)
         assertHasNames(r, c("mzmin", "mzmax", "retmin", "retmax"))
     }
-    ret <- doGetEICs(analysisInfo, ranges, gapFactor, mode = if (output == "raw") "full" else "simple",
+    ret <- doGetEICs(obj, ranges, gapFactor, mode = if (output == "raw") "full" else "simple",
                      minIntensityIMS = minIntensityIMS, pad = output == "pad")
     if (output == "fill")
-    {
-        ret <- lapply(ret, function(anaEICs)
-        {
-            at <- attr(anaEICs, "allXValues")
-            if (is.null(at))
-                return(anaEICs) # no EICs
-        
-            return(lapply(anaEICs, \(eic) cbind(time = at, intensity = doFillEIXIntensities(at, eic[, "time"], eic[, "intensity"]))))
-        })
-    }
+        ret <- doFillEICOutput(ret)
     return(ret)
-}
+})
+
+#' @describeIn getEICs-methods Wrapper for the \code{data.table} method (method for \code{data.frame}).
+#' @export
+setMethod("getEICs", "data.frame", function(obj, ...)
+{
+    return(getEICs(as.data.table(obj), ...))
+})
+
+#' @describeIn getEICs-methods Generates EICs for all (or selected) features (method for \code{features}).
+#' @export
+setMethod("getEICs", "features", function(obj, analysis = analyses(obj), EICParams = getDefEICParams(), output = "fill")
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertSubset(analysis, analyses(obj), add = ac)
+    assertEICParams(EICParams, add = ac)
+    checkmate::assertChoice(output, c("fill", "pad", "raw"), add = ac)
+    checkmate::reportAssertions(ac)
+
+    ret <- getFeatureEIXs(obj, "EIC", analysis = analysis, EIXParams = EICParams,
+                          mode = if (output == "raw") "full" else "simple", pad = output == "pad")
+    if (output == "fill")
+        ret <- doFillEICOutput(ret)
+    return(ret)
+})
+
+#' @describeIn getEICs-methods Generates EICs for all (or selected) feature groups (method for
+#'   \code{featureGroups}).
+#' @export
+setMethod("getEICs", "featureGroups", function(obj, analysis = analyses(obj), groupName = names(obj),
+                                               EICParams = getDefEICParams(), output = "fill")
+{
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertSubset, . ~ analysis + groupName, list(analyses(obj), names(obj)),
+           fixed = list(add = ac))
+    checkmate::assertCharacter(analysis, any.missing = FALSE, min.chars = 1, add = ac)
+    checkmate::assertCharacter(groupName, any.missing = FALSE, min.chars = 1, add = ac)
+    assertEICParams(EICParams, add = ac)
+    checkmate::assertChoice(output, c("fill", "pad", "raw"), add = ac)
+    checkmate::reportAssertions(ac)
+
+    ret <- getFeatureEIXs(obj, "EIC", analysis = analysis, groupName = groupName, EIXParams = EICParams,
+                          mode = if (output == "raw") "full" else "simple", pad = output == "pad")
+    if (output == "fill")
+        ret <- doFillEICOutput(ret)
+    return(ret)
+})
 
 #' Background MS/MS peak detection
 #'

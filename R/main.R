@@ -897,3 +897,45 @@ NULL
 #'
 #' @name feature-quality
 NULL
+
+#' Obtains extracted ion chromatograms (EICs)
+#'
+#' These methods generate one or more EIC(s). The \code{data.table} and \code{data.frame} methods generate EIC(s) for
+#' given retention time, \emph{m/z} and optionally mobility ranges. The \code{features} and \code{featureGroups}
+#' methods generate EICs for all (or selected) features and feature groups, respectively, whereby the ranges are
+#' automatically determined from the feature data (see the \link[=EIXParams]{EIC parameters} for configuration
+#' options).
+#'
+#' @param obj For the \code{data.table} and \code{data.frame} methods: a table with
+#'   \link[=analysis-information]{analysis information}. For the \code{features} and \code{featureGroups} methods: the
+#'   object for which EICs should be generated.
+#' @param ranges A \code{list} with for each analysis a \code{data.frame} with \code{numeric} columns \code{"retmin"},
+#'   \code{"retmax"}, \code{"mzmin"}, \code{"mzmax"} with the lower/upper ranges of the retention time and \emph{m/z}.
+#'   Furthermore, columns \code{"mobmin"} and \code{"mobmax"} can be added for mobility lower/upper ranges in IMS data.
+#' @param gapFactor A \code{numeric} that configures gap filling. See \code{\link{getDefEICParams}} for more details.
+#' @param output Should be \code{"fill"}, \code{"pad"} or \code{"raw"}. Internally, EIC data is compressed by omitting
+#'   any zero intensity data points. If \code{output="fill"} then the zero intensity points are re-added to obtain
+#'   continuous chromatograms. If \code{output="pad"} then zero intensity points are only re-added that surround others,
+#'   which is sufficient for \emph{e.g.} plotting. If \code{output="raw"} then the original compressed data is returned.
+#'
+#' @template minIntensityIMS-arg
+#'
+#' @param analysis A \code{character} vector with the analyses for which EICs should be generated.
+#' @param groupName A \code{character} vector with the names of the feature groups for which EICs should be generated.
+#' @template EICParams-arg
+#' @param \dots For the \code{data.frame} method: further arguments passed to the \code{data.table} method.
+#'
+#' @return A \code{list} with for each analysis a \code{list} with EIC data. For the \code{data.table} and
+#'   \code{data.frame} methods the EICs are ordered according to the rows in \code{ranges}. For the \code{features} and
+#'   \code{featureGroups} methods the EICs are named after the feature IDs and feature group names, respectively, and
+#'   analyses without any EIC data are omitted.
+#'
+#'   If \code{output="raw"} then additional columns with \emph{e.g.} mean-averaged and base peak \emph{m/z} values for
+#'   each data point are returned. Furthermore, the \code{allXValues} attribute is set that can be used to obtain the
+#'   original retention time values to reconstruct the original complete chromatogram.
+#'
+#' @templateVar what \code{getEICs}
+#' @template uses-msdata
+#'
+#' @name getEICs-methods
+NULL

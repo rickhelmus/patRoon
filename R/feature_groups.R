@@ -650,14 +650,6 @@ setMethod("removeEmptyAnalyses", "featureGroups", function(fGroups)
     return(fGroups)
 })
 
-#' @export
-setMethod("normIntsP", "featureGroups", function(fGroups, param = NULL, ..., standards = NULL)
-{
-    paramList <- prepAndVerifyParamForCall(param, "NormIntsParam", ...)
-    do.call(normInts, c(list(fGroups), paramList))
-})
-
-
 setMethod("averageGroups", "featureGroups", function(fGroups, areas, normalized, by, func)
 {
     gTable <- copy(groupTable(fGroups, areas, normalized))
@@ -1386,10 +1378,10 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
 
 #' @export
 #' @rdname featureGroups-class
-setMethod("normIntsP", "featureGroups", function(fGroups, param = NULL, ..., standards = NULL)
+setMethod("normIntsP", "featureGroups", function(obj, param = NULL, ..., standards = NULL)
 {
     paramList <- prepAndVerifyParamForCall(param, "NormIntsParam", ..., exOptsToDots = TRUE)
-    do.call(normInts, c(list(fGroups, standards = standards), paramList))
+    do.call(normInts, c(list(obj, standards = standards), paramList))
 })
 
 #' @aliases calculateConcs

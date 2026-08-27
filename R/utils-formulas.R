@@ -486,7 +486,7 @@ addMiscFormulaInfo <- function(formTable, adduct)
     if (is.null(formTable[["ion_formula_mz"]]))
         formTable[, ion_formula_mz := sapply(neutralMass, calculateMasses, as.adduct(..adduct), type = "mz")]
     
-    formTable[explainedPeaks > 0, fragInfo := Map(ion_formula, fragInfo, f = function(form, fi)
+    formTable[, fragInfo := Map(ion_formula, fragInfo, f = function(form, fi)
     {
         fi <- copy(fi)
         if (nrow(fi) == 0)
@@ -498,7 +498,7 @@ addMiscFormulaInfo <- function(formTable, adduct)
     
     if (is.null(formTable[["explainedPeaks"]]))
         formTable[, explainedPeaks := sapply(fragInfo, nrow)]
-    
+        
     return(formTable)
 }
 

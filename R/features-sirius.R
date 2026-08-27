@@ -51,7 +51,8 @@ findFeaturesSIRIUS <- function(analysisInfo, noiseIntensity = NULL, alignMaxRTDe
     filePaths <- getCentroidedMSFilesFromAnaInfo(analysisInfo, "mzML")
     
     hash <- makeHash(analysisInfo[, c("analysis", "path_centroid"), with = FALSE], lapply(filePaths, makeFileHash),
-                     noiseIntensity, alignMaxRTDev, minSNR)
+                     noiseIntensity, alignMaxRTDev, minSNR,
+                     if (!is.null(projectPath) && file.exists(projectPath)) makeFileHash(projectPath))
     
     cachefg <- loadCacheData("featuresSIRIUS", hash)
     if (!is.null(cachefg))
@@ -120,6 +121,7 @@ findFeaturesSIRIUS <- function(analysisInfo, noiseIntensity = NULL, alignMaxRTDe
                "area"))
     allFeats[, c("mzmin", "mzmax") := list(mz - 0.005, mz + 0.005)] # UNDONE: change this whenever this data becomes available
     setcolorder(allFeats, c("ID", "SIRAlignedFeatureID", "ret", "retmin", "retmax", "mz", "mzmin", "mzmax"))
+    setorderv(allFeats, c("ret", "mz"))
     
     allFeatsList <- split(allFeats, by = "analysis", keep.by = FALSE)
     allFeatsList <- allFeatsList[intersect(analysisInfo$analysis, names(allFeatsList))] # re-order
@@ -131,4 +133,19 @@ findFeaturesSIRIUS <- function(analysisInfo, noiseIntensity = NULL, alignMaxRTDe
         cat("\n===========\nDone!\n")
     
     return(ret)
+}
+
+#' @details \code{importFeaturesSIRIUS} is a simple wrapper around \code{findFeaturesSIRIUS} to import features from an
+#'   existing SIRIUS project. It will set \code{runMode="read"} and \code{projectPath} to the provided \code{input}
+#'   path.
+#'
+#' @param input Sets \code{projectPath}.
+#' @param \dots Additional arguments passed to \code{\link{findFeaturesSIRIUS}}.
+#' 
+#' @rdname findFeaturesSIRIUS
+#' @export
+importFeaturesSIRIUS <- function(input, analysisInfo, ...)
+{
+    checkmate::assertFileExists(input)
+    findFeaturesSIRIUS(analysisInfo, projectPath = input, runMode = "read", ...)
 }

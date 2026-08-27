@@ -13,7 +13,9 @@ ffXCMS3 <- findFeatures(anaInfoOne, "xcms3", xcms::CentWaveParam(noise = 3E4))
 # UNDONE: ignore warnings about clusters...
 ffKPIC2 <- withCallingHandlers(findFeatures(anaInfoOne, "kpic2", level = 1E5),
                                warning = function(w) if (grepl("number of clusters", w, fixed = TRUE)) invokeRestart("muffleWarning"))
-ffSIRIUS <- findFeatures(anaInfoOne, "sirius")
+SIRProjPath <- tempfile("sirius_proj", fileext = ".sirius")
+# NOTE: run w/out cache so we can import stuff later
+ffSIRIUS <- withOpt(cache.mode = "none", findFeatures(anaInfoOne, "sirius", projectPath = SIRProjPath, noiseIntensity = 3E5))
 
 # generate mzXML files for enviPick
 exDataFiles <- list.files(patRoonData::exampleDataPath(), "\\.mzML$", full.names = TRUE)
@@ -53,6 +55,7 @@ if (doDATests())
 
 # Remove ID column: not reproducible
 OpenMSFTable <- function(ff) sapply(featureTable(ff), function(fts) fts[, -"ID"], simplify = FALSE)
+SIRFTable <- function(ff) sapply(featureTable(ff), function(fts) fts[, -c("ID", "SIRAlignedFeatureID")], simplify = FALSE)
 
 test_that("verify feature finder output", {
     expect_known_val(OpenMSFTable(ffOpenMS), "ff-openms", tolerance = 1E-5) # increased tolerance value for win/lin deviations
@@ -60,7 +63,7 @@ test_that("verify feature finder output", {
     expect_known_val(featureTable(ffXCMS3), "ff-xcms3")
     expect_known_val(featureTable(ffEP), "ff-envipick")
     expect_known_val(featureTable(ffKPIC2), "ff-kpic2")
-    expect_known_val(featureTable(ffSIRIUS), "ff-sirius")
+    expect_known_val(SIRFTable(ffSIRIUS), "ff-sirius")
     
     expect_known_val(OpenMSFTable(ffOpenMSQ), "ff-openms-qual")
     
@@ -69,6 +72,8 @@ test_that("verify feature finder output", {
                  OpenMSFTable(getTestFeatures(anaInfo,
                                               extraOpts = list("-algorithm:common:noise_threshold_int" = 30000))))
 
+    expect_equal(ffSIRIUS, importFeatures(SIRProjPath, "sirius", anaInfoOne))
+    
     skip_if_not(doDATests())
     expect_known_val(featureTable(ffDA), "ff-DA")
 })

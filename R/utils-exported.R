@@ -1995,8 +1995,7 @@ getSIRIUSConfig <- function(config = NULL, import = NULL, login = "check", alway
     )
     if (!is.null(import))
         checkmate::assertFileExists(import, add = ac)
-    assertSIRIUSLogin(login, add = ac)
-    checkmate::assertFlag(alwaysLogin, add = ac)
+    assertSIRIUSLogin(login, alwaysLogin, add = ac)
     checkmate::assertClass(SIRIUSAPI, "rsirius_api", null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     

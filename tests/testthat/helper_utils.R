@@ -259,9 +259,9 @@ testRegrTab <- function(fg, feat, rb, avg)
 
 doGenFormsSIRFPs <- function(fGroups, plists) doGenForms(fGroups, plists, "sirius", runMode = "read", calculateFeatures = FALSE,
                                                          getFingerprints = TRUE,
-                                                         projectPath = paste0(getSIRFormFPsProjPath()))
+                                                         projectPath = c(testSIRFormFPs = getSIRFormFPsProjPath()))
 doGenCompsSIR <- function(fGroups, plists) doGenComps(fGroups, plists, "sirius", runMode = "read", login = FALSE,
-                                                      projectPath = paste0(getSIRCompProjPath()))
+                                                      projectPath = c(testSIRComps = getSIRCompProjPath()))
 
 updateSIRIUSFormFPsProj <- function(...)
 {

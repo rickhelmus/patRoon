@@ -28,7 +28,8 @@ setMethod("initialize", "featureGroupsSIRIUS",
 #' @details This algorithm always first finds features with \command{SIRIUS} and can therefore not group features from
 #'   other algorithms. The MS files should be in the \file{mzML} or \file{mzXML} format.
 #'
-#' @param \dots Further arguments passed to \code{\link{findFeaturesSIRIUS}}.
+#' @param \dots Further arguments passed to \code{\link{findFeaturesSIRIUS}} (\code{groupFeaturesSIRIUS}) or
+#'   \code{\link{groupFeaturesSIRIUS}} (\code{importFeatureGroupsSIRIUS}).
 #'
 #' @template sirius-args
 #' @template centroid_note_mandatory
@@ -53,7 +54,8 @@ groupFeaturesSIRIUS <- function(analysisInfo, ..., login = "check", alwaysLogin 
     checkmate::reportAssertions(ac)
     
     filePaths <- getCentroidedMSFilesFromAnaInfo(analysisInfo, "mzML")
-    hash <- makeHash(analysisInfo[, c("analysis", "path_centroid"), with = FALSE], lapply(filePaths, makeFileHash), ...)
+    hash <- makeHash(analysisInfo[, c("analysis", "path_centroid"), with = FALSE], lapply(filePaths, makeFileHash), ...,
+                     if (!is.null(projectPath) && file.exists(projectPath)) makeFileHash(projectPath))
     
     cachefg <- loadCacheData("featureGroupsSIRIUS", hash)
     if (!is.null(cachefg))
@@ -102,7 +104,7 @@ groupFeaturesSIRIUS <- function(analysisInfo, ..., login = "check", alwaysLogin 
     SIRAlignedFeats <- SIRAlignedFeats[alignedFeatureId %chin% unique(allFeats$SIRAlignedFeatureID)]
     
     gInfo <- SIRAlignedFeats[, .(ret = rtApexSeconds, mz = ionMass, SIRAlignedFeatureID = alignedFeatureId)]
-    setorderv(gInfo, "mz")
+    setorderv(gInfo, c("ret", "mz"))
     gInfo[, group := mapply(seq_len(.N), ret, mz, FUN = makeFGroupName)]
     setcolorder(gInfo, "group")
     
@@ -132,6 +134,20 @@ groupFeaturesSIRIUS <- function(analysisInfo, ..., login = "check", alwaysLogin 
         cat("\n===========\nDone!\n")
     
     return(ret)
+}
+
+#' @details \code{importFeatureGroupsSIRIUS} is a simple wrapper around \code{groupFeaturesSIRIUS} to import feature
+#'   groups from an existing SIRIUS project. It will set \code{runMode="read"} and \code{projectPath} to the provided
+#'   \code{input} path.
+#'
+#' @param input Sets \code{projectPath}.
+#'
+#' @rdname groupFeaturesSIRIUS
+#' @export
+importFeatureGroupsSIRIUS <- function(input, analysisInfo, ...)
+{
+    checkmate::assertFileExists(input)
+    groupFeaturesSIRIUS(analysisInfo, projectPath = input, runMode = "read", ...)
 }
 
 #' @rdname featureGroups-class

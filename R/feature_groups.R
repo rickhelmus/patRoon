@@ -1733,14 +1733,14 @@ setMethod("groupFeatures", "data.frame", function(obj, algorithm, ..., verbose =
 #' @templateVar what import feature groups from files
 #' @templateVar ex1 importFeatureGroupsXCMS3
 #' @templateVar ex2 importFeatureGroupsTable
-#' @templateVar algosSuffix XCMS,XCMS3,KPIC2,Table,BrukerPA,BrukerTASQ,EnviMass
+#' @templateVar algosSuffix XCMS,XCMS3,KPIC2,SIRIUS,Table,BrukerPA,BrukerTASQ,EnviMass
 #' @templateVar ret featureGroups
 #' @templateVar noParam TRUE
 #' @template generic-algo
 #'
 #' @param input The input object or path that should be imported. See the algorithm specific functions for more details.
-#' @param type What type of data should be imported: \code{"xcms"}, \code{"xcms3"}, \code{"kpic2"}, \code{"table"},
-#'   \code{"brukerpa"} (Bruker ProfileAnalysis), \code{"brukertasq"} (Bruker TASQ) or \code{"envimass"}.
+#' @param type What type of data should be imported: \code{"xcms"}, \code{"xcms3"}, \code{"kpic2"}, \code{"sirius"},
+#'   \code{"table"}, \code{"brukerpa"} (Bruker ProfileAnalysis), \code{"brukertasq"} (Bruker TASQ) or \code{"envimass"}.
 #' @param \dots Further arguments passed to the selected import algorithm function.
 #'
 #' @inherit groupFeatures return
@@ -1754,11 +1754,12 @@ importFeatureGroups <- function(input, type, ...)
                 xcms = importFeatureGroupsXCMS,
                 xcms3 = importFeatureGroupsXCMS3,
                 kpic2 = importFeatureGroupsKPIC2,
+                sirius = importFeatureGroupsSIRIUS,
                 table = importFeatureGroupsTable,
                 brukerpa = importFeatureGroupsBrukerPA,
                 brukertasq = importFeatureGroupsBrukerTASQ,
                 envimass = importFeatureGroupsEnviMass,
-                stop("Invalid algorithm! Should be: xcms, xcms3, kpic2, table, brukerpa, brukertasq or envimass"))
+                stop("Invalid algorithm! Should be: xcms, xcms3, kpic2, sirius, table, brukerpa, brukertasq or envimass"))
 
     f(input, ...)
 }

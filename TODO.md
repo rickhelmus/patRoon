@@ -3,6 +3,8 @@
 ## SIRIUS
 
 - update tests
+    - make fGroup tests consistent
+    - don't try to use the adduct reported p$peakAnnotation --> use as$spectrumAnnotation$adduct?
 - NEWS
     - relatedCIDs from PCL is now ; separated instead of space separated
 

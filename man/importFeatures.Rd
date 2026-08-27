@@ -9,8 +9,8 @@ importFeatures(input, type, ...)
 \arguments{
 \item{input}{The input object or path that should be imported. See the algorithm specific functions for more details.}
 
-\item{type}{What type of data should be imported: \code{"xcms"}, \code{"xcms3"}, \code{"kpic2"}, \code{"table"}, or
-\code{"envimass"}.}
+\item{type}{What type of data should be imported: \code{"xcms"}, \code{"xcms3"}, \code{"kpic2"}, \code{"sirius"},
+\code{"table"}, or \code{"envimass"}.}
 
 \item{\dots}{Further arguments passed to the selected import algorithm function.}
 }
@@ -27,7 +27,7 @@ Generic function to import features produced by other software.
 }
 \seealso{
 The \code{\link{features}} output class and its methods and the algorithm specific functions:
-  \code{\link{importFeaturesXCMS}}, \code{\link{importFeaturesXCMS3}}, \code{\link{importFeaturesKPIC2}}, \code{\link{importFeaturesTable}}, \code{\link{importFeaturesEnviMass}}
+  \code{\link{importFeaturesXCMS}}, \code{\link{importFeaturesXCMS3}}, \code{\link{importFeaturesKPIC2}}, \code{\link{importFeaturesSIRIUS}}, \code{\link{importFeaturesTable}}, \code{\link{importFeaturesEnviMass}}
 
 \code{\link{findFeatures}} to find new features.
 }

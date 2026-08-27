@@ -12,7 +12,11 @@ fgXCMS <- groupFeatures(fList, "xcms")
 fgXCMS3 <- groupFeatures(fList, "xcms3")
 fgKPIC2 <- groupFeatures(fList, "kpic2")
 fgGreedy <- groupFeatures(fList, "greedy")
-fgSIRIUS <- groupFeatures(analysisInfo(fList)[1,], "sirius") # only do first analysis to avoid long run times
+SIRProjPath <- tempfile("sirius_proj", fileext = ".sirius")
+# only do first analysis to avoid long run times
+# NOTE: run w/out cache so we can import stuff later
+fgSIRIUS <- withOpt(cache.mode = "none",
+                    groupFeatures(analysisInfo(fList)[1,], "sirius", projectPath = SIRProjPath, noiseIntensity = 3E5))
 
 fgIMS <- groupFeatures(getTestFeaturesIMS(intThr = 2E5), "greedy")
 fgIMSEmpty <- groupFeatures(getEmptyFeaturesIMS(), "greedy")
@@ -52,6 +56,8 @@ test_that("verify feature grouping output", {
     expect_known_val(groupTable(fgSIRIUS), "fg-sirius")
     expect_known_val(groupTable(fgAMInt), "fg-am")
     expect_known_val(groupTable(fgOpenMSQ), "fg-openms-qual")
+    
+    expect_equal(fgSIRIUS, importFeatureGroups(SIRProjPath, "sirius", analysisInfo(fgSIRIUS)))
 })
 
 test_that("verify show output", {

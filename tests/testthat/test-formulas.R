@@ -26,7 +26,7 @@ if (doSIRIUS)
     formsSIREmpty <- doGenForms(fGroupsEmpty, plistsEmpty, "sirius")
     formsSIREmptyPL <- doGenForms(fGroups, plistsEmpty, "sirius")
     formsSIREmptyPLMS <- doGenForms(fGroups, plistsEmptyMS, "sirius")
-    
+    browser()
     if (FALSE)
         updateSIRIUSFormFPsProj(fGroups, plists)
     

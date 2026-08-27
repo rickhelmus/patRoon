@@ -2,6 +2,7 @@
 % Please edit documentation in R/feature_groups-sirius.R
 \name{groupFeaturesSIRIUS}
 \alias{groupFeaturesSIRIUS}
+\alias{importFeatureGroupsSIRIUS}
 \title{Group features using SIRIUS}
 \usage{
 groupFeaturesSIRIUS(
@@ -15,12 +16,15 @@ groupFeaturesSIRIUS(
   SIRIUSPath = NULL,
   verbose = TRUE
 )
+
+importFeatureGroupsSIRIUS(input, analysisInfo, ...)
 }
 \arguments{
 \item{analysisInfo}{A \code{data.frame} (or \code{data.table}) with \link[=analysis-information]{Analysis
 information}.}
 
-\item{\dots}{Further arguments passed to \code{\link{findFeaturesSIRIUS}}.}
+\item{\dots}{Further arguments passed to \code{\link{findFeaturesSIRIUS}} (\code{groupFeaturesSIRIUS}) or
+\code{\link{groupFeaturesSIRIUS}} (\code{importFeatureGroupsSIRIUS}).}
 
 \item{login, alwaysLogin}{Specifies if and how account logging of SIRIUS should be handled:
 
@@ -60,6 +64,8 @@ connection will be started automatically.}
 \code{SIRIUSAPI} is not provided.}
 
 \item{verbose}{if \code{FALSE} then no text output will be shown.}
+
+\item{input}{Sets \code{projectPath}.}
 }
 \value{
 Returns a \code{featureGroupsSIRIUS} object dervied from \code{\link{featureGroups}}. This object contains an
@@ -77,6 +83,10 @@ This algorithm always first finds features with \command{SIRIUS} and can therefo
 
 The input MS data files need to be centroided. The \code{\link{convertMSFiles}} function can be used
   to centroid data.
+
+\code{importFeatureGroupsSIRIUS} is a simple wrapper around \code{groupFeaturesSIRIUS} to import feature
+  groups from an existing SIRIUS project. It will set \code{runMode="read"} and \code{projectPath} to the provided
+  \code{input} path.
 }
 \section{SIRIUS 6 functionality}{
  The interface to \command{SIRIUS 6} is still in development and may be extended in

@@ -2,6 +2,7 @@
 % Please edit documentation in R/features-sirius.R
 \name{findFeaturesSIRIUS}
 \alias{findFeaturesSIRIUS}
+\alias{importFeaturesSIRIUS}
 \title{Find features using SIRIUS}
 \usage{
 findFeaturesSIRIUS(
@@ -17,6 +18,8 @@ findFeaturesSIRIUS(
   SIRIUSPath = NULL,
   verbose = TRUE
 )
+
+importFeaturesSIRIUS(input, analysisInfo, ...)
 }
 \arguments{
 \item{analysisInfo}{A \code{data.frame} (or \code{data.table}) with \link[=analysis-information]{Analysis
@@ -63,6 +66,10 @@ connection will be started automatically.}
 \code{SIRIUSAPI} is not provided.}
 
 \item{verbose}{If set to \code{FALSE} then no text output is shown.}
+
+\item{input}{Sets \code{projectPath}.}
+
+\item{\dots}{Additional arguments passed to \code{\link{findFeaturesSIRIUS}}.}
 }
 \value{
 An object of a class which is derived from \code{\link{features}}.
@@ -78,6 +85,10 @@ The MS files should be in the \file{mzML} or \file{mzXML} format.
 
 The input MS data files need to be centroided. The \code{\link{convertMSFiles}} function can be used
   to centroid data.
+
+\code{importFeaturesSIRIUS} is a simple wrapper around \code{findFeaturesSIRIUS} to import features from an
+  existing SIRIUS project. It will set \code{runMode="read"} and \code{projectPath} to the provided \code{input}
+  path.
 }
 \section{SIRIUS 6 functionality}{
  The interface to \command{SIRIUS 6} is still in development and may be extended in

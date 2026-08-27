@@ -142,7 +142,14 @@ findFeaturesSIRIUSNew <- function(analysisInfo, noiseIntensity = NULL, traceMaxM
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
-    # UNDONE: caching
+    filePaths <- getCentroidedMSFilesFromAnaInfo(analysisInfo, "mzML")
+    
+    hash <- makeHash(analysisInfo[, c("analysis", "path_centroid"), with = FALSE], lapply(filePaths, makeFileHash),
+                     noiseIntensity, traceMaxMassDeviation, minSNR, projectPath)
+    
+    cachefg <- loadCacheData("featuresSIRIUS", hash)
+    if (!is.null(cachefg))
+        return(cachefg)
     
     if (is.null(SIRIUSAPI))
         SIRIUSAPI <- startSIRIUS(SIRIUSPath)
@@ -150,35 +157,10 @@ findFeaturesSIRIUSNew <- function(analysisInfo, noiseIntensity = NULL, traceMaxM
     doSIRIUSLogin(login, alwaysLogin, SIRIUSAPI)
     projectID <- openSIRIUSProject(projectPath, SIRIUSAPI, runMode)
     
-    getQuants <- function(ID, type)
-    {
-        # UNDONE: we need this until there is a stable API: https://github.com/sirius-ms/sirius-client-openAPI/issues/188
-        
-        resp <- httr::GET(sprintf("%s/api/projects/%s/aligned-features/%s/quant-table-row",
-                                  SIRIUSAPI$api_client$base_path, projectID, ID),
-                          query = list(type = type))
-        
-        if (httr::status_code(resp) != 200)
-        {
-            stop("Failed to retrieve quant table from SIRIUS API: ", httr::content(resp, "text", encoding = "UTF-8"),
-                 call. = FALSE)
-        }
-        
-        cont <- httr::content(resp, "parsed")
-        if (is.null(cont) || is.null(cont[["values"]]))
-            stop("Failed to retrieve quant values from SIRIUS API", call. = FALSE)
-        
-        # UNDONE: how to get file names?? columnNames reads the original file name from the mzML file...
-        ret <- data.table(analysis = unlist(cont$columnNames), value = unlist(cont$values))
-        ret[, analysis := gsub(paste0(".*(", paste0(analysisInfo$analysis, collapse = "|"), ")$"), "\\1", analysis), by = .I]
-        browser()
-        return(cont$values)
-    }
-    
     if (runMode == "execute")
     {
         if (verbose)
-            printf("Running SIRIUS job...\n")
+            printf("Running SIRIUS job to get features...\n")
         
         params <- RSirius::LcmsSubmissionParameters$new()
         if (!is.null(noiseIntensity))
@@ -188,8 +170,7 @@ findFeaturesSIRIUSNew <- function(analysisInfo, noiseIntensity = NULL, traceMaxM
         if (!is.null(minSNR))
             params$minSNR <- minSNR
         
-        filePaths <- getCentroidedMSFilesFromAnaInfo(analysisInfo, "mzML")
-        job <- SIRIUSAPI$projects_api$ImportMsRunDataAsJob(projectID, as.list(unname(filePaths[2:3])), parameters = params)
+        job <- SIRIUSAPI$projects_api$ImportMsRunDataAsJob(projectID, as.list(unname(filePaths)), parameters = params)
         
         # NOTE: maxProgress can change during the job execution, so we normalize the current progress to it at each update
         prog <- openProgBar(0, 1)
@@ -203,17 +184,26 @@ findFeaturesSIRIUSNew <- function(analysisInfo, noiseIntensity = NULL, traceMaxM
         }
         setTxtProgressBar(prog, 1)
         close(prog)
-        
-        SIRFeats <- SIRIUSAPI$features_api$GetAlignedFeatures(projectID)
-        fTab <- rbindlist(lapply(SIRFeats, function(f)
-        {
-            return(data.table(ID = f$alignedFeatureId, ret = f$rtApexSeconds, mz = f$ionMass,
-                              mzmin = f$ionMass - 0.005, mzmax = f$ionMass + 0.005, # UNDONE
-                              retmin = f$rtStartSeconds, retmax = f$rtEndSeconds))
-        }))
-        
-        browser()
-        fTab[, intensity := getQuants("APEX_INTENSITY")]
-        fTab[, area := getQuants("AREA_UNDER_CURVE")]
     }
+    
+    alignedFeatTab <- getSIRIUSAlignedFeatTab(SIRIUSAPI, projectID)
+    SIRQuantTabInt <- getSIRIUSQuantTab(SIRIUSAPI, projectID, "intensity")
+    SIRQuantTabArea <- getSIRIUSQuantTab(SIRIUSAPI, projectID, "area")
+    
+    allFeats <- merge(SIRQuantTabInt, alignedFeatTab, by = "SIRID", sort = FALSE)
+    allFeats[SIRQuantTabArea, area := i.area, on = c("SIRID", "analysis")]
+    setcolorder(allFeats, "intensity", before = "area")
+    allFeats <- allFeats[intensity > 0]
+    allFeats[, ID := as.character(seq_len(.N)), by = "analysis"]
+    setcolorder(allFeats, "ID")
+    allFeatsList <- split(allFeats, by = "analysis", keep.by = FALSE)
+    allFeatsList <- allFeatsList[intersect(analysisInfo$analysis, names(allFeatsList))] # re-order
+    
+    ret <- featuresSIRIUS(analysisInfo = analysisInfo, features = allFeatsList)
+    saveCacheData("featuresSIRIUS", ret, hash)
+    
+    if (verbose)
+        cat("\n===========\nDone!\n")
+    
+    return(ret)
 }

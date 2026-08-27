@@ -86,6 +86,33 @@ openSIRIUSProject <- function(projectPath, SIRIUSAPI, runMode)
     return(projectID)
 }
 
+getSIRIUSAlignedFeatTab <- function(SIRIUSAPI, projectID)
+{
+    SIRFeats <- SIRIUSAPI$features_api$GetAlignedFeatures(projectID, opt_fields = "qualities")
+    return(rbindlist(lapply(SIRFeats, function(f)
+    {
+        return(data.table(SIRID = f$alignedFeatureId, ret = f$rtApexSeconds, mz = f$ionMass,
+                          mzmin = f$ionMass - 0.005, mzmax = f$ionMass + 0.005, # UNDONE
+                          retmin = f$rtStartSeconds, retmax = f$rtEndSeconds,
+                          quality = f$quality, qualityIsotope = f$qualities$ISOTOPE_QUALITY,
+                          qualityPeak = f$qualities$PEAK_QUALITY))
+    })))
+}
+
+getSIRIUSQuantTab <- function(SIRIUSAPI, projectID, type)
+{
+    sirtype <- if (type == "intensity") "APEX_INTENSITY" else "AREA_UNDER_CURVE"
+    # based on https://github.com/sirius-ms/sirius-client-openAPI/issues/188#issuecomment-5423823645
+    sirq <- SIRIUSAPI$features_api$GetFeatureQuantTable(projectID, type = sirtype, opt_fields = "columnSources")
+    tab <- rbindlist(lapply(sirq$values, \(v) as.list(unlist(v))))
+    anas <- baseName(tools::file_path_sans_ext(unlist(sirq$columnSources)))
+    setnames(tab, anas)
+    setnafill(tab, fill = 0)
+    tab[, SIRID := unlist(sirq$rowIds)]
+    tab <- melt(tab, id.vars = "SIRID", variable.name = "analysis", variable.factor = FALSE, value.name = type)
+    return(tab)
+}
+
 getSIRIUSFormulaCandidates <- function(projectID, SIRIUSAPI, SIRFeatID, adduct)
 {
     formCands <- SIRIUSAPI$features_api$GetFormulaCandidates(projectID, SIRFeatID, opt_fields = "statistics")

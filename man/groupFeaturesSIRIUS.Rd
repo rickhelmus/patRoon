@@ -4,16 +4,66 @@
 \alias{groupFeaturesSIRIUS}
 \title{Group features using SIRIUS}
 \usage{
-groupFeaturesSIRIUS(analysisInfo, verbose = TRUE)
+groupFeaturesSIRIUS(
+  analysisInfo,
+  ...,
+  login = "check",
+  alwaysLogin = FALSE,
+  projectPath = NULL,
+  runMode = "execute",
+  SIRIUSAPI = NULL,
+  SIRIUSPath = NULL,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{analysisInfo}{A \code{data.frame} (or \code{data.table}) with \link[=analysis-information]{Analysis
 information}.}
 
+\item{\dots}{Further arguments passed to \code{\link{findFeaturesSIRIUS}}.}
+
+\item{login, alwaysLogin}{Specifies if and how account logging of SIRIUS should be handled:
+
+  \code{login=FALSE}: no automatic login is performed and the active login status is not checked.
+
+  \code{login="check"}: aborts if no active login is present.
+
+  \code{login="interactive"}: interactively ask for login (using \CRANpkg{getPass}).
+
+  \code{login=c(username="...", password="...")}: perform the login with the given details. For security reasons,
+  please do not enter the details directly, but use e.g. environment variables or store/retrieve them with the
+  \CRANpkg{keyring} package.
+  
+  if \code{alwaysLogin=TRUE} then a login is always performed, otherwise only if SIRIUS reports no active login.
+
+  See the \href{https://v6.docs.sirius-ms.io/account-and-license/}{SIRIUS website} and \pkg{patRoon} handbook for
+  more information.
+  
+  \strong{NOTE}: By loggin in you will accept the terms of the Service and Privacy Policy of the SIRIUS Webservice.}
+
+\item{runMode, projectPath}{Whether to execute a \command{SIRIUS} processing job (\code{runMode="execute"}) or load
+  results from an existing \command{SIRIUS} project (\code{runMode"read"}). If \code{runMode="execute"} then
+  \code{projectPath} can be \code{NULL} and a temporary project will be used, otherwise \code{projectPath} must point
+  to an existing project.
+
+  \strong{NOTE:} if \code{runMode="execute"} then any existing project at \code{projectPath} will be removed.
+
+  \strong{NOTE:} This is primarily intended for internal purposes, but may be of interest to e.g. re-import SIRIUS
+  results.
+
+  \setsWF \code{projectPath} should be a \code{character} specifying the paths for each set.}
+
+\item{SIRIUSAPI}{An \code{rsirius_api} object for connecting to the \command{SIRIUS} API. If \code{NULL}, a new
+connection will be started automatically.}
+
+\item{SIRIUSPath}{The full path to the \command{SIRIUS} command-line interface executable. Only used when
+\code{SIRIUSAPI} is not provided.}
+
 \item{verbose}{if \code{FALSE} then no text output will be shown.}
 }
 \value{
-An object of a class which is derived from \code{\link{featureGroups}}.
+Returns a \code{featureGroupsSIRIUS} object dervied from \code{\link{featureGroups}}. This object contains an
+  additional slot \code{groupInfoSIR} with information about the SIRIUS aligned features.
 }
 \description{
 Uses \href{https://bio.informatik.uni-jena.de/software/sirius/}{SIRIUS} to find \emph{and} group features.
@@ -22,17 +72,23 @@ Uses \href{https://bio.informatik.uni-jena.de/software/sirius/}{SIRIUS} to find 
 This function uses SIRIUS to group features. This function is called when calling \code{groupFeatures} with
   \code{algorithm="sirius"}.
 
-Finding and grouping features is done by running the \command{lcms-align} command on every analyses at once.
-  For this reason, grouping feature data from other algorithms than \command{SIRIUS} is not supported.
-
-  The MS files should be in the \file{mzML} or \file{mzXML} format. Furthermore, this algorithms requires the
-  presence of (data-dependent) MS/MS data.
+This algorithm always first finds features with \command{SIRIUS} and can therefore not group features from
+  other algorithms. The MS files should be in the \file{mzML} or \file{mzXML} format.
 
 The input MS data files need to be centroided. The \code{\link{convertMSFiles}} function can be used
   to centroid data.
 }
+\section{SIRIUS 6 functionality}{
+ The interface to \command{SIRIUS 6} is still in development and may be extended in
+  the future. There is a vast amount of functionality available, which will require quite some effort to support all.
+  However, the current functionality in \pkg{patRoon} is mostly equal to what was supported with previous
+  \command{SIRIUS} releases. Any feedback on the inclusion of specific functionality is welcome!
+}
+
 \references{
-\insertRef{Dhrkop2019}{patRoon}
+\insertRef{Hoffmann2021}{patRoon} \cr\cr \insertRef{Dhrkop2020}{patRoon} \cr\cr
+  \insertRef{Dhrkop2019}{patRoon} \cr\cr \insertRef{Duhrkop2015}{patRoon} \cr\cr
+  \insertRef{Duhrkop2015-2}{patRoon} \cr\cr \insertRef{Bcker2008}{patRoon}
 }
 \seealso{
 \code{\link{groupFeatures}} for more details and other algorithms.

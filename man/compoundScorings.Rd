@@ -13,7 +13,7 @@ compoundScorings(
 )
 }
 \arguments{
-\item{algorithm}{The algorithm: \code{"metfrag"} or \code{"sirius"}. Set to \code{NULL} to return all scorings.}
+\item{algorithm}{The algorithm: currently just \code{"metfrag"}. Set to \code{NULL} to return all scorings.}
 
 \item{database}{The database for which results should be returned (\emph{e.g.} \code{"pubchem"}). Set to \code{NULL}
 to return all scorings.}

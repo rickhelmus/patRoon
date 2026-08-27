@@ -92,6 +92,7 @@
 \alias{featureGroupsOpenMS}
 \alias{featureGroupsSIRIUS-class}
 \alias{featureGroupsSIRIUS}
+\alias{delete,featureGroupsSIRIUS-method}
 \alias{featureGroupsTable-class}
 \alias{featureGroupsTable}
 \alias{featureGroupsXCMS-class}
@@ -294,6 +295,8 @@ updateGroups(fGroups, ...)
 \S4method{unset}{featureGroupsSet}(obj, set)
 
 \S4method{delete}{featureGroupsKPIC2}(obj, ...)
+
+\S4method{delete}{featureGroupsSIRIUS}(obj, ...)
 
 \S4method{analysisInfo}{featureGroupsXCMS}(obj) <- value
 

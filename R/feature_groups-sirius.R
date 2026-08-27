@@ -82,7 +82,7 @@ processSIRIUSFGroups <- function(outPath, anaInfo)
 
 #' @rdname featureGroups-class
 #' @export
-featureGroupsSIRIUS <- setClass("featureGroupsSIRIUS", slots = c(SIRIDMapping = "data.table"),
+featureGroupsSIRIUS <- setClass("featureGroupsSIRIUS", slots = c(groupInfoSIR = "data.table"),
                                 contains = "featureGroups")
 
 setMethod("initialize", "featureGroupsSIRIUS",
@@ -144,137 +144,90 @@ groupFeaturesSIRIUS <- function(analysisInfo, verbose = TRUE)
     return(ret)
 }
 
-groupFeaturesSIRIUSNew <- function(analysisInfo, ..., verbose = TRUE)
+groupFeaturesSIRIUSNew <- function(analysisInfo, ..., login = "check", alwaysLogin = FALSE, projectPath = NULL,
+                                   runMode = "execute", SIRIUSAPI = NULL, SIRIUSPath = NULL, verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     # UNDONE: API docs say that mzXML is also supported?
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, fileTypes = "centroid", allowedFormats = "mzML", add = ac)
+    assertCommonSIRIUSArgs(login, alwaysLogin, projectPath, runMode, SIRIUSAPI, add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
-    features <- findFeaturesSIRIUSNew(analysisInfo, ..., verbose = verbose)
-    hash <- makeHash(features)
-        
+    filePaths <- getCentroidedMSFilesFromAnaInfo(analysisInfo, "mzML")
+    hash <- makeHash(analysisInfo[, c("analysis", "path_centroid"), with = FALSE], lapply(filePaths, makeFileHash), ...)
+    
     cachefg <- loadCacheData("featureGroupsSIRIUS", hash)
     if (!is.null(cachefg))
         return(cachefg)
 
+    # setup here so it can be shared with findFeaturesSIRIUS()
+    if (is.null(SIRIUSAPI))
+        SIRIUSAPI <- startSIRIUS(SIRIUSPath)
+    
+    # NOTE: setup projectPath/ID here so it can be shared with findFeaturesSIRIUS()
+    if (is.null(projectPath))
+        projectPath <- tempfile("patRoonSIRIUS", fileext = ".sirius")
+    if (length(names(projectPath)) == 0)
+        names(projectPath) <- "patRoonProjectID"
+    
+    # HACK: we always need to find features with SIRIUS to get group info from its project file, so temporarily disable
+    # loading from cache
+    features <- withOpt(
+        cache.mode = "save",
+        findFeaturesSIRIUSNew(analysisInfo, ..., login = login, alwaysLogin = alwaysLogin,
+                              projectPath = projectPath, runMode = runMode, SIRIUSAPI = SIRIUSAPI,
+                              SIRIUSPath = SIRIUSPath, verbose = verbose)
+    )
+    
+    # no need to login
+    # doSIRIUSLogin(login, alwaysLogin, SIRIUSAPI)
+    
+    projectID <- openSIRIUSProject(projectPath, SIRIUSAPI, "read")
+    
+    if (verbose)
+        printf("Importing SIRIUS aligned features...\n")
+    
+    SIRAlignedFeats <- getSIRIUSPagedResults(SIRIUSAPI$features_api$GetAlignedFeaturesPage, projectID,
+                                             opt_fields = "qualities", showProgress = verbose, pageSize = 100)
+    SIRAlignedFeats <- rbindlist(lapply(SIRAlignedFeats, function(f)
+    {
+        feat <- f$toList()[c("alignedFeatureId", "rtApexSeconds", "ionMass", "quality")]
+        feat$qualityIsotope = f$qualities$ISOTOPE_QUALITY
+        feat$qualityPeak = f$qualities$PEAK_QUALITY
+        return(feat)
+    }))
+    
     allFeats <- as.data.table(features)
     
-    # NOTE: feat properties are actually group properties at the moment, so just pick them from the features data
-    gInfo <- unique(allFeats, by = "SIRID")[, c("ret", "mz", "SIRID"), with = FALSE]
+    # NOTE: somehow SIRIUS can return empty aligned features
+    SIRAlignedFeats <- SIRAlignedFeats[alignedFeatureId %chin% unique(allFeats$SIRAlignedFeatureID)]
+    
+    gInfo <- SIRAlignedFeats[, .(ret = rtApexSeconds, mz = ionMass, SIRAlignedFeatureID = alignedFeatureId)]
     setorderv(gInfo, "mz")
     gInfo[, group := mapply(seq_len(.N), ret, mz, FUN = makeFGroupName)]
     setcolorder(gInfo, "group")
     
-    gTab <- dcast(allFeats, analysis ~ SIRID, value.var = "intensity", fill = 0)
+    gTab <- dcast(allFeats, analysis ~ SIRAlignedFeatureID, value.var = "intensity", fill = 0)
     gTab <- gTab[match(analysisInfo$analysis, analysis)]
     gTab[, analysis := NULL]
     setnames(gTab, gInfo$group)
     
-    ftind <- dcast(allFeats, analysis ~ SIRID, value.var = "ID", fill = 0)
+    allFeats[, row := seq_len(.N), by = "analysis"]
+    ftind <- dcast(allFeats, analysis ~ SIRAlignedFeatureID, value.var = "row", fill = 0)
     ftind <- ftind[match(analysisInfo$analysis, analysis)]
     ftind[, analysis := NULL]
     ftind[, (names(ftind)) := lapply(.SD, as.integer), .SDcols = names(ftind)]
     setnames(ftind, gInfo$group)
     
-    SIRIDMapping <- gInfo[, c("group", "SIRID"), with = FALSE]
-    gInfo[, SIRID := NULL]
+    gInfoSIR <- gInfo[, c("group", "SIRAlignedFeatureID"), with = FALSE]
+    gInfoSIR[SIRAlignedFeats, c("quality", "qualityIsotope", "qualityPeak") :=
+                 .(i.quality, i.qualityIsotope, i.qualityPeak), on = c("SIRAlignedFeatureID" = "alignedFeatureId")]
+    gInfo[, SIRAlignedFeatureID := NULL]
     
     ret <- featureGroupsSIRIUS(groups = gTab, groupInfo = gInfo, features = features, ftindex = ftind,
-                               SIRIDMapping = SIRIDMapping)
+                               groupInfoSIR = gInfoSIR)
     
-    
-    
-    if (F)
-    {
-        features <- findFeaturesSIRIUSNew(analysisInfo, login = login, alwaysLogin = alwaysLogin,
-                                          projectPath = projectPath, runMode = runMode, SIRIUSAPI = SIRIUSAPI,
-                                          SIRIUSPath = SIRIUSPath, ..., verbose = verbose)
-        
-        if (verbose)
-            printf("Running SIRIUS job to find and group features...\n")
-        
-        params <- RSirius::LcmsSubmissionParameters$new()
-        if (!is.null(noiseIntensity))
-            params$noiseIntensity <- noiseIntensity
-        if (!is.null(traceMaxMassDeviation))
-            params$traceMaxMassDeviation <- traceMaxMassDeviation
-        if (!is.null(minSNR))
-            params$minSNR <- minSNR
-        
-        job <- SIRIUSAPI$projects_api$ImportMsRunDataAsJob(projectID, as.list(unname(filePaths)), parameters = params)
-        
-        # NOTE: maxProgress can change during the job execution, so we normalize the current progress to it at each update
-        prog <- openProgBar(0, 1)
-        repeat
-        {
-            Sys.sleep(1)
-            jp <- SIRIUSAPI$jobs_api$GetJob(projectID, job$id)$progress
-            if (jp$state %in% c("CANCELED", "FAILED", "DONE"))
-                break
-            setTxtProgressBar(prog, jp$currentProgress / jp$maxProgress)
-        }
-        setTxtProgressBar(prog, 1)
-        close(prog)
-        
-        SIRFeats <- SIRIUSAPI$features_api$GetAlignedFeatures(projectID)
-        alignedFeatTab <- rbindlist(lapply(SIRFeats, function(f)
-        {
-            return(data.table(SIRID = f$alignedFeatureId, ret = f$rtApexSeconds, mz = f$ionMass,
-                              mzmin = f$ionMass - 0.005, mzmax = f$ionMass + 0.005, # UNDONE
-                              retmin = f$rtStartSeconds, retmax = f$rtEndSeconds))
-        }))
-        
-        getSirQuant <- function(type)
-        {
-            sirtype <- if (type == "intensity") "APEX_INTENSITY" else "AREA_UNDER_CURVE"
-            # based on https://github.com/sirius-ms/sirius-client-openAPI/issues/188#issuecomment-5423823645
-            sirq <- SIRIUSAPI$features_api$GetFeatureQuantTable(projectID, type = sirtype, opt_fields = "columnSources")
-            tab <- rbindlist(lapply(sirq$values, \(v) as.list(unlist(v))))
-            anas <- baseName(tools::file_path_sans_ext(unlist(sirq$columnSources)))
-            setnames(tab, anas)
-            setnafill(tab, fill = 0)
-            tab[, SIRID := unlist(sirq$rowIds)]
-            tab <- melt(tab, id.vars = "SIRID", variable.name = "analysis", variable.factor = FALSE, value.name = type)
-            return(tab)
-        }
-        
-        SIRQuantTabInt <- getSirQuant("intensity")
-        SIRQuantTabArea <- getSirQuant("area")
-        
-        allFeats <- merge(SIRQuantTabInt, alignedFeatTab, by = "SIRID", sort = FALSE)
-        allFeats[SIRQuantTabArea, area := i.area, on = c("SIRID", "analysis")]
-        setcolorder(allFeats, "intensity", before = "area")
-        allFeats <- allFeats[intensity > 0]
-        allFeats[, ID := as.character(seq_len(.N)), by = "analysis"]
-        setcolorder(allFeats, "ID")
-        allFeatsList <- split(allFeats, by = "analysis", keep.by = FALSE)
-        allFeatsList <- allFeatsList[intersect(analysisInfo$analysis, names(allFeatsList))] # re-order
-        
-        gInfo <- alignedFeatTab[, c("ret", "mz", "SIRID"), with = FALSE]
-        gInfo[, group := mapply(seq_len(.N), ret, mz, FUN = makeFGroupName)]
-        setcolorder(gInfo, "group")
-        setorderv(gInfo, "mz")
-        
-        gTab <- dcast(allFeats, analysis ~ SIRID, value.var = "intensity", fill = 0)
-        gTab <- gTab[match(analysisInfo$analysis, analysis)]
-        gTab[, analysis := NULL]
-        setnames(gTab, gInfo$group)
-        
-        ftind <- dcast(allFeats, analysis ~ SIRID, value.var = "ID", fill = 0)
-        ftind <- ftind[match(analysisInfo$analysis, analysis)]
-        ftind[, analysis := NULL]
-        ftind[, (names(ftind)) := lapply(.SD, as.integer), .SDcols = names(ftind)]
-        setnames(ftind, gInfo$group)
-        
-        SIRIDMapping <- gInfo[, c("group", "SIRID"), with = FALSE]
-        gInfo[, SIRID := NULL]
-        
-        ret <- featureGroupsSIRIUS(groups = gTab, groupInfo = gInfo, features = allFeatsList, ftindex = ftind,
-                                   SIRIDMapping = SIRIDMapping)
-    }
-        
     saveCacheData("featureGroupsSIRIUS", ret, hash)
     
     if (verbose)
@@ -288,6 +241,6 @@ groupFeaturesSIRIUSNew <- function(analysisInfo, ..., verbose = TRUE)
 setMethod("delete", "featureGroupsSIRIUS", function(obj, ...)
 {
     obj <- callNextMethod()
-    obj@SIRIDMapping <- obj@SIRIDMapping[group %chin % names(obj)]
+    obj@groupInfoSIR <- obj@groupInfoSIR[group %chin % names(obj)]
     return(obj)
 })

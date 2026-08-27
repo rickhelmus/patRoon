@@ -69,6 +69,18 @@ openSIRIUSProject <- function(projectPath, SIRIUSAPI, runMode)
     else
         normalizePath(projectPath, mustWork = FALSE, winslash = "/")
     
+    openProjects <- SIRIUSAPI$projects_api$GetProjects()
+    for (proj in openProjects)
+    {
+        if (proj$projectId == projectID)
+        {
+            p <- normalizePath(proj$location, mustWork = FALSE, winslash = "/")
+            if (!is.null(projectPath) && p != projectPath)
+                stop(sprintf("Project with ID '%s' is already open at a different location: %s", projectID, p), call. = FALSE)
+            return(projectID)
+        }
+    }
+    
     if (file.exists(projectPath) && runMode == "read")
         SIRIUSAPI$projects_api$OpenProject(projectID, projectPath)
     else
@@ -86,31 +98,40 @@ openSIRIUSProject <- function(projectPath, SIRIUSAPI, runMode)
     return(projectID)
 }
 
-getSIRIUSAlignedFeatTab <- function(SIRIUSAPI, projectID)
+getSIRIUSPagedResults <- function(getFunc, ..., pageSize = 100, showProgress = TRUE)
 {
-    SIRFeats <- SIRIUSAPI$features_api$GetAlignedFeatures(projectID, opt_fields = "qualities")
-    return(rbindlist(lapply(SIRFeats, function(f)
+    pageRes <- getFunc(page = 0, size = pageSize, ...)
+    totPages <- pageRes$page$totalPages
+    ret <- vector("list", length = totPages)
+    ret[[1]] <- pageRes$content
+    
+    if (totPages > 1)
     {
-        return(data.table(SIRID = f$alignedFeatureId, ret = f$rtApexSeconds, mz = f$ionMass,
-                          mzmin = f$ionMass - 0.005, mzmax = f$ionMass + 0.005, # UNDONE
-                          retmin = f$rtStartSeconds, retmax = f$rtEndSeconds,
-                          quality = f$quality, qualityIsotope = f$qualities$ISOTOPE_QUALITY,
-                          qualityPeak = f$qualities$PEAK_QUALITY))
-    })))
-}
+        if (showProgress)
+        {
+            prog <- openProgBar(0, totPages)
+            setTxtProgressBar(prog, 1)
+        }
+        
+        for (i in seq(1, totPages - 1))
+        {
+            pageRes <- getFunc(..., page = i, size = pageSize)
+            ret[[i + 1]] <- pageRes$content
+            if (showProgress)
+                setTxtProgressBar(prog, i)
+        }
+        
+        if (showProgress)
+        {
+            setTxtProgressBar(prog, totPages)
+            close(prog)
+        }
+    }
 
-getSIRIUSQuantTab <- function(SIRIUSAPI, projectID, type)
-{
-    sirtype <- if (type == "intensity") "APEX_INTENSITY" else "AREA_UNDER_CURVE"
-    # based on https://github.com/sirius-ms/sirius-client-openAPI/issues/188#issuecomment-5423823645
-    sirq <- SIRIUSAPI$features_api$GetFeatureQuantTable(projectID, type = sirtype, opt_fields = "columnSources")
-    tab <- rbindlist(lapply(sirq$values, \(v) as.list(unlist(v))))
-    anas <- baseName(tools::file_path_sans_ext(unlist(sirq$columnSources)))
-    setnames(tab, anas)
-    setnafill(tab, fill = 0)
-    tab[, SIRID := unlist(sirq$rowIds)]
-    tab <- melt(tab, id.vars = "SIRID", variable.name = "analysis", variable.factor = FALSE, value.name = type)
-    return(tab)
+    ret <- unlist(ret, recursive = FALSE)
+
+    
+    return(ret)
 }
 
 getSIRIUSFormulaCandidates <- function(projectID, SIRIUSAPI, SIRFeatID, adduct)
@@ -376,10 +397,10 @@ runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUS
             {
                 # BUG: opt_fields doesn't seem to do anything
                 # UNDONE: support opt_fields="libraryMatches"?
-                ret$structCands <- SIRIUSAPI$features_api$GetStructureCandidatesPaged(projectID,
-                                                                                      sirFeat$alignedFeatureId,
-                                                                                      page = 0, size = topMostStructures,
-                                                                                      opt_fields = c("dbLinks"))
+                ret$structCands <- SIRIUSAPI$features_api$GetStructureCandidatesPage(projectID,
+                                                                                     sirFeat$alignedFeatureId,
+                                                                                     page = 0, size = topMostStructures,
+                                                                                     opt_fields = c("dbLinks"))
                 ret$structCands <- rbindlist(lapply(ret$structCands$content, \(sc) sc$toList()), fill = TRUE)
                 if (nrow(ret$structCands) > 0)
                 {

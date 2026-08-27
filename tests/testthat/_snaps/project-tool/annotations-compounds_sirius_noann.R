@@ -43,8 +43,8 @@ mslists <- filter(mslists, MSLevel = 2, absMinIntensity = NULL, relMinIntensity 
 
 # Calculate compound structure candidates
 # Please see the handbook for SIRIUS login options. If you want to disable automatic login set login=FALSE
-compounds <- generateCompounds(fGroups, mslists, "sirius", adduct = "[M+H]+", fingerIDDatabase = "pubchem",
-                               elements = "CHNOP", profile = "qtof", login = "interactive", alwaysLogin = FALSE)
+compounds <- generateCompounds(fGroups, mslists, "sirius", adduct = "[M+H]+", config = getSIRIUSConfig(),
+                               login = "interactive", alwaysLogin = FALSE)
 
 # -------------------------
 # reporting

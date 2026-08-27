@@ -407,7 +407,10 @@ genScriptFeaturesBlock <- function(ionization, IMS, settingsFeat, generator)
                  condition = fa == "piek" && settingsFeat$piekParams$filter == "suspects"),
             list(name = "adduct", value = suspPiekA, quote = TRUE,
                  condition = fa == "piek" && settingsFeat$piekParams$filter == "suspects"),
-            list(name = "doFMF", value = TRUE, condition = fa == "Bruker")
+            list(name = "doFMF", value = TRUE, condition = fa == "Bruker"),
+            list(name = "noiseIntensity", value = NULL, condition = fa == "SIRIUS"),
+            list(name = "alignMaxRTDev", value = NULL, condition = fa == "SIRIUS"),
+            list(name = "minSNR", value = NULL, condition = fa == "SIRIUS")
         ))
     }
     
@@ -417,7 +420,7 @@ genScriptFeaturesBlock <- function(ionization, IMS, settingsFeat, generator)
     {
         generator$addComment("Find all features")
         generator$addComment("NOTE: see the reference manual for many more options",
-                             condition = !settingsFeat$featAlgo %in% c("Bruker", "SIRIUS"))
+                             condition = settingsFeat$featAlgo != "Bruker")
         
         if (settingsFeat$featAlgo == "piek")
         {
@@ -472,7 +475,10 @@ genScriptFeaturesBlock <- function(ionization, IMS, settingsFeat, generator)
         list(name = "groupParam", value = "xcms::PeakDensityParam(sampleGroups = analysisInfo(fList)$replicate)",
              condition = settingsFeat$fGroupsAlgo == "XCMS"),
         list(name = "retAlignParam", value = "xcms::ObiwarpParam()", condition = doRTAlign && settingsFeat$fGroupsAlgo == "XCMS"),
-        list(name = "scoreWeights", value = "c(retention = 1, mz = 1, mobility = 1)", condition = settingsFeat$fGroupsAlgo == "Greedy")
+        list(name = "scoreWeights", value = "c(retention = 1, mz = 1, mobility = 1)", condition = settingsFeat$fGroupsAlgo == "Greedy"),
+        list(name = "noiseIntensity", value = NULL, condition = settingsFeat$fGroupsAlgo == "SIRIUS"),
+        list(name = "alignMaxRTDev", value = NULL, condition = settingsFeat$fGroupsAlgo == "SIRIUS"),
+        list(name = "minSNR", value = NULL, condition = settingsFeat$fGroupsAlgo == "SIRIUS")
     ))
     
     retRange <- settingsFeat$fGroupsAdv$retention

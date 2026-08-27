@@ -26,10 +26,18 @@ generateComponentsNet(fGroups, ...)
   annotAlgo = "imss",
   annotAdducts = c("[M+H]+", "[M+Na]+", "[M+K]+", "[M+NH4]+", "[M-H]-", "[M-H2O-H]-"),
   annotPrefAdducts = c("[M+H]+", "[M-H]-"),
-  annotArgs = list()
+  annotArgs = list(),
+  MSPeakLists = NULL,
+  mzFragBelow = 10
 )
 
-\S4method{generateComponentsNet}{featureGroupsSet}(fGroups, ionization = NULL, ...)
+\S4method{generateComponentsNet}{featureGroupsSet}(
+  fGroups,
+  ionization = NULL,
+  ...,
+  MSPeakLists = NULL,
+  mzFragBelow = 10
+)
 }
 \arguments{
 \item{fGroups}{\code{\link{featureGroups}} object for which components should be generated.}
@@ -94,6 +102,16 @@ least two adducts are required. Adducts incompatible with the ionization mode ar
 list should contain \code{pattern} and \code{adduct} elements, which are themselves lists with arguments passed to
 \code{\link[nontarget:pattern.search]{nontarget::pattern.search}} and
 \code{\link[nontarget:adduct.search]{nontarget::adduct.search}}, respectively.}
+
+\item{MSPeakLists}{An \code{\link{MSPeakLists}} object that was generated for the supplied \code{fGroups}. If given,
+MS2 peak lists are used to annotate which features within a component are likely in-source fragments: MS2 peaks are
+matched against other feature groups within the same component (using the tolerance set by \code{mzWindow}). Set to
+\code{NULL} to skip this step.}
+
+\item{mzFragBelow}{Only match feature group \code{A} to the MS2 data of feature group \code{B} if the \emph{m/z}
+value of \code{A} is at least \code{mzFragBelow} below that of \code{B}. The value should be sufficiently high to
+avoid taking a same MS2 scan for \code{A} and \code{B}, \emph{i.e.} \code{mzFragBelow} should be set based on the
+MS2 isolation window of the instrument. Only relevant if \code{MSPeakLists} is set.}
 }
 \value{
 A \code{\link{componentsNet}} object (derived from \code{\link{components}}). The
@@ -144,6 +162,12 @@ A \code{\link{componentsNet}} object (derived from \code{\link{components}}). Th
   \item{\code{add_link_mz_tol}}{The mass tolerance(s) for the adduct assignment.}
   }
 
+  When \code{MSPeakLists} is provided, the following column is added:
+  \describe{
+  \item{\code{fragOf}}{Names of feature groups of this the feature group is a potential in-source fragment. \code{NA}
+    if no assignment was made. Multiple values are semicolon-separated.}
+  }
+
   The \code{\link{componentInfo}} table contains the columns \code{name} (component name), \code{cmp_ret} (mean
   retention time), \code{cmp_retsd} (retention time standard deviation), \code{neutral_mass} (mean neutral mass) and
   \code{size} (number of features).
@@ -174,15 +198,17 @@ Features are first grouped per analysis into feature components by constructing 
 
     \item uses a different approach to convert feature components across analyses into consensus components, which
     should (hopefully) perform better than other feature-based algorithms (\code{\link{generateComponentsOpenMS}} and
-    \code{\link{generateComponentsCliqueMS}})).
-    
+    \code{\link{generateComponentsCliqueMS}}).
+
     \item supports different and configurable componentization methods (see \code{componMethod} argument).
-    
+
     \item supports isotope annotation that is not based on 13C differences thanks to the \pkg{nontarget} package, eg
     useful for halogenated compounds.
+    
+    \item supports basic annotation of in-source fragments from MS2 data.
 
   }
-  
+
   It is recommended to use the \code{\link[=plotGraph,componentsNet]{plotGraph()}} method to evaluate the feature
   componentization, e.g. to evaluate different methods (\code{componMethod} argument) or relevant parameters.
 }

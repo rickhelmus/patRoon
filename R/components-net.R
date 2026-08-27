@@ -366,6 +366,54 @@ annotateCompNetNontarget <- function(componList, mzWindow, ionization, adducts, 
     return(list(components = componList, objects = objects))
 }
 
+addCompNetMS2 <- function(componList, fGroups, MSPeakLists, mzWindow, mzFragBelow)
+{
+    componList <- sapply(componList, function(comp)
+    {
+        comp <- copy(comp)
+        
+        if (nrow(comp) < 2)
+        {
+            comp[, fragOf := if (.N == 0) character() else NA_character_]
+            return(comp)
+        }
+        
+        gInfo <- groupInfo(fGroups)[group %in% comp$group]
+        MS2Links <- pruneList(sapply(gInfo$group, function(gn)
+        {
+            MS2 <- MSPeakLists[[gn]][["MSMS"]]
+            if (is.null(MS2))
+                return(NULL)
+            MS2 <- MS2[mz < (gInfo[group == gn]$mz - mzFragBelow)]
+            MS2[, closest := sapply(mz, function(m)
+            {
+                cands <- gInfo[group != gn & numLTE(abs(mz - m), mzWindow)]
+                wh <- which.min(cands$mz - m)
+                return(if (length(wh) > 0) cands[wh]$group else NA_character_)
+            })]
+            MS2[!is.na(closest)]
+        }, simplify = FALSE), checkZeroRows = TRUE)
+        
+        MS2Tab <- rbindlist(MS2Links, idcol = "prec")
+        if (nrow(MS2Tab) == 0)
+            comp[, fragOf := NA_character_]
+        else
+        {
+            comp[, fragOf := sapply(group, function(g)
+            {
+                precs <- MS2Tab[closest == g]$prec
+                if (length(precs) == 0)
+                    return(NA_character_)
+                return(paste0(precs, collapse = ";"))
+            })]
+        }
+
+        return(comp)
+    }, simplify = FALSE)
+    
+    return(componList)
+}
+
 #' Components class for network-based componentization.
 #'
 #' This class is derived from \code{\link{components}} and is used to store results from network-based componentization.
@@ -417,15 +465,17 @@ setMethod("expandForIMS", "componentsNet", function(obj, ...) cannotExpandCompon
 #'
 #'     \item uses a different approach to convert feature components across analyses into consensus components, which
 #'     should (hopefully) perform better than other feature-based algorithms (\code{\link{generateComponentsOpenMS}} and
-#'     \code{\link{generateComponentsCliqueMS}})).
-#'     
+#'     \code{\link{generateComponentsCliqueMS}}).
+#'
 #'     \item supports different and configurable componentization methods (see \code{componMethod} argument).
-#'     
+#'
 #'     \item supports isotope annotation that is not based on 13C differences thanks to the \pkg{nontarget} package, eg
 #'     useful for halogenated compounds.
+#'     
+#'     \item supports basic annotation of in-source fragments from MS2 data.
 #'
 #'   }
-#'   
+#'
 #'   It is recommended to use the \code{\link[=plotGraph,componentsNet]{plotGraph()}} method to evaluate the feature
 #'   componentization, e.g. to evaluate different methods (\code{componMethod} argument) or relevant parameters.
 #'
@@ -483,6 +533,14 @@ setMethod("expandForIMS", "componentsNet", function(obj, ...) cannotExpandCompon
 #'   list should contain \code{pattern} and \code{adduct} elements, which are themselves lists with arguments passed to
 #'   \code{\link[nontarget:pattern.search]{nontarget::pattern.search}} and
 #'   \code{\link[nontarget:adduct.search]{nontarget::adduct.search}}, respectively.
+#' @param MSPeakLists An \code{\link{MSPeakLists}} object that was generated for the supplied \code{fGroups}. If given,
+#'   MS2 peak lists are used to annotate which features within a component are likely in-source fragments: MS2 peaks are
+#'   matched against other feature groups within the same component (using the tolerance set by \code{mzWindow}). Set to
+#'   \code{NULL} to skip this step.
+#' @param mzFragBelow Only match feature group \code{A} to the MS2 data of feature group \code{B} if the \emph{m/z}
+#'   value of \code{A} is at least \code{mzFragBelow} below that of \code{B}. The value should be sufficiently high to
+#'   avoid taking a same MS2 scan for \code{A} and \code{B}, \emph{i.e.} \code{mzFragBelow} should be set based on the
+#'   MS2 isolation window of the instrument. Only relevant if \code{MSPeakLists} is set.
 #'
 #' @templateVar ion TRUE
 #' @templateVar minSize TRUE
@@ -538,6 +596,12 @@ setMethod("expandForIMS", "componentsNet", function(obj, ...) cannotExpandCompon
 #'   \item{\code{add_link_mz_tol}}{The mass tolerance(s) for the adduct assignment.}
 #'   }
 #'
+#'   When \code{MSPeakLists} is provided, the following column is added:
+#'   \describe{
+#'   \item{\code{fragOf}}{Names of feature groups of this the feature group is a potential in-source fragment. \code{NA}
+#'     if no assignment was made. Multiple values are semicolon-separated.}
+#'   }
+#'
 #'   The \code{\link{componentInfo}} table contains the columns \code{name} (component name), \code{cmp_ret} (mean
 #'   retention time), \code{cmp_retsd} (retention time standard deviation), \code{neutral_mass} (mean neutral mass) and
 #'   \code{size} (number of features).
@@ -546,7 +610,7 @@ setMethod("expandForIMS", "componentsNet", function(obj, ...) cannotExpandCompon
 #'
 #' @templateVar class componentsNetSet
 #' @template compon_gen-sets-merged
-#' 
+#'
 #' @note The \code{generateComponentsNet} function is still experimental. Any feedback is welcome!
 #'
 #' @source The componentization approach was inspired by \pkg{CAMERA} and \pkg{cliqueMS}.
@@ -569,12 +633,12 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
                                                              annotAdducts = c("[M+H]+", "[M+Na]+", "[M+K]+", "[M+NH4]+",
                                                                               "[M-H]-", "[M-H2O-H]-"),
                                                              annotPrefAdducts = c("[M+H]+", "[M-H]-"),
-                                                             annotArgs = list())
+                                                             annotArgs = list(), MSPeakLists = NULL,
+                                                             mzFragBelow = 10)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertClass(fGroups, "featureGroups", add = ac)
     ionization <- checkAndGetIonization(ionization, fGroups, add = ac)
-    aapply(checkmate::assertCount, . ~ minSize, positive = TRUE, fixed = list(add = ac))
+    checkmate::assertCount(minSize, positive = TRUE, add = ac)
     checkmate::assertNumber(mzWindow, finite = TRUE, lower = 0, add = ac)
     checkmate::assertChoice(componSim, c("pearson", "cosine"), add = ac)
     checkmate::assertNumber(componMinSim, finite = TRUE, lower = 0, upper = 1, add = ac)
@@ -591,6 +655,8 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     checkmate::assertCharacter(annotAdducts, min.chars = 1, any.missing = FALSE, unique = TRUE, add = ac)
     checkmate::assertCharacter(annotPrefAdducts, min.chars = 1, any.missing = FALSE, unique = TRUE, add = ac)
     checkmate::assertList(annotArgs, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
+    checkmate::assertClass(MSPeakLists, "MSPeakLists", null.ok = TRUE, add = ac)
+    checkmate::assertNumber(mzFragBelow, finite = TRUE, lower = 0, add = ac)
     checkmate::reportAssertions(ac)
     
     if (length(fGroups) == 0)
@@ -621,7 +687,8 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     }
     
     hash <- makeHash(fGroups, ionization, minSize, mzWindow, componSim, componMinSim, componMaxP, componMethod,
-                     componArgs, groupClust, groupClustH, annotAlgo, annotAdducts, annotPrefAdducts, annotArgs)
+                     componArgs, groupClust, groupClustH, annotAlgo, annotAdducts, annotPrefAdducts, annotArgs,
+                     MSPeakLists, mzFragBelow)
     cd <- loadCacheData("componentsNet", hash)
     if (!is.null(cd))
         return(cd)
@@ -711,6 +778,13 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     
     componList <- annotResult$components
     
+    if (!is.null(MSPeakLists))
+    {
+        printf("Adding MS2 information to components... ")
+        componList <- addCompNetMS2(componList, fGroups, MSPeakLists, mzWindow, mzFragBelow)
+        printf("Done!\n")
+    }
+    
     cInfo <- data.table(name = names(componList), cmp_ret = sapply(componList, function(cmp) mean(cmp$ret)),
                         cmp_retsd = sapply(componList, function(cmp) sd(cmp$ret)),
                         neutral_mass = sapply(componList, function(cmp) if (all(is.na(cmp$neutralMass))) NA_real_ else mean(cmp$neutralMass, na.rm = TRUE)),
@@ -726,10 +800,13 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
 
 #' @rdname generateComponentsNet
 #' @export
-setMethod("generateComponentsNet", "featureGroupsSet", function(fGroups, ionization = NULL, ...)
+setMethod("generateComponentsNet", "featureGroupsSet", function(fGroups, ionization = NULL, ..., MSPeakLists = NULL,
+                                                                mzFragBelow = 10)
 {
+    msplArgs <- if (!is.null(MSPeakLists))
+        assertAndGetMSPLSetsArgs(fGroups, MSPeakLists)
     generateComponentsSet(fGroups, ionization, generateComponentsNet, setIonization = TRUE, ...,
-                          classGenerator = componentsNetSet)
+                          mzFragBelow = mzFragBelow, setArgs = msplArgs, classGenerator = componentsNetSet)
 })
 
 #' @describeIn componentsNet Plots an interactive network graph for the feature components of an analysis.

@@ -242,14 +242,15 @@ setMethod("show", "MSPeakLists", function(object)
     }
     else
     {
-        mspcount <- sum(sapply(object@peakLists, function(pa) sum(sapply(pa, function(pf) if (!is.null(pf[["MS"]])) nrow(pf[["MS"]]) else 0))))
-        msmspcount <- sum(sapply(object@peakLists, function(pa) sum(sapply(pa, function(pf) if (!is.null(pf[["MSMS"]])) nrow(pf[["MSMS"]]) else 0))))
+        prunedPLists <- pruneList(object@peakLists, checkEmptyElements = TRUE)
+        mspcount <- sum(sapply(prunedPLists, function(pa) sum(sapply(pa, function(pf) if (!is.null(pf[["MS"]])) nrow(pf[["MS"]]) else 0))))
+        msmspcount <- sum(sapply(prunedPLists, function(pa) sum(sapply(pa, function(pf) if (!is.null(pf[["MSMS"]])) nrow(pf[["MSMS"]]) else 0))))
         totpcount <- sum(mspcount, msmspcount)
-        mslcount <- sum(sapply(object@peakLists, function(pa) sum(sapply(pa, function(pf) !is.null(pf[["MS"]])))))
-        msmslcount <- sum(sapply(object@peakLists, function(pa) sum(sapply(pa, function(pf) !is.null(pf[["MSMS"]])))))
+        mslcount <- sum(sapply(prunedPLists, function(pa) sum(sapply(pa, function(pf) !is.null(pf[["MS"]])))))
+        msmslcount <- sum(sapply(prunedPLists, function(pa) sum(sapply(pa, function(pf) !is.null(pf[["MSMS"]])))))
         totlcount <- sum(mslcount, msmslcount)
 
-        anacount <- length(object@peakLists)
+        anacount <- length(prunedPLists)
         atotpcount <- totpcount / anacount
         amspcount <- mspcount / anacount
         amsmspcount <- msmspcount / anacount

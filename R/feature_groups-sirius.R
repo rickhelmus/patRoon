@@ -82,7 +82,8 @@ processSIRIUSFGroups <- function(outPath, anaInfo)
 
 #' @rdname featureGroups-class
 #' @export
-featureGroupsSIRIUS <- setClass("featureGroupsSIRIUS", contains = "featureGroups")
+featureGroupsSIRIUS <- setClass("featureGroupsSIRIUS", slots = c(SIRIDMapping = "data.table"),
+                                contains = "featureGroups")
 
 setMethod("initialize", "featureGroupsSIRIUS",
           function(.Object, ...) callNextMethod(.Object, algorithm = "sirius", ...))
@@ -142,3 +143,151 @@ groupFeaturesSIRIUS <- function(analysisInfo, verbose = TRUE)
 
     return(ret)
 }
+
+groupFeaturesSIRIUSNew <- function(analysisInfo, ..., verbose = TRUE)
+{
+    ac <- checkmate::makeAssertCollection()
+    # UNDONE: API docs say that mzXML is also supported?
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, fileTypes = "centroid", allowedFormats = "mzML", add = ac)
+    checkmate::assertFlag(verbose, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    features <- findFeaturesSIRIUSNew(analysisInfo, ..., verbose = verbose)
+    hash <- makeHash(features)
+        
+    cachefg <- loadCacheData("featureGroupsSIRIUS", hash)
+    if (!is.null(cachefg))
+        return(cachefg)
+
+    allFeats <- as.data.table(features)
+    
+    # NOTE: feat properties are actually group properties at the moment, so just pick them from the features data
+    gInfo <- unique(allFeats, by = "SIRID")[, c("ret", "mz", "SIRID"), with = FALSE]
+    setorderv(gInfo, "mz")
+    gInfo[, group := mapply(seq_len(.N), ret, mz, FUN = makeFGroupName)]
+    setcolorder(gInfo, "group")
+    
+    gTab <- dcast(allFeats, analysis ~ SIRID, value.var = "intensity", fill = 0)
+    gTab <- gTab[match(analysisInfo$analysis, analysis)]
+    gTab[, analysis := NULL]
+    setnames(gTab, gInfo$group)
+    
+    ftind <- dcast(allFeats, analysis ~ SIRID, value.var = "ID", fill = 0)
+    ftind <- ftind[match(analysisInfo$analysis, analysis)]
+    ftind[, analysis := NULL]
+    ftind[, (names(ftind)) := lapply(.SD, as.integer), .SDcols = names(ftind)]
+    setnames(ftind, gInfo$group)
+    
+    SIRIDMapping <- gInfo[, c("group", "SIRID"), with = FALSE]
+    gInfo[, SIRID := NULL]
+    
+    ret <- featureGroupsSIRIUS(groups = gTab, groupInfo = gInfo, features = features, ftindex = ftind,
+                               SIRIDMapping = SIRIDMapping)
+    
+    
+    
+    if (F)
+    {
+        features <- findFeaturesSIRIUSNew(analysisInfo, login = login, alwaysLogin = alwaysLogin,
+                                          projectPath = projectPath, runMode = runMode, SIRIUSAPI = SIRIUSAPI,
+                                          SIRIUSPath = SIRIUSPath, ..., verbose = verbose)
+        
+        if (verbose)
+            printf("Running SIRIUS job to find and group features...\n")
+        
+        params <- RSirius::LcmsSubmissionParameters$new()
+        if (!is.null(noiseIntensity))
+            params$noiseIntensity <- noiseIntensity
+        if (!is.null(traceMaxMassDeviation))
+            params$traceMaxMassDeviation <- traceMaxMassDeviation
+        if (!is.null(minSNR))
+            params$minSNR <- minSNR
+        
+        job <- SIRIUSAPI$projects_api$ImportMsRunDataAsJob(projectID, as.list(unname(filePaths)), parameters = params)
+        
+        # NOTE: maxProgress can change during the job execution, so we normalize the current progress to it at each update
+        prog <- openProgBar(0, 1)
+        repeat
+        {
+            Sys.sleep(1)
+            jp <- SIRIUSAPI$jobs_api$GetJob(projectID, job$id)$progress
+            if (jp$state %in% c("CANCELED", "FAILED", "DONE"))
+                break
+            setTxtProgressBar(prog, jp$currentProgress / jp$maxProgress)
+        }
+        setTxtProgressBar(prog, 1)
+        close(prog)
+        
+        SIRFeats <- SIRIUSAPI$features_api$GetAlignedFeatures(projectID)
+        alignedFeatTab <- rbindlist(lapply(SIRFeats, function(f)
+        {
+            return(data.table(SIRID = f$alignedFeatureId, ret = f$rtApexSeconds, mz = f$ionMass,
+                              mzmin = f$ionMass - 0.005, mzmax = f$ionMass + 0.005, # UNDONE
+                              retmin = f$rtStartSeconds, retmax = f$rtEndSeconds))
+        }))
+        
+        getSirQuant <- function(type)
+        {
+            sirtype <- if (type == "intensity") "APEX_INTENSITY" else "AREA_UNDER_CURVE"
+            # based on https://github.com/sirius-ms/sirius-client-openAPI/issues/188#issuecomment-5423823645
+            sirq <- SIRIUSAPI$features_api$GetFeatureQuantTable(projectID, type = sirtype, opt_fields = "columnSources")
+            tab <- rbindlist(lapply(sirq$values, \(v) as.list(unlist(v))))
+            anas <- baseName(tools::file_path_sans_ext(unlist(sirq$columnSources)))
+            setnames(tab, anas)
+            setnafill(tab, fill = 0)
+            tab[, SIRID := unlist(sirq$rowIds)]
+            tab <- melt(tab, id.vars = "SIRID", variable.name = "analysis", variable.factor = FALSE, value.name = type)
+            return(tab)
+        }
+        
+        SIRQuantTabInt <- getSirQuant("intensity")
+        SIRQuantTabArea <- getSirQuant("area")
+        
+        allFeats <- merge(SIRQuantTabInt, alignedFeatTab, by = "SIRID", sort = FALSE)
+        allFeats[SIRQuantTabArea, area := i.area, on = c("SIRID", "analysis")]
+        setcolorder(allFeats, "intensity", before = "area")
+        allFeats <- allFeats[intensity > 0]
+        allFeats[, ID := as.character(seq_len(.N)), by = "analysis"]
+        setcolorder(allFeats, "ID")
+        allFeatsList <- split(allFeats, by = "analysis", keep.by = FALSE)
+        allFeatsList <- allFeatsList[intersect(analysisInfo$analysis, names(allFeatsList))] # re-order
+        
+        gInfo <- alignedFeatTab[, c("ret", "mz", "SIRID"), with = FALSE]
+        gInfo[, group := mapply(seq_len(.N), ret, mz, FUN = makeFGroupName)]
+        setcolorder(gInfo, "group")
+        setorderv(gInfo, "mz")
+        
+        gTab <- dcast(allFeats, analysis ~ SIRID, value.var = "intensity", fill = 0)
+        gTab <- gTab[match(analysisInfo$analysis, analysis)]
+        gTab[, analysis := NULL]
+        setnames(gTab, gInfo$group)
+        
+        ftind <- dcast(allFeats, analysis ~ SIRID, value.var = "ID", fill = 0)
+        ftind <- ftind[match(analysisInfo$analysis, analysis)]
+        ftind[, analysis := NULL]
+        ftind[, (names(ftind)) := lapply(.SD, as.integer), .SDcols = names(ftind)]
+        setnames(ftind, gInfo$group)
+        
+        SIRIDMapping <- gInfo[, c("group", "SIRID"), with = FALSE]
+        gInfo[, SIRID := NULL]
+        
+        ret <- featureGroupsSIRIUS(groups = gTab, groupInfo = gInfo, features = allFeatsList, ftindex = ftind,
+                                   SIRIDMapping = SIRIDMapping)
+    }
+        
+    saveCacheData("featureGroupsSIRIUS", ret, hash)
+    
+    if (verbose)
+        cat("\n===========\nDone!\n")
+    
+    return(ret)
+}
+
+#' @rdname featureGroups-class
+#' @export
+setMethod("delete", "featureGroupsSIRIUS", function(obj, ...)
+{
+    obj <- callNextMethod()
+    obj@SIRIDMapping <- obj@SIRIDMapping[group %chin % names(obj)]
+    return(obj)
+})

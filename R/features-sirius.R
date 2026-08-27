@@ -145,7 +145,7 @@ findFeaturesSIRIUSNew <- function(analysisInfo, noiseIntensity = NULL, traceMaxM
     filePaths <- getCentroidedMSFilesFromAnaInfo(analysisInfo, "mzML")
     
     hash <- makeHash(analysisInfo[, c("analysis", "path_centroid"), with = FALSE], lapply(filePaths, makeFileHash),
-                     noiseIntensity, traceMaxMassDeviation, minSNR, projectPath)
+                     noiseIntensity, traceMaxMassDeviation, minSNR)
     
     cachefg <- loadCacheData("featuresSIRIUS", hash)
     if (!is.null(cachefg))
@@ -173,29 +173,48 @@ findFeaturesSIRIUSNew <- function(analysisInfo, noiseIntensity = NULL, traceMaxM
         job <- SIRIUSAPI$projects_api$ImportMsRunDataAsJob(projectID, as.list(unname(filePaths)), parameters = params)
         
         # NOTE: maxProgress can change during the job execution, so we normalize the current progress to it at each update
-        prog <- openProgBar(0, 1)
+        prog <- if (verbose) openProgBar(0, 1)
         repeat
         {
             Sys.sleep(1)
             jp <- SIRIUSAPI$jobs_api$GetJob(projectID, job$id)$progress
             if (jp$state %in% c("CANCELED", "FAILED", "DONE"))
                 break
-            setTxtProgressBar(prog, jp$currentProgress / jp$maxProgress)
+            if (verbose)
+                setTxtProgressBar(prog, jp$currentProgress / jp$maxProgress)
         }
-        setTxtProgressBar(prog, 1)
-        close(prog)
+        if (verbose)
+        {
+            setTxtProgressBar(prog, 1)
+            close(prog)
+        }
     }
     
-    alignedFeatTab <- getSIRIUSAlignedFeatTab(SIRIUSAPI, projectID)
-    SIRQuantTabInt <- getSIRIUSQuantTab(SIRIUSAPI, projectID, "intensity")
-    SIRQuantTabArea <- getSIRIUSQuantTab(SIRIUSAPI, projectID, "area")
+    if (verbose)
+        printf("Importing SIRIUS features...\n")
     
-    allFeats <- merge(SIRQuantTabInt, alignedFeatTab, by = "SIRID", sort = FALSE)
-    allFeats[SIRQuantTabArea, area := i.area, on = c("SIRID", "analysis")]
-    setcolorder(allFeats, "intensity", before = "area")
-    allFeats <- allFeats[intensity > 0]
-    allFeats[, ID := as.character(seq_len(.N)), by = "analysis"]
-    setcolorder(allFeats, "ID")
+    SIRQT <- SIRIUSAPI$features_api$GetFeatureQuantTable(projectID, opt_fields = "columnSources")
+    SIRAlignedFeatIDs <- unlist(SIRQT$rowIds)
+    SIRAnas <- baseName(tools::file_path_sans_ext(unlist(SIRQT$columnSources)))
+    names(SIRAnas) <- unlist(SIRQT$columnIds)
+    allFeats <- rbindlist(doMap(FALSE, SIRAlignedFeatIDs, f = function(SIRFeatID)
+    {
+        # UNDONE: no qualities yet?
+        res <- getSIRIUSPagedResults(SIRIUSAPI$features_api$GetFeaturesPage, projectID, SIRFeatID,
+                                     opt_fields = "qualities", showProgress = FALSE)
+        rbindlist(lapply(res, \(x) x$toList()))
+    }, stripEnv = FALSE, prog = verbose))
+    
+    allFeats[, analysis := SIRAnas[runId]]
+    allFeats[, runId := NULL]
+    setnames(allFeats,
+             c("featureId", "alignedFeatureId", "averageMz", "apexMz", "rtStartSeconds", "rtEndSeconds",
+               "rtApexSeconds", "rtFwhmSeconds", "apexIntensity", "areaUnderCurve"),
+             c("ID", "SIRAlignedFeatureID", "mz", "mzAPEX", "retmin", "retmax", "ret", "FWHM", "intensity",
+               "area"))
+    allFeats[, c("mzmin", "mzmax") := list(mz - 0.005, mz + 0.005)] # UNDONE: change this whenever this data becomes available
+    setcolorder(allFeats, c("ID", "SIRAlignedFeatureID", "ret", "retmin", "retmax", "mz", "mzmin", "mzmax"))
+    
     allFeatsList <- split(allFeats, by = "analysis", keep.by = FALSE)
     allFeatsList <- allFeatsList[intersect(analysisInfo$analysis, names(allFeatsList))] # re-order
     

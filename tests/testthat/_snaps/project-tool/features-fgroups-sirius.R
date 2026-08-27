@@ -16,7 +16,7 @@ anaInfo <- data.frame(path_centroid = character(), analysis = character(), repli
 # -------------------------
 
 # Group and align features between analyses
-fGroups <- groupFeatures(anaInfo, "sirius")
+fGroups <- groupFeatures(anaInfo, "sirius", noiseIntensity = NULL, alignMaxRTDev = NULL, minSNR = NULL)
 
 # Basic rule based filtering
 fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 10000, relMinReplicateAbundance = 1,

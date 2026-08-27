@@ -16,7 +16,8 @@ anaInfo <- data.frame(path_centroid = character(), analysis = character(), repli
 # -------------------------
 
 # Find all features
-fList <- findFeatures(anaInfo, "sirius")
+# NOTE: see the reference manual for many more options
+fList <- findFeatures(anaInfo, "sirius", noiseIntensity = NULL, alignMaxRTDev = NULL, minSNR = NULL)
 
 # Group and align features between analyses
 fGroups <- groupFeatures(fList, "openms", rtalign = TRUE)

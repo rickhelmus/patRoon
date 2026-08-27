@@ -2,7 +2,7 @@
 
 ## SIRIUS
 
-- update tests, including newProject()
+- update tests
 - NEWS
     - relatedCIDs from PCL is now ; separated instead of space separated
 

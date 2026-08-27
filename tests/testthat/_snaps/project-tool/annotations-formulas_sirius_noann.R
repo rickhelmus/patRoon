@@ -46,7 +46,7 @@ mslists <- filter(mslists, MSLevel = 2, absMinIntensity = NULL, relMinIntensity 
                   maxMZOverPrec = 4)
 
 # Calculate formula candidates
-formulas <- generateFormulas(fGroups, mslists, "sirius", adduct = "[M+H]+", elements = "CHNOP", profile = "qtof",
+formulas <- generateFormulas(fGroups, mslists, "sirius", adduct = "[M+H]+", config = getSIRIUSConfig(),
                              calculateFeatures = FALSE)
 
 # -------------------------

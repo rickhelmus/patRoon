@@ -162,6 +162,8 @@ setMethod("predictTox", "compoundsSIRIUS", function(obj, type = "FP", LC50Mode =
 #'   structure will be removed (unlike \code{\link{generateFormulasSIRIUS}}). This method requires the availability of
 #'   MS/MS data, and feature groups without will be ignored.
 #'
+#' @param config A \code{RSirius::JobSubmission} configuration object, typically obtained with
+#'   \code{\link{getSIRIUSConfig}}. If \code{NULL}, the default \command{SIRIUS} configuration is used.
 #' @param verbose If \code{TRUE} then more output is shown in the terminal.
 #'
 #' @template sirius-args

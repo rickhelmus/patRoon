@@ -16,8 +16,6 @@
 #'   more information.
 #'   
 #'   \strong{NOTE}: By loggin in you will accept the terms of the Service and Privacy Policy of the SIRIUS Webservice.
-#' @param config A \code{RSirius::JobSubmission} configuration object, typically obtained with
-#'   \code{\link{getSIRIUSConfig}}. If \code{NULL}, the default \command{SIRIUS} configuration is used.
 #' @param runMode,projectPath Whether to execute a \command{SIRIUS} processing job (\code{runMode="execute"}) or load
 #'   results from an existing \command{SIRIUS} project (\code{runMode"read"}). If \code{runMode="execute"} then
 #'   \code{projectPath} can be \code{NULL} and a temporary project will be used, otherwise \code{projectPath} must point

@@ -139,6 +139,8 @@ setMethod("predictTox", "formulasSIRIUS", function(obj, LC50Mode = "static", con
 #'
 #' @details Note that \command{SIRIUS} requires availability of MS/MS data.
 #'
+#' @param config A \code{RSirius::JobSubmission} configuration object, typically obtained with
+#'   \code{\link{getSIRIUSConfig}}. If \code{NULL}, the default \command{SIRIUS} configuration is used.
 #' @param verbose If \code{TRUE} then more output is shown.
 #'
 #' @template sirius-args

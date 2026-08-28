@@ -111,14 +111,16 @@ groupFeaturesSIRIUS <- function(analysisInfo, ..., login = "check", alwaysLogin 
     gTab <- dcast(allFeats, analysis ~ SIRAlignedFeatureID, value.var = "intensity", fill = 0)
     gTab <- gTab[match(analysisInfo$analysis, analysis)]
     gTab[, analysis := NULL]
-    setnames(gTab, gInfo$group)
+    setnames(gTab, gInfo$group[match(names(gTab), gInfo$SIRAlignedFeatureID)])
+    gTab <- gTab[, gInfo$group, with = FALSE] # sync order
     
     allFeats[, row := seq_len(.N), by = "analysis"]
     ftind <- dcast(allFeats, analysis ~ SIRAlignedFeatureID, value.var = "row", fill = 0)
     ftind <- ftind[match(analysisInfo$analysis, analysis)]
     ftind[, analysis := NULL]
     ftind[, (names(ftind)) := lapply(.SD, as.integer), .SDcols = names(ftind)]
-    setnames(ftind, gInfo$group)
+    setnames(ftind, gInfo$group[match(names(ftind), gInfo$SIRAlignedFeatureID)])
+    ftind <- ftind[, gInfo$group, with = FALSE] # sync order
     
     gInfoSIR <- gInfo[, c("group", "SIRAlignedFeatureID"), with = FALSE]
     gInfoSIR[SIRAlignedFeats, c("quality", "qualityIsotope", "qualityPeak") :=

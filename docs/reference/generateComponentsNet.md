@@ -24,11 +24,19 @@ generateComponentsNet(
   annotAlgo = "imss",
   annotAdducts = c("[M+H]+", "[M+Na]+", "[M+K]+", "[M+NH4]+", "[M-H]-", "[M-H2O-H]-"),
   annotPrefAdducts = c("[M+H]+", "[M-H]-"),
-  annotArgs = list()
+  annotArgs = list(),
+  MSPeakLists = NULL,
+  mzFragBelow = 10
 )
 
 # S4 method for class 'featureGroupsSet'
-generateComponentsNet(fGroups, ionization = NULL, ...)
+generateComponentsNet(
+  fGroups,
+  ionization = NULL,
+  ...,
+  MSPeakLists = NULL,
+  mzFragBelow = 10
+)
 ```
 
 ## Source
@@ -150,6 +158,25 @@ The componentization approach was inspired by CAMERA and cliqueMS.
   and
   [`nontarget::adduct.search`](https://rdrr.io/pkg/nontarget/man/adduct.search.html),
   respectively.
+
+- MSPeakLists:
+
+  An
+  [`MSPeakLists`](https://rickhelmus.github.io/patRoon/reference/MSPeakLists-class.md)
+  object that was generated for the supplied `fGroups`. If given, MS2
+  peak lists are used to annotate which features within a component are
+  likely in-source fragments: MS2 peaks are matched against other
+  feature groups within the same component (using the tolerance set by
+  `mzWindow`). Set to `NULL` to skip this step.
+
+- mzFragBelow:
+
+  Only match feature group `A` to the MS2 data of feature group `B` if
+  the *m/z* value of `A` is at least `mzFragBelow` below that of `B`.
+  The value should be sufficiently high to avoid taking a same MS2 scan
+  for `A` and `B`, *i.e.* `mzFragBelow` should be set based on the MS2
+  isolation window of the instrument. Only relevant if `MSPeakLists` is
+  set.
 
 ## Value
 
@@ -281,6 +308,14 @@ annotation columns are added:
 
   The mass tolerance(s) for the adduct assignment.
 
+When `MSPeakLists` is provided, the following column is added:
+
+- `fragOf`:
+
+  Names of feature groups of this the feature group is a potential
+  in-source fragment. `NA` if no assignment was made. Multiple values
+  are semicolon-separated.
+
 The
 [`componentInfo`](https://rickhelmus.github.io/patRoon/reference/components-class.md)
 table contains the columns `name` (component name), `cmp_ret` (mean
@@ -319,13 +354,15 @@ Compared to other componentization algorithms supported in patRoon,
   better than other feature-based algorithms
   ([`generateComponentsOpenMS`](https://rickhelmus.github.io/patRoon/reference/generateComponentsOpenMS.md)
   and
-  [`generateComponentsCliqueMS`](https://rickhelmus.github.io/patRoon/reference/generateComponentsCliqueMS.md))).
+  [`generateComponentsCliqueMS`](https://rickhelmus.github.io/patRoon/reference/generateComponentsCliqueMS.md)).
 
 - supports different and configurable componentization methods (see
   `componMethod` argument).
 
 - supports isotope annotation that is not based on 13C differences
   thanks to the nontarget package, eg useful for halogenated compounds.
+
+- supports basic annotation of in-source fragments from MS2 data.
 
 It is recommended to use the
 [`plotGraph()`](https://rickhelmus.github.io/patRoon/reference/generics.md)

@@ -73,11 +73,19 @@ profiles.</p>
 <span>  annotAlgo <span class="op">=</span> <span class="st">"imss"</span>,</span>
 <span>  annotAdducts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"[M+H]+"</span>, <span class="st">"[M+Na]+"</span>, <span class="st">"[M+K]+"</span>, <span class="st">"[M+NH4]+"</span>, <span class="st">"[M-H]-"</span>, <span class="st">"[M-H2O-H]-"</span><span class="op">)</span>,</span>
 <span>  annotPrefAdducts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"[M+H]+"</span>, <span class="st">"[M-H]-"</span><span class="op">)</span>,</span>
-<span>  annotArgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  annotArgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  MSPeakLists <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  mzFragBelow <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
-<span><span class="fu">generateComponentsNet</span><span class="op">(</span><span class="va">fGroups</span>, ionization <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">generateComponentsNet</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  ionization <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  MSPeakLists <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  mzFragBelow <span class="op">=</span> <span class="fl">10</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -173,6 +181,20 @@ list should contain <code>pattern</code> and <code>adduct</code> elements, which
 <code><a href="https://rdrr.io/pkg/nontarget/man/pattern.search.html" class="external-link">nontarget::pattern.search</a></code> and
 <code><a href="https://rdrr.io/pkg/nontarget/man/adduct.search.html" class="external-link">nontarget::adduct.search</a></code>, respectively.</p></dd>
 
+
+<dt id="arg-mspeaklists">MSPeakLists<a class="anchor" aria-label="anchor" href="#arg-mspeaklists"></a></dt>
+<dd><p>An <code><a href="MSPeakLists-class.html">MSPeakLists</a></code> object that was generated for the supplied <code>fGroups</code>. If given,
+MS2 peak lists are used to annotate which features within a component are likely in-source fragments: MS2 peaks are
+matched against other feature groups within the same component (using the tolerance set by <code>mzWindow</code>). Set to
+<code>NULL</code> to skip this step.</p></dd>
+
+
+<dt id="arg-mzfragbelow">mzFragBelow<a class="anchor" aria-label="anchor" href="#arg-mzfragbelow"></a></dt>
+<dd><p>Only match feature group <code>A</code> to the MS2 data of feature group <code>B</code> if the <em>m/z</em>
+value of <code>A</code> is at least <code>mzFragBelow</code> below that of <code>B</code>. The value should be sufficiently high to
+avoid taking a same MS2 scan for <code>A</code> and <code>B</code>, <em>i.e.</em> <code>mzFragBelow</code> should be set based on the
+MS2 isolation window of the instrument. Only relevant if <code>MSPeakLists</code> is set.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -265,6 +287,11 @@ list should contain <code>pattern</code> and <code>adduct</code> elements, which
 <dd><p>The mass tolerance(s) for the adduct assignment.</p></dd>
 
 
+</dl><p>When <code>MSPeakLists</code> is provided, the following column is added:</p><dl><dt><code>fragOf</code></dt>
+<dd><p>Names of feature groups of this the feature group is a potential in-source fragment. <code>NA</code>
+    if no assignment was made. Multiple values are semicolon-separated.</p></dd>
+
+
 </dl><p>The <code><a href="components-class.html">componentInfo</a></code> table contains the columns <code>name</code> (component name), <code>cmp_ret</code> (mean
   retention time), <code>cmp_retsd</code> (retention time standard deviation), <code>neutral_mass</code> (mean neutral mass) and
   <code>size</code> (number of features).</p>
@@ -286,10 +313,11 @@ list should contain <code>pattern</code> and <code>adduct</code> elements, which
     environmental studies.</p></li>
 <li><p>uses a different approach to convert feature components across analyses into consensus components, which
     should (hopefully) perform better than other feature-based algorithms (<code><a href="generateComponentsOpenMS.html">generateComponentsOpenMS</a></code> and
-    <code><a href="generateComponentsCliqueMS.html">generateComponentsCliqueMS</a></code>)).</p></li>
+    <code><a href="generateComponentsCliqueMS.html">generateComponentsCliqueMS</a></code>).</p></li>
 <li><p>supports different and configurable componentization methods (see <code>componMethod</code> argument).</p></li>
 <li><p>supports isotope annotation that is not based on 13C differences thanks to the <span class="pkg">nontarget</span> package, eg
     useful for halogenated compounds.</p></li>
+<li><p>supports basic annotation of in-source fragments from MS2 data.</p></li>
 </ul><p>It is recommended to use the <code><a href="generics.html">plotGraph()</a></code> method to evaluate the feature
   componentization, e.g. to evaluate different methods (<code>componMethod</code> argument) or relevant parameters.</p>
     </div>

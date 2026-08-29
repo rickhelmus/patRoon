@@ -624,6 +624,8 @@ The other algorithms interfaced in `patRoon` operate on a 'feature level' (`Netw
 
 Each algorithm supports many different parameters that may significantly influence the (quality of the) output. For instance, care has to be taken to avoid 'over-clustering' of feature groups which do not belong in the same component. This is often easily visible since the chromatographic peaks poorly overlap or are shaped differently. The `checkComponents` function (discussed [here](#intReview)) can be used to quickly verify componentization results. For a complete listing all arguments see the reference manual (e.g. `?generateComponents`). Furthermore, the `plotGraph()` function (discussed [here](#vis_feat_ann)) can be used to visualize the networking results for the `Network` algorithm.
 
+The `Network` algorithm supports a basic method to annotate potential in-source fragments (ISF). The algorithm checks for each feature group in a component, if its _m/z_ value is present in the MS/MS data of feature groups with larger _m/z_ values in the same component. To enable ISF annotation, the `MSPeakLists` argument should be set (see example below). To obtain the MS peak lists, see the [MS peak lists section](#MSPL).
+
 Once the components with adduct and isotopes annotations are generated this data can be [used to prioritize and improve the workflow](#incorpAdductIso).
 
 Some example usage is shown below.
@@ -651,6 +653,9 @@ componCliqueMS <- generateComponents(fGroups, "cliquems", ionization = "negative
 # Network with customized parameters
 componNet <- generateComponents(fGroups, "net", ionization = "positive", componMinSim = 0.97, annotAlgo = "nontarget",
                                 componMethod = "hcs", annotAdducts = c("[M+H]+", "[M+Na]+", "[M+NH4]+"))
+# enable in-source fragment annotation by providing MS peak lists
+mslists <- generateMSPeakLists(fGroups)
+componNetISF <- generateComponents(fGroups, "net", ionization = "positive", MSPeakLists = mslists)
 ```
 
 

@@ -7,7 +7,7 @@
 fGroups <- getTestFGroups(getTestAnaInfoComponents(), localMZRange = 0)
 # reduced set for CAMERA/RAMClustR/intensity; for the others we keep all to have sufficient data for good results
 fGroupsSimple <- fGroups[, 1:50]
-
+fGroupsSimpleMSPL <- fGroups[, 1:250] # HACK: a bit more, so that we get annotations for compsNetMSPL
 
 # fix seed for reproducible clustering, suppress warnings about <5 samples
 withr::with_seed(20, suppressWarnings(compsRC <- generateComponents(fGroupsSimple, "ramclustr")))
@@ -18,7 +18,7 @@ suppressWarnings(compsCAMMR <- generateComponents(fGroupsSimple, "camera", relMi
 suppressWarnings(compsCAMSize <- generateComponents(fGroupsSimple, "camera", minSize = 3))
 compsNT <- generateComponents(fGroups, "nontarget")
 compsInt <- generateComponents(fGroupsSimple, "intclust", average = FALSE) # no averaging: only one rep group
-plists <- generateMSPeakLists(fGroupsSimple)
+plists <- generateMSPeakLists(fGroupsSimpleMSPL)
 compsSpec <- generateComponents(fGroupsSimple, "specclust", plists)
 compsOpenMS <- generateComponents(fGroups, "openms")
 compsOpenMSMS <- generateComponents(fGroups, "openms", minSize = 3)
@@ -34,6 +34,7 @@ compsNetCliques <- generateComponents(fGroups, "net", componMethod = "cliques")
 compsNetHCS <- generateComponents(fGroups, "net", componMethod = "hcs")
 compsNetHclust <- generateComponents(fGroups, "net", componMethod = "hclust")
 compsNetNT <- generateComponents(fGroups, "net", annotAlgo = "nontarget")
+compsNetMSPL <- generateComponents(fGroups, "net", MSPeakLists = plists)
 
 fGroupsEmpty <- getEmptyTestFGroups()
 compsEmpty <- componentsSet(algorithm = "none", componentInfo = data.table())
@@ -56,7 +57,7 @@ test_that("components generation works", {
     expect_known_val(list(componentTable(compsNetHCS), componentInfo(compsNetHCS)), "components-net-hcs")
     expect_known_val(list(componentTable(compsNetHclust), componentInfo(compsNetHclust)), "components-net-hclust")
     expect_known_val(list(componentTable(compsNetNT), componentInfo(compsNetNT)), "components-net-nt")
-
+    expect_known_val(list(componentTable(compsNetMSPL), componentInfo(compsNetMSPL)), "components-net-mspl")
     expect_length(compsEmpty, 0)
     expect_length(generateComponents(fGroupsEmpty, "ramclustr"), 0)
     expect_length(generateComponents(fGroupsEmpty, "camera"), 0)
@@ -88,11 +89,6 @@ test_that("verify components show", {
     expect_known_show(compsNet, "components-net")
     
     expect_known_show(compsClMS, "components-cm")
-})
-
-test_that("network components columns", {
-    checkmate::expect_names(names(componentInfo(compsNet)), must.include = c("name", "cmp_ret", "cmp_retsd", "neutral_mass", "size"))
-    checkmate::expect_names(names(compsNet[[1]]), must.include = c("group", "ret", "mz", "degreeMin", "degreeMax", "degreeMean", "corMin", "corMax", "corMean"))
 })
 
 test_that("basic subsetting", {
@@ -198,7 +194,15 @@ test_that("consensus works", {
 test_that("clustered components", {
     expect_equal(length(treeCut(compsInt, k = 5)), 5)
     expect_equal(treeCutDynamic(compsInt), compsInt)
-    expect_setequal(groupNames(compsSpec), groupNames(filter(plists, withMSMS = TRUE)))
+    expect_setequal(groupNames(compsSpec), groupNames(filter(plists[, groupNames(fGroupsSimple)], withMSMS = TRUE)))
+})
+
+test_that("network components", {
+    checkmate::expect_names(names(componentInfo(compsNet)), must.include = c("name", "cmp_ret", "cmp_retsd", "neutral_mass", "size"))
+    checkmate::expect_names(names(compsNet[[1]]), must.include = c("group", "ret", "mz", "degreeMin", "degreeMax", "degreeMean", "corMin", "corMax", "corMean"))
+    checkmate::expect_names(names(compsNet[[1]]), disjunct.from = "fragOf")
+    checkmate::expect_names(names(compsNetMSPL[[1]]), must.include = "fragOf")
+    expect_true(any(!is.na(as.data.table(compsNetMSPL)$fragOf)))
 })
 
 test_that("reporting works", {

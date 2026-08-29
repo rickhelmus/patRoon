@@ -306,7 +306,9 @@ defaultPreTreatSettings <- function()
 
 upgradePreTreatSettings <- function(settings)
 {
-    # NOTE: this updates from first file version
+    if (settings$version != 1L)
+        return(settings)
+    
     # NOTE: the old vendor peak picking setting is ignored
     
     ret <- defaultPreTreatSettings()

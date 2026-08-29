@@ -129,7 +129,9 @@ defaultGeneralSettings <- function(destPath)
 
 upgradeGeneralSettings <- function(settings, destPath)
 {
-    # NOTE: this updates from first file version
+    if (settings$version != 1L)
+        return(settings)
+
     return(modifyList(defaultGeneralSettings(destPath),
                       settings[c("scriptFile", "createRStudioProj", "ionization")]))
 }

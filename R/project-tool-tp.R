@@ -130,7 +130,9 @@ defaultTPSettings <- function()
 
 upgradeTPsSettings <- function(settings)
 {
-    # NOTE: this updates from first file version
+    if (settings$version != 1L)
+        return(settings)
+
     ret <- modifyList(defaultTPSettings(), settings[c("TPGenInput", "TPSuspectList", "TPDoMFDB")])
     if (settings$doTPs)
         ret$TPsAlgo <- tolower(settings$TPGen)

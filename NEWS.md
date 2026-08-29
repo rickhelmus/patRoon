@@ -16,6 +16,7 @@ threshold. For this reason the `minRelCumIntensity` and `relMinCumIntensity` (la
 to `maxRelCumIntensity`.
 * Optimizations for very large datasets (issue #154)
 * The `window` EIC and EIM parameter can now be `Inf` to include the data points for the entire chromatogram or mobility trace
+* Small changes for `newProject()` to handle loading of MS peak lists for `generateComponentsNet()`
 
 **Fixes**
 

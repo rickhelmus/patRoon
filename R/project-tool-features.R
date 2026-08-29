@@ -457,7 +457,9 @@ defaultFeaturesSettings <- function()
 
 upgradeFeaturesSettings <- function(settings)
 {
-    # NOTE: this updates from first file version
+    if (settings$version != 1L)
+        return(settings)
+
     ret <- defaultFeaturesSettings()
     ret$suspects <- list(single = settings$suspectList,
                          sets = list(pos = settings$suspectListPos, neg = settings$suspectListNeg))

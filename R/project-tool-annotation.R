@@ -29,7 +29,12 @@ newProjectAnnotationUI <- function(id)
                 ns = ns,
                 fillRow(
                     height = 25,
-                    checkboxInput(ns("selectIons"), "Select feature adduct ions")
+                    checkboxInput(ns("selectIons"), "Select feature adduct ions"),
+                    conditionalPanel(
+                        condition = "input.componAlgo == \"net\"",
+                        ns = ns,
+                        checkboxInput(ns("annotateISF"), "Annotate in-source fragments")
+                    )
                 )
             ),
             br(),
@@ -104,6 +109,7 @@ newProjectAnnotationServer <- function(id, hasSuspects, IMSMode, settings)
     {
         observeEvent(settings(), {
             updateSelectInput(session, "componAlgo", selected = settings()$componAlgo)
+            updateCheckboxInput(session, "annotateISF", value = settings()$annotateISF)
             updateCheckboxInput(session, "selectIons", value = settings()$selectIons)
             updateSelectInput(session, "formulasAlgo", selected = settings()$formulasAlgo)
             updateSelectInput(session, "compoundsAlgo", selected = settings()$compoundsAlgo)
@@ -131,6 +137,7 @@ newProjectAnnotationServer <- function(id, hasSuspects, IMSMode, settings)
             }),
             settings = reactive(list(
                 componAlgo = input$componAlgo,
+                annotateISF = input$annotateISF,
                 selectIons = input$selectIons,
                 formulasAlgo = input$formulasAlgo,
                 compoundsAlgo = input$compoundsAlgo,
@@ -147,6 +154,7 @@ defaultAnnotationSettings <- function()
 {
     return(list(
         componAlgo = "",
+        annotateISF = FALSE,
         selectIons = TRUE,
         formulasAlgo = "",
         compoundsAlgo = "",
@@ -159,13 +167,20 @@ defaultAnnotationSettings <- function()
 
 upgradeAnnotationsSettings <- function(settings)
 {
-    # NOTE: this updates from first file version
-    # NOTE: some settings are ignored (eg MSPL algos, DIA)
-    ret <- modifyList(defaultAnnotationSettings(), settings[c("selectIons", "MSLibraryFormat", "MSLibraryPath")])
-    ret$componAlgo <- settings$components
-    ret$formulasAlgo <- settings$formulaGen
-    ret$compoundsAlgo <- settings$compIdent
-    if (!settings$annotateSus)
-        ret$estIDConf <- setdiff(ret$estIDConf, "suspects")
+    ret <- settings
+    if (settings$version == 1L)
+    {    
+        # NOTE: some settings are ignored (eg MSPL algos, DIA)
+        ret <- modifyList(defaultAnnotationSettings(), settings[c("selectIons", "MSLibraryFormat", "MSLibraryPath")])
+        ret$componAlgo <- settings$components
+        ret$formulasAlgo <- settings$formulaGen
+        ret$compoundsAlgo <- settings$compIdent
+        if (!settings$annotateSus)
+            ret$estIDConf <- setdiff(ret$estIDConf, "suspects")
+    }
+    else if (settings$version < curProjectSettingsVersion())
+    {
+        ret <- modifyList(defaultAnnotationSettings(), settings)
+    }
     return(ret)
 }

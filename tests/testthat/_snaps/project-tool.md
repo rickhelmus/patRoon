@@ -235,6 +235,9 @@
       $annotations$componAlgo
       [1] "RAMClustR"
       
+      $annotations$annotateISF
+      [1] FALSE
+      
       $annotations$selectIons
       [1] FALSE
       

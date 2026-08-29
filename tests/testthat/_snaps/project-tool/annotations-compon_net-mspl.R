@@ -5,7 +5,7 @@ library(patRoon)
 # initialization
 # -------------------------
 
-workPath <- "<WORK_PATH>/test-np/annotations-compounds_library"
+workPath <- "<WORK_PATH>/test-np/annotations-compon_net-mspl"
 setwd(workPath)
 
 # NOTE: please set to a valid data.frame with analysis information. See ?`analysis-information` for more details.
@@ -38,25 +38,18 @@ avgMSListParams <- getDefAvgPListParams(clusterMzWindow = 0.005)
 mslists <- generateMSPeakLists(fGroups, avgFeatParams = avgMSListParams, avgFGroupParams = avgMSListParams)
 
 # -------------------------
-# annotation
+# componentization
 # -------------------------
 
-# Rule based filtering of MS peak lists. You may want to tweak this. See the manual for more information.
-mslists <- filter(mslists, MSLevel = 2, absMinIntensity = NULL, relMinIntensity = 0.05, topMostPeaks = 25,
-                  maxMZOverPrec = 4)
-
-# Load MS library. You may want to filter it, please see the manuals for more details.
-mslibrary <- loadMSLibrary("lib", "json")
-# Calculate compound structure candidates
-compounds <- generateCompounds(fGroups, mslists, "library", adduct = "[M+H]+", MSLibrary = mslibrary, minSim = 0.75,
-                               specSimParams = getDefSpecSimParams())
-
-compounds <- estimateIDConfidence(compounds, MSPeakLists = mslists, formulas = NULL, IDFile = "idlevelrules.yml")
+# Perform automatic generation of components
+components <- generateComponents(fGroups, "net", ionization = "positive", componMethod = "community",
+                                 annotAlgo = "imss", MSPeakLists = mslists)
+fGroups <- selectIons(fGroups, components, prefAdduct = "[M+H]+", onlyMonoIso = TRUE)
 
 # -------------------------
 # reporting
 # -------------------------
 
 # Advanced report settings can be edited in the report.yml file.
-report(fGroups, MSPeakLists = mslists, formulas = NULL, compounds = compounds, components = NULL,
-       settingsFile = "report.yml", openReport = TRUE)
+report(fGroups, MSPeakLists = NULL, formulas = NULL, compounds = NULL, components = NULL, settingsFile = "report.yml",
+       openReport = TRUE)

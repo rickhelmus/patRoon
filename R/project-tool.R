@@ -61,6 +61,8 @@ getNewProjectUI <- function()
     )
 }
 
+curProjectSettingsVersion <- \() 3L
+
 # NOTE: the read/write functions below are also used by tests
 readProjectSettings <- function(file, destPath)
 {
@@ -68,7 +70,7 @@ readProjectSettings <- function(file, destPath)
     
     if (is.null(settings[["version"]]))
         settings$version <- 1L # first file version was unversioned
-    if (settings$version < 2L) 
+    if (settings$version < curProjectSettingsVersion()) 
     {
         settings <- list(general = upgradeGeneralSettings(settings, destPath),
                          analyses = upgradeAnalysesSettings(settings),
@@ -97,7 +99,7 @@ readProjectSettings <- function(file, destPath)
 
 writeProjectSettings <- function(settings, file)
 {
-    settings$version <- 2L
+    settings$version <- curProjectSettingsVersion()
     writeYAML(settings, file)
 }
 

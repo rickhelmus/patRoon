@@ -624,6 +624,9 @@ defaultAnalysesSettings <- function()
 
 upgradeAnalysesSettings <- function(settings)
 {
+    if (settings$version != 1L)
+        return(settings)
+    
     # NOTE: this updates from first file version
     return(modifyList(defaultAnalysesSettings(), list(
         analysisTableFileCSV = settings$analysisTableFile,

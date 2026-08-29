@@ -46,12 +46,16 @@ fGroups <- updateGroups(fGroups, what = c("ret", "mz", "mobility"), intWeight = 
 fGroups <- screenSuspects(fGroups, suspList, adduct = "[M+H]+", onlyHits = TRUE)
 
 # -------------------------
+# retrieve MS peak lists
+# -------------------------
+
+avgMSListParams <- getDefAvgPListParams(clusterMzWindow = 0.005)
+mslists <- generateMSPeakLists(fGroups, avgFeatParams = avgMSListParams, avgFGroupParams = avgMSListParams)
+
+# -------------------------
 # annotation
 # -------------------------
 
-# Retrieve MS peak lists
-avgMSListParams <- getDefAvgPListParams(clusterMzWindow = 0.005)
-mslists <- generateMSPeakLists(fGroups, avgFeatParams = avgMSListParams, avgFGroupParams = avgMSListParams)
 # Rule based filtering of MS peak lists. You may want to tweak this. See the manual for more information.
 mslists <- filter(mslists, MSLevel = 2, absMinIntensity = NULL, relMinIntensity = 0.05, topMostPeaks = 25,
                   maxMZOverPrec = 4)

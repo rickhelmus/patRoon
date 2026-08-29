@@ -520,6 +520,17 @@ genScriptFeaturesBlock <- function(ionization, IMS, settingsFeat, generator)
     }
 }
 
+genScriptMSPLBlock <- function(generator)
+{
+    generator$addHeader("retrieve MS peak lists")
+    generator$addCall("avgMSListParams", "getDefAvgPListParams", list(name = "clusterMzWindow", value = defaultLim("mz", "medium")))
+    generator$addCall("mslists", "generateMSPeakLists", list(
+        list(value = "fGroups"),
+        list(name = "avgFeatParams", value = "avgMSListParams"),
+        list(name = "avgFGroupParams", value = "avgMSListParams")
+    ))
+}
+
 genScriptComponBlock <- function(ionization, settingsAnnon, generator)
 {
     generator$addHeader("componentization")
@@ -533,7 +544,8 @@ genScriptComponBlock <- function(ionization, settingsAnnon, generator)
         list(name = "mzRange", value = c(5, 120), condition = settingsAnnon$componAlgo == "nontarget"),
         list(name = "elements", value = c("C", "H", "O"), quote = TRUE, condition = settingsAnnon$componAlgo == "nontarget"),
         list(name = "componMethod", value = "community", quote = TRUE, condition = settingsAnnon$componAlgo == "net"),
-        list(name = "annotAlgo", value = "imss", quote = TRUE, condition = settingsAnnon$componAlgo == "net")
+        list(name = "annotAlgo", value = "imss", quote = TRUE, condition = settingsAnnon$componAlgo == "net"),
+        list(name = "MSPeakLists", value = "mslists", condition = settingsAnnon$componAlgo == "net" && settingsAnnon$annotateISF)
     ))
     
     if (settingsAnnon$selectIons && settingsAnnon$componAlgo != "nontarget")
@@ -684,13 +696,6 @@ genScriptAnnBlock <- function(ionization, IMS, settingsAnn, adductArg, doSusps, 
     
     generator$addHeader("annotation")
     
-    generator$addComment("Retrieve MS peak lists")
-    generator$addCall("avgMSListParams", "getDefAvgPListParams", list(name = "clusterMzWindow", value = defaultLim("mz", "medium")))
-    generator$addCall("mslists", "generateMSPeakLists", list(
-        list(value = "fGroups"),
-        list(name = "avgFeatParams", value = "avgMSListParams"),
-        list(name = "avgFGroupParams", value = "avgMSListParams")
-    ))
     generator$addComment("Rule based filtering of MS peak lists. You may want to tweak this. See the manual for more information.")
     generator$addCall("mslists", "filter", list(
         list(value = "mslists"),
@@ -917,6 +922,7 @@ getScriptCode <- function(CCSCalibrant, anaInfoData, settings, noDate)
     doSusps <- settings$features$exSuspList || (ionization != "both" && nzchar(settings$features$suspects$single)) ||
         (ionization == "both" && nzchar(settings$features$suspects$sets$pos))
     doPiekSusps <- settings$features$featAlgo == "piek" && settings$features$piekParams$filter == "suspects"
+    doMSPLCompon <- settings$annotation$componAlgo == "net" && settings$annotation$annotateISF
     doFGNorm <- settings$features$fGroupsAdv$featNorm != "none" || settings$features$fGroupsAdv$groupNorm
     doISTDs <- doFGNorm && settings$features$fGroupsAdv$featNorm == "istd"
     doTPs <- nzchar(settings$TP$TPsAlgo)
@@ -948,7 +954,11 @@ getScriptCode <- function(CCSCalibrant, anaInfoData, settings, noDate)
     genScriptFeaturesBlock(ionization, settings$general$IMS, settings$features, generator)
 
     if (nzchar(settings$annotation$componAlgo))
+    {
+        if (doMSPLCompon)
+            genScriptMSPLBlock(generator) # needed for ISF annotations
         genScriptComponBlock(ionization, settings$annotation, generator)
+    }
     
     if (doFGNorm)
         genScriptFGNormBlock(ionization, settings$features, adductArg, generator)
@@ -966,6 +976,8 @@ getScriptCode <- function(CCSCalibrant, anaInfoData, settings, noDate)
     
     if (nzchar(settings$annotation$formulasAlgo) || nzchar(settings$annotation$compoundsAlgo))
     {
+        if (!doMSPLCompon)
+            genScriptMSPLBlock(generator)
         addMFDB <- doTPsStructScr && settings$TP$TPDoMFDB
         genScriptAnnBlock(ionization, settings$general$IMS, settings$annotation, adductArg, doSusps, addMFDB, generator)
     }

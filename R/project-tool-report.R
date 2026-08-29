@@ -52,7 +52,9 @@ defaultReportSettings <- function()
 
 upgradeReportSettings <- function(settings)
 {
-    # NOTE: this updates from first file version
+    if (settings$version != 1L)
+        return(settings)
+    
     ret <- modifyList(defaultReportSettings(), settings[c("reportGen", "reportLegacy")])
     ret$reportLegacy <- setdiff(ret$reportLegacy, "HTML")
     return(ret)

@@ -134,9 +134,56 @@ getSIRIUSPagedResults <- function(getFunc, ..., pageSize = 100, showProgress = T
     return(ret)
 }
 
-getSIRIUSFormulaCandidates <- function(projectID, SIRIUSAPI, SIRFeatID, adduct)
+getSIRIUSFragInfos <- function(projectID, SIRAnnotatedSpec, precursorIonForm, PLMS2)
 {
-    formCands <- SIRIUSAPI$features_api$GetFormulaCandidates(projectID, SIRFeatID, opt_fields = "statistics")
+    # HACK: no PL IDs (yet) for feature specific peak lists
+    hasPLID <- !is.null(PLMS2[["ID"]])
+    
+    emptyFI <- data.table(mz = numeric(0), ion_formula_mz = numeric(0), formula_SIR = character(0),
+                          adduct = character(0), error_mz = numeric(0), error_ppm = numeric(0),
+                          PLID = if (hasPLID) integer(0), ion_formula = character(0),
+                          neutral_loss = character(0))
+    
+    if (is.null(SIRAnnotatedSpec$peaks) || length(SIRAnnotatedSpec$peaks) == 0)
+        return(emptyFI)
+    
+    peaks <- SIRAnnotatedSpec$peaks[[1]] # UNDONE: >1 index if there are multiple spectra? (then not relevant atm)
+    npeaks <- length(peaks$mz)
+    
+    if (is.null(peaks$peakAnnotation) || length(peaks$peakAnnotation) == 0)
+        return(emptyFI)
+    
+    ret <- rbindlist(lapply(seq_len(npeaks), function(i)
+    {
+        if (is.na(peaks$peakAnnotation$molecularFormula[i]))
+            return(NULL)
+        
+        anns <- data.table(mz = peaks$mz[i], ion_formula_mz = peaks$peakAnnotation$exactMass[i],
+                           formula_SIR = peaks$peakAnnotation$molecularFormula[i],
+                           adduct = gsub(" ", "", peaks$peakAnnotation$adduct[i]),
+                           error_mz = peaks$peakAnnotation$massDeviationMz[i],
+                           error_ppm = peaks$peakAnnotation$massDeviationPpm[i])
+        if (hasPLID)
+            anns[, PLID := PLMS2[which.min(abs(peaks$mz[i] - mz))]$ID]
+        
+        # HACK: it seems that SIRIUS emits [M+?]+ like adducts that should be [M]+ adducts
+        anns[, adduct := gsub("+?]", "]", adduct, fixed = TRUE)]
+        
+        # SIRIUS neutralizes fragments, make them ion again
+        anns[, ion_formula := mapply(formula_SIR, adduct, FUN = calculateIonFormula)]
+        anns[, neutral_loss := sapply(ion_formula, subtractFormula, formula1 = precursorIonForm)]
+        return(anns)
+    }))
+    
+    if (length(ret) == 0)
+        return(emptyFI)
+    return(ret)
+}
+
+getSIRIUSFormulaCandidates <- function(projectID, SIRIUSAPI, SIRFeatID, PLMS2)
+{
+    formCands <- getSIRIUSPagedResults(SIRIUSAPI$features_api$GetFormulaCandidatesPage, projectID, SIRFeatID,
+                                       opt_fields = c("statistics", "annotatedSpectrum"), showProgress = FALSE)
     if (length(formCands) == 0)
         return(data.table())
     tab <- rbindlist(lapply(formCands, function(fc)
@@ -145,62 +192,31 @@ getSIRIUSFormulaCandidates <- function(projectID, SIRIUSAPI, SIRFeatID, adduct)
         l$medAbsMassDev <- l$medianMassDeviation$absolute
         l$medRelMassDev <- l$medianMassDeviation$ppm
         l$medianMassDeviation <- NULL
-        if (is.null(l$medAbsMassDev))
+        if (is.null(l[["medAbsMassDev"]]))
             l$medAbsMassDev <- NA_real_
-        if (is.null(l$medRelMassDev))
+        if (is.null(l[["medRelMassDev"]]))
             l$medRelMassDev <- NA_real_
+        if (is.null(l[["totalExplainedIntensity"]]))
+            l$totalExplainedIntensity <- NA_real_
+        l$annotatedSpectrum <- NULL # you are for later
         return(l)
     }), fill = TRUE)
-    # NOTE: explainedPeaks is re-caclulated later, but putting it now places the column before explainablePeaks
+    # NOTE: explainedPeaks is re-calculated later, but putting it now places the column before explainablePeaks
     setnames(tab,
              c("molecularFormula", "siriusScore", "siriusScoreNormalized", "isotopeScore", "treeScore",
                "numOfExplainedPeaks", "numOfExplainablePeaks"),
              c("neutral_formula", "score", "scoreNormalized", "isoScore", "MSMSScore", "explainedPeaks",
                "explainablePeaks"), skip_absent = TRUE)
-    return(tab)
-}
-
-getSIRIUSFragInfos <- function(projectID, SIRIUSAPI, SIRFeatID, SIRFormIDs, PLMS2)
-{
-    # HACK: no PL IDs (yet) for feature specific peak lists
-    hasPLID <- !is.null(PLMS2[["ID"]])
     
-    emptyFI <- data.table(mz = numeric(0), ion_formula_mz = character(0), formula_SIR = character(0),
-                          adduct = character(0), error_mz = numeric(0), error_ppm = numeric(0),
-                          PLID = if (hasPLID) numeric(0), ion_formula = character(0),
-                          neutral_loss = character(0))
-    
-    # NOTE: there may be duplicate formIDs --> only query unique ones and then expand to all SIRFormIDs
-    fragInfos <- sapply(unique(SIRFormIDs), function(fid)
+    # NOTE: frag info for SIRIUS is only available from formula candidates(!)
+    for (i in seq_len(nrow(tab)))
     {
-        as <- SIRIUSAPI$features_api$GetFormulaAnnotatedSpectrum(projectID, SIRFeatID, fid)
-        if (is.null(as$peaks)) # no MS/MS data?
-            return(copy(emptyFI))
-        
-        ionform <- calculateIonFormula(as$spectrumAnnotation$molecularFormula,
-                                       gsub(" ", "", as$spectrumAnnotation$adduct))
-        
-        rbindlist(lapply(as$peaks, function(p)
-        {
-            if (is.null(p$peakAnnotation) || !p$peakAnnotation$isValid()) # no annotations
-                return(copy(emptyFI))
-            
-            anns <- data.table(mz = p$mz, ion_formula_mz = p$peakAnnotation$exactMass,
-                               formula_SIR = p$peakAnnotation$molecularFormula,
-                               adduct = gsub(" ", "", p$peakAnnotation$adduct),
-                               error_mz = p$peakAnnotation$massDeviationMz,
-                               error_ppm = p$peakAnnotation$massDeviationPpm)
-            if (hasPLID)
-                anns[, PLID := PLMS2[which.min(abs(p$mz - mz))]$ID]
-            
-            # SIRIUS neutralizes fragments, make them ion again
-            anns[, ion_formula := mapply(formula_SIR, adduct, FUN = calculateIonFormula)]
-            anns[, neutral_loss := sapply(ion_formula, subtractFormula, formula1 = ionform)]
-            return(anns)
-        }))
-    }, simplify = FALSE)
+        set(tab, i = i, j = "fragInfo", value = list(getSIRIUSFragInfos(projectID, formCands[[i]]$annotatedSpectrum,
+                                                                        tab[i]$neutral_formula, PLMS2)))
+        set(tab, i = i, j = "explainedPeaks", value = nrow(tab$fragInfo[[i]]))
+    }
     
-    return(fragInfos[SIRFormIDs])
+    return(tab)
 }
 
 getSIRIUSFingerprints <- function(projectID, SIRIUSAPI, SIRFeatID, SIRFormIDs, fingerIDData)
@@ -371,7 +387,10 @@ runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUS
             close(prog)
         }
         
-        SIRFeatListImp <- SIRIUSAPI$features_api$GetAlignedFeatures(projectID)
+        # use a search query to only get features that have formula annotations: https://stackoverflow.com/a/5384490
+        SIRFeatListImp <- getSIRIUSPagedResults(SIRIUSAPI$features_api$GetAlignedFeaturesPage, projectID,
+                                                search_query = "topAnnotations.formulaAnnotation.molecularFormula:[* TO *]",
+                                                showProgress = FALSE)
         names(SIRFeatListImp) <- sapply(SIRFeatListImp, \(f) if (is.null(f$externalFeatureId)) NA_character_ else f$externalFeatureId)
         
         # UNDONE: this sometimes fails, why?
@@ -382,20 +401,13 @@ runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUS
         {
             ret <- list()
             
-            ret$formCands <- getSIRIUSFormulaCandidates(projectID, SIRIUSAPI, sirFeat$alignedFeatureId)
+            ret$formCands <- getSIRIUSFormulaCandidates(projectID, SIRIUSAPI, sirFeat$alignedFeatureId, PLMS2)
             if (nrow(ret$formCands) == 0)
                 return(NULL)
-            
-            # NOTE: frag info for SIRIUS is only available from formula candidates(!)
-            fragInfos <- getSIRIUSFragInfos(projectID, SIRIUSAPI, sirFeat$alignedFeatureId, ret$formCands$formulaId, PLMS2)
-            set(ret$formCands, j = "fragInfo", value = fragInfos[ret$formCands$formulaId])
-            set(ret$formCands, j = "explainedPeaks", value = sapply(ret$formCands$fragInfo, nrow))
-            
             ret$formCands <- addMiscFormulaInfo(ret$formCands, fgAdd$grpAdducts[[sirFeat$externalFeatureId]])
             
             if (!formulasOnly)
             {
-                # BUG: opt_fields doesn't seem to do anything
                 # UNDONE: support opt_fields="libraryMatches"?
                 ret$structCands <- SIRIUSAPI$features_api$GetStructureCandidatesPage(projectID,
                                                                                      sirFeat$alignedFeatureId,

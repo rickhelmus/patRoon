@@ -42,6 +42,8 @@
 - `generateComponentsRAMClustR()`: set `RCExperimentVals$instrument$ionization` automatically if unspecified.
 - normInts and claculatePeakQualities now use match.fun() to allow string input for normFunc/avgFunc
 - normIntsP() has adduct argument to make things easier (no need for extraOpts)
+- fixed: compounds sets method for estimateIDConfidence didn't take specSimParams arg
+
 
 # Priority
 

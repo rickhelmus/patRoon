@@ -254,7 +254,9 @@ setMethod("predictTox", "compoundsSet", doFeatAnnPredictToxSets)
 #' @rdname id-conf
 #' @export
 setMethod("estimateIDConfidence", "compoundsSet", function(obj, absMzDev = defaultLim("mz", "medium"), MSPeakLists = NULL,
-                                                           formulas = NULL,  formulasNormalizeScores = "max",
+                                                           formulas = NULL,
+                                                           specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+                                                           formulasNormalizeScores = "max",
                                                            compoundsNormalizeScores = "max",
                                                            IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
                                                            logPath = NULL)
@@ -268,7 +270,7 @@ setMethod("estimateIDConfidence", "compoundsSet", function(obj, absMzDev = defau
     logPath <- if (is.null(logPath)) rep(list(NULL), length(sets(obj))) else file.path(logPath, sets(obj))
     
     obj@setObjects <- Map(setObjects(obj), MSPeakLists = unsetMSPL, formulas = unsetFormulas, logPath = logPath,
-                          f = estimateIDConfidence, MoreArgs = list(absMzDev = absMzDev,
+                          f = estimateIDConfidence, MoreArgs = list(absMzDev = absMzDev, specSimParams = specSimParams,
                                                                     formulasNormalizeScores = formulasNormalizeScores,
                                                                     compoundsNormalizeScores = compoundsNormalizeScores,
                                                                     IDFile = IDFile))

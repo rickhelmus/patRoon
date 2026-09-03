@@ -180,13 +180,9 @@ getSIRIUSFragInfos <- function(projectID, SIRAnnotatedSpec, precursorIonForm, PL
     return(ret)
 }
 
-getSIRIUSFormulaCandidates <- function(projectID, SIRIUSAPI, SIRFeatID, PLMS2)
+getSIRIUSFormulaCandidates <- function(projectID, SIRForms, PLMS2)
 {
-    formCands <- getSIRIUSPagedResults(SIRIUSAPI$features_api$GetFormulaCandidatesPage, projectID, SIRFeatID,
-                                       opt_fields = c("statistics", "annotatedSpectrum"), showProgress = FALSE)
-    if (length(formCands) == 0)
-        return(data.table())
-    tab <- rbindlist(lapply(formCands, function(fc)
+    tab <- rbindlist(lapply(SIRForms, function(fc)
     {
         l <- fc$toList()
         l$medAbsMassDev <- l$medianMassDeviation$absolute
@@ -198,7 +194,7 @@ getSIRIUSFormulaCandidates <- function(projectID, SIRIUSAPI, SIRFeatID, PLMS2)
             l$medRelMassDev <- NA_real_
         if (is.null(l[["totalExplainedIntensity"]]))
             l$totalExplainedIntensity <- NA_real_
-        l$annotatedSpectrum <- NULL # you are for later
+        l$annotatedSpectrum <- l$predictedFingerprint <- NULL # you are for later
         return(l)
     }), fill = TRUE)
     # NOTE: explainedPeaks is re-calculated later, but putting it now places the column before explainablePeaks
@@ -211,7 +207,7 @@ getSIRIUSFormulaCandidates <- function(projectID, SIRIUSAPI, SIRFeatID, PLMS2)
     # NOTE: frag info for SIRIUS is only available from formula candidates(!)
     for (i in seq_len(nrow(tab)))
     {
-        set(tab, i = i, j = "fragInfo", value = list(getSIRIUSFragInfos(projectID, formCands[[i]]$annotatedSpectrum,
+        set(tab, i = i, j = "fragInfo", value = list(getSIRIUSFragInfos(projectID, SIRForms[[i]]$annotatedSpectrum,
                                                                         tab[i]$neutral_formula, PLMS2)))
         set(tab, i = i, j = "explainedPeaks", value = nrow(tab$fragInfo[[i]]))
     }
@@ -219,16 +215,13 @@ getSIRIUSFormulaCandidates <- function(projectID, SIRIUSAPI, SIRFeatID, PLMS2)
     return(tab)
 }
 
-getSIRIUSFingerprints <- function(projectID, SIRIUSAPI, SIRFeatID, SIRFormIDs, fingerIDData)
+getSIRIUSFingerprints <- function(projectID, SIRForms, fingerIDData)
 {
     fps <- data.table()
-    for (fid in unique(SIRFormIDs))
+    for (i in seq_len(length(SIRForms)))
     {
-        # NOTE: GetFingerprintPrediction() throws an error if there are not FPs, so we use GetFormulaCandidate() with
-        # opt_fields instead, which returns NULL if there are no FPs
-        formC <- SIRIUSAPI$features_api$GetFormulaCandidate(projectID, SIRFeatID, fid, opt_fields = "predictedFingerprint")
-        if (!is.null(formC$predictedFingerprint))
-            set(fps, j = formC$molecularFormula, value = unlist(formC$predictedFingerprint))
+        if (!is.null(SIRForms[[i]]$predictedFingerprint))
+            set(fps, j = SIRForms[[i]]$molecularFormula, value = unlist(SIRForms[[i]]$predictedFingerprint))
     }
     
     if (nrow(fps) > 0)
@@ -401,10 +394,17 @@ runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUS
         {
             ret <- list()
             
-            ret$formCands <- getSIRIUSFormulaCandidates(projectID, SIRIUSAPI, sirFeat$alignedFeatureId, PLMS2)
-            if (nrow(ret$formCands) == 0)
+            optFields <- c("statistics", "annotatedSpectrum", if (getFingerprints) "predictedFingerprint")
+            SIRForms <- getSIRIUSPagedResults(SIRIUSAPI$features_api$GetFormulaCandidatesPage, projectID,
+                                              sirFeat$alignedFeatureId, opt_fields = optFields, showProgress = FALSE)
+            if (length(SIRForms) == 0)
                 return(NULL)
+            
+            ret$formCands <- getSIRIUSFormulaCandidates(projectID, SIRForms, PLMS2)
             ret$formCands <- addMiscFormulaInfo(ret$formCands, fgAdd$grpAdducts[[sirFeat$externalFeatureId]])
+            
+            if (getFingerprints)
+                ret$fingerprints <- getSIRIUSFingerprints(projectID, SIRForms, fingerIDData)
             
             if (!formulasOnly)
             {
@@ -431,21 +431,16 @@ runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUS
                     ret$structCands[, dbLinks := NULL]
                 }
                 
-                ret$fingerprints <- if (getFingerprints && nrow(ret$structCands) > 0)
+                if (getFingerprints)
                 {
-                    # only get fingerprints for relavant formulae
-                    getSIRIUSFingerprints(projectID, SIRIUSAPI, sirFeat$alignedFeatureId, ret$structCands$formulaId,
-                                          fingerIDData)
+                    ret$fingerprints <- if (nrow(ret$structCands) == 0)
+                        data.table()
+                    else
+                    {
+                        # only keep fingerprints for relevant formulae
+                        ret$fingerprints[, intersect(names(ret$fingerprints), c(ret$structCands$neutral_formula, names(fingerIDData))), with = FALSE]
+                    }
                 }
-                else
-                    data.table()
-                
-            }
-            else if (getFingerprints)
-            {
-                # get ALL fingerprints
-                ret$fingerprints <- getSIRIUSFingerprints(projectID, SIRIUSAPI, sirFeat$alignedFeatureId,
-                                                          ret$formCands$formulaId, fingerIDData)
             }
             
             return(ret)

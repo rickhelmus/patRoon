@@ -4,7 +4,6 @@
 
 - update tests
     - make fGroup tests consistent
-    - also get fingerprints with GetFormulaCandidatesPaged()
 - NEWS
     - relatedCIDs from PCL is now ; separated instead of space separated
 

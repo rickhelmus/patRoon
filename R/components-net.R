@@ -673,7 +673,7 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     if (annotAlgo == "imss")
         checkPackage("InterpretMSSpectrum")
     if (annotAlgo == "nontarget")
-        checkPackage("nontarget")
+        checkPackage("nontarget", "https://github.com/blosloos/nontarget")
     
     if (!is.list(annotAdducts))
         annotAdducts <- lapply(annotAdducts, as.adduct)

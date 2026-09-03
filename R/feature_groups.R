@@ -853,10 +853,11 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
     assertFeatureQualities(featureQualities, null.ok = TRUE, add = ac)
     assertFeatureQualities(featureGroupQualities, null.ok = TRUE, add = ac)
     checkmate::assertNumber(flatnessFactor, add = ac)
-    checkmate::assertFunction(avgFunc, add = ac)
     assertEICParams(EICParams, add = ac)
     checkmate::assertFlag(parallel, add = ac)
     checkmate::reportAssertions(ac)
+    
+    avgFunc <- match.fun(avgFunc)
 
     featQualities <- if (!is.list(featureQualities)) featureQualities(featureQualities) else featureQualities
     fgQualities <- if (!is.list(featureGroupQualities)) featureGroupQualities(featureGroupQualities) else featureGroupQualities
@@ -1216,11 +1217,12 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
     ac <- checkmate::makeAssertCollection()
     checkmate::assertSubset(featNorm, c("tic", "istd", "conc", "none"))
     checkmate::assertFlag(groupNorm, add = ac)
-    checkmate::assertFunction(normFunc, add = ac)
     checkmate::assertDataFrame(standards, null.ok = featNorm != "istd", add = ac) # more asserts in screenSuspects()
     aapply(checkmate::assertNumber, . ~ ISTDRTWindow + ISTDMZWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertCount(minISTDs, positive = TRUE, add = ac)
     checkmate::reportAssertions(ac)
+    
+    normFunc <- match.fun(normFunc)
     
     if (length(fGroups) == 0)
         return(fGroups)
@@ -1378,9 +1380,11 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
 
 #' @export
 #' @rdname featureGroups-class
-setMethod("normIntsP", "featureGroups", function(obj, param = NULL, ..., standards = NULL)
+setMethod("normIntsP", "featureGroups", function(obj, param = NULL, ..., standards = NULL, adduct = NULL)
 {
     paramList <- prepAndVerifyParamForCall(param, "NormIntsParam", ..., exOptsToDots = TRUE)
+    if (!is.null(adduct)) # HACK: this makes it easier to specify the adduct
+        paramList$adduct <- adduct
     do.call(normInts, c(list(obj, standards = standards), paramList))
 })
 

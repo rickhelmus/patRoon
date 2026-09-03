@@ -28,9 +28,15 @@ test_that("all param classes can be constructed without errors", {
     expect_error(FeatureGroupsXCMS3Param(), NA)
     expect_error(FeatureGroupsKPIC2Param(), NA)
     expect_error(FeatureGroupsGreedyParam(), NA)
+    expect_error(FilterFeatGroupsParam(), NA)
+    expect_error(ScreenSuspectsParam(), NA)
+    expect_error(SelectIonsParam(), NA)
+    expect_error(NormIntsParam(), NA)
+    expect_error(CalculatePeakQualitiesParam(), NA)
 
     # Annotation
     expect_error(MSPeakListsParam(), NA)
+    expect_error(FilterMSPeakListsParam(), NA)
     expect_error(FormulasGenFormParam(), NA)
     expect_error(CompoundsMetFragParam(), NA)
     expect_error(CompoundsLibraryParam(), NA)

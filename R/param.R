@@ -79,7 +79,9 @@ setValidity("param", function(object)
             list = checkmate::assertList,
             data.frame = checkmate::assertDataFrame,
             count = checkmate::assertCount,
+            "function" = \(x, ...) match.fun(x),
             range = assertRange,
+            EICParams = assertEICParams,
             specSimParams = assertSpecSimParams,
             IMS = assertIMSArg,
             IMSMatchParams = assertIMSMatchParams,
@@ -102,14 +104,17 @@ setAs("param", "list", function(from) as.list(from))
 
 setMethod("show", "param", function(object)
 {
+    objL <- as.list(object)
+    
     printf("Parameter class: %s\n", object@name)
     printf("Base name: %s\n", object@baseName)
     printf("Description: %s\n", object@description)
     printf("Version: %s\n", object@version)
     printf("Date created: %s\n", format(object@date))
-    printf("Parameters (%d in total)\n", length(object@definitions))
+    printf("Parameters (%d in total)\n", length(objL))
     # UNDONE: mark defaults
-    print(data.table(parameter = names(object@definitions), value = sapply(as.list(object), as.character),
+    values <- sapply(objL, \(x) if (is.function(x)) paste0(deparse(x, nlines = 2), collapse = "") else as.character(x))
+    print(data.table(parameter = names(object@definitions), value = values,
                      description = sapply(object@definitions, "[[", "description")))
 })
 

@@ -34,15 +34,14 @@
 - screenSuspectsP(): keep onlyHits and amend in params?
 - selectIonsP(): somehow add prefAdduct to param? Maybe split for sets and non sets workflows?
 - normIntsP/calculatePeakQualitiesP()
-    - make normFunc/avgFunc also be able to be a string so the param object can be serialized
-    - test and check
     - make workflow wrapper also be able to call features method only of calculatePeakQualities()?
 
 
-## NEWS
+## NEWS / docs
 
-* `generateComponentsRAMClustR()`: set `RCExperimentVals$instrument$ionization` automatically if unspecified.
-
+- `generateComponentsRAMClustR()`: set `RCExperimentVals$instrument$ionization` automatically if unspecified.
+- normInts and claculatePeakQualities now use match.fun() to allow string input for normFunc/avgFunc
+- normIntsP() has adduct argument to make things easier (no need for extraOpts)
 
 # Priority
 

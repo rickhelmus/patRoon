@@ -235,8 +235,7 @@ setMethod("estimateIDConfidence", "featureGroupsScreening", function(obj, MSPeak
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ MSPeakLists + formulas + compounds,
            c("MSPeakLists", "formulas", "compounds"), null.ok = TRUE, fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ absMzDev, lower = 0,
-           finite = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ absMzDev, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertSubset(checkFragments, c("mz", "formula", "compound"), add = ac)
     aapply(assertNormalizationMethod, . ~ formulasNormalizeScores + compoundsNormalizeScores, withNone = FALSE,
            fixed = list(add = ac))
@@ -375,6 +374,20 @@ setMethod("estimateIDConfidence", "featureGroupsScreening", function(obj, MSPeak
     saveCacheData("estimateIDConfidenceScr", obj, hash)
     
     return(obj)
+})
+
+#' @rdname id-conf
+#' @export
+setMethod("estimateIDConfidenceP", "featureGroupsScreening", function(obj, param = NULL, ...,
+                                                                      MSPeakLists = NULL, formulas = NULL,
+                                                                      compounds = NULL,
+                                                                      IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
+                                                                      logPath = file.path("log", "ident"))
+{
+    p <- prepAndVerifyParamForCall(param, "EstimateIDConfidenceParam", ...)
+    p <- p[names(p) != "specSimParams"]
+    do.call(estimateIDConfidence, c(list(obj, MSPeakLists = MSPeakLists, formulas = formulas,
+                                         compounds = compounds, IDFile = IDFile, logPath = logPath), p))
 })
 
 #' @describeIn featureGroupsScreening Performs rule based filtering. This method builds on the comprehensive filter

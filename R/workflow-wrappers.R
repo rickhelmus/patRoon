@@ -323,6 +323,29 @@ setMethod("calculatePeakQualitiesP", "workflow",
                                              slotNameOut = "fGroups", paramClass = "CalculatePeakQualitiesParam",
                                              obj, param = param, ...))
 
+#' @rdname id-conf
+setMethod("estimateIDConfidenceP", "workflow", function(obj, param = NULL, ...)
+{
+    if (!is.null(obj@formulas))
+    {
+        obj <- doWfStep(func = "estimateIDConfidenceP", slotNameIn = "formulas", slotNameOut = "formulas",
+                        paramClass = "EstimateIDConfidenceParam", obj, param = param, ...)
+    }
+    if (!is.null(obj@compounds))
+    {
+        obj <- doWfStep(func = "estimateIDConfidenceP", slotNameIn = c("compounds", "formulas"),
+                        slotNameOut = "compounds", paramClass = "EstimateIDConfidenceParam", obj, param = param, ...)
+    }
+    
+    if (!is.null(obj@fGroups) && isScreening(obj@fGroups))
+    {
+        obj <- doWfStep(func = "estimateIDConfidenceP", slotNameIn = c("fGroups", "formulas", "compounds"),
+                        slotNameOut = "fGroups", paramClass = "EstimateIDConfidenceParam", obj, param = param, ...)
+    }
+    
+    return(obj)
+})
+
 
 setMethod("wfWrap", "workflow", function(obj, expr)
 {

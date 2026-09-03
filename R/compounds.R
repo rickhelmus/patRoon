@@ -778,6 +778,18 @@ setMethod("estimateIDConfidence", "compounds", function(obj, absMzDev = defaultL
     return(obj)
 })
 
+#' @rdname id-conf
+#' @export
+setMethod("estimateIDConfidenceP", "compounds", function(obj, param = NULL, ..., MSPeakLists = NULL, formulas = NULL,
+                                                         IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
+                                                         logPath = NULL)
+{
+    p <- prepAndVerifyParamForCall(param, "EstimateIDConfidenceParam", ...)
+    p <- p[names(p) != "checkFragments"]
+    do.call(estimateIDConfidence, c(list(obj, MSPeakLists = MSPeakLists, formulas = formulas, IDFile = IDFile,
+                                         logPath = logPath), p))
+})
+
 #' Assign IMS data to a \code{compounds} object.
 #'
 #' Assigns ion mobility and \acronym{CCS} values to the candidates in a \code{\link{compounds}} object.

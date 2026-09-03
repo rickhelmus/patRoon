@@ -40,6 +40,7 @@ test_that("all param classes can be constructed without errors", {
     expect_error(FormulasGenFormParam(), NA)
     expect_error(CompoundsMetFragParam(), NA)
     expect_error(CompoundsLibraryParam(), NA)
+    expect_error(EstimateIDConfidenceParam(), NA)
     
     # TPs
     expect_error(TPsBioTransformerParam(), NA)

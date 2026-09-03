@@ -528,6 +528,9 @@ NULL
 #' @name id-conf
 setGeneric("estimateIDConfidence", function(obj, ...) standardGeneric("estimateIDConfidence"))
 
+#' @name id-conf
+setGeneric("estimateIDConfidenceP", function(obj, ...) standardGeneric("estimateIDConfidenceP"))
+
 
 #' @templateVar func adducts
 #' @templateVar desc returns assigned adducts of the object.

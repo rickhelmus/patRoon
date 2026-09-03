@@ -484,6 +484,18 @@ setMethod("estimateIDConfidence", "formulas", function(obj, absMzDev = defaultLi
     return(obj)
 })
 
+#' @rdname id-conf
+#' @export
+setMethod("estimateIDConfidenceP", "formulas", function(obj, param = NULL, ...,
+                                                        IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
+                                                        logPath = NULL)
+{
+    p <- prepAndVerifyParamForCall(param, "EstimateIDConfidenceParam", ...)
+    p <- p[names(p) %in% c("absMzDev", "formulasNormalizeScores")]
+    names(p)[names(p) == "formulasNormalizeScores"] <- "normalizeScores" # HACK
+    do.call(estimateIDConfidence, c(list(obj, IDFile = IDFile, logPath = logPath), p))
+})
+
 #' @templateVar what formulas
 #' @template consensus-form_comp
 #'

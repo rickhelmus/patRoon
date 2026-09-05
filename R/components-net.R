@@ -55,8 +55,15 @@ getNetCompCliques <- function(graph, ...)
 }
 
 # NOTE: this function is called by a withProg() block, so handles progression updates
-makeCompNetFeatures <- function(fTable, EICs, sim, minSim, maxP, method, ...)
+makeCompNetFeatures <- function(fTable, EICs, EICXValues, sim, minSim, maxP, method, ...)
 {
+    # Fill EICs with full timescale so these can be compared.
+    EICs <- Map(names(EICs), EICs, f = function(fg, eic)
+    {
+        m <- cbind(time = EICXValues, intensity = doFillEIXIntensities(EICXValues, eic[, "time"], eic[, "intensity"]))
+        return(m)
+    })
+    
     eicm <- do.call(cbind, lapply(EICs, \(eic) eic[, "intensity"]))
     
     if (sim == "pearson")
@@ -695,32 +702,17 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     
     fTable <- featureTable(fGroups)
     
-    printf("Getting EICs and correlation matrices for %d analyses...\n", length(fTable))
+    printf("Getting EICs for %d analyses...\n", length(fTable))
+    EICs <- getFeatureEIXs(fGroups, "EIC", EIXParams = getDefEICParams(window = 0))
+    EICXValues <- sapply(EICsN, \(anaEICs) attr(anaEICs, "allXValues"), simplify = FALSE)
     
-    # EICs: get complete chromatograms so these can be compared, however, only keep the feature signal so other peaks
-    # will not interfere correlation calculations.
-    EICs <- getFeatureEIXs(fGroups, "EIC", EIXParams = getDefEICParams(window = Inf))
-    EICs <- Map(names(EICs), EICs, f = function(ana, anaEICs)
-    {
-        at <- attr(anaEICs, "allXValues")
-        return(Map(names(anaEICs), anaEICs, f = function(fg, eic)
-        {
-            m <- cbind(time = at, intensity = doFillEIXIntensities(at, eic[, "time"], eic[, "intensity"]))
-            ft <- fTable[[ana]][group == fg]
-            # UNDONE: limit retmin/retmax?
-            m[m[, "time"] < ft$retmin | m[, "time"] > ft$retmax, "intensity"] <- 0
-            # m[, "intensity"] <- m[, "intensity"] / max(m[, "intensity"]) * 100 # UNDONE: need normalization?
-            return(m)
-        }))
-    })
-
     printf("Generating feature components for %d analyses...\n", length(fTable))
-    compsFeats <- withProg(length(fTable), FALSE, Map(fTable, EICs, f = makeCompNetFeatures,
-                                                      MoreArgs = c(list(sim = componSim, minSim = componMinSim,
-                                                                        maxP = componMaxP, method = componMethod),
-                                                                   componArgs)))
+    compsFeats <- withProg(length(fTable), FALSE, Map(fTable, EICs, EICXValues, f = makeCompNetFeatures,
+                                                       MoreArgs = c(list(sim = componSim, minSim = componMinSim,
+                                                                         maxP = componMaxP, method = componMethod),
+                                                                       componArgs)))
     compsFeatsTabs <- sapply(compsFeats, "[[", "components", simplify = FALSE)
-    
+
     # generate consensus components: calculate pairwise grouping of features across analyses
     printf("Generating consensus components across analyses...")
     compsGroupsList <- sapply(compsFeatsTabs, \(x) lapply(x, "[[", "group"), simplify = FALSE)

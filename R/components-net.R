@@ -704,13 +704,13 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     
     printf("Getting EICs for %d analyses...\n", length(fTable))
     EICs <- getFeatureEIXs(fGroups, "EIC", EIXParams = getDefEICParams(window = 0))
-    EICXValues <- sapply(EICsN, \(anaEICs) attr(anaEICs, "allXValues"), simplify = FALSE)
+    EICXValues <- sapply(EICs, \(anaEICs) attr(anaEICs, "allXValues"), simplify = FALSE)
     
     printf("Generating feature components for %d analyses...\n", length(fTable))
     compsFeats <- withProg(length(fTable), FALSE, Map(fTable, EICs, EICXValues, f = makeCompNetFeatures,
                                                        MoreArgs = c(list(sim = componSim, minSim = componMinSim,
                                                                          maxP = componMaxP, method = componMethod),
-                                                                       componArgs)))
+                                                                    componArgs)))
     compsFeatsTabs <- sapply(compsFeats, "[[", "components", simplify = FALSE)
 
     # generate consensus components: calculate pairwise grouping of features across analyses

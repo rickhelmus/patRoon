@@ -55,7 +55,7 @@ getNetCompCliques <- function(graph, ...)
 }
 
 # NOTE: this function is called by a withProg() block, so handles progression updates
-makeCompNetFeatures <- function(fTable, EICs, EICXValues, sim, minSim, maxP, method, ...)
+makeCompNetFeatures <- function(EICs, EICXValues, sim, minSim, maxP, method, ...)
 {
     # Fill EICs with full timescale so these can be compared.
     EICs <- Map(names(EICs), EICs, f = function(fg, eic)
@@ -707,7 +707,7 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     EICXValues <- sapply(EICs, \(anaEICs) attr(anaEICs, "allXValues"), simplify = FALSE)
     
     printf("Generating feature components for %d analyses...\n", length(fTable))
-    compsFeats <- withProg(length(fTable), FALSE, Map(fTable, EICs, EICXValues, f = makeCompNetFeatures,
+    compsFeats <- withProg(length(fTable), FALSE, Map(EICs, EICXValues, f = makeCompNetFeatures,
                                                        MoreArgs = c(list(sim = componSim, minSim = componMinSim,
                                                                          maxP = componMaxP, method = componMethod),
                                                                     componArgs)))

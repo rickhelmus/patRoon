@@ -784,6 +784,8 @@ setMethod("plotChroms", "MSPeakLists", function(obj, fGroups, groupName, analysi
     EICs <- getMSPLEICs(obj, fGroups, groupName, analysis, gapFactor = gapFactor, MSLevel = MSLevel,
                         fixedIsolationWidth = fixedIsolationWidth, rtWindow = rtWindow, mzWindow = mzWindow, pad = TRUE)
     
+    EICs <- EICs[[1]][[1]] # so far only one groupName and analysis is supported
+    
     # prepare EICs for plotting
     if (retMin)
     {

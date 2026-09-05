@@ -784,37 +784,124 @@ mergeBinnedAndAnnPL <- function(binPL, annPL, which)
 
 getMSPLEICsInfo <- function(MSPeakLists, fGroups, groupName, analysis, MSLevel, fixedIsolationWidth, rtWindow, mzWindow)
 {
-    pl <- copy(getSpec(MSPeakLists, groupName, MSLevel, analysis))
-    pl <- pl[, c("ID", "mz", "precursor"), with = FALSE]
-    precMZ <- pl[precursor == TRUE]$mz
-    if (length(precMZ) == 0)
-        precMZ <- groupInfo(fGroups)[group == groupName]$mz # UNDONE: doc
-    pl[, precursorMZ := precMZ]
-    
-    ftab <- getFeatures(fGroups)[[analysis]][group == groupName]
-    for (col in c("retmin", "retmax", "mobmin", "mobmax"))
+    sapply(analysis, function(ana)
     {
-        if (col %in% names(ftab))
-            pl[, (col) := ftab[[col]]]
-    }
- 
-    if (is.infinite(rtWindow))
-        pl[, c("retmin", "retmax") := 0]
-    else
-        pl[, c("retmin", "retmax") := .(retmin - rtWindow, retmax + rtWindow)]
-    
-    pl[, c("mzmin", "mzmax") := .(mz - mzWindow, mz + mzWindow)]
-    
-    return(pl[])
+        tabs <- sapply(groupName, function(grp)
+        {
+            ftab <- getFeatures(fGroups)[[ana]][group == grp]
+            if (nrow(tab) == 0)
+                return(NULL)
+            
+            pl <- copy(getSpec(MSPeakLists, grp, MSLevel, ana))
+            pl <- pl[, c("ID", "mz", "precursor"), with = FALSE]
+            precMZ <- pl[precursor == TRUE]$mz
+            if (length(precMZ) == 0)
+                precMZ <- groupInfo(fGroups)[group == grp]$mz # UNDONE: doc
+            pl[, precursorMZ := precMZ]
+            
+            for (col in c("retmin", "retmax", "mobmin", "mobmax"))
+            {
+                if (col %in% names(ftab))
+                    pl[, (col) := ftab[[col]]]
+            }
+            
+            if (is.infinite(rtWindow))
+                pl[, c("retmin", "retmax") := 0]
+            else
+                pl[, c("retmin", "retmax") := .(retmin - rtWindow, retmax + rtWindow)]
+            
+            pl[, c("mzmin", "mzmax") := .(mz - mzWindow, mz + mzWindow)]
+            
+            return(pl[])
+        }, simplify = FALSE)
+        tab <- rbindlist(tabs, idcol = "group")
+    }, simplify = FALSE)
 }
 
 getMSPLEICs <- function(MSPeakLists, fGroups, groupName, analysis, gapFactor = 3, MSLevel, fixedIsolationWidth = FALSE,
                         rtWindow = defaultLim("retention", "wide"), mzWindow = defaultLim("mz", "medium"), ...)
 {
-    inputTab <- getMSPLEICsInfo(MSPeakLists, fGroups, groupName, analysis, MSLevel, fixedIsolationWidth, rtWindow,
-                                mzWindow)
-    inputTabList <- setNames(list(inputTab), analysis)
-    EICs <- doGetEICs(analysisInfo(fGroups), inputTabList, gapFactor = gapFactor, MSLevel = MSLevel,
+    inputTabs <- getMSPLEICsInfo(MSPeakLists, fGroups, groupName, analysis, MSLevel, fixedIsolationWidth, rtWindow,
+                                 mzWindow)
+    EICs <- doGetEICs(analysisInfo(fGroups), inputTabs, gapFactor = gapFactor, MSLevel = MSLevel,
                       fixedIsolationWidth = fixedIsolationWidth, ...)
-    return(EICs[[1]])
+    
+    EICs <- Map(names(EICs), EICs, f = function(ana, anaEICs)
+    {
+        rts <- attr(anaEICs, "allXValues")
+        ret <- sapply(unique(inputTabs[[ana]]$group), function(grp)
+        {
+            wh <- inputTabs[[ana]][group == grp, which = TRUE]
+            return(setNames(anaEICs[wh], inputTabs[[ana]][wh]$ID))
+        }, simplify = FALSE)
+        attr(ret, "allXValues") <- rts
+        return(ret)
+    })
+    return(EICs)
+}
+
+filterMSPLCor <- function(MSPeakLists, fGroups, MSLevel, threshold, fixedIsolationWidth = FALSE,
+                          gapFactor = 3, mzWindow = defaultLim("mz", "medium"))
+{
+    fTable <- featureTable(fGroups)
+    
+    # EICs: get complete chromatograms so these can be compared, however, only keep the feature signal so other peaks
+    # will not interfere correlation calculations.
+    EICs <- getMSPLEICs(MSPeakLists, fGroups, names(fGroups), analyses(fGroups), gapFactor = gapFactor,
+                        MSLevel = MSLevel, fixedIsolationWidth = fixedIsolationWidth, rtWindow = 0,
+                        mzWindow = mzWindow)
+    
+    # UNDONE: specify EICParams as arg?
+    EICsFeat <- NULL
+    if (MSLevel == 2)
+    {
+        EICsFeat <- getFeatureEIXs(fGroups, "eic", EIXParams = getDefEICParams(gapFactor = gapFactor, window = 0))
+        EICsFeat <- Map(names(EICsFeat), EICsFeat, f = function(ana, anaEICs)
+        {
+            at <- attr(anaEICs, "allXValues")
+            return(Map(names(anaEICs), anaEICs, f = function(fg, eic)
+            {
+                cbind(time = at, intensity = doFillEIXIntensities(at, eic[, "time"], eic[, "intensity"]))
+            }))
+        })
+    }
+    
+    correlations <- Map(names(EICs), EICs, f = function(ana, anaEICs)
+    {
+        at <- attr(anaEICs, "allXValues")
+        Map(names(anaEICs), anaEICs, f = function(grp, grpEICs)
+        {
+            grpEICs <- Map(names(grpEICs), grpEICs, f = function(id, eic)
+            {
+                m <- cbind(time = at, intensity = doFillEIXIntensities(at, eic[, "time"], eic[, "intensity"]))
+                # ft <- fTable[[ana]][group == grp]
+                # m[m[, "time"] < ft$retmin | m[, "time"] > ft$retmax, "intensity"] <- 0
+                return(m)
+            })
+            eicm <- do.call(cbind, lapply(grpEICs, \(eic) eic[, "intensity"]))
+            colnames(eicm) <- names(grpEICs)
+            
+            spec <- getSpec(MSPeakLists, grp, MSLevel, ana)
+            precID <- as.character(spec[precursor == TRUE]$ID) # NOTE: IDs are stored as strings in EIC list
+            corrSpecPrec <- numeric()
+            if (length(precID) != 0L)
+            {
+                precInd <- which(names(grpEICs) == precID)
+                if (length(precInd) != 0L)
+                    corrSpecPrec <- cor(eicm[, precInd], eicm, use = "pairwise.complete.obs")
+            }
+            
+            corrSpec1Prec <- numeric()
+            if (MSLevel == 2)
+            {
+                eic <- EICsFeat[[ana]][[grp]]
+                if (!is.null(eic))
+                    corrSpec1Prec <- cor(eic, eicm, use = "pairwise.complete.obs")
+            }
+            browser()
+            # corrs <- cor(eicm, use = "pairwise.complete.obs")
+        })
+    })
+    
+    
 }

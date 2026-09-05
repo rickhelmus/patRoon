@@ -57,8 +57,7 @@ if (runData)
     formulas <- formsGF <- generateFormulas(fGroupsAnn, mslists, "genform", relMzDev = 5,
                                             adduct = "[M+H]+", elements = "CHNOPSCl",
                                             calculateFeatures = TRUE, featThresholdAnn = 0.75)
-    formsSIR <- generateFormulas(fGroupsAnn, mslists, "sirius", elements = "CHNOPSCl", adduct = "[M+H]+",
-                                 calculateFeatures = FALSE)
+    formsSIR <- generateFormulas(fGroupsAnn, mslists, "sirius", adduct = "[M+H]+", calculateFeatures = FALSE)
 
     compsMF <- compounds <-
         generateCompounds(fGroupsAnn, mslists, "metfrag", method = "CL",

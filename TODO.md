@@ -2,8 +2,7 @@
 
 ## SIRIUS
 
-- update tests
-    - make fGroup tests consistent
+- check if formsSIR Venn in Handbook is still fine
 - NEWS
     - relatedCIDs from PCL is now ; separated instead of space separated
 

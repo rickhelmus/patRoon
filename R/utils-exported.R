@@ -1912,8 +1912,7 @@ genIDLevelRulesFile <- function(out, inLevels = NULL, exLevels = NULL)
 #'   vector of configuration names when \code{config = NA}.
 #'
 #' @export
-getSIRIUSConfig <- function(config = NULL, import = NULL, login = "check", alwaysLogin = FALSE, SIRIUSAPI = NULL,
-                            SIRIUSPath = NULL)
+getSIRIUSConfig <- function(config = NULL, import = NULL, login = "check", alwaysLogin = FALSE, SIRIUSAPI = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assert(
@@ -1933,7 +1932,7 @@ getSIRIUSConfig <- function(config = NULL, import = NULL, login = "check", alway
         stop("Only one of 'config' and 'import' can be provided.", call. = FALSE)
     
     if (is.null(SIRIUSAPI))
-        SIRIUSAPI <- startSIRIUS(SIRIUSPath)
+        SIRIUSAPI <- startSIRIUS()
     
     doSIRIUSLogin(login, alwaysLogin, SIRIUSAPI)
     

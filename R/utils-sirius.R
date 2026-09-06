@@ -45,7 +45,7 @@ startSIRIUS <- function(path)
     shutdownSIR <- FALSE
     if (is.null(SIRIUSAPI))
     {
-        SIRIUSAPI <- sdk$start_sirius(sirius_path = path, headless = TRUE)
+        SIRIUSAPI <- sdk$start_sirius(sirius_path = getExtDepPath("sirius"), headless = TRUE)
         shutdownSIR <- TRUE
     }
     withr::defer_parent({
@@ -234,8 +234,8 @@ getSIRIUSFingerprints <- function(projectID, SIRForms, fingerIDData)
     return(fps)
 }
 
-runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUSAPI, SIRIUSPath, projectPath, config,
-                      login, alwaysLogin, formulasOnly, calculateFeatures, cacheName, getFingerprints,
+runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUSAPI, projectPath, config, login,
+                      alwaysLogin, formulasOnly, calculateFeatures, cacheName, getFingerprints,
                       topMostStructures = NULL)
 {
     doFGroup <- function(grp, ana = NULL)
@@ -299,7 +299,7 @@ runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUS
     if (length(gNamesTBD) > 0)
     {
         if (is.null(SIRIUSAPI))
-            SIRIUSAPI <- startSIRIUS(SIRIUSPath)
+            SIRIUSAPI <- startSIRIUS()
         
         doSIRIUSLogin(login, alwaysLogin, SIRIUSAPI)
         projectID <- openSIRIUSProject(projectPath, SIRIUSAPI, runMode)
@@ -359,7 +359,7 @@ runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUS
             SIRIUSAPI$features_api$AddAlignedFeatures(project_id = projectID, SIRFeatList)
             
             if (is.null(config))
-                config <- getSIRIUSConfig(SIRIUSAPI = SIRIUSAPI, SIRIUSPath = SIRIUSPath, login = FALSE) # NOTE: should already be logged in
+                config <- getSIRIUSConfig(SIRIUSAPI = SIRIUSAPI, login = FALSE) # NOTE: should already be logged in
             config$spectraSearchParams$enabled <- FALSE
             config$formulaIdParams$enabled <- TRUE
             config$fingerprintPredictionParams$enabled <- getFingerprints

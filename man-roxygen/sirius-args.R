@@ -29,8 +29,6 @@
 #'   \setsWF \code{projectPath} should be a \code{character} specifying the paths for each set.
 #' @param SIRIUSAPI An \code{rsirius_api} object for connecting to the \command{SIRIUS} API. If \code{NULL}, a new
 #'   connection will be started automatically.
-#' @param SIRIUSPath The full path to the \command{SIRIUS} command-line interface executable. Only used when
-#'   \code{SIRIUSAPI} is not provided.
 #'
 #' @section SIRIUS 6 functionality: The interface to \command{SIRIUS 6} is still in development and may be extended in
 #'   the future. There is a vast amount of functionality available, which will require quite some effort to support all.

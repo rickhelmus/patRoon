@@ -164,8 +164,7 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
                                                               featThresholdAnn = 0.75,
                                                               absAlignMzDev = defaultLim("mz", "narrow"),
                                                               minIMSSpecSim = 0, projectPath = NULL,
-                                                              runMode = "execute", SIRIUSAPI = NULL, SIRIUSPath = NULL,
-                                                              verbose = TRUE)
+                                                              runMode = "execute", SIRIUSAPI = NULL, verbose = TRUE)
 {
     # UNDONE: see generateCompoundsSIRIUS()
 
@@ -195,8 +194,8 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     if (verbose)
         printf("Processing %d feature groups with SIRIUS...\n", length(fGroups))
     
-    SIRResults <- runSIRIUS(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUSAPI, SIRIUSPath, projectPath,
-                            config, login, alwaysLogin, formulasOnly = TRUE, calculateFeatures = calculateFeatures,
+    SIRResults <- runSIRIUS(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUSAPI, projectPath, config, login,
+                            alwaysLogin, formulasOnly = TRUE, calculateFeatures = calculateFeatures,
                             cacheName = "formulasSIRIUS", getFingerprints = getFingerprints)
     
     prepRes <- function(res)

@@ -37,7 +37,7 @@ setMethod("initialize", "featuresSIRIUS",
 #' @export
 findFeaturesSIRIUS <- function(analysisInfo, noiseIntensity = NULL, alignMaxRTDev = NULL,
                                minSNR = NULL, login = "check", alwaysLogin = FALSE, projectPath = NULL,
-                               runMode = "execute", SIRIUSAPI = NULL, SIRIUSPath = NULL, verbose = TRUE)
+                               runMode = "execute", SIRIUSAPI = NULL, verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     # UNDONE: API docs say that mzXML is also supported?
@@ -59,7 +59,7 @@ findFeaturesSIRIUS <- function(analysisInfo, noiseIntensity = NULL, alignMaxRTDe
         return(cachefg)
     
     if (is.null(SIRIUSAPI))
-        SIRIUSAPI <- startSIRIUS(SIRIUSPath)
+        SIRIUSAPI <- startSIRIUS()
     
     doSIRIUSLogin(login, alwaysLogin, SIRIUSAPI)
     projectID <- openSIRIUSProject(projectPath, SIRIUSAPI, runMode)

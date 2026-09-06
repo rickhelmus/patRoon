@@ -44,7 +44,7 @@ setMethod("initialize", "featureGroupsSIRIUS",
 #'
 #' @export
 groupFeaturesSIRIUS <- function(analysisInfo, ..., login = "check", alwaysLogin = FALSE, projectPath = NULL,
-                                runMode = "execute", SIRIUSAPI = NULL, SIRIUSPath = NULL, verbose = TRUE)
+                                runMode = "execute", SIRIUSAPI = NULL, verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     # UNDONE: API docs say that mzXML is also supported?
@@ -63,7 +63,7 @@ groupFeaturesSIRIUS <- function(analysisInfo, ..., login = "check", alwaysLogin 
 
     # setup here so it can be shared with findFeaturesSIRIUS()
     if (is.null(SIRIUSAPI))
-        SIRIUSAPI <- startSIRIUS(SIRIUSPath)
+        SIRIUSAPI <- startSIRIUS()
     
     # NOTE: setup projectPath/ID here so it can be shared with findFeaturesSIRIUS()
     if (is.null(projectPath))
@@ -75,9 +75,8 @@ groupFeaturesSIRIUS <- function(analysisInfo, ..., login = "check", alwaysLogin 
     # loading from cache
     features <- withOpt(
         cache.mode = "save",
-        findFeaturesSIRIUS(analysisInfo, ..., login = login, alwaysLogin = alwaysLogin,
-                           projectPath = projectPath, runMode = runMode, SIRIUSAPI = SIRIUSAPI,
-                           SIRIUSPath = SIRIUSPath, verbose = verbose)
+        findFeaturesSIRIUS(analysisInfo, ..., login = login, alwaysLogin = alwaysLogin, projectPath = projectPath,
+                           runMode = runMode, SIRIUSAPI = SIRIUSAPI, verbose = verbose)
     )
     
     # no need to login

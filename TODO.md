@@ -3,6 +3,7 @@
 ## SIRIUS
 
 - check if formsSIR Venn in Handbook is still fine
+- update docs, but not on the latest Roxygen because it borks [/[[ docs
 - NEWS
     - relatedCIDs from PCL is now ; separated instead of space separated
 

@@ -184,11 +184,10 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
                                                                adduct = NULL, config = NULL, topMost = 100,
                                                                login = "check", alwaysLogin = FALSE, minIMSSpecSim = 0,
                                                                projectPath = NULL, runMode = "execute", SIRIUSAPI = NULL,
-                                                               SIRIUSPath = NULL, verbose = TRUE)
+                                                               verbose = TRUE)
 {
     # UNDONE: error handling for SIRIUS API calls
     # UNDONE: handle IMSSpecSims: test (including caching)
-    # UNDONE: replace SIRIUSPath by patRoonExt
 
     checkPackage("RSirius", "sirius-ms/sirius-client-openAPI", ghSubDir = "client-api_r/generated")
     
@@ -212,7 +211,7 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
     if (verbose)
         printf("Processing %d feature groups with SIRIUS+CSI:FingerID...\n", length(fGroups))
 
-    SIRResults <- runSIRIUS(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUSAPI, SIRIUSPath, projectPath,
+    SIRResults <- runSIRIUS(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUSAPI, projectPath,
                             config, login, alwaysLogin, formulasOnly = FALSE, calculateFeatures = FALSE,
                             cacheName = "compoundsSIRIUS", getFingerprints = TRUE, topMostStructures = topMost)    
 

@@ -35,7 +35,7 @@ doSIRIUSLogin <- function(login, force, SIRIUSAPI)
     invisible(NULL)
 }
 
-startSIRIUS <- function(path)
+startSIRIUS <- function()
 {
     checkPackage("RSirius", "sirius-ms/sirius-client-openAPI", ghSubDir = "client-api_r/generated")
     

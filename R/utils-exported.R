@@ -1889,6 +1889,30 @@ genIDLevelRulesFile <- function(out, inLevels = NULL, exLevels = NULL)
     invisible(NULL)
 }
 
+#' Log in to SIRIUS
+#'
+#' Performs an account login to \command{SIRIUS}. This function starts the \command{SIRIUS} API (if needed) and performs
+#' the login. It can be used to explicitly log in before running \code{\link{generateFormulasSIRIUS}} or
+#' \code{\link{generateCompoundsSIRIUS}}.
+#'
+#' @inheritParams generateCompoundsSIRIUS
+#'
+#' @export
+SIRIUSLogin <- function(login = "check", alwaysLogin = FALSE, SIRIUSAPI = NULL)
+{
+    ac <- checkmate::makeAssertCollection()
+    assertSIRIUSLogin(login, alwaysLogin, add = ac)
+    checkmate::assertClass(SIRIUSAPI, "rsirius_api", null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+
+    if (is.null(SIRIUSAPI))
+        SIRIUSAPI <- startSIRIUS()
+
+    doSIRIUSLogin(login, alwaysLogin, SIRIUSAPI)
+
+    invisible(NULL)
+}
+
 #' Obtain a SIRIUS job configuration
 #'
 #' This function obtains a \link[RSirius]{JobSubmission} configuration object for use with

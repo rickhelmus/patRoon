@@ -63,15 +63,15 @@ openSIRIUSProject <- function(projectPath, SIRIUSAPI, runMode)
     if (runMode == "read" && (is.null(projectPath) || !file.exists(projectPath)))
         stop("projectPath must be provided and exist when runMode is 'read'", call. = FALSE)
     
-    projectID <- if (!is.null(projectPath) && length(names(projectPath) > 0)) names(projectPath)[1] else "patRoonProjectID"
+    projectID <- if (!is.null(projectPath) && length(names(projectPath) > 0)) names(projectPath)[1] else paste0("patRoonProjectID", Sys.getpid())
     if (is.null(projectPath))
         projectPath <- tempfile("patRoonSIRIUS", fileext = ".sirius")
     else
     {
         # normalizePath(projectPath, mustWork = FALSE, winslash = "/")
         # NOTE: normalizePath() doesn't work for non-existing files
-        projectPath <- fs::path_abs(projectPath)
-    }    
+        projectPath <- fs::path_abs(fs::path_expand(projectPath))
+    }
     
     openProjects <- SIRIUSAPI$projects_api$GetProjects()
     for (proj in openProjects)
@@ -84,7 +84,7 @@ openSIRIUSProject <- function(projectPath, SIRIUSAPI, runMode)
             return(projectID)
         }
     }
-    
+
     if (file.exists(projectPath) && runMode == "read")
         SIRIUSAPI$projects_api$OpenProject(projectID, projectPath)
     else

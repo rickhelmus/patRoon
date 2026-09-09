@@ -86,6 +86,7 @@ setValidity("param", function(object)
             normalizationMethod = assertNormalizationMethod,
             IMS = assertIMSArg,
             IMSMatchParams = assertIMSMatchParams,
+            CCSParams = assertCCSParams,
             TPStructParams = assertTPStructParams
         )
         

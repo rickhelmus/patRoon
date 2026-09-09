@@ -346,6 +346,27 @@ setMethod("estimateIDConfidenceP", "workflow", function(obj, param = NULL, ...)
     return(obj)
 })
 
+setMethod("assignMobilitiesP", c("workflow", "character"), function(obj, param, ...)
+{
+    checkmate::assertChoice(param, c("fGroups", "compounds"))
+    obj <- doWfStep(func = "assignMobilitiesP",
+                    slotNameIn = if (param == "fGroups") "fGroups" else c("compounds", "fGroups"), slotNameOut = param,
+                    paramClass = if (param == "fGroups") "AssignMobilitiesFeatureGroupsParam" else "AssignMobilitiesCompoundsParam",
+                    obj, param = NULL, ...)
+    return(obj)
+})
+setMethod("assignMobilitiesP", c("workflow", "AssignMobilitiesFeatureGroupsParam"), function(obj, param, ...)
+{
+    obj <- doWfStep(func = "assignMobilitiesP", slotNameIn = "fGroups", slotNameOut = "fGroups",
+                    paramClass = "AssignMobilitiesFeatureGroupsParam", obj, param = param, ...)
+    return(obj)
+})
+setMethod("assignMobilitiesP", c("workflow", "AssignMobilitiesCompoundsParam"), function(obj, param, ...)
+{
+    obj <- doWfStep(func = "assignMobilitiesP", slotNameIn = c("compounds", "fGroups"), slotNameOut = "compounds",
+                    paramClass = "AssignMobilitiesCompoundsParam", obj, param = param, ...)
+    return(obj)
+})
 
 setMethod("wfWrap", "workflow", function(obj, expr)
 {

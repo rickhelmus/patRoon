@@ -578,6 +578,11 @@ setGeneric("annotations", function(obj, ...) standardGeneric("annotations"))
 #' @template generics
 setGeneric("assignMobilities", function(obj, ...) standardGeneric("assignMobilities"))
 
+#' @templateVar func assignMobilitiesP
+#' @templateVar desc assigns ion mobility and/or \acronym{CCS} values to workflow data.
+#' @template generics
+setGeneric("assignMobilitiesP", function(obj, param, ...) standardGeneric("assignMobilitiesP"))
+
 #' @templateVar func calculatePeakQualities
 #' @templateVar desc calculates chromatographic peak qualities and scores.
 #' @template generics

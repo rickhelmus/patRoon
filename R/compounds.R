@@ -905,6 +905,13 @@ setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, fr
     return(obj)
 })
 
+#' @export
+setMethod("assignMobilitiesP", "compounds", function(obj, param = NULL, ..., fGroups, adduct = NULL)
+{
+    do.call(assignMobilities, c(list(obj, fGroups = fGroups, adduct = adduct),
+                                prepAndVerifyParamForCall(param, "AssignMobilitiesCompoundsParam", ...)))
+})
+
 setMethod("prepareConsensusLabels", "compounds", function(obj, ..., labels)
 {
     if (is.null(labels))

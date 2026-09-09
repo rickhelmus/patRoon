@@ -35,6 +35,8 @@
 - selectIonsP(): somehow add prefAdduct to param? Maybe split for sets and non sets workflows?
 - normIntsP/calculatePeakQualitiesP()
     - make workflow wrapper also be able to call features method only of calculatePeakQualities()?
+- move MF, SIR, GF etc params to feature_annotations-param.R?
+- assignMobilities: set default peak detection to piek to have easy defaults?
 
 
 ## NEWS / docs

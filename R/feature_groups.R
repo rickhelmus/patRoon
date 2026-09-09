@@ -1635,6 +1635,14 @@ setMethod("assignMobilities", "featureGroups", function(obj, mobPeakParams = NUL
     return(obj)
 })
 
+#' @export
+setMethod("assignMobilitiesP", "featureGroups", function(obj, param = NULL, ...)
+{
+    p <- prepAndVerifyParamForCall(param, "AssignMobilitiesFeatureGroupsParam", ...)
+    p[c("fromSuspects", "IMSMatchParams")] <- NULL
+    do.call(assignMobilities, c(list(obj), p))
+})
+
 #' @describeIn featureGroups Obtain the total ion chromatogram/s (TICs) of the analyses.
 #' @export
 setMethod("getTICs", "featureGroups", function(obj, retentionRange = NULL, MSLevel = 1)

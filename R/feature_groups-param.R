@@ -152,3 +152,88 @@ setValidity("CalculatePeakQualitiesParam", function(object)
     
     return(TRUE)
 })
+
+
+#' @export
+getAssignMobilitiesFeatureGroupsParamDefs <- paramConfigDefsFact(list(
+    # NOTE: most param assertions happen in util called by validity method below
+    
+    mobPeakParams = list(
+        default = NULL,
+        description = "Parameters for ion mobility peak detection"
+    ),
+    chromPeakParams = list(
+        default = NULL,
+        description = "Parameters for chromatographic peak detection"
+    ),
+    EIMParams = list(
+        default = getDefEIMParams(),
+        description = "Extracted ion mobilogram parameters"
+    ),
+    EICParams = list(
+        default = getDefEICParams(),
+        description = "Extracted ion chromatogram parameters"
+    ),
+    peakRTWindow = list(
+        default = defaultLim("retention", "narrow"),
+        description = "Maximum retention time deviation for reintegrated peaks"
+    ),
+    fallbackEIC = list(
+        default = TRUE,
+        description = "Fall back to chromatographic data when no mobility peak is found"
+    ),
+    calcArea = list(
+        default = "integrate",
+        description = "Method for calculating areas from chromatographic data"
+    ),
+    mobWindow = list(
+        default = defaultLim("mobility", "medium"),
+        description = "Mobility window for grouping IMS features"
+    ),
+    scoreWeights = list(
+        default = c(mobility = 1, intensity = 1),
+        description = "Weights for IMS feature-group scoring"
+    ),
+    CCSParams = list(
+        default = NULL,
+        description = "Parameters for CCS assignment"
+    ),
+    parallel = list(
+        default = "maybe",
+        description = "Parallel processing mode"
+    ),
+    fromSuspects = list(
+        default = FALSE,
+        description = "Use suspect-screening mobility assignments",
+        type = "flag"
+    ),
+    IMSMatchParams = list(
+        default = NULL,
+        description = "IMS matching parameters",
+        type = "IMSMatchParams",
+        typeCheckArgs = list(null.ok = TRUE)
+    )
+))
+
+AssignMobilitiesFeatureGroupsParam <- setClass("AssignMobilitiesFeatureGroupsParam", contains = "param")
+setMethod("initialize", "AssignMobilitiesFeatureGroupsParam", function(.Object, ...)
+{
+    callNextMethod(.Object, name = "AssignMobilitiesFeatureGroupsParam", baseName = "AssignMobilitiesFeatureGroupsParam",
+                   description = "Parameters for assignMobilities on feature groups", version = "1.0",
+                   definitions = getAssignMobilitiesFeatureGroupsParamDefs(), ...)
+})
+
+setValidity("AssignMobilitiesFeatureGroupsParam", function(object)
+{
+    parsFilled <- paramListFillDefaults(object@data, object@definitions)
+    ac <- checkmate::makeAssertCollection()
+    assertFindMobilitiesArgs(parsFilled$mobPeakParams, parsFilled$chromPeakParams, parsFilled$EIMParams,
+                             parsFilled$EICParams, parsFilled$peakRTWindow, parsFilled$fallbackEIC,
+                             parsFilled$calcArea, parsFilled$mobWindow, parsFilled$CCSParams, parsFilled$parallel,
+                             add = ac)
+    # UNDONE/HACK just do assertion here, we can do so when the P interface starts to replace the non-P
+    assertAndPRepGreedyScoringWeights(parsFilled$scoreWeights)
+    OK <- tryCatch(checkmate::reportAssertions(ac), error = function(e) e)
+    return(TRUE)
+})
+

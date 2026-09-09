@@ -339,6 +339,14 @@ setMethod("assignMobilities", "featureGroupsSet", function(obj, mobPeakParams = 
     return(obj)
 })
 
+#' @export
+setMethod("assignMobilitiesP", "featureGroupsSet", function(obj, param = NULL, ...)
+{
+    p <- prepAndVerifyParamForCall(param, "AssignMobilitiesFeatureGroupsParam", ...)
+    p[c("fromSuspects", "IMSMatchParams")] <- NULL
+    do.call(assignMobilities, c(list(obj), p))
+})
+
 #' @param groupAlgo groupAlgo The name of the feature grouping algorithm. See the \code{algorithm} argument of
 #'   \code{\link{groupFeatures}} for details.
 #' @param groupArgs A \code{list} with arguments directly passed to \code{groupFeatures} (can be named). Example:

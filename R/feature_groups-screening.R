@@ -535,6 +535,12 @@ setMethod("assignMobilities", "featureGroupsScreening", function(obj, mobPeakPar
     return(obj)
 })
 
+#' @export
+setMethod("assignMobilitiesP", "featureGroupsScreening", function(obj, param = NULL, ...)
+{
+    do.call(assignMobilities, c(list(obj), prepAndVerifyParamForCall(param, "AssignMobilitiesFeatureGroupsParam", ...)))
+})
+
 #' Target and suspect screening
 #'
 #' Utilities to screen for analytes with known or suspected identity.

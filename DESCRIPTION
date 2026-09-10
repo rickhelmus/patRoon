@@ -238,6 +238,7 @@ Collate:
     'compounds-set.R'
     'utils-sirius.R'
     'compounds-sirius.R'
+    'convert-param.R'
     'convert.R'
     'defunct.R'
     'utils-bruker.R'

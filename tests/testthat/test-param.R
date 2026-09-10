@@ -5,6 +5,13 @@
 # UNDONE: just some dummy tests now
 
 test_that("all param classes can be constructed without errors", {
+    # Conversion params
+    expect_error(ConvertMSFilesPWizParam(), NA)
+    expect_error(ConvertMSFilesOpenMSParam(), NA)
+    expect_error(ConvertMSFilesBrukerParam(), NA)
+    expect_error(ConvertMSFilesIMSCollapseParam(), NA)
+    expect_error(ConvertMSFilesTIMSCONVERTParam(), NA)
+
     # Feature params
     expect_error(FeaturesOpenMSParam(), NA)
     expect_error(FeaturesXCMS3Param(), NA)

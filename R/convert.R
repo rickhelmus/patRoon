@@ -446,7 +446,7 @@ convertMSFilesTIMSCONVERT <- function(inFiles, outFiles, formatTo = "mzML", cent
     checkmate::assertChoice(formatTo, getMSConversionFormats("timsconvert", "output"), add = ac)
     aapply(checkmate::assertFlag, . ~ centroid + centroidRaw + IMS, fixed = list(add = ac))
     checkmate::assertCharacter(extraOpts, min.chars = 1, null.ok = TRUE, add = ac)
-    checkmate::assertCharacter(virtualenv, min.chars = 1, null.ok = TRUE, add = ac)
+    checkmate::assertString(virtualenv, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
     # NOTE: activate virtualenv will setup the right PATH
@@ -631,3 +631,86 @@ convertMSFiles <- function(anaInfo, typeFrom = "raw", typeTo = "centroid", forma
     
     do.call(convertMSFilesPaths, args)
 }
+
+#' @rdname MSConversion
+#' @export
+setMethod("convertMSFilesP", c("data.frame", "ConvertMSFilesPWizParam"), function(obj, param, typeFrom = "raw",
+                                                                                  typeTo = "centroid", formatFrom,
+                                                                                  formatTo = "mzML", overwrite = FALSE, ...)
+{
+    p <- prepAndVerifyParamForCall(param, "ConvertMSFilesPWizParam", ...)
+    do.call(convertMSFiles, c(list(anaInfo = obj, typeFrom = typeFrom, typeTo = typeTo,
+                                   formatFrom = formatFrom, formatTo = formatTo, overwrite = overwrite,
+                                   algorithm = "pwiz"), p))
+})
+
+#' @rdname MSConversion
+#' @export
+setMethod("convertMSFilesP", c("data.frame", "ConvertMSFilesOpenMSParam"), function(obj, param, typeFrom = "raw",
+                                                                                    typeTo = "centroid", formatFrom,
+                                                                                    formatTo = "mzML",
+                                                                                    overwrite = FALSE, ...)
+{
+    p <- prepAndVerifyParamForCall(param, "ConvertMSFilesOpenMSParam", ...)
+    do.call(convertMSFiles, c(list(anaInfo = obj, typeFrom = typeFrom, typeTo = typeTo,
+                                   formatFrom = formatFrom, formatTo = formatTo, overwrite = overwrite,
+                                   algorithm = "openms"), p))
+})
+
+#' @rdname MSConversion
+#' @export
+setMethod("convertMSFilesP", c("data.frame", "ConvertMSFilesBrukerParam"), function(obj, param, typeFrom = "raw",
+                                                                                    typeTo = "centroid", formatFrom,
+                                                                                    formatTo = "mzML",
+                                                                                    overwrite = FALSE, ...)
+{
+    p <- prepAndVerifyParamForCall(param, "ConvertMSFilesBrukerParam", ...)
+    do.call(convertMSFiles, c(list(anaInfo = obj, typeFrom = typeFrom, typeTo = typeTo,
+                                   formatFrom = formatFrom, formatTo = formatTo, overwrite = overwrite,
+                                   algorithm = "bruker"), p))
+})
+
+#' @rdname MSConversion
+#' @export
+setMethod("convertMSFilesP", c("data.frame", "ConvertMSFilesIMSCollapseParam"), function(obj, param, typeFrom = "raw",
+                                                                                         typeTo = "centroid", formatFrom,
+                                                                                         formatTo = "mzML",
+                                                                                         overwrite = FALSE, ...)
+{
+    p <- prepAndVerifyParamForCall(param, "ConvertMSFilesIMSCollapseParam", ...)
+    do.call(convertMSFiles, c(list(anaInfo = obj, typeFrom = typeFrom, typeTo = typeTo,
+                                   formatFrom = formatFrom, formatTo = formatTo, overwrite = overwrite,
+                                   algorithm = "imscollapse"), p))
+})
+
+#' @rdname MSConversion
+#' @export
+setMethod("convertMSFilesP", c("data.frame", "ConvertMSFilesTIMSCONVERTParam"), function(obj, param, typeFrom = "raw",
+                                                                                         typeTo = "centroid", formatFrom,
+                                                                                         formatTo = "mzML",
+                                                                                         overwrite = FALSE, ...)
+{
+    p <- prepAndVerifyParamForCall(param, "ConvertMSFilesTIMSCONVERTParam", ...)
+    do.call(convertMSFiles, c(list(anaInfo = obj, typeFrom = typeFrom, typeTo = typeTo,
+                                   formatFrom = formatFrom, formatTo = formatTo, overwrite = overwrite,
+                                   algorithm = "timsconvert"), p))
+})
+
+#' @rdname MSConversion
+#' @export
+setMethod("convertMSFilesP", c("data.frame", "character"), function(obj, param, typeFrom = "raw",
+                                                                    typeTo = "centroid", formatFrom,
+                                                                    formatTo = "mzML", overwrite = FALSE, ...)
+{
+    cl <- switch(param,
+                 "pwiz" = "ConvertMSFilesPWizParam",
+                 "openms" = "ConvertMSFilesOpenMSParam",
+                 "bruker" = "ConvertMSFilesBrukerParam",
+                 "imscollapse" = "ConvertMSFilesIMSCollapseParam",
+                 "timsconvert" = "ConvertMSFilesTIMSCONVERTParam",
+                 stop("Unknown param class: ", param, call. = FALSE))
+    p <- prepAndVerifyParamForCall(new(cl), cl, ...)
+    do.call(convertMSFiles, c(list(anaInfo = obj, typeFrom = typeFrom, typeTo = typeTo,
+                                   formatFrom = formatFrom, formatTo = formatTo, overwrite = overwrite,
+                                   algorithm = param), p))
+})

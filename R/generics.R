@@ -52,6 +52,9 @@ setGeneric("getKeptXCMSPeakInds", function(old, new, xd) standardGeneric("getKep
 
 setGeneric("initMSReadBackend", function(backend, genMobilities) standardGeneric("initMSReadBackend"))
 
+#' @rdname MSConversion
+setGeneric("convertMSFilesP", function(obj, param, ...) standardGeneric("convertMSFilesP"))
+
 ### Features and feature groups
 
 #' @name featureGroups-class

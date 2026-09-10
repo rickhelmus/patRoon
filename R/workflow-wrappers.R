@@ -18,6 +18,15 @@ doWfStep <- function(obj, func, slotNameIn, slotNameOut, param, paramClass, ...)
     return(obj)
 }
 
+
+#' @rdname MSConversion
+setMethod("convertMSFilesP", c("workflow", "ANY"), function(obj, param, ...)
+{
+    convertMSFilesP(analysisInfo(obj), param, ...)
+    return(obj)
+})
+
+
 doWfFeat <- function(..., algo)
 {
     doWfStep(func = paste0("findFeaturesP", algo), slotNameIn = "analysisInfo", slotNameOut = "features",

@@ -368,6 +368,30 @@ setMethod("predictToxP", "workflow", function(obj, param = NULL, ...)
     return(obj)
 })
 
+#' @rdname pred-quant
+setMethod("predictRespFactorsP", "workflow", function(obj, param = NULL, ...)
+{
+    # UNDONE: enable this if MS2Quant will ever support SIRIUS 6
+    # if (!is.null(obj@formulas) && inherits(obj@formulas, "formulasSIRIUS"))
+    # {
+    #     obj <- doWfStep(func = "predictRespFactorsP", slotNameIn = c("formulas", "fGroups"),
+    #                     slotNameOut = "formulas", paramClass = "PredictRespFactorsParam",
+    #                     obj, param = param, ...)
+    # }
+    if (!is.null(obj@compounds))
+    {
+        obj <- doWfStep(func = "predictRespFactorsP", slotNameIn = c("compounds", "fGroups"),
+                        slotNameOut = "compounds", paramClass = "PredictRespFactorsParam",
+                        obj, param = param, ...)
+    }
+    if (!is.null(obj@fGroups) && isScreening(obj@fGroups))
+    {
+        obj <- doWfStep(func = "predictRespFactorsP", slotNameIn = "fGroups", slotNameOut = "fGroups",
+                        paramClass = "PredictRespFactorsParam", obj, param = param, ...)
+    }
+    return(obj)
+})
+
 setMethod("assignMobilitiesP", c("workflow", "character"), function(obj, param, ...)
 {
     checkmate::assertChoice(param, c("fGroups", "compounds"))

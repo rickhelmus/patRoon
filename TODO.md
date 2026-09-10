@@ -1,6 +1,6 @@
 # General
 
-- predictTox(): SIRIUS method doesn't pass some args to parent method (eg parallel)
+- predictTox()/predictRespFactors(): SIRIUS methods don't pass some args to parent method (eg parallel)
     - update P method afterwards
 - move predictTox() and predictToxP() generic docs to pred-tox
 
@@ -43,6 +43,10 @@
     - make workflow wrapper also be able to call features method only of calculatePeakQualities()?
 - move MF, SIR, GF etc params to feature_annotations-param.R?
 - assignMobilities: set default peak detection to piek to have easy defaults?
+- predictRespFacotrsP(): where to put pHAq, eluent, calibrants, organicModifier?
+    - these should be specified and cannot be default
+    - but moving them to params could be interesting when using the same method often
+    - somehow have non-default params?
 
 
 ## NEWS / docs

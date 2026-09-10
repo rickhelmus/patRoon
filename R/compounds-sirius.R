@@ -96,6 +96,15 @@ setMethod("predictRespFactors", "compoundsSIRIUS", function(obj, fGroups, calibr
     return(obj)
 })
 
+#' @rdname pred-quant
+#' @export
+setMethod("predictRespFactorsP", "compoundsSIRIUS", function(obj, param = NULL, ..., fGroups, calibrants)
+{
+    p <- prepAndVerifyParamForCall(param, "PredictRespFactorsParam", ...)
+    p <- p[setdiff(names(p), c("updateScore", "scoreWeight", "parallel"))]
+    do.call(predictRespFactors, c(list(obj, fGroups = fGroups, calibrants = calibrants), p))
+})
+
 #' @rdname pred-tox
 #' @export
 setMethod("predictTox", "compoundsSIRIUS", function(obj, type = "FP", LC50Mode = "static", concUnit = "ugL")

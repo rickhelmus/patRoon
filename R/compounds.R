@@ -646,6 +646,15 @@ setMethod("predictRespFactors", "compounds", function(obj, fGroups, calibrants, 
     return(addCompoundScore(obj, "RF_SMILES", updateScore, scoreWeight))
 })
 
+#' @rdname pred-quant
+#' @export
+setMethod("predictRespFactorsP", "compounds", function(obj, param = NULL, ..., fGroups, calibrants)
+{
+    p <- prepAndVerifyParamForCall(param, "PredictRespFactorsParam", ...)
+    p <- p[setdiff(names(p), "type")]
+    do.call(predictRespFactors, c(list(obj, fGroups = fGroups, calibrants = calibrants), p))
+})
+
 #' @rdname pred-tox
 #' @export
 setMethod("predictTox", "compounds", function(obj, LC50Mode = "static", concUnit = "ugL", updateScore = FALSE,

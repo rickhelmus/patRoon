@@ -346,6 +346,28 @@ setMethod("estimateIDConfidenceP", "workflow", function(obj, param = NULL, ...)
     return(obj)
 })
 
+#' @rdname pred-tox
+setMethod("predictToxP", "workflow", function(obj, param = NULL, ...)
+{
+    # UNDONE: enable this if MS2Tox will ever support SIRIUS 6
+    # if (!is.null(obj@formulas) && inherits(obj@formulas, "formulasSIRIUS"))
+    # {
+    #     obj <- doWfStep(func = "predictToxP", slotNameIn = "formulas", slotNameOut = "formulas",
+    #                     paramClass = "PredictToxParam", obj, param = param, ...)
+    # }
+    if (!is.null(obj@compounds))
+    {
+        obj <- doWfStep(func = "predictToxP", slotNameIn = "compounds", slotNameOut = "compounds",
+                        paramClass = "PredictToxParam", obj, param = param, ...)
+    }
+    if (!is.null(obj@fGroups) && isScreening(obj@fGroups))
+    {
+        obj <- doWfStep(func = "predictToxP", slotNameIn = "fGroups", slotNameOut = "fGroups",
+                        paramClass = "PredictToxParam", obj, param = param, ...)
+    }
+    return(obj)
+})
+
 setMethod("assignMobilitiesP", c("workflow", "character"), function(obj, param, ...)
 {
     checkmate::assertChoice(param, c("fGroups", "compounds"))

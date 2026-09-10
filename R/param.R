@@ -87,7 +87,8 @@ setValidity("param", function(object)
             IMS = assertIMSArg,
             IMSMatchParams = assertIMSMatchParams,
             CCSParams = assertCCSParams,
-            TPStructParams = assertTPStructParams
+            TPStructParams = assertTPStructParams,
+            concUnit = assertConcUnit
         )
         
         if (is.null(cmfunc))

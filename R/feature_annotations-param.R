@@ -115,3 +115,49 @@ setValidity("AssignMobilitiesCompoundsParam", function(object)
     return(OK)
 })
 
+#' @export
+getPredictToxParamDefs <- paramConfigDefsFact(list(
+    type = list(
+        default = "FP",
+        description = "Prediction input type",
+        type = "choice",
+        typeCheckArgs = list(choices = c("FP", "SMILES", "both"))
+    ),
+    LC50Mode = list(
+        default = "static",
+        description = "LC50 prediction mode",
+        type = "choice",
+        typeCheckArgs = list(choices = c("static", "flow"))
+    ),
+    concUnit = list(
+        default = "ugL",
+        description = "Concentration unit",
+        type = "concUnit"
+    ),
+    updateScore = list(
+        default = FALSE,
+        description = "Update compound scores with predicted toxicity values",
+        type = "flag"
+    ),
+    scoreWeight = list(
+        default = 1,
+        description = "Weight for the toxicity score",
+        type = "number",
+        typeCheckArgs = list(lower = 1, finite = TRUE)
+    ),
+    parallel = list(
+        default = TRUE,
+        description = "Process candidates in parallel",
+        type = "flag"
+    )
+))
+
+#' @export
+PredictToxParam <- setClass("PredictToxParam", contains = "param")
+setMethod("initialize", "PredictToxParam", function(.Object, ...)
+{
+    callNextMethod(.Object, name = "PredictToxParam", baseName = "PredictToxParam",
+                   description = "Parameters for predictTox", version = "1.0",
+                   definitions = getPredictToxParamDefs(), ...)
+})
+

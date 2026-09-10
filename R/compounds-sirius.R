@@ -146,6 +146,15 @@ setMethod("predictTox", "compoundsSIRIUS", function(obj, type = "FP", LC50Mode =
     return(obj)
 })
 
+#' @rdname pred-tox
+#' @export
+setMethod("predictToxP", "compoundsSIRIUS", function(obj, param = NULL, ...)
+{
+    p <- prepAndVerifyParamForCall(param, "PredictToxParam", ...)
+    p <- p[setdiff(names(p), c("updateScore", "scoreWeight", "parallel"))]
+    do.call(predictTox, c(list(obj), p))
+})
+
 
 #' Compound annotation with SIRIUS
 #'

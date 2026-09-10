@@ -779,6 +779,9 @@ setGeneric("predictRespFactors", function(obj, ...) standardGeneric("predictResp
 #' @template generics
 setGeneric("predictTox", function(obj, ...) standardGeneric("predictTox"))
 
+#' @name pred-tox
+setGeneric("predictToxP", function(obj, ...) standardGeneric("predictToxP"))
+
 #' @templateVar func delete
 #' @templateVar desc Deletes results.
 #' @template generics

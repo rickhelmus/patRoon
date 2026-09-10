@@ -126,6 +126,15 @@ setMethod("predictTox", "formulasSIRIUS", function(obj, LC50Mode = "static", con
     return(obj)
 })
 
+#' @rdname pred-tox
+#' @export
+setMethod("predictToxP", "formulasSIRIUS", function(obj, param = NULL, ...)
+{
+    p <- prepAndVerifyParamForCall(param, "PredictToxParam", ...)
+    p <- p[intersect(names(p), c("LC50Mode", "concUnit"))]
+    do.call(predictTox, c(list(obj), p))
+})
+
 
 #' Generate formula with SIRIUS
 #'

@@ -335,6 +335,15 @@ setMethod("predictRespFactors", "featureGroupsScreeningSet", function(obj, calib
     
 })
 
+#' @rdname pred-quant
+#' @export
+setMethod("predictRespFactorsP", "featureGroupsScreeningSet", function(obj, param = NULL, ..., calibrants)
+{
+    p <- prepAndVerifyParamForCall(param, "PredictRespFactorsParam", ...)
+    p <- p[setdiff(names(p), c("type", "updateScore", "scoreWeight", "parallel"))]
+    do.call(predictRespFactors, c(list(obj, calibrants = calibrants), p))
+})
+
 #' @rdname pred-tox
 #' @export
 setMethod("predictTox", "featureGroupsScreeningSet", doPredictToxSuspects)

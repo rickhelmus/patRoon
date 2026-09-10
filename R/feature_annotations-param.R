@@ -136,18 +136,18 @@ getPredictToxParamDefs <- paramConfigDefsFact(list(
     ),
     updateScore = list(
         default = FALSE,
-        description = "Update compound scores with predicted toxicity values",
+        description = "Update compound scores with predicted toxicity values (unused by SIRIUS)",
         type = "flag"
     ),
     scoreWeight = list(
         default = 1,
-        description = "Weight for the toxicity score",
+        description = "Weight for the toxicity scoring (unused by SIRIUS)",
         type = "number",
         typeCheckArgs = list(lower = 1, finite = TRUE)
     ),
     parallel = list(
         default = TRUE,
-        description = "Process candidates in parallel",
+        description = "Process candidates in parallel (unused by SIRIUS)",
         type = "flag"
     )
 ))
@@ -159,5 +159,68 @@ setMethod("initialize", "PredictToxParam", function(.Object, ...)
     callNextMethod(.Object, name = "PredictToxParam", baseName = "PredictToxParam",
                    description = "Parameters for predictTox", version = "1.0",
                    definitions = getPredictToxParamDefs(), ...)
+})
+
+#' @export
+getPredictRespFactorsParamDefs <- paramConfigDefsFact(list(
+    type = list(
+        default = "FP",
+        description = "Prediction input type",
+        type = "choice",
+        typeCheckArgs = list(choices = c("FP", "SMILES", "both"))
+    ),
+    eluent = list(
+        default = NULL,
+        description = "LC gradient program",
+        type = "data.frame",
+        typeCheckArgs = list(null.ok = TRUE)
+    ),
+    organicModifier = list(
+        default = NULL,
+        description = "Organic modifier of the mobile phase",
+        type = "choice",
+        typeCheckArgs = list(choices = c("MeOH", "MeCN"), null.ok = TRUE)
+    ),
+    pHAq = list(
+        default = NULL,
+        description = "pH of the aqueous part of the mobile phase",
+        type = "number",
+        typeCheckArgs = list(finite = TRUE, null.ok = TRUE)
+    ),
+    concUnit = list(
+        default = "ugL",
+        description = "Concentration unit",
+        type = "concUnit"
+    ),
+    calibConcUnit = list(
+        default = "ugL",
+        description = "Concentration unit used in the calibrants table",
+        type = "concUnit"
+    ),
+    updateScore = list(
+        default = FALSE,
+        description = "Update compound scores with predicted response factors (unused by SIRIUS)",
+        type = "flag"
+    ),
+    scoreWeight = list(
+        default = 1,
+        description = "Weight for the response-factor scoring (unused by SIRIUS)",
+        type = "number",
+        typeCheckArgs = list(lower = 1, finite = TRUE)
+    ),
+    parallel = list(
+        default = TRUE,
+        description = "Process candidates in parallel (unused by SIRIUS)",
+        type = "flag"
+    )
+))
+
+#' @export
+PredictRespFactorsParam <- setClass("PredictRespFactorsParam", contains = "param")
+setMethod("initialize", "PredictRespFactorsParam", function(.Object, ...)
+{
+    callNextMethod(.Object, name = "PredictRespFactorsParam", baseName = "PredictRespFactorsParam",
+                   description = "Parameters for predictRespFactors", version = "1.0",
+                   definitions = getPredictRespFactorsParamDefs(), ...)
 })
 

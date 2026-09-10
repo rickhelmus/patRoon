@@ -678,6 +678,15 @@ setMethod("predictTox", "compounds", function(obj, LC50Mode = "static", concUnit
     return(addCompoundScore(obj, "LC50_SMILES", updateScore, scoreWeight))
 })
 
+#' @rdname pred-tox
+#' @export
+setMethod("predictToxP", "compounds", function(obj, param = NULL, ...)
+{
+    p <- prepAndVerifyParamForCall(param, "PredictToxParam", ...)
+    p <- p[names(p) != "type"]
+    do.call(predictTox, c(list(obj), p))
+})
+
 #' @rdname id-conf
 #' @export
 setMethod("estimateIDConfidence", "compounds", function(obj, absMzDev = defaultLim("mz", "medium"), MSPeakLists = NULL,

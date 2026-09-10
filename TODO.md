@@ -1,3 +1,9 @@
+# General
+
+- predictTox(): SIRIUS method doesn't pass some args to parent method (eg parallel)
+    - update P method afterwards
+- move predictTox() and predictToxP() generic docs to pred-tox
+
 # workflow
 
 - findFeatures: update docs (fix analysisInfo --> obj), NEWS
@@ -16,7 +22,7 @@
         - construct workflowSets directly by eg workflowSets(positive = anaInfoPos1, negative = anaInfoNeg)
         - findFeatures() will be ran for each set and call makeSet() automatically
         - easier, but cannot use makeSet(fGroups) anymore
-
+- predictToxP()/predictRespFactorsP(): make it configurable which objects are used for prediction?
 
 ## Params
 

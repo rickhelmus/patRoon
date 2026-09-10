@@ -154,6 +154,15 @@ setMethod("predictRespFactors", "featureGroupsScreening", function(obj, calibran
 #' @export
 setMethod("predictTox", "featureGroupsScreening", doPredictToxSuspects)
 
+#' @rdname pred-tox
+#' @export
+setMethod("predictToxP", "featureGroupsScreening", function(obj, param = NULL, ...)
+{
+    p <- prepAndVerifyParamForCall(param, "PredictToxParam", ...)
+    p <- p[intersect(names(p), c("LC50Mode", "concUnit"))]
+    do.call(predictTox, c(list(obj), p))
+})
+
 #' @rdname pred-quant
 #' @export
 setMethod("calculateConcs", "featureGroupsScreening", function(fGroups, featureAnn = NULL, areas = FALSE)

@@ -40,6 +40,7 @@ test_that("all param classes can be constructed without errors", {
     expect_error(SelectIonsParam(), NA)
     expect_error(NormIntsParam(), NA)
     expect_error(CalculatePeakQualitiesParam(), NA)
+    expect_error(AssignMobilitiesFeatureGroupsParam(), NA)
 
     # Annotation
     expect_error(MSPeakListsParam(), NA)
@@ -48,6 +49,9 @@ test_that("all param classes can be constructed without errors", {
     expect_error(CompoundsMetFragParam(), NA)
     expect_error(CompoundsLibraryParam(), NA)
     expect_error(EstimateIDConfidenceParam(), NA)
+    expect_error(AssignMobilitiesCompoundsParam(), NA)
+    expect_error(PredictToxParam(), NA)
+    expect_error(PredictRespFactorsParam(), NA)
     
     # TPs
     expect_error(TPsBioTransformerParam(), NA)

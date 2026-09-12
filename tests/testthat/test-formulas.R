@@ -22,7 +22,8 @@ formsGFMS <- doGenForms(fGroups, plists, "genform", MSMode = "ms")
 
 if (doSIRIUS)
 {
-    formsSIR <- doGenForms(fGroups, plists, "sirius", calculateFeatures = FALSE)
+    # UNDONE!! Disabled until https://github.com/sirius-ms/sirius-client-openAPI/issues/193 is fixed
+    # formsSIR <- doGenForms(fGroups, plists, "sirius")
     formsSIREmpty <- doGenForms(fGroupsEmpty, plistsEmpty, "sirius")
     formsSIREmptyPL <- doGenForms(fGroups, plistsEmpty, "sirius")
     formsSIREmptyPLMS <- doGenForms(fGroups, plistsEmptyMS, "sirius")
@@ -30,6 +31,10 @@ if (doSIRIUS)
         updateSIRIUSFormFPsProj(fGroups, plists)
     
     formsSIRFPs <- doGenFormsSIRFPs(fGroups, plists)
+    
+    # UNDONE!! See above
+    formsSIR <- copy(formsSIRFPs)
+    formsSIR@setObjects <- lapply(formsSIR@setObjects, \(so) { so@fingerprints <- list(); so })
 }
 
 # disabled: deprecated

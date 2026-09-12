@@ -28,6 +28,15 @@ if (!nzchar(Sys.getenv("PATROON_NOTESTS")))
     # https://github.com/r-lib/devtools/issues/1526
     Sys.unsetenv("R_TESTS")
     
+    SIRIUSAPI <- patRoon:::startSIRIUS() # HACK start it now so we can share it between tests and makes things faster.
+    
+    if (!is.null(Sys.getenv("PATROON_SIRUSER")) && nzchar(Sys.getenv("PATROON_SIRUSER")) &&
+        !is.null(Sys.getenv("PATROON_SIRPASS")) && nzchar(Sys.getenv("PATROON_SIRPASS")))
+    {
+        SIRIUSLogin(login = c(username = Sys.getenv("PATROON_SIRUSER"), password = Sys.getenv("PATROON_SIRPASS")),
+                    SIRIUSAPI = SIRIUSAPI)
+    }
+    
     ju <- Sys.getenv("PATROON_JUNIT")
     if (nzchar(ju))
         test_check("patRoon", reporter = JunitReporter$new(file = ju))

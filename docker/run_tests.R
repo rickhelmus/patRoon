@@ -15,6 +15,15 @@ data.table::update_dev_pkg()
 # errors.
 devtools::load_all()
 
+SIRIUSAPI <- patRoon:::startSIRIUS() # HACK start it now so we can share it between tests and makes things faster.
+
+if (!is.null(Sys.getenv("PATROON_SIRUSER")) && nzchar(Sys.getenv("PATROON_SIRUSER")) &&
+    !is.null(Sys.getenv("PATROON_SIRPASS")) && nzchar(Sys.getenv("PATROON_SIRPASS")))
+{
+    SIRIUSLogin(login = c(username = Sys.getenv("PATROON_SIRUSER"), password = Sys.getenv("PATROON_SIRPASS")),
+                SIRIUSAPI = SIRIUSAPI)
+}
+
 # return failure exit code when tests fail: https://github.com/r-lib/testthat/issues/515
 tret <- as.data.frame(devtools::test(reporter = testthat::MultiReporter$new(list(testthat::SummaryReporter$new(),
                                                                                  testthat::JunitReporter$new(file = "~/junit.xml")))))

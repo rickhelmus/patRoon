@@ -16,6 +16,15 @@ pkgload::load_all()
 install.packages(c("testthat", "vdiffr"))
 remotes::install_github("rickhelmus/covr@live-console-update")
 
+SIRIUSAPI <- patRoon:::startSIRIUS() # HACK start it now so we can share it between tests and makes things faster.
+
+if (!is.null(Sys.getenv("PATROON_SIRUSER")) && nzchar(Sys.getenv("PATROON_SIRUSER")) &&
+    !is.null(Sys.getenv("PATROON_SIRPASS")) && nzchar(Sys.getenv("PATROON_SIRPASS")))
+{
+    SIRIUSLogin(login = c(username = Sys.getenv("PATROON_SIRUSER"), password = Sys.getenv("PATROON_SIRPASS")),
+                SIRIUSAPI = SIRIUSAPI)
+}
+
 withr::with_envvar(list(NOT_CRAN = "true"), covr::codecov(quiet = FALSE, errorsAreFatal = FALSE, clean = FALSE,
                                                           type = "none", code = 'testthat::test_package("patRoon")',
                                                           code_stdout = TRUE))

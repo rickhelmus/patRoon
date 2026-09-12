@@ -12,7 +12,7 @@ doSIRIUSLogin <- function(login, force, SIRIUSAPI)
     if (length(login) == 1 && login == "check" && !isLoggedIn)
         stop("There is no active SIRIUS login. Please consult the SIRIUS documentation and patRoon handbook for details.")
     
-    else if (force || !isLoggedIn)
+    if (force || !isLoggedIn)
     {
         if (length(login) == 1 && login == "interactive")
         {
@@ -51,7 +51,10 @@ startSIRIUS <- function()
     withr::defer_parent({
         tryCatch({
             if (shutdownSIR)
+            {
+                printf("Shutting down SIRIUS API...")
                 sdk$shutdown_sirius()
+            }
         }, error = function(e) NULL)
     })
     
@@ -73,28 +76,39 @@ openSIRIUSProject <- function(projectPath, SIRIUSAPI, runMode)
         projectPath <- fs::path_abs(fs::path_expand(projectPath))
     }
     
+    printf("Opening SIRIUS project '%s' at %s\n", projectID, projectPath)
+    
     openProjects <- SIRIUSAPI$projects_api$GetProjects()
     for (proj in openProjects)
     {
+        printf("Found open SIRIUS project '%s' at %s\n", proj$projectId, proj$location)
         if (proj$projectId == projectID)
         {
             p <- normalizePath(proj$location, mustWork = FALSE, winslash = "/")
             if (!is.null(projectPath) && p != projectPath)
                 stop(sprintf("Project with ID '%s' is already open at a different location: %s", projectID, p), call. = FALSE)
+            printf("re-using open SIRIUS project '%s' at %s\n", projectID, p)
             return(projectID)
         }
     }
 
-    if (file.exists(projectPath) && runMode == "read")
+    proj <- if (file.exists(projectPath) && runMode == "read")
+    {
+        printf("Re-opening existing SIRIUS project at %s\n", projectPath)
         SIRIUSAPI$projects_api$OpenProject(projectID, projectPath)
+    }
     else
     {
+        printf("Creating new SIRIUS project at %s\n", projectPath)
         unlink(projectPath)
         SIRIUSAPI$projects_api$CreateProject(projectID, projectPath)
     }
     
+    # printf("Opened SIRIUS project: \n"); print(proj)
+    
     withr::defer_parent({
         tryCatch({
+            printf("Closing SIRIUS project '%s' at %s\n", projectID, projectPath)
             SIRIUSAPI$projects_api$CloseProject(projectID)
         }, error = function(e) NULL)
     })
@@ -390,9 +404,11 @@ runSIRIUS <- function(runMode, fGroups, MSPeakLists, IMSSpecSims, adduct, SIRIUS
                                                 showProgress = FALSE)
         names(SIRFeatListImp) <- sapply(SIRFeatListImp, \(f) if (is.null(f$externalFeatureId)) NA_character_ else f$externalFeatureId)
         
-        # UNDONE: this sometimes fails, why?
-        fingerIDData <- tryCatch(SIRIUSAPI$projects_api$GetFingerIdData(projectID, charge = 1L),
-                                 error = \(...) data.table())
+        printf("Imported %d SIRIUS features with formula annotations\n", length(SIRFeatListImp))
+        
+        # UNDONE: this sometimes fails?
+        fingerIDData <- if (getFingerprints) SIRIUSAPI$projects_api$GetFingerIdData(projectID, charge = 1L)
+            # tryCatch(SIRIUSAPI$projects_api$GetFingerIdData(projectID, charge = 1L), error = \(...) data.table())
         
         getResFromFeat <- function(sirFeat, PLMS2)
         {

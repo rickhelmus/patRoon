@@ -271,7 +271,15 @@ setMethod("generateCompoundsSIRIUS", "featureGroupsSet", function(fGroups, MSPea
                                                                   setThresholdAnn = 0, setAvgSpecificScores = FALSE)
 {
     checkmate::assertCharacter(projectPath, len = length(sets(fGroups)), null.ok = TRUE)
-    sa <- if (!is.null(projectPath)) lapply(projectPath, function(p) list(projectPath = p)) else list()
+    sa <- if (!is.null(projectPath))
+    {
+        if (checkmate::test_named(projectPath))
+            Map(names(projectPath), projectPath, f = \(n, p) list(projectPath = setNames(p, n)))
+        else
+            lapply(projectPath, \(p) list(projectPath = p))
+    }
+    else
+        list()
     generateCompoundsSet(fGroups, MSPeakLists, specSimParams, adduct, generateCompoundsSIRIUS, config = config,
                          login = login, alwaysLogin = alwaysLogin, minIMSSpecSim = minIMSSpecSim, ...,
                          setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,

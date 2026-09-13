@@ -1,6 +1,19 @@
 # DEVEL
 
-**New functionality**
+**SIRIUS 6.0 support**
+
+This release introduces support for SIRIUS 6.0, which replaces the legacy SIRIUS 5.0 interface (which is no longer
+maintained). Most of the functionality has been restored, i.e. to find & group features and generate formula and
+compound annotation candidates. Note that MS2Quant/MS2Tox do not support SIRIUS 6.0 fingerprints, this functionality is
+now disabled and predictions can only be done with SMILES data. The `patRoonExt` package was updated to supply SIRIUS
+6.0, please update it as well. Furthermore, the [latest version of the RSirius
+package](https://github.com/sirius-ms/sirius-client-openAPI/tree/master/client-api_r) is needed by the new interface. By
+default the SIRIUS interface tries to connect to a running SIRIUS 6.0 instance, which can speed up repeated job
+submission and may be useful for debugging purposes.
+
+SIRIUS 6 has a vast amount of functionality. Any feedback on the inclusion of specific functionality is welcome!
+
+**Other new functionality**
 
 * New network-based algorithm for fast, flexible and feature-based componentization. See `?generateComponentsNet` for details.
 * `fixedIsolationWindow` can now be a two-sized vector to specify asymmetric isolation windows (issue #161)
@@ -17,6 +30,8 @@ to `maxRelCumIntensity`.
 * Optimizations for very large datasets (issue #154)
 * The `window` EIC and EIM parameter can now be `Inf` to include the data points for the entire chromatogram or mobility trace
 * Small changes for `newProject()` to handle loading of MS peak lists for `generateComponentsNet()`
+* `generateCompoundsMetFrag()`: The identifiers in relatedCIDs from PubChemLite are now separated by `;` instead of a space
+* Added `SIRIUSLogin()` function
 
 **Fixes**
 

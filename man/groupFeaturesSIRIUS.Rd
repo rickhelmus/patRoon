@@ -84,6 +84,16 @@ The input MS data files need to be centroided. The \code{\link{convertMSFiles}} 
   groups from an existing SIRIUS project. It will set \code{runMode="read"} and \code{projectPath} to the provided
   \code{input} path.
 }
+\section{Running SIRIUS}{
+ By default, \pkg{patRoon} tries to connect to a running instance of \command{SIRIUS}. This
+  is generally faster and may be useful for debugging by \emph{e.g.} checking the logs in \command{SIRIUS}.
+  Otherwise, an attempt will be made to start \command{SIRIUS} automatically. The binaries are searched from the
+  \option{patRoon.path.SIRIUS} package option, \pkg{patRoonExt} package or the system \code{PATH} environment
+  variable. Any automatically started \command{SIRIUS} instances are automatically closed if jobs are finished. By
+  default, a temporary \command{SIRIUS} project is made for \command{SIRIUS} data processing and removed afterwards.
+  See the \code{projectPath} to change this.
+}
+
 \section{SIRIUS 6 functionality}{
  The interface to \command{SIRIUS 6} is still in development and may be extended in
   the future. There is a vast amount of functionality available, which will require quite some effort to support all.

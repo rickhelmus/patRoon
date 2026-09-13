@@ -1,10 +1,5 @@
 # Priority
 
-## SIRIUS
-
-- NEWS
-    - relatedCIDs from PCL is now ; separated instead of space separated
-
 ## general
 
 

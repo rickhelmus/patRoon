@@ -13,7 +13,6 @@ groupFeaturesSIRIUS(
   projectPath = NULL,
   runMode = "execute",
   SIRIUSAPI = NULL,
-  SIRIUSPath = NULL,
   verbose = TRUE
 )
 
@@ -59,9 +58,6 @@ information}.}
 
 \item{SIRIUSAPI}{An \code{rsirius_api} object for connecting to the \command{SIRIUS} API. If \code{NULL}, a new
 connection will be started automatically.}
-
-\item{SIRIUSPath}{The full path to the \command{SIRIUS} command-line interface executable. Only used when
-\code{SIRIUSAPI} is not provided.}
 
 \item{verbose}{if \code{FALSE} then no text output will be shown.}
 

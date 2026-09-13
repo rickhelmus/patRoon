@@ -919,9 +919,6 @@ fGroups <- fGroupsRep
 plotUpSet(fGroups) # compare replicates
 plotVenn(fGroups, which = c("repl1", "repl2"), aggregate = TRUE) # compare some replicates
 plotChord(fGroups, aggregate = TRUE) # overlap between replicates
-# compare with custom made groups
-# plotChord(fGroups, aggregate = TRUE,
-#           outer = c(repl1 = "grp1", repl2 = "grp1", repl3 = "grp2", repl4 = "grp3"))
 
 # compare GenForm and SIRIUS results
 plotVenn(formsGF, formsSIR,

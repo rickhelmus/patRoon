@@ -9,8 +9,8 @@ importFeatureGroups(input, type, ...)
 \arguments{
 \item{input}{The input object or path that should be imported. See the algorithm specific functions for more details.}
 
-\item{type}{What type of data should be imported: \code{"xcms"}, \code{"xcms3"}, \code{"kpic2"}, \code{"table"},
-\code{"brukerpa"} (Bruker ProfileAnalysis), \code{"brukertasq"} (Bruker TASQ) or \code{"envimass"}.}
+\item{type}{What type of data should be imported: \code{"xcms"}, \code{"xcms3"}, \code{"kpic2"}, \code{"sirius"},
+\code{"table"}, \code{"brukerpa"} (Bruker ProfileAnalysis), \code{"brukertasq"} (Bruker TASQ) or \code{"envimass"}.}
 
 \item{\dots}{Further arguments passed to the selected import algorithm function.}
 }
@@ -27,7 +27,7 @@ Generic function to import feature groups produced by other software from files.
 }
 \seealso{
 The \code{\link{featureGroups}} output class and its methods and the algorithm specific functions:
-  \code{\link{importFeatureGroupsXCMS}}, \code{\link{importFeatureGroupsXCMS3}}, \code{\link{importFeatureGroupsKPIC2}}, \code{\link{importFeatureGroupsTable}}, \code{\link{importFeatureGroupsBrukerPA}}, \code{\link{importFeatureGroupsBrukerTASQ}}, \code{\link{importFeatureGroupsEnviMass}}
+  \code{\link{importFeatureGroupsXCMS}}, \code{\link{importFeatureGroupsXCMS3}}, \code{\link{importFeatureGroupsKPIC2}}, \code{\link{importFeatureGroupsSIRIUS}}, \code{\link{importFeatureGroupsTable}}, \code{\link{importFeatureGroupsBrukerPA}}, \code{\link{importFeatureGroupsBrukerTASQ}}, \code{\link{importFeatureGroupsEnviMass}}
 
 \code{\link{groupFeatures}} to group features.
 }

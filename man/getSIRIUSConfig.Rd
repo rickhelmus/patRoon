@@ -9,8 +9,7 @@ getSIRIUSConfig(
   import = NULL,
   login = "check",
   alwaysLogin = FALSE,
-  SIRIUSAPI = NULL,
-  SIRIUSPath = NULL
+  SIRIUSAPI = NULL
 )
 }
 \arguments{
@@ -42,9 +41,6 @@ GUI. Cannot be used together with \code{config}.}
 
 \item{SIRIUSAPI}{An \code{rsirius_api} object for connecting to the \command{SIRIUS} API. If \code{NULL}, a new
 connection will be started automatically.}
-
-\item{SIRIUSPath}{The full path to the \command{SIRIUS} command-line interface executable. Only used when
-\code{SIRIUSAPI} is not provided.}
 }
 \value{
 A \code{RSirius::JobSubmission} object with the job configuration, or a \code{character}

@@ -792,7 +792,10 @@ getMSPLEICsInfo <- function(MSPeakLists, fGroups, groupName, analysis, MSLevel, 
             if (nrow(tab) == 0)
                 return(NULL)
             
-            pl <- copy(getSpec(MSPeakLists, grp, MSLevel, ana))
+            spec <- getSpec(MSPeakLists, grp, MSLevel, ana)
+            if (is.null(spec))
+                return(NULL)
+            pl <- copy(spec)
             pl <- pl[, c("ID", "mz", "precursor"), with = FALSE]
             precMZ <- pl[precursor == TRUE]$mz
             if (length(precMZ) == 0)
@@ -855,7 +858,7 @@ filterMSPLCor <- function(MSPeakLists, fGroups, MSLevel, threshold, fixedIsolati
     EICsFeat <- NULL
     if (MSLevel == 2)
     {
-        EICsFeat <- getFeatureEIXs(fGroups, "eic", EIXParams = getDefEICParams(gapFactor = gapFactor, window = 0))
+        EICsFeat <- getFeatureEIXs(fGroups, "EIC", EIXParams = getDefEICParams(gapFactor = gapFactor, window = 0))
         EICsFeat <- Map(names(EICsFeat), EICsFeat, f = function(ana, anaEICs)
         {
             at <- attr(anaEICs, "allXValues")
@@ -896,12 +899,33 @@ filterMSPLCor <- function(MSPeakLists, fGroups, MSLevel, threshold, fixedIsolati
             {
                 eic <- EICsFeat[[ana]][[grp]]
                 if (!is.null(eic))
-                    corrSpec1Prec <- cor(eic, eicm, use = "pairwise.complete.obs")
+                {
+                    idx <- findInterval(at, eic[, "time"])
+                    # UNDONE: verify this further, and handle multiple MS2 scans belonging to one MS1
+                    eic <- cbind(time = at, intensity = eic[idx, "intensity"])
+                    corrSpec1Prec <- cor(eic[, "intensity"], eicm, use = "pairwise.complete.obs")
+                }
             }
-            browser()
-            # corrs <- cor(eicm, use = "pairwise.complete.obs")
+            
+            if (length(corrSpecPrec) > 0 && length(corrSpec1Prec) > 0)
+                return(pmax(corrSpecPrec, corrSpec1Prec))
+            else if (length(corrSpecPrec) > 0)
+                return(corrSpecPrec)
+            return(corrSpec1Prec)
         })
     })
     
-    
+    ret <- delete(MSPeakLists, j = function(pl, grp, ana, type)
+    {
+        if ((type == "MS" && MSLevel == 2) || (type == "MSMS" && MSLevel == 1) || is.null(ana))
+            return(FALSE)
+        
+        corrs <- correlations[[ana]][[grp]]
+        if (length(corrs) == 0)
+            return(FALSE)
+
+        return(!pl$ID %in% colnames(corrs)[corrs >= threshold])
+    })
+
+    return(ret)
 }

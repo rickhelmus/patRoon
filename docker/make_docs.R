@@ -30,6 +30,12 @@ Sys.setenv(PATH = paste0(Sys.getenv("PATH"), ":", "/home/rstudio/bin"))
 # BUG: somehow the OpenTIMS backends leads to strange bookdown errors, so disable it...
 options(patRoon.MS.backends = c("mzr", "mstoolkit"))
 
+if (!is.null(Sys.getenv("PATROON_SIRUSER")) && nzchar(Sys.getenv("PATROON_SIRUSER")) &&
+    !is.null(Sys.getenv("PATROON_SIRPASS")) && nzchar(Sys.getenv("PATROON_SIRPASS")))
+{
+    SIRIUSLogin(login = c(username = Sys.getenv("PATROON_SIRUSER"), password = Sys.getenv("PATROON_SIRPASS")))
+}
+
 pkgdown::clean_site()
 pkgdown::build_site(examples = FALSE)
 

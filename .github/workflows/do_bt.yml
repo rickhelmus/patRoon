@@ -53,7 +53,7 @@ jobs:
                   git diff --binary --cached --full-index > patRoonDeps-${{ inputs.R }}.diff
                   choco install dos2unix
                   dos2unix patRoonDeps-${{ inputs.R }}.diff
-            - uses: actions/upload-artifact@v4
+            - uses: actions/upload-artifact@v7
               name: Upload patch
               with:
                   name: patch-${{ inputs.R }}
@@ -69,7 +69,7 @@ jobs:
               env:
                   PATROONEXT_CACHE: ${{ github.workspace }}/pExtCache
               run: Rscript utils/make_bundle.R
-            - uses: actions/upload-artifact@v4
+            - uses: actions/upload-artifact@v7
               name: Upload bundle
               if:  ${{ inputs.makeBundle }}
               with:
@@ -80,6 +80,8 @@ jobs:
         runs-on: windows-latest
         env:
             GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+            PATROON_SIRUSER: ${{ secrets.PATROON_SIRUSER }}
+            PATROON_SIRPASS: ${{ secrets.PATROON_SIRPASS }}
             TESTTHAT_CPUS: 3
         name: Run tests directly
         if:  ${{ !inputs.makeBundle && inputs.doTests }}
@@ -149,6 +151,8 @@ jobs:
         runs-on: windows-latest
         env:
             GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+            PATROON_SIRUSER: ${{ secrets.PATROON_SIRUSER }}
+            PATROON_SIRPASS: ${{ secrets.PATROON_SIRPASS }}
             TESTTHAT_CPUS: 3
         name: Run tests from bundle
         if:  ${{ inputs.makeBundle && inputs.doTests }}

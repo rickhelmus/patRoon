@@ -6,6 +6,7 @@
 [![patRoon r-universe](https://rickhelmus.r-universe.dev/badges/patRoon)](https://rickhelmus.r-universe.dev/patRoon)
 [![DOI:10.1186/s13321-020-00477-w](https://zenodo.org/badge/DOI/10.1186/s13321-020-00477-w.svg)](https://doi.org/10.1186/s13321-020-00477-w)
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.04029/status.svg)](https://doi.org/10.21105/joss.04029)
+[![DOI:10.1186/s13321-020-00477-w](https://zenodo.org/badge/DOI/10.1186/s13321-026-01302-6.svg)](https://doi.org/10.1186/s13321-026-01302-6)
 [![REUSE status](https://api.reuse.software/badge/github.com/rickhelmus/patRoon)](https://api.reuse.software/info/github.com/rickhelmus/patRoon)
 
 `patRoon` aims to provide comprehensive mass spectrometry based non-target analysis (NTA) workflows for environmental
@@ -13,6 +14,8 @@ analysis. The name is derived from a Dutch word that means _pattern_ and may als
 specTROmetry nOn-target aNalysis_.
 
 ## Project news
+
+**September 2026** `patRoon 3.1.0` is now released. This release supports SIRIUS 6.0, adds a new componentization algorithm and integrates various smaller changes and fixes from user feedback. Please see the [Project NEWS][NEWS] for more details.
 
 **April 2026** `patRoon 3.0.0` is released! This a **major** release which adds ion mobility separation (IMS) support, new algorithms for feature and transformation product detection, use of sample metadata and many other improvements. Please see the [Project NEWS][NEWS] for more details and important notes on upgrading to `patRoon 3.0`.
 
@@ -125,7 +128,7 @@ screening](https://doi.org/10.1186/s13321-020-00477-w). _Journal of Cheminformat
 Rick Helmus, Bas van de Velde, Andrea M. Brunner, Thomas L. ter Laak, Annemarie P. van Wezel and Emma L. Schymanski.
 [patRoon 2.0: Improved non-target analysis workflows including automated transformation product screening]( https://doi.org/10.21105/joss.04029). _Journal of Open Source Software_, 7(71), 4029
 
-Rick Helmus, Jan C. Specker, Christine Gallampois and Emma L. Schymanski. [patRoon 3.0: Enhanced non-target analysis workflows with ion mobility separation and other major improvements](https://doi.org/10.21203/rs.3.rs-9517980/v1) _PREPRINT at Research Square_
+Rick Helmus, Jan C. Specker, Christine Gallampois and Emma L. Schymanski. [patRoon 3.0: Enhanced non-target analysis workflows with ion mobility separation and other major improvements](https://doi.org/10.1186/s13321-026-01302-6). _Journal of Cheminformatics_ (2026)
 
 `patRoon` builds on many open-source software tools and open data sources. Therefore, it is important to also cite their
 work when using these algorithms via `patRoon`.

@@ -30,7 +30,7 @@ fGroupsSuspDupl <- predictRespFactors(fGroupsSuspDupl, calib, eluent, organicMod
                                       calibConcUnit = "M")
 fGroupsSuspDupl <- predictTox(fGroupsSuspDupl)
 
-doSIRIUS <- TRUE #!is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patRoon.path.SIRIUS"))
+doSIRIUS <- FALSE #!is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patRoon.path.SIRIUS"))
 if (doSIRIUS)
 {
     fGroupsForms <- getFormFGroups()

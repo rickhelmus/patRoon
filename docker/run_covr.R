@@ -3,6 +3,7 @@ options(covr.flags = list(CXXFLAGS = '', LDFLAGS = ''))
 
 Sys.setenv(TESTTHAT_CPUS = 2)
 Sys.setenv(PATROON_MP_MAXPROCS = 2)
+Sys.setenv(PATROON_THREADS = 2)
 Sys.setenv(PKG_BUILD_EXTRA_FLAGS = "false")
 
 # HACK: do this until https://github.com/Rdatatable/data.table/issues/7749 is on CRAN

@@ -15,7 +15,7 @@ getRDepsTab <- function(format)
     {
         repos <- ghRepos(name, dep)
         if (!is.null(dep[["pkgroot"]]))
-            repos <- paste0(repos, "/", dep$pkgroot)
+            repos <- paste0(repos, "/tree/master/", dep$pkgroot)
         return(sprintf("https://github.com/%s", repos))
     }
     depComments <- function(dep)
@@ -59,6 +59,8 @@ getRDepsTab <- function(format)
                 break
             }
         }
+        if (!is.null(dep[["pkgroot"]]))
+            return(sprintf("`remotes::install_github('%s', subdir = '%s')`", repos, dep$pkgroot))
         return(sprintf("`remotes::install_github('%s')`", repos))
     }
     

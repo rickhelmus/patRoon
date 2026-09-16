@@ -1,4 +1,4 @@
-# DEVEL
+# patRoon 3.1
 
 **SIRIUS 6.0 support**
 
@@ -7,11 +7,12 @@ maintained). Most of the functionality has been restored, i.e. to find & group f
 compound annotation candidates. Note that MS2Quant/MS2Tox do not support SIRIUS 6.0 fingerprints, this functionality is
 now disabled and predictions can only be done with SMILES data. The `patRoonExt` package was updated to supply SIRIUS
 6.0, please update it as well. Furthermore, the [latest version of the RSirius
-package](https://github.com/sirius-ms/sirius-client-openAPI/tree/master/client-api_r) is needed by the new interface. By
-default the SIRIUS interface tries to connect to a running SIRIUS 6.0 instance, which can speed up repeated job
-submission and may be useful for debugging purposes.
+package](https://github.com/sirius-ms/sirius-client-openAPI/tree/master/client-api_r) is needed by the new interface.
+This can be installed with `patRoonInst::install("RSirius")`. By default the SIRIUS interface tries to connect to a
+running SIRIUS 6.0 instance, which can speed up repeated job submission and may be useful for debugging purposes.
 
-SIRIUS 6 has a vast amount of functionality. Any feedback on the inclusion of specific functionality is welcome!
+SIRIUS 6 has a lot more functionality than is now interfaced in `patRoon`. Any feedback on the inclusion of specific
+functionality is welcome!
 
 **Other new functionality**
 
@@ -20,6 +21,7 @@ SIRIUS 6 has a vast amount of functionality. Any feedback on the inclusion of sp
 * Added the `maxReplicateIntRSDPres` filter that ignores absent (zero intensity) filters in its RSD calculation, and clarified in the docs that the legacy `maxReplicateIntRSD` filter doesn't (issue #162)
 * Adduct conversion (`as.adduct()`/`as.character()`) now support `nontarget` format
 * Added `getEICs()` methods for `features` and `featureGroups` objects to easily extract EICs for (selected) features/feature groups (`getEICs()` is now an S4 generic)
+* Added `SIRIUSLogin()`, `importFeaturesSIRIUS()` and `importFeatureGroupsSIRIUS()` functions
 
 **Changes**
 
@@ -30,8 +32,7 @@ to `maxRelCumIntensity`.
 * Optimizations for very large datasets (issue #154)
 * The `window` EIC and EIM parameter can now be `Inf` to include the data points for the entire chromatogram or mobility trace
 * Small changes for `newProject()` to handle loading of MS peak lists for `generateComponentsNet()`
-* `generateCompoundsMetFrag()`: The identifiers in relatedCIDs from PubChemLite are now separated by `;` instead of a space
-* Added `SIRIUSLogin()` function
+* `generateCompoundsMetFrag()`: The identifiers in `relatedCIDs` from PubChemLite are now separated by `;` instead of a space
 
 **Fixes**
 

@@ -248,6 +248,9 @@ unset(obj, set)
 # S4 method for class 'featureGroupsKPIC2'
 delete(obj, ...)
 
+# S4 method for class 'featureGroupsSIRIUS'
+delete(obj, ...)
+
 # S4 method for class 'featureGroupsXCMS'
 analysisInfo(obj) <- value
 

@@ -565,6 +565,7 @@ data.
   [`featureGroupsScreening`](https://rickhelmus.github.io/patRoon/reference/featureGroupsScreening-class.md);
   [`featureGroupsScreeningSet`](https://rickhelmus.github.io/patRoon/reference/featureGroupsScreening-class.md);
   [`featureGroupsSet`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md);
+  [`featureGroupsSIRIUS`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md);
   [`featureGroupsXCMS`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md);
   [`featureGroupsXCMS3`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md);
   [`features`](https://rickhelmus.github.io/patRoon/reference/features-class.md);

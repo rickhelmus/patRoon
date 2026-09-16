@@ -111,9 +111,8 @@ generateCompoundsMetFrag(
 - topMost:
 
   Only keep this number of candidates (per feature group) with highest
-  score. Set to `NULL` to always keep all candidates, however, please
-  note that this may result in significant usage of CPU/RAM resources
-  for large numbers of candidates.
+  score. Setting this to a high number may result in significant usage
+  of CPU/RAM resources for large numbers of candidates.
 
 - dbRelMzDev:
 

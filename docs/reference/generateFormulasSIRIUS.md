@@ -13,28 +13,20 @@ generateFormulasSIRIUS(
   fGroups,
   MSPeakLists,
   specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
-  relMzDev = defaultLim("mz", "narrow_rel"),
   adduct = NULL,
-  projectPath = NULL,
-  elements = "CHNOP",
-  profile = "qtof",
-  database = NULL,
-  noise = NULL,
-  cores = NULL,
+  config = NULL,
   getFingerprints = FALSE,
-  topMost = 100,
-  login = FALSE,
+  login = "check",
   alwaysLogin = FALSE,
-  extraOptsGeneral = NULL,
-  extraOptsFormula = NULL,
   calculateFeatures = FALSE,
   featThreshold = 0,
   featThresholdAnn = 0.75,
   absAlignMzDev = defaultLim("mz", "narrow"),
   minIMSSpecSim = 0,
-  verbose = TRUE,
-  splitBatches = FALSE,
-  dryRun = FALSE
+  projectPath = NULL,
+  runMode = "execute",
+  SIRIUSAPI = NULL,
+  verbose = TRUE
 )
 
 # S4 method for class 'featureGroupsSet'
@@ -42,8 +34,14 @@ generateFormulasSIRIUS(
   fGroups,
   MSPeakLists,
   specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
-  relMzDev = defaultLim("mz", "narrow_rel"),
   adduct = NULL,
+  config = NULL,
+  login = "check",
+  alwaysLogin = FALSE,
+  calculateFeatures = FALSE,
+  featThreshold = 0,
+  featThresholdAnn = 0.75,
+  minIMSSpecSim = 0,
   projectPath = NULL,
   ...,
   setThreshold = 0,
@@ -82,11 +80,6 @@ generateFormulasSIRIUS(
   parameters](https://rickhelmus.github.io/patRoon/reference/specSimParams.md)
   documentation for more details.
 
-- relMzDev:
-
-  Maximum relative deviation between the measured and candidate formula
-  *m/z* values (in ppm). Sets the --ppm-max command line option.
-
 - adduct:
 
   An
@@ -99,64 +92,13 @@ generateFormulasSIRIUS(
   (**sets workflow**) The `adduct` argument is not supported for sets
   workflows, since the adduct annotations will then always be used.
 
-- projectPath, dryRun:
+- config:
 
-  These are mainly for internal purposes. `projectPath` sets the output
-  directory for the `SIRIUS` output (a temporary directory if `NULL`).
-  If `dryRun` is `TRUE` then no computations are done and only the
-  results from `projectPath` are processed.
-
-  (**sets workflow**) `projectPath` should be a `character` specifying
-  the paths for each set.
-
-- elements:
-
-  Elements to be considered for formulae calculation. This will heavily
-  affects the number of candidates! Always try to work with a minimal
-  set by excluding elements you don't expect. The minimum/maximum number
-  of elements can also be specified, for example: a value of
-  `"C[5]H[10-15]O"` will only consider formulae with up to five carbon
-  atoms, between ten and fifteen hydrogen atoms and any amount of oxygen
-  atoms. Sets the --elements command line option.
-
-- profile:
-
-  Name of the configuration profile, for example: "qtof", "orbitrap",
-  "fticr". Sets the --profile commandline option.
-
-- database:
-
-  If not `NULL`, use a database for retrieval of formula candidates.
-  Possible values are: "pubchem", "bio", "kegg", "hmdb". Sets the
-  --database commandline option.
-
-- noise:
-
-  Median intensity of the noise (`NULL` ignores this parameter). Sets
-  the --noise commandline option.
-
-- cores:
-
-  The number of cores `SIRIUS` will use. If `NULL` then the default of
-  all cores will be used.
-
-- getFingerprints:
-
-  Set to `TRUE` to load `SIRIUS-CSI:FingerID` MS/MS fingerprints for the
-  formula candidates. This is currently only supported with
-  `calculateFeatures=FALSE` to avoid heavy server traffic. The
-  fingerprints are stored in the `fingerprints` slot of the returned
-  [`formulasSIRIUS`](https://rickhelmus.github.io/patRoon/reference/formulasSIRIUS-class.md)
-  object, and are used by the
-  [`predictTox`](https://rickhelmus.github.io/patRoon/reference/generics.md)
-  and
-  [`predictRespFactors`](https://rickhelmus.github.io/patRoon/reference/generics.md)
-  methods.
-
-- topMost:
-
-  Only keep this number of candidates (per feature group) with highest
-  score. Sets the --candidates command line option.
+  A
+  [`RSirius::JobSubmission`](https://rdrr.io/pkg/RSirius/man/JobSubmission.html)
+  configuration object, typically obtained with
+  [`getSIRIUSConfig`](https://rickhelmus.github.io/patRoon/reference/getSIRIUSConfig.md).
+  If `NULL`, the default `SIRIUS` configuration is used.
 
 - login, alwaysLogin:
 
@@ -180,17 +122,11 @@ generateFormulasSIRIUS(
   if SIRIUS reports no active login.
 
   See the [SIRIUS
-  website](https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/)
-  and patRoon handbook for more information.
+  website](https://v6.docs.sirius-ms.io/account-and-license/) and
+  patRoon handbook for more information.
 
-- extraOptsGeneral, extraOptsFormula:
-
-  a `character` vector with any extra commandline parameters for
-  `SIRIUS`. For `SIRIUS` versions `<4.4` there is no distinction between
-  general and formula options. Otherwise commandline options specified
-  in `extraOptsGeneral` are added prior to the `formula` command, while
-  options specified in `extraOptsFormula` are added in afterwards. See
-  the `SIRIUS` manual for more details. Set to `NULL` to ignore.
+  **NOTE**: By loggin in you will accept the terms of the Service and
+  Privacy Policy of the SIRIUS Webservice.
 
 - calculateFeatures:
 
@@ -211,9 +147,7 @@ generateFormulasSIRIUS(
   As `featThreshold`, but only considers features with annotations. For
   instance, `featThresholdAnn=0.75` dictates that a formula should be
   present in at least 75% of the features with annotations inside a
-  feature group. @param topMost Only keep this number of candidates (per
-  feature group) with highest score. Sets the --candidates command line
-  option.
+  feature group.
 
 - absAlignMzDev:
 
@@ -238,19 +172,31 @@ generateFormulasSIRIUS(
   however, these are adjusted based on the peak list data of the IMS
   feature group.
 
+- runMode, projectPath:
+
+  Whether to execute a `SIRIUS` processing job (`runMode="execute"`) or
+  load results from an existing `SIRIUS` project (`runMode"read"`). If
+  `runMode="execute"` then `projectPath` can be `NULL` and a temporary
+  project will be used, otherwise `projectPath` must point to an
+  existing project.
+
+  **NOTE:** if `runMode="execute"` then any existing project at
+  `projectPath` will be removed.
+
+  **NOTE:** This is primarily intended for internal purposes, but may be
+  of interest to e.g. re-import SIRIUS results.
+
+  (**sets workflow**) `projectPath` should be a `character` specifying
+  the paths for each set.
+
+- SIRIUSAPI:
+
+  An `rsirius_api` object for connecting to the `SIRIUS` API. If `NULL`,
+  a new connection will be started automatically.
+
 - verbose:
 
-  If `TRUE` then more output is shown in the terminal.
-
-- splitBatches:
-
-  If `TRUE` then the calculations done by `SIRIUS` will be evenly split
-  over multiple `SIRIUS` calls (which may be run in parallel depending
-  on the [set package
-  options](https://rickhelmus.github.io/patRoon/reference/patRoon-package.md)).
-  If `splitBatches=FALSE` then all feature calculations are performed
-  from a single `SIRIUS` execution, which is often the fastest if
-  calculations are performed on a single computer.
+  If `TRUE` then more output is shown.
 
 - setThreshold:
 
@@ -280,29 +226,46 @@ object.
 This function uses sirius to generate formula candidates. This function
 is called when calling `generateFormulas` with `algorithm="sirius"`.
 
-Similarity of measured and theoretical isotopic patterns will be used
-for scoring candidates. Note that `SIRIUS` requires availability of
-MS/MS data.
+Note that `SIRIUS` requires availability of MS/MS data.
 
-## Note
+## Running SIRIUS
 
-For annotations performed with `SIRIUS` it is often the fastest to keep
-the default `splitBatches=FALSE`. In this case, all `SIRIUS` output will
-be printed to the terminal (unless `verbose=FALSE` or
-patRoon.MP.method="future"). Furthermore, please note that only
-annotations to be performed for the same adduct are grouped in a single
-batch execution.
+By default, patRoon tries to connect to a running instance of `SIRIUS`.
+This is generally faster and may be useful for debugging by *e.g.*
+checking the logs in `SIRIUS`. Otherwise, an attempt will be made to
+start `SIRIUS` automatically. The binaries are searched from the
+patRoon.path.SIRIUS package option, patRoonExt package or the system
+`PATH` environment variable. Any automatically started `SIRIUS`
+instances are automatically closed if jobs are finished. By default, a
+temporary `SIRIUS` project is made for `SIRIUS` data processing and
+removed afterwards. See the `projectPath` to change this.
 
-## Parallelization
+## SIRIUS 6 functionality
 
-generateFormulasSIRIUS uses multiprocessing to parallelize computations.
-Please see the parallelization section in the handbook for more details
-and [patRoon
-options](https://rickhelmus.github.io/patRoon/reference/patRoon-package.md)
-for configuration options.
+The interface to `SIRIUS 6` is still in development and may be extended
+in the future. There is a vast amount of functionality available, which
+will require quite some effort to support all. However, the current
+functionality in patRoon is mostly equal to what was supported with
+previous `SIRIUS` releases. Any feedback on the inclusion of specific
+functionality is welcome!
 
 ## References
 
+Hoffmann MA, Nothias L, Ludwig M, Fleischauer M, Gentry EC, Witting M,
+Dorrestein PC, Dührkop K, Böcker S (2021). “High-confidence structural
+annotation of metabolites absent from spectral libraries.” *Nature
+Biotechnology*, **40**(3), 411–421. ISSN 1546-1696.
+[doi:10.1038/s41587-021-01045-9](https://doi.org/10.1038/s41587-021-01045-9)
+. <http://dx.doi.org/10.1038/s41587-021-01045-9>.\
+\
+Dührkop K, Nothias L, Fleischauer M, Reher R, Ludwig M, Hoffmann MA,
+Petras D, Gerwick WH, Rousu J, Dorrestein PC, Böcker S (2020).
+“Systematic classification of unknown metabolites using high-resolution
+fragmentation mass spectra.” *Nature Biotechnology*, **39**(4), 462–471.
+ISSN 1546-1696.
+[doi:10.1038/s41587-020-0740-8](https://doi.org/10.1038/s41587-020-0740-8)
+. <http://dx.doi.org/10.1038/s41587-020-0740-8>.\
+\
 Duhrkop K, Fleischauer M, Ludwig M, Aksenov AA, Melnik AV, Meusel M,
 Dorrestein PC, Rousu J, Bocker S (2019). “SIRIUS 4: a rapid tool for
 turning tandem mass spectra into metabolite structure information.”

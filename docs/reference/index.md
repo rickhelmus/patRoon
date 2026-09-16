@@ -66,6 +66,9 @@
   [`getDefIsolatePrecParams()`](https://rickhelmus.github.io/patRoon/reference/MSPeakLists-class.md)
   : Class containing MS Peak Lists
 
+- [`SIRIUSLogin()`](https://rickhelmus.github.io/patRoon/reference/SIRIUSLogin.md)
+  : Log in to SIRIUS
+
 - [`TPLogicTransformations()`](https://rickhelmus.github.io/patRoon/reference/TPLogicTransformations.md)
   : Obtain default rules for metabolic logic
 
@@ -352,6 +355,7 @@
   [`export(`*`<featureGroupsSet>`*`)`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)
   [`unset(`*`<featureGroupsSet>`*`)`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)
   [`delete(`*`<featureGroupsKPIC2>`*`)`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)
+  [`delete(`*`<featureGroupsSIRIUS>`*`)`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)
   [`` `analysisInfo<-`( ``*`<featureGroupsXCMS>`*`)`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)
   [`delete(`*`<featureGroupsXCMS>`*`)`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)
   [`delete(`*`<featureGroupsXCMS3>`*`)`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)
@@ -443,6 +447,7 @@
   : Find features using SAFD
 
 - [`findFeaturesSIRIUS()`](https://rickhelmus.github.io/patRoon/reference/findFeaturesSIRIUS.md)
+  [`importFeaturesSIRIUS()`](https://rickhelmus.github.io/patRoon/reference/findFeaturesSIRIUS.md)
   : Find features using SIRIUS
 
 - [`findFeaturesXCMS()`](https://rickhelmus.github.io/patRoon/reference/findFeaturesXCMS.md)
@@ -657,6 +662,9 @@
 - [`getMSFileTypes()`](https://rickhelmus.github.io/patRoon/reference/getMSFileTypes.md)
   : Get supported MS file types
 
+- [`getSIRIUSConfig()`](https://rickhelmus.github.io/patRoon/reference/getSIRIUSConfig.md)
+  : Obtain a SIRIUS job configuration
+
 - [`groupFeatures()`](https://rickhelmus.github.io/patRoon/reference/groupFeatures.md)
   : Grouping of features
 
@@ -670,6 +678,7 @@
   : Group features using OpenMS
 
 - [`groupFeaturesSIRIUS()`](https://rickhelmus.github.io/patRoon/reference/groupFeaturesSIRIUS.md)
+  [`importFeatureGroupsSIRIUS()`](https://rickhelmus.github.io/patRoon/reference/groupFeaturesSIRIUS.md)
   : Group features using SIRIUS
 
 - [`groupFeaturesXCMS()`](https://rickhelmus.github.io/patRoon/reference/groupFeaturesXCMS.md)

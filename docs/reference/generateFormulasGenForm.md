@@ -155,8 +155,7 @@ generateFormulasGenForm(
   As `featThreshold`, but only considers features with annotations. For
   instance, `featThresholdAnn=0.75` dictates that a formula should be
   present in at least 75% of the features with annotations inside a
-  feature group. @param topMost Only keep this number of candidates (per
-  feature group) with highest score.
+  feature group.
 
 - absAlignMzDev:
 

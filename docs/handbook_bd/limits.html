@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-09-05" />
+<meta name="date" content="2026-09-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -236,7 +236,8 @@ div.csl-indent {
 <li class="chapter" data-level="4.8.2" data-path="annotation.html"><a href="annotation.html#formulae"><i class="fa fa-check"></i><b>4.8.2</b> Formulae</a></li>
 <li class="chapter" data-level="4.8.3" data-path="annotation.html"><a href="annotation.html#compounds"><i class="fa fa-check"></i><b>4.8.3</b> Compounds</a></li>
 <li class="chapter" data-level="4.8.4" data-path="annotation.html"><a href="annotation.html#estIDConf"><i class="fa fa-check"></i><b>4.8.4</b> Estimation of identification confidence</a></li>
-<li class="chapter" data-level="4.8.5" data-path="annotation.html"><a href="annotation.html#SIRLogin"><i class="fa fa-check"></i><b>4.8.5</b> Account login for SIRIUS</a></li>
+<li class="chapter" data-level="4.8.5" data-path="annotation.html"><a href="annotation.html#SIRConf"><i class="fa fa-check"></i><b>4.8.5</b> SIRIUS configuration</a></li>
+<li class="chapter" data-level="4.8.6" data-path="annotation.html"><a href="annotation.html#SIRLogin"><i class="fa fa-check"></i><b>4.8.6</b> Account login for SIRIUS</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="processing.html"><a href="processing.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a>
@@ -412,40 +413,40 @@ div.csl-indent {
 <h2><span class="header-section-number">9.2</span> Default numeric limits and tolerances<a href="limits.html#limits" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The functions in <code>patRoon</code> use various numeric limits and tolerances to configure e.g. tolerances applied to match retention times and <em>m/z</em> values. Since <code>patRoon 3.0</code> the defaults for these limits are centralized, which simplifies configuration and switching defaults between different HRMS instruments.</p>
 <p>The configuration is done through the <code>limits.yml</code> file. This is an easily editable <a href="https://en.wikipedia.org/wiki/YAML">YAML</a> text file, and by default looks like this:</p>
-<div class="sourceCode" id="cb293"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb293-1"><a href="limits.html#cb293-1" tabindex="-1"></a><span class="fu">general</span><span class="kw">:</span></span>
-<span id="cb293-2"><a href="limits.html#cb293-2" tabindex="-1"></a><span class="at">    </span><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="dv">1</span></span>
-<span id="cb293-3"><a href="limits.html#cb293-3" tabindex="-1"></a><span class="at">    </span><span class="fu">IMS</span><span class="kw">:</span><span class="at"> bruker</span></span>
-<span id="cb293-4"><a href="limits.html#cb293-4" tabindex="-1"></a><span class="fu">retention</span><span class="kw">:</span></span>
-<span id="cb293-5"><a href="limits.html#cb293-5" tabindex="-1"></a><span class="at">    </span><span class="fu">very_narrow</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span></span>
-<span id="cb293-6"><a href="limits.html#cb293-6" tabindex="-1"></a><span class="at">    </span><span class="fu">narrow</span><span class="kw">:</span><span class="at"> </span><span class="dv">6</span></span>
-<span id="cb293-7"><a href="limits.html#cb293-7" tabindex="-1"></a><span class="at">    </span><span class="fu">medium</span><span class="kw">:</span><span class="at"> </span><span class="dv">12</span></span>
-<span id="cb293-8"><a href="limits.html#cb293-8" tabindex="-1"></a><span class="at">    </span><span class="fu">wide</span><span class="kw">:</span><span class="at"> </span><span class="dv">30</span></span>
-<span id="cb293-9"><a href="limits.html#cb293-9" tabindex="-1"></a><span class="fu">mz</span><span class="kw">:</span></span>
-<span id="cb293-10"><a href="limits.html#cb293-10" tabindex="-1"></a><span class="at">    </span><span class="fu">very_narrow</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.001</span></span>
-<span id="cb293-11"><a href="limits.html#cb293-11" tabindex="-1"></a><span class="at">    </span><span class="fu">narrow</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.002</span></span>
-<span id="cb293-12"><a href="limits.html#cb293-12" tabindex="-1"></a><span class="at">    </span><span class="fu">medium</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.005</span></span>
-<span id="cb293-13"><a href="limits.html#cb293-13" tabindex="-1"></a><span class="at">    </span><span class="fu">wide</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.02</span></span>
-<span id="cb293-14"><a href="limits.html#cb293-14" tabindex="-1"></a><span class="at">    </span><span class="fu">narrow_rel</span><span class="kw">:</span><span class="at"> </span><span class="dv">5</span></span>
-<span id="cb293-15"><a href="limits.html#cb293-15" tabindex="-1"></a><span class="at">    </span><span class="fu">medium_rel</span><span class="kw">:</span><span class="at"> </span><span class="dv">10</span></span>
-<span id="cb293-16"><a href="limits.html#cb293-16" tabindex="-1"></a><span class="fu">mobility_bruker</span><span class="kw">:</span></span>
-<span id="cb293-17"><a href="limits.html#cb293-17" tabindex="-1"></a><span class="at">    </span><span class="fu">very_narrow</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.01</span></span>
-<span id="cb293-18"><a href="limits.html#cb293-18" tabindex="-1"></a><span class="at">    </span><span class="fu">narrow</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.02</span></span>
-<span id="cb293-19"><a href="limits.html#cb293-19" tabindex="-1"></a><span class="at">    </span><span class="fu">medium</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.04</span></span>
-<span id="cb293-20"><a href="limits.html#cb293-20" tabindex="-1"></a><span class="at">    </span><span class="fu">wide</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.2</span></span>
-<span id="cb293-21"><a href="limits.html#cb293-21" tabindex="-1"></a><span class="at">    </span><span class="fu">medium_rel</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.05</span></span>
-<span id="cb293-22"><a href="limits.html#cb293-22" tabindex="-1"></a><span class="fu">mobility_agilent</span><span class="kw">:</span></span>
-<span id="cb293-23"><a href="limits.html#cb293-23" tabindex="-1"></a><span class="at">    </span><span class="fu">very_narrow</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
-<span id="cb293-24"><a href="limits.html#cb293-24" tabindex="-1"></a><span class="at">    </span><span class="fu">narrow</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.2</span></span>
-<span id="cb293-25"><a href="limits.html#cb293-25" tabindex="-1"></a><span class="at">    </span><span class="fu">medium</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.4</span></span>
-<span id="cb293-26"><a href="limits.html#cb293-26" tabindex="-1"></a><span class="at">    </span><span class="fu">wide</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span></span>
-<span id="cb293-27"><a href="limits.html#cb293-27" tabindex="-1"></a><span class="at">    </span><span class="fu">medium_rel</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.05</span></span>
-<span id="cb293-28"><a href="limits.html#cb293-28" tabindex="-1"></a><span class="fu">CCS</span><span class="kw">:</span></span>
-<span id="cb293-29"><a href="limits.html#cb293-29" tabindex="-1"></a><span class="at">    </span><span class="fu">medium</span><span class="kw">:</span><span class="at"> </span><span class="dv">10</span></span>
-<span id="cb293-30"><a href="limits.html#cb293-30" tabindex="-1"></a><span class="at">    </span><span class="fu">medium_rel</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.05</span></span></code></pre></div>
+<div class="sourceCode" id="cb294"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb294-1"><a href="limits.html#cb294-1" tabindex="-1"></a><span class="fu">general</span><span class="kw">:</span></span>
+<span id="cb294-2"><a href="limits.html#cb294-2" tabindex="-1"></a><span class="at">    </span><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="dv">1</span></span>
+<span id="cb294-3"><a href="limits.html#cb294-3" tabindex="-1"></a><span class="at">    </span><span class="fu">IMS</span><span class="kw">:</span><span class="at"> bruker</span></span>
+<span id="cb294-4"><a href="limits.html#cb294-4" tabindex="-1"></a><span class="fu">retention</span><span class="kw">:</span></span>
+<span id="cb294-5"><a href="limits.html#cb294-5" tabindex="-1"></a><span class="at">    </span><span class="fu">very_narrow</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span></span>
+<span id="cb294-6"><a href="limits.html#cb294-6" tabindex="-1"></a><span class="at">    </span><span class="fu">narrow</span><span class="kw">:</span><span class="at"> </span><span class="dv">6</span></span>
+<span id="cb294-7"><a href="limits.html#cb294-7" tabindex="-1"></a><span class="at">    </span><span class="fu">medium</span><span class="kw">:</span><span class="at"> </span><span class="dv">12</span></span>
+<span id="cb294-8"><a href="limits.html#cb294-8" tabindex="-1"></a><span class="at">    </span><span class="fu">wide</span><span class="kw">:</span><span class="at"> </span><span class="dv">30</span></span>
+<span id="cb294-9"><a href="limits.html#cb294-9" tabindex="-1"></a><span class="fu">mz</span><span class="kw">:</span></span>
+<span id="cb294-10"><a href="limits.html#cb294-10" tabindex="-1"></a><span class="at">    </span><span class="fu">very_narrow</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.001</span></span>
+<span id="cb294-11"><a href="limits.html#cb294-11" tabindex="-1"></a><span class="at">    </span><span class="fu">narrow</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.002</span></span>
+<span id="cb294-12"><a href="limits.html#cb294-12" tabindex="-1"></a><span class="at">    </span><span class="fu">medium</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.005</span></span>
+<span id="cb294-13"><a href="limits.html#cb294-13" tabindex="-1"></a><span class="at">    </span><span class="fu">wide</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.02</span></span>
+<span id="cb294-14"><a href="limits.html#cb294-14" tabindex="-1"></a><span class="at">    </span><span class="fu">narrow_rel</span><span class="kw">:</span><span class="at"> </span><span class="dv">5</span></span>
+<span id="cb294-15"><a href="limits.html#cb294-15" tabindex="-1"></a><span class="at">    </span><span class="fu">medium_rel</span><span class="kw">:</span><span class="at"> </span><span class="dv">10</span></span>
+<span id="cb294-16"><a href="limits.html#cb294-16" tabindex="-1"></a><span class="fu">mobility_bruker</span><span class="kw">:</span></span>
+<span id="cb294-17"><a href="limits.html#cb294-17" tabindex="-1"></a><span class="at">    </span><span class="fu">very_narrow</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.01</span></span>
+<span id="cb294-18"><a href="limits.html#cb294-18" tabindex="-1"></a><span class="at">    </span><span class="fu">narrow</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.02</span></span>
+<span id="cb294-19"><a href="limits.html#cb294-19" tabindex="-1"></a><span class="at">    </span><span class="fu">medium</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.04</span></span>
+<span id="cb294-20"><a href="limits.html#cb294-20" tabindex="-1"></a><span class="at">    </span><span class="fu">wide</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.2</span></span>
+<span id="cb294-21"><a href="limits.html#cb294-21" tabindex="-1"></a><span class="at">    </span><span class="fu">medium_rel</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.05</span></span>
+<span id="cb294-22"><a href="limits.html#cb294-22" tabindex="-1"></a><span class="fu">mobility_agilent</span><span class="kw">:</span></span>
+<span id="cb294-23"><a href="limits.html#cb294-23" tabindex="-1"></a><span class="at">    </span><span class="fu">very_narrow</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
+<span id="cb294-24"><a href="limits.html#cb294-24" tabindex="-1"></a><span class="at">    </span><span class="fu">narrow</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.2</span></span>
+<span id="cb294-25"><a href="limits.html#cb294-25" tabindex="-1"></a><span class="at">    </span><span class="fu">medium</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.4</span></span>
+<span id="cb294-26"><a href="limits.html#cb294-26" tabindex="-1"></a><span class="at">    </span><span class="fu">wide</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span></span>
+<span id="cb294-27"><a href="limits.html#cb294-27" tabindex="-1"></a><span class="at">    </span><span class="fu">medium_rel</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.05</span></span>
+<span id="cb294-28"><a href="limits.html#cb294-28" tabindex="-1"></a><span class="fu">CCS</span><span class="kw">:</span></span>
+<span id="cb294-29"><a href="limits.html#cb294-29" tabindex="-1"></a><span class="at">    </span><span class="fu">medium</span><span class="kw">:</span><span class="at"> </span><span class="dv">10</span></span>
+<span id="cb294-30"><a href="limits.html#cb294-30" tabindex="-1"></a><span class="at">    </span><span class="fu">medium_rel</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.05</span></span></code></pre></div>
 <p>The <code>IMS</code> setting under <code>general</code> specifies which IMS defaults are applied: this should be <code>bruker</code> or <code>agilent</code>. Depending on this setting, defaults are either taken from the <code>mobility_buker</code> or <code>mobility_agilent</code> setting blocks.</p>
 <p>If you used the <a href="newProject.html#newProject">newProject tool</a> to create a new project, the <code>limits.yml</code> file is automatically copied to the project directory. Otherwise, it can be created by the <code>genLimitsFile()</code> function:</p>
-<div class="sourceCode" id="cb294"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb294-1"><a href="limits.html#cb294-1" tabindex="-1"></a><span class="fu">genLimitsFile</span>() <span class="co"># copy default limits.yml file to current working directory</span></span>
-<span id="cb294-2"><a href="limits.html#cb294-2" tabindex="-1"></a><span class="fu">genLimitsFile</span>(<span class="st">&quot;my/path/limits.yml&quot;</span>, <span class="at">IMS =</span> <span class="st">&quot;agilent&quot;</span>) <span class="co"># generate `my/path/limits.yml` with Agilent IMS defaults</span></span></code></pre></div>
+<div class="sourceCode" id="cb295"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb295-1"><a href="limits.html#cb295-1" tabindex="-1"></a><span class="fu">genLimitsFile</span>() <span class="co"># copy default limits.yml file to current working directory</span></span>
+<span id="cb295-2"><a href="limits.html#cb295-2" tabindex="-1"></a><span class="fu">genLimitsFile</span>(<span class="st">&quot;my/path/limits.yml&quot;</span>, <span class="at">IMS =</span> <span class="st">&quot;agilent&quot;</span>) <span class="co"># generate `my/path/limits.yml` with Agilent IMS defaults</span></span></code></pre></div>
 <p>More information on the limits can be found in the reference manual (<code>?limits</code>).</p>
 </div>
             </section>

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">patRoon</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -52,7 +52,18 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">groupFeaturesSIRIUS</span><span class="op">(</span><span class="va">analysisInfo</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">groupFeaturesSIRIUS</span><span class="op">(</span></span>
+<span>  <span class="va">analysisInfo</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  login <span class="op">=</span> <span class="st">"check"</span>,</span>
+<span>  alwaysLogin <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  projectPath <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  runMode <span class="op">=</span> <span class="st">"execute"</span>,</span>
+<span>  SIRIUSAPI <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">importFeatureGroupsSIRIUS</span><span class="op">(</span><span class="va">input</span>, <span class="va">analysisInfo</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -64,31 +75,119 @@
 information</a>.</p></dd>
 
 
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Further arguments passed to <code><a href="findFeaturesSIRIUS.html">findFeaturesSIRIUS</a></code> (<code>groupFeaturesSIRIUS</code>) or
+<code>groupFeaturesSIRIUS</code> (<code>importFeatureGroupsSIRIUS</code>).</p></dd>
+
+
+<dt id="arg-login-alwayslogin">login, alwaysLogin<a class="anchor" aria-label="anchor" href="#arg-login-alwayslogin"></a></dt>
+<dd><p>Specifies if and how account logging of SIRIUS should be handled:</p>
+<p><code>login=FALSE</code>: no automatic login is performed and the active login status is not checked.</p>
+<p><code>login="check"</code>: aborts if no active login is present.</p>
+<p><code>login="interactive"</code>: interactively ask for login (using <a href="https://CRAN.R-project.org/package=getPass" class="external-link"><span class="pkg">getPass</span></a>).</p>
+<p><code>login=c(username="...", password="...")</code>: perform the login with the given details. For security reasons,
+  please do not enter the details directly, but use e.g. environment variables or store/retrieve them with the
+  <a href="https://CRAN.R-project.org/package=keyring" class="external-link"><span class="pkg">keyring</span></a> package.</p>
+<p>if <code>alwaysLogin=TRUE</code> then a login is always performed, otherwise only if SIRIUS reports no active login.</p>
+<p>See the <a href="https://v6.docs.sirius-ms.io/account-and-license/" class="external-link">SIRIUS website</a> and <span class="pkg">patRoon</span> handbook for
+  more information.</p>
+<p><strong>NOTE</strong>: By loggin in you will accept the terms of the Service and Privacy Policy of the SIRIUS Webservice.</p></dd>
+
+
+<dt id="arg-runmode-projectpath">runMode, projectPath<a class="anchor" aria-label="anchor" href="#arg-runmode-projectpath"></a></dt>
+<dd><p>Whether to execute a <code class="command">SIRIUS</code> processing job (<code>runMode="execute"</code>) or load
+  results from an existing <code class="command">SIRIUS</code> project (<code>runMode"read"</code>). If <code>runMode="execute"</code> then
+  <code>projectPath</code> can be <code>NULL</code> and a temporary project will be used, otherwise <code>projectPath</code> must point
+  to an existing project.</p>
+<p><strong>NOTE:</strong> if <code>runMode="execute"</code> then any existing project at <code>projectPath</code> will be removed.</p>
+<p><strong>NOTE:</strong> This is primarily intended for internal purposes, but may be of interest to e.g. re-import SIRIUS
+  results.</p>
+<p>(<strong>sets workflow</strong>) <code>projectPath</code> should be a <code>character</code> specifying the paths for each set.</p></dd>
+
+
+<dt id="arg-siriusapi">SIRIUSAPI<a class="anchor" aria-label="anchor" href="#arg-siriusapi"></a></dt>
+<dd><p>An <code>rsirius_api</code> object for connecting to the <code class="command">SIRIUS</code> API. If <code>NULL</code>, a new
+connection will be started automatically.</p></dd>
+
+
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
 <dd><p>if <code>FALSE</code> then no text output will be shown.</p></dd>
+
+
+<dt id="arg-input">input<a class="anchor" aria-label="anchor" href="#arg-input"></a></dt>
+<dd><p>Sets <code>projectPath</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>An object of a class which is derived from <code><a href="featureGroups-class.html">featureGroups</a></code>.</p>
+    <p>Returns a <code>featureGroupsSIRIUS</code> object dervied from <code><a href="featureGroups-class.html">featureGroups</a></code>. This object contains an
+  additional slot <code>groupInfoSIR</code> with information about the SIRIUS aligned features.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>This function uses SIRIUS to group features. This function is called when calling <code>groupFeatures</code> with
   <code>algorithm="sirius"</code>.</p>
-<p>Finding and grouping features is done by running the <code class="command">lcms-align</code> command on every analyses at once.
-  For this reason, grouping feature data from other algorithms than <code class="command">SIRIUS</code> is not supported.</p>
-<p>The MS files should be in the <code class="file">mzML</code> or <code class="file">mzXML</code> format. Furthermore, this algorithms requires the
-  presence of (data-dependent) MS/MS data.</p>
+<p>This algorithm always first finds features with <code class="command">SIRIUS</code> and can therefore not group features from
+  other algorithms. The MS files should be in the <code class="file">mzML</code> or <code class="file">mzXML</code> format.</p>
 <p>The input MS data files need to be centroided. The <code><a href="MSConversion.html">convertMSFiles</a></code> function can be used
   to centroid data.</p>
+<p><code>importFeatureGroupsSIRIUS</code> is a simple wrapper around <code>groupFeaturesSIRIUS</code> to import feature
+  groups from an existing SIRIUS project. It will set <code>runMode="read"</code> and <code>projectPath</code> to the provided
+  <code>input</code> path.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="running-sirius">Running SIRIUS<a class="anchor" aria-label="anchor" href="#running-sirius"></a></h2>
+    <p>By default, <span class="pkg">patRoon</span> tries to connect to a running instance of <code class="command">SIRIUS</code>. This
+  is generally faster and may be useful for debugging by <em>e.g.</em> checking the logs in <code class="command">SIRIUS</code>.
+  Otherwise, an attempt will be made to start <code class="command">SIRIUS</code> automatically. The binaries are searched from the
+  <span class="option">patRoon.path.SIRIUS</span> package option, <span class="pkg">patRoonExt</span> package or the system <code>PATH</code> environment
+  variable. Any automatically started <code class="command">SIRIUS</code> instances are automatically closed if jobs are finished. By
+  default, a temporary <code class="command">SIRIUS</code> project is made for <code class="command">SIRIUS</code> data processing and removed afterwards.
+  See the <code>projectPath</code> to change this.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="sirius-functionality">SIRIUS 6 functionality<a class="anchor" aria-label="anchor" href="#sirius-functionality"></a></h2>
+    <p>The interface to <code class="command">SIRIUS 6</code> is still in development and may be extended in
+  the future. There is a vast amount of functionality available, which will require quite some effort to support all.
+  However, the current functionality in <span class="pkg">patRoon</span> is mostly equal to what was supported with previous
+  <code class="command">SIRIUS</code> releases. Any feedback on the inclusion of specific functionality is welcome!</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
-    <p>Duhrkop K, Fleischauer M, Ludwig M, Aksenov AA, Melnik AV, Meusel M, Dorrestein PC, Rousu J, Bocker S (2019).
+    <p>Hoffmann MA, Nothias L, Ludwig M, Fleischauer M, Gentry EC, Witting M, Dorrestein PC, Dührkop K, Böcker S (2021).
+“High-confidence structural annotation of metabolites absent from spectral libraries.”
+<em>Nature Biotechnology</em>, <b>40</b>(3), 411–421.
+ISSN 1546-1696.
+<a href="https://doi.org/10.1038/s41587-021-01045-9" class="external-link">doi:10.1038/s41587-021-01045-9</a>
+.
+<a href="http://dx.doi.org/10.1038/s41587-021-01045-9" class="external-link">http://dx.doi.org/10.1038/s41587-021-01045-9</a>.
+ <br><br> Dührkop K, Nothias L, Fleischauer M, Reher R, Ludwig M, Hoffmann MA, Petras D, Gerwick WH, Rousu J, Dorrestein PC, Böcker S (2020).
+“Systematic classification of unknown metabolites using high-resolution fragmentation mass spectra.”
+<em>Nature Biotechnology</em>, <b>39</b>(4), 462–471.
+ISSN 1546-1696.
+<a href="https://doi.org/10.1038/s41587-020-0740-8" class="external-link">doi:10.1038/s41587-020-0740-8</a>
+.
+<a href="http://dx.doi.org/10.1038/s41587-020-0740-8" class="external-link">http://dx.doi.org/10.1038/s41587-020-0740-8</a>.
+ <br><br>
+  Duhrkop K, Fleischauer M, Ludwig M, Aksenov AA, Melnik AV, Meusel M, Dorrestein PC, Rousu J, Bocker S (2019).
 “SIRIUS 4: a rapid tool for turning tandem mass spectra into metabolite structure information.”
 <em>Nature Methods</em>, <b>16</b>(4), 299–302.
 <a href="https://doi.org/10.1038/s41592-019-0344-8" class="external-link">doi:10.1038/s41592-019-0344-8</a>
+.
+ <br><br> Duhrkop K, Bocker S (2015).
+“Fragmentation Trees Reloaded.”
+In Przytycka TM (ed.), <em>Research in Computational Molecular Biology</em>, 65–79.
+ISBN 978-3-319-16706-0.
+ <br><br>
+  Duhrkop K, Shen H, Meusel M, Rousu J, Bocker S (2015).
+“Searching molecular structure databases with tandem mass spectra using CSI:FingerID.”
+<em>Proceedings of the National Academy of Sciences</em>, <b>112</b>(41), 12580–12585.
+<a href="https://doi.org/10.1073/pnas.1509788112" class="external-link">doi:10.1073/pnas.1509788112</a>
+.
+ <br><br> Bocker S, Letzel MC, Liptak Z, Pervukhin A (2008).
+“SIRIUS: decomposing isotope patterns for metabolite identification.”
+<em>Bioinformatics</em>, <b>25</b>(2), 218–224.
+<a href="https://doi.org/10.1093/bioinformatics/btn603" class="external-link">doi:10.1093/bioinformatics/btn603</a>
 .</p>
     </div>
     <div class="section level2">

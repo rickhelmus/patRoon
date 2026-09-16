@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-09-05" />
+<meta name="date" content="2026-09-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -236,7 +236,8 @@ div.csl-indent {
 <li class="chapter" data-level="4.8.2" data-path="annotation.html"><a href="annotation.html#formulae"><i class="fa fa-check"></i><b>4.8.2</b> Formulae</a></li>
 <li class="chapter" data-level="4.8.3" data-path="annotation.html"><a href="annotation.html#compounds"><i class="fa fa-check"></i><b>4.8.3</b> Compounds</a></li>
 <li class="chapter" data-level="4.8.4" data-path="annotation.html"><a href="annotation.html#estIDConf"><i class="fa fa-check"></i><b>4.8.4</b> Estimation of identification confidence</a></li>
-<li class="chapter" data-level="4.8.5" data-path="annotation.html"><a href="annotation.html#SIRLogin"><i class="fa fa-check"></i><b>4.8.5</b> Account login for SIRIUS</a></li>
+<li class="chapter" data-level="4.8.5" data-path="annotation.html"><a href="annotation.html#SIRConf"><i class="fa fa-check"></i><b>4.8.5</b> SIRIUS configuration</a></li>
+<li class="chapter" data-level="4.8.6" data-path="annotation.html"><a href="annotation.html#SIRLogin"><i class="fa fa-check"></i><b>4.8.6</b> Account login for SIRIUS</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="processing.html"><a href="processing.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a>
@@ -411,8 +412,8 @@ div.csl-indent {
 <div id="features" class="section level2 hasAnchor" number="4.5">
 <h2><span class="header-section-number">4.5</span> Features<a href="features.html#features" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Collecting features from the analyses consists of finding all features, grouping them across analyses (optionally after retention time alignment), and if desired suspect screening:</p>
-<div id="htmlwidget-8f2794fec7a767f314d9" style="width:500px;height:70px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-8f2794fec7a767f314d9">{"x":{"diagram":"\ndigraph Features {\n  graph [ rankdir = LR, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features\" -> \"Group features\"\n    \"Suspect screening\"\n    \"Group features\" -> \"Suspect screening\" [style=dashed]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-e939e72fe80a0e07b9c6" style="width:500px;height:70px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-e939e72fe80a0e07b9c6">{"x":{"diagram":"\ndigraph Features {\n  graph [ rankdir = LR, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features\" -> \"Group features\"\n    \"Suspect screening\"\n    \"Group features\" -> \"Suspect screening\" [style=dashed]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <div id="findFeat" class="section level3 hasAnchor" number="4.5.1">
 <h3><span class="header-section-number">4.5.1</span> Finding features<a href="features.html#findFeat" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Several algorithms are available for finding features. These are listed in the table below alongside their usage and general remarks.</p>
@@ -488,6 +489,9 @@ div.csl-indent {
 </tr>
 </tbody>
 </table>
+<blockquote>
+<p><strong><em>NOTE</em></strong> SIRIUS requires an active login, see <a href="annotation.html#SIRLogin">this section</a>.</p>
+</blockquote>
 <p>The feature finding algorithms have different requirements on the data file types and formats (<em>Input</em> column). See the <a href="sample-analyses.html#pre-treat">data conversion section</a> to perform data conversion.</p>
 <p>When using the <a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a> algorithms both the ‘classical’ interface and latest <code>XCMS3</code> interfaces are supported. The implementation and functionality is largely the same within <code>patRoon</code>, however, the latter is recommended as the classical interface is not further developed anymore.</p>
 <p>Most often the performance of these algorithms heavily depends on the data and parameter settings that are used. Since obtaining a good feature dataset is crucial for the rest of the workflow, it is highly recommended to experiment with different settings (this process can also be automated, see <a href="fOpt.html#fOpt">the feature optimization section</a> for more details). Some common parameters to look at are listed in the table below. However, there are many more parameters that can be set, please see the reference documentation for these (e.g. <code>?findFeatures</code>).</p>
@@ -525,7 +529,7 @@ div.csl-indent {
 </tr>
 <tr class="even">
 <td><a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a></td>
-<td>The <code>sirius</code> algorithm is currently parameterless</td>
+<td><code>noiseIntensity</code>, <code>alignMaxRTDev</code>, <code>minSNR</code> (see <code>?findFeaturesSIRIUS</code>)</td>
 </tr>
 <tr class="odd">
 <td><a href="https://bitbucket.org/SSamanipour/safd.jl/src/master/">SAFD</a></td>
@@ -638,6 +642,9 @@ div.csl-indent {
 </table>
 <blockquote>
 <p><strong><em>NOTE</em></strong>: Grouping features with the <code>sirius</code> algorithm will perform both finding and grouping features with <a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a>. This algorithm cannot work with features from another algorithm.</p>
+</blockquote>
+<blockquote>
+<p><strong><em>NOTE</em></strong> SIRIUS requires an active login, see <a href="annotation.html#SIRLogin">this section</a>.</p>
 </blockquote>
 <p>Just like finding features, each algorithm has their own set of parameters. Often the defaults are a good start, but it is recommended to have look at them. See <code>?groupFeatures</code> for more details. The algorithm used to group features does not have to match to the algorithm that was used to find the features.</p>
 <p>Some examples of grouping features are shown below.</p>

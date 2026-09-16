@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">patRoon</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,6 +45,44 @@
       <small>Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="3.1" id="patroon-31">patRoon 3.1<a class="anchor" aria-label="anchor" href="#patroon-31"></a></h2>
+<p><strong>SIRIUS 6.0 support</strong></p>
+<p>This release introduces support for SIRIUS 6.0, which replaces the legacy SIRIUS 5.0 interface (which is no longer maintained). Most of the functionality has been restored, i.e. to find &amp; group features and generate formula and compound annotation candidates. Note that MS2Quant/MS2Tox do not support SIRIUS 6.0 fingerprints, this functionality is now disabled and predictions can only be done with SMILES data. The <code>patRoonExt</code> package was updated to supply SIRIUS 6.0, please update it as well. Furthermore, the <a href="https://github.com/sirius-ms/sirius-client-openAPI/tree/master/client-api_r" class="external-link">latest version of the RSirius package</a> is needed by the new interface. This can be installed with <code>patRoonInst::install("RSirius")</code>. By default the SIRIUS interface tries to connect to a running SIRIUS 6.0 instance, which can speed up repeated job submission and may be useful for debugging purposes.</p>
+<p>SIRIUS 6 has a lot more functionality than is now interfaced in <code>patRoon</code>. Any feedback on the inclusion of specific functionality is welcome!</p>
+<p><strong>Other new functionality</strong></p>
+<ul><li>New network-based algorithm for fast, flexible and feature-based componentization. See <code><a href="../reference/generateComponentsNet.html">?generateComponentsNet</a></code> for details.</li>
+<li>
+<code>fixedIsolationWindow</code> can now be a two-sized vector to specify asymmetric isolation windows (issue <a href="https://github.com/rickhelmus/patRoon/issues/161" class="external-link">#161</a>)</li>
+<li>Added the <code>maxReplicateIntRSDPres</code> filter that ignores absent (zero intensity) filters in its RSD calculation, and clarified in the docs that the legacy <code>maxReplicateIntRSD</code> filter doesn’t (issue <a href="https://github.com/rickhelmus/patRoon/issues/162" class="external-link">#162</a>)</li>
+<li>Adduct conversion (<code><a href="../reference/adduct-utils.html">as.adduct()</a></code>/<code><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character()</a></code>) now support <code>nontarget</code> format</li>
+<li>Added <code><a href="../reference/generics.html">getEICs()</a></code> methods for <code>features</code> and <code>featureGroups</code> objects to easily extract EICs for (selected) features/feature groups (<code><a href="../reference/generics.html">getEICs()</a></code> is now an S4 generic)</li>
+<li>Added <code><a href="../reference/SIRIUSLogin.html">SIRIUSLogin()</a></code>, <code><a href="../reference/findFeaturesSIRIUS.html">importFeaturesSIRIUS()</a></code> and <code><a href="../reference/groupFeaturesSIRIUS.html">importFeatureGroupsSIRIUS()</a></code> functions</li>
+</ul><p><strong>Changes</strong></p>
+<ul><li>
+<strong>Important</strong> The cumulative intensity filters for MS peak list averaging and filtering were changed to address issue <a href="https://github.com/rickhelmus/patRoon/issues/160" class="external-link">#160</a>. The filters now correctly prioritize the most intense peaks and remove the lower intensity peaks that are above the filter threshold. For this reason the <code>minRelCumIntensity</code> and <code>relMinCumIntensity</code> (latter was named incorrectly) are renamed to <code>maxRelCumIntensity</code>.</li>
+<li>Optimizations for very large datasets (issue <a href="https://github.com/rickhelmus/patRoon/issues/154" class="external-link">#154</a>)</li>
+<li>The <code>window</code> EIC and EIM parameter can now be <code>Inf</code> to include the data points for the entire chromatogram or mobility trace</li>
+<li>Small changes for <code><a href="../reference/newProject.html">newProject()</a></code> to handle loading of MS peak lists for <code><a href="../reference/generateComponentsNet.html">generateComponentsNet()</a></code>
+</li>
+<li>
+<code><a href="../reference/generateCompoundsMetFrag.html">generateCompoundsMetFrag()</a></code>: The identifiers in <code>relatedCIDs</code> from PubChemLite are now separated by <code>;</code> instead of a space</li>
+</ul><p><strong>Fixes</strong></p>
+<ul><li>Fixed: <code><a href="../reference/generics.html">getEICs()</a></code> output was returned as nested matrices when <code>output="fill"</code>
+</li>
+<li>Fixed: <code><a href="../reference/reporting.html">report()</a></code>: component table lacked ret and m/z columns</li>
+<li>Fixed: <code><a href="../reference/newProject.html">newProject()</a></code>: misc fixes when creating a project that loads analyses from a table (issue <a href="https://github.com/rickhelmus/patRoon/issues/154" class="external-link">#154</a>).</li>
+<li>Fixed: Improve handling of raw data without exported MS2 isolation windows in <code>piek</code> and <code><a href="../reference/generateMSPeakLists.html">generateMSPeakLists()</a></code> (issue <a href="https://github.com/rickhelmus/patRoon/issues/156" class="external-link">#156</a>)</li>
+<li>
+<code><a href="../reference/generics.html">as.data.table()</a></code>: Support non numeric columns for <code>anaInfoCols</code> when averaging (issue <a href="https://github.com/rickhelmus/patRoon/issues/158" class="external-link">#158</a>)</li>
+<li>Fixed: <code>topMost</code> argument for <code><a href="../reference/generateMSPeakLists.html">generateMSPeakLists()</a></code> threw an error (issue <a href="https://github.com/rickhelmus/patRoon/issues/159" class="external-link">#159</a>)</li>
+<li>Fixed: <code>fixedIsolationWindow</code> was incorrectly handled for eg Agilent DDA data (issue <a href="https://github.com/rickhelmus/patRoon/issues/161" class="external-link">#161</a>)</li>
+<li>Fixed: Some links in the reference documentation for generics (<code><a href="../reference/generics.html">?generics</a></code>) were missing or wrong</li>
+<li>Added the <code>maxReplicateIntRSDPres</code> filter that ignores absent (zero intensity) filters in its RSD calculation, and clarified in the docs that the legacy <code>maxReplicateIntRSD</code> filter doesn’t (issue <a href="https://github.com/rickhelmus/patRoon/issues/162" class="external-link">#162</a>)</li>
+<li>
+<code>fixedIsolationWindow</code> can now be a two-sized vector to specify asymmetric isolation windows (issue <a href="https://github.com/rickhelmus/patRoon/issues/161" class="external-link">#161</a>)</li>
+<li>Fixed: setting <code>annotate</code> for <code><a href="../reference/generics.html">plotChroms()</a></code>/<code><a href="../reference/feature-plotting.html">plotMobilograms()</a></code> generated warnings</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="3.0" id="patroon-30">patRoon 3.0<a class="anchor" aria-label="anchor" href="#patroon-30"></a></h2>
 <p>This release adds a significant amount of new functionality and changes. Please see the updated <a href="https://rickhelmus.github.io/patRoon/handbook_bd/index.html">Handbook</a>, <a href="https://doi.org/10.21203/rs.3.rs-9517980/v1" class="external-link">pre-print</a>, and sections below for more information. Users of previous <code>patRoon</code> versions should inform themselves with the important changes highlighted in the next section.</p>

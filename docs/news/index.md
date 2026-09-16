@@ -1,5 +1,118 @@
 # Changelog
 
+## patRoon 3.1
+
+**SIRIUS 6.0 support**
+
+This release introduces support for SIRIUS 6.0, which replaces the
+legacy SIRIUS 5.0 interface (which is no longer maintained). Most of the
+functionality has been restored, i.e. to find & group features and
+generate formula and compound annotation candidates. Note that
+MS2Quant/MS2Tox do not support SIRIUS 6.0 fingerprints, this
+functionality is now disabled and predictions can only be done with
+SMILES data. The `patRoonExt` package was updated to supply SIRIUS 6.0,
+please update it as well. Furthermore, the [latest version of the
+RSirius
+package](https://github.com/sirius-ms/sirius-client-openAPI/tree/master/client-api_r)
+is needed by the new interface. This can be installed with
+`patRoonInst::install("RSirius")`. By default the SIRIUS interface tries
+to connect to a running SIRIUS 6.0 instance, which can speed up repeated
+job submission and may be useful for debugging purposes.
+
+SIRIUS 6 has a lot more functionality than is now interfaced in
+`patRoon`. Any feedback on the inclusion of specific functionality is
+welcome!
+
+**Other new functionality**
+
+- New network-based algorithm for fast, flexible and feature-based
+  componentization. See
+  [`?generateComponentsNet`](https://rickhelmus.github.io/patRoon/reference/generateComponentsNet.md)
+  for details.
+- `fixedIsolationWindow` can now be a two-sized vector to specify
+  asymmetric isolation windows (issue
+  [\#161](https://github.com/rickhelmus/patRoon/issues/161))
+- Added the `maxReplicateIntRSDPres` filter that ignores absent (zero
+  intensity) filters in its RSD calculation, and clarified in the docs
+  that the legacy `maxReplicateIntRSD` filter doesn’t (issue
+  [\#162](https://github.com/rickhelmus/patRoon/issues/162))
+- Adduct conversion
+  ([`as.adduct()`](https://rickhelmus.github.io/patRoon/reference/adduct-utils.md)/[`as.character()`](https://rdrr.io/r/base/character.html))
+  now support `nontarget` format
+- Added
+  [`getEICs()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  methods for `features` and `featureGroups` objects to easily extract
+  EICs for (selected) features/feature groups
+  ([`getEICs()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  is now an S4 generic)
+- Added
+  [`SIRIUSLogin()`](https://rickhelmus.github.io/patRoon/reference/SIRIUSLogin.md),
+  [`importFeaturesSIRIUS()`](https://rickhelmus.github.io/patRoon/reference/findFeaturesSIRIUS.md)
+  and
+  [`importFeatureGroupsSIRIUS()`](https://rickhelmus.github.io/patRoon/reference/groupFeaturesSIRIUS.md)
+  functions
+
+**Changes**
+
+- **Important** The cumulative intensity filters for MS peak list
+  averaging and filtering were changed to address issue
+  [\#160](https://github.com/rickhelmus/patRoon/issues/160). The filters
+  now correctly prioritize the most intense peaks and remove the lower
+  intensity peaks that are above the filter threshold. For this reason
+  the `minRelCumIntensity` and `relMinCumIntensity` (latter was named
+  incorrectly) are renamed to `maxRelCumIntensity`.
+- Optimizations for very large datasets (issue
+  [\#154](https://github.com/rickhelmus/patRoon/issues/154))
+- The `window` EIC and EIM parameter can now be `Inf` to include the
+  data points for the entire chromatogram or mobility trace
+- Small changes for
+  [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md)
+  to handle loading of MS peak lists for
+  [`generateComponentsNet()`](https://rickhelmus.github.io/patRoon/reference/generateComponentsNet.md)
+- [`generateCompoundsMetFrag()`](https://rickhelmus.github.io/patRoon/reference/generateCompoundsMetFrag.md):
+  The identifiers in `relatedCIDs` from PubChemLite are now separated by
+  `;` instead of a space
+
+**Fixes**
+
+- Fixed:
+  [`getEICs()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  output was returned as nested matrices when `output="fill"`
+- Fixed:
+  [`report()`](https://rickhelmus.github.io/patRoon/reference/reporting.md):
+  component table lacked ret and m/z columns
+- Fixed:
+  [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md):
+  misc fixes when creating a project that loads analyses from a table
+  (issue [\#154](https://github.com/rickhelmus/patRoon/issues/154)).
+- Fixed: Improve handling of raw data without exported MS2 isolation
+  windows in `piek` and
+  [`generateMSPeakLists()`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakLists.md)
+  (issue [\#156](https://github.com/rickhelmus/patRoon/issues/156))
+- [`as.data.table()`](https://rickhelmus.github.io/patRoon/reference/generics.md):
+  Support non numeric columns for `anaInfoCols` when averaging (issue
+  [\#158](https://github.com/rickhelmus/patRoon/issues/158))
+- Fixed: `topMost` argument for
+  [`generateMSPeakLists()`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakLists.md)
+  threw an error (issue
+  [\#159](https://github.com/rickhelmus/patRoon/issues/159))
+- Fixed: `fixedIsolationWindow` was incorrectly handled for eg Agilent
+  DDA data (issue
+  [\#161](https://github.com/rickhelmus/patRoon/issues/161))
+- Fixed: Some links in the reference documentation for generics
+  ([`?generics`](https://rickhelmus.github.io/patRoon/reference/generics.md))
+  were missing or wrong
+- Added the `maxReplicateIntRSDPres` filter that ignores absent (zero
+  intensity) filters in its RSD calculation, and clarified in the docs
+  that the legacy `maxReplicateIntRSD` filter doesn’t (issue
+  [\#162](https://github.com/rickhelmus/patRoon/issues/162))
+- `fixedIsolationWindow` can now be a two-sized vector to specify
+  asymmetric isolation windows (issue
+  [\#161](https://github.com/rickhelmus/patRoon/issues/161))
+- Fixed: setting `annotate` for
+  [`plotChroms()`](https://rickhelmus.github.io/patRoon/reference/generics.md)/[`plotMobilograms()`](https://rickhelmus.github.io/patRoon/reference/feature-plotting.md)
+  generated warnings
+
 ## patRoon 3.0
 
 This release adds a significant amount of new functionality and changes.
@@ -58,7 +171,13 @@ of important points.
   interface has various small changes to simplify its usage and extend
   support. For instance:
 
-  `# pre 3.0`` `[`convertMSFiles`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md)`(``anaInfo ``=`` ``anaInfo``, from ``=`` ``"bruker"``, to ``=`` ``"mzML"``, algorithm ``=`` ``"pwiz"``, centroid ``=`` ``"vendor"``,`` `` overWrite ``=`` ``FALSE``)`` ``# 3.0`` `[`convertMSFiles`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md)`(``anaInfo``, typeFrom ``=`` ``"raw"``, formatFrom ``=`` ``"bruker"``, typeTo ``=`` ``"centroid"``, formatTo ``=`` ``"mzML"``,`` `` algorithm ``=`` ``"pwiz"``, overwrite ``=`` ``FALSE``)`
+  \
+  `# pre 3.0`\
+  [`convertMSFiles`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md)`(``anaInfo ``=`` ``anaInfo``, from ``=`` ``"bruker"``, to ``=`` ``"mzML"``, algorithm ``=`` ``"pwiz"``, centroid ``=`` ``"vendor"``,`\
+  `               overWrite ``=`` ``FALSE``)`\
+  `# 3.0`\
+  [`convertMSFiles`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md)`(``anaInfo``, typeFrom ``=`` ``"raw"``, formatFrom ``=`` ``"bruker"``, typeTo ``=`` ``"centroid"``, formatTo ``=`` ``"mzML"``,`\
+  `               algorithm ``=`` ``"pwiz"``, overwrite ``=`` ``FALSE``)`
 
   Please see
   [`?convertMSFiles`](https://rickhelmus.github.io/patRoon/reference/MSConversion.md)
@@ -70,14 +189,23 @@ of important points.
   ([`?generateMSPeakLists`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakLists.md)
   for details). E.g.:
 
-  `# pre 3.0`` ``mslists`` ``<-`` `[`generateMSPeakLists`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakLists.md)`(``fGroups``, ``"mzr"``, maxMSRtWindow ``=`` ``5``, precursorMzWindow ``=`` ``4``, avgFeatParams ``=`` ``...``,`` `` avgFGroupParams ``=`` ``...``)`` ``# 3.0`` ``mslists`` ``<-`` `[`generateMSPeakLists`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakLists.md)`(``fGroups``, maxMSRTWindow ``=`` ``5``, avgFeatParams ``=`` ``...``, avgFGroupParams ``=`` ``...``)`
+  \
+  `# pre 3.0`\
+  `mslists`` ``<-`` `[`generateMSPeakLists`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakLists.md)`(``fGroups``, ``"mzr"``, maxMSRtWindow ``=`` ``5``, precursorMzWindow ``=`` ``4``, avgFeatParams ``=`` ``...``,`\
+  `                               avgFGroupParams ``=`` ``...``)`\
+  `# 3.0`\
+  `mslists`` ``<-`` `[`generateMSPeakLists`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakLists.md)`(``fGroups``, maxMSRTWindow ``=`` ``5``, avgFeatParams ``=`` ``...``, avgFGroupParams ``=`` ``...``)`
 
 - The filtering of MS peak lists is simplified and is now done per MS
   level (see
   [`?MSPeakLists`](https://rickhelmus.github.io/patRoon/reference/MSPeakLists-class.md)
   for details):
 
-  `# pre 3.0`` ``mslists`` ``<-`` `[`filter`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``mslists``, relMSMSIntThr ``=`` ``0.05``, topMSMSPeaks ``=`` ``25``, ``...``)`` ``# 3.0`` ``mslists`` ``<-`` `[`filter`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``mslists``, msLevel ``=`` ``2``, relMinIntensity ``=`` ``0.05``, topMost ``=`` ``25``, ``...``)`
+  \
+  `# pre 3.0`\
+  `mslists`` ``<-`` `[`filter`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``mslists``, relMSMSIntThr ``=`` ``0.05``, topMSMSPeaks ``=`` ``25``, ``...``)`\
+  `# 3.0`\
+  `mslists`` ``<-`` `[`filter`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``mslists``, msLevel ``=`` ``2``, relMinIntensity ``=`` ``0.05``, topMost ``=`` ``25``, ``...``)`
 
 - The estimation of identification confidence levels was extended beyond
   suspect screening workflows. The
@@ -89,7 +217,15 @@ of important points.
   [`?estimateIDConfidence`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)
   for details. Eg:
 
-  `# pre 3.0`` ``fGroups`` ``<-`` `[`annotateSuspects`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md)`(``fGroups``, formulas ``=`` ``formulas``, compounds ``=`` ``compounds``, MSPeakLists ``=`` ``mslists``,`` `` IDFile ``=`` ``"idlevelrules.yml"``)`` ``# 3.0`` ``formulas`` ``<-`` `[`estimateIDConfidence`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)`(``formulas``, IDFile ``=`` ``"idlevelrules.yml"``)`` ``compounds`` ``<-`` `[`estimateIDConfidence`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)`(``compounds``, MSPeakLists ``=`` ``mslists``, formulas ``=`` ``formulas``, IDFile ``=`` ``"idlevelrules.yml"``)`` ``fGroups`` ``<-`` `[`estimateIDConfidence`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)`(``fGroups``, formulas ``=`` ``formulas``, compounds ``=`` ``compounds``, MSPeakLists ``=`` ``mslists``,`` `` IDFile ``=`` ``"idlevelrules.yml"``)`
+  \
+  `# pre 3.0`\
+  `fGroups`` ``<-`` `[`annotateSuspects`](https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.md)`(``fGroups``, formulas ``=`` ``formulas``, compounds ``=`` ``compounds``, MSPeakLists ``=`` ``mslists``,`\
+  `                            IDFile ``=`` ``"idlevelrules.yml"``)`\
+  `# 3.0`\
+  `formulas`` ``<-`` `[`estimateIDConfidence`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)`(``formulas``, IDFile ``=`` ``"idlevelrules.yml"``)`\
+  `compounds`` ``<-`` `[`estimateIDConfidence`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)`(``compounds``, MSPeakLists ``=`` ``mslists``, formulas ``=`` ``formulas``, IDFile ``=`` ``"idlevelrules.yml"``)`\
+  `fGroups`` ``<-`` `[`estimateIDConfidence`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)`(``fGroups``, formulas ``=`` ``formulas``, compounds ``=`` ``compounds``, MSPeakLists ``=`` ``mslists``,`\
+  `                                IDFile ``=`` ``"idlevelrules.yml"``)`
 
 - The default rules for ID level estimation was changed for level 3a.
   Either re-generate the file by running
@@ -100,11 +236,13 @@ of important points.
 - The report configuration file was updated. Run the following to update
   an existing file:
 
-  [`genReportSettingsFile`](https://rickhelmus.github.io/patRoon/reference/reporting.md)`(``"report.yml"``, baseFrom ``=`` ``"report.yml"``)`
+  \
+  [`genReportSettingsFile`](https://rickhelmus.github.io/patRoon/reference/reporting.md)`(``"report.yml"``, baseFrom ``=`` ``"report.yml"``)`
 
 - The default numeric limits were centralized (discussed further below).
   To generate a new file for configuration:
 
+  \
   [`genLimitsFile`](https://rickhelmus.github.io/patRoon/reference/limits.md)`(``)`
 
   See
@@ -2278,11 +2416,14 @@ code without using any new functionality:
 
 Change your existing code, e.g.
 
-`scr`` ``<-`` `[`screenSuspects`](https://rickhelmus.github.io/patRoon/reference/suspect-screening.md)`(``fGroups``, ``suspectList``, ``...``)`` ``fGroupsScr`` ``<-`` ``groupFeaturesScreening``(``fGroups``, ``scr``)`
+\
+`scr`` ``<-`` `[`screenSuspects`](https://rickhelmus.github.io/patRoon/reference/suspect-screening.md)`(``fGroups``, ``suspectList``, ``...``)`\
+`fGroupsScr`` ``<-`` ``groupFeaturesScreening``(``fGroups``, ``scr``)`
 
 to
 
-`fGroupsScr`` ``<-`` `[`screenSuspects`](https://rickhelmus.github.io/patRoon/reference/suspect-screening.md)`(``fGroups``, ``suspectList``, ``...``, onlyHits ``=`` ``TRUE``)`
+\
+`fGroupsScr`` ``<-`` `[`screenSuspects`](https://rickhelmus.github.io/patRoon/reference/suspect-screening.md)`(``fGroups``, ``suspectList``, ``...``, onlyHits ``=`` ``TRUE``)`
 
 **Major changes**
 

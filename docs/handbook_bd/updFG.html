@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-09-05" />
+<meta name="date" content="2026-09-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -236,7 +236,8 @@ div.csl-indent {
 <li class="chapter" data-level="4.8.2" data-path="annotation.html"><a href="annotation.html#formulae"><i class="fa fa-check"></i><b>4.8.2</b> Formulae</a></li>
 <li class="chapter" data-level="4.8.3" data-path="annotation.html"><a href="annotation.html#compounds"><i class="fa fa-check"></i><b>4.8.3</b> Compounds</a></li>
 <li class="chapter" data-level="4.8.4" data-path="annotation.html"><a href="annotation.html#estIDConf"><i class="fa fa-check"></i><b>4.8.4</b> Estimation of identification confidence</a></li>
-<li class="chapter" data-level="4.8.5" data-path="annotation.html"><a href="annotation.html#SIRLogin"><i class="fa fa-check"></i><b>4.8.5</b> Account login for SIRIUS</a></li>
+<li class="chapter" data-level="4.8.5" data-path="annotation.html"><a href="annotation.html#SIRConf"><i class="fa fa-check"></i><b>4.8.5</b> SIRIUS configuration</a></li>
+<li class="chapter" data-level="4.8.6" data-path="annotation.html"><a href="annotation.html#SIRLogin"><i class="fa fa-check"></i><b>4.8.6</b> Account login for SIRIUS</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="processing.html"><a href="processing.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a>
@@ -411,11 +412,11 @@ div.csl-indent {
 <div id="updFG" class="section level2 hasAnchor" number="5.6">
 <h2><span class="header-section-number">5.6</span> Updating feature group data<a href="updFG.html#updFG" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The feature group properties such as retention time and <em>m/z</em> are calculated during the feature grouping process. These properties usually represent an average calculated from the features within the group, and are e.g. used to match <a href="features.html#suspscr">suspects</a>. It may be useful to recalculate these values after e.g. filtering noisy features to to improve the accuracy. This is achieved with the <code>updateGroups</code> function:</p>
-<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="updFG.html#cb121-1" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, ...) <span class="co"># perform filtering steps</span></span>
-<span id="cb121-2"><a href="updFG.html#cb121-2" tabindex="-1"></a></span>
-<span id="cb121-3"><a href="updFG.html#cb121-3" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">updateGroups</span>(fGroups) <span class="co"># update retention time and m/z by re-averaging data</span></span>
-<span id="cb121-4"><a href="updFG.html#cb121-4" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">updateGroups</span>(fGroups, <span class="at">intWeight =</span> <span class="cn">TRUE</span>) <span class="co"># use intensity weighting for averaging</span></span>
-<span id="cb121-5"><a href="updFG.html#cb121-5" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">updateGroups</span>(fGroups, <span class="at">what =</span> <span class="fu">c</span>(<span class="st">&quot;mz&quot;</span>)) <span class="co"># only update m/z values</span></span></code></pre></div>
+<div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb122-1"><a href="updFG.html#cb122-1" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, ...) <span class="co"># perform filtering steps</span></span>
+<span id="cb122-2"><a href="updFG.html#cb122-2" tabindex="-1"></a></span>
+<span id="cb122-3"><a href="updFG.html#cb122-3" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">updateGroups</span>(fGroups) <span class="co"># update retention time and m/z by re-averaging data</span></span>
+<span id="cb122-4"><a href="updFG.html#cb122-4" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">updateGroups</span>(fGroups, <span class="at">intWeight =</span> <span class="cn">TRUE</span>) <span class="co"># use intensity weighting for averaging</span></span>
+<span id="cb122-5"><a href="updFG.html#cb122-5" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">updateGroups</span>(fGroups, <span class="at">what =</span> <span class="fu">c</span>(<span class="st">&quot;mz&quot;</span>)) <span class="co"># only update m/z values</span></span></code></pre></div>
 </div>
             </section>
 

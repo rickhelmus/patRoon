@@ -151,6 +151,11 @@ internally to calculate molecular weights. Please make sure that
 The toxicities are predicted with the `predictTox` generic functions,
 which accepts the following input:
 
+**NOTE**: Prediction from `SIRIUS` fingerprints is **not supported
+anymore**, as the required webservice from `SIRIUS` 5 was taken offline.
+This functionality is hopefully restored when new prediction models
+become available that are trained on `SIRIUS` 6 fingerprints.
+
 - [Suspect screening
   results](https://rickhelmus.github.io/patRoon/reference/suspect-screening.md).
   The SMILES data is used to predict toxicities for suspect hits.

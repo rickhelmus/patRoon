@@ -7,6 +7,7 @@
 r-universe](https://rickhelmus.r-universe.dev/badges/patRoon)](https://rickhelmus.r-universe.dev/patRoon)
 [![DOI:10.1186/s13321-020-00477-w](https://zenodo.org/badge/DOI/10.1186/s13321-020-00477-w.svg)](https://doi.org/10.1186/s13321-020-00477-w)
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.04029/status.svg)](https://doi.org/10.21105/joss.04029)
+[![DOI:10.1186/s13321-020-00477-w](https://zenodo.org/badge/DOI/10.1186/s13321-026-01302-6.svg)](https://doi.org/10.1186/s13321-026-01302-6)
 [![REUSE
 status](https://api.reuse.software/badge/github.com/rickhelmus/patRoon)](https://api.reuse.software/info/github.com/rickhelmus/patRoon)
 
@@ -16,6 +17,13 @@ is derived from a Dutch word that means *pattern* and may also be an
 acronym for *hyPhenated mAss specTROmetry nOn-target aNalysis*.
 
 ## Project news
+
+**September 2026** `patRoon 3.1.0` is now released. This release
+supports SIRIUS 6.0, adds a new componentization algorithm and
+integrates various smaller changes and fixes from user feedback. Please
+see the [Project
+NEWS](https://github.com/rickhelmus/patRoon/blob/master/NEWS.md) for
+more details.
 
 **April 2026** `patRoon 3.0.0` is released! This a **major** release
 which adds ion mobility separation (IMS) support, new algorithms for
@@ -181,7 +189,9 @@ for more information.
 
 For a very quick start:
 
-[`library`](https://rdrr.io/r/base/library.html)`(`[`patRoon`](https://github.com/rickhelmus/patRoon)`)`` `[`newProject`](https://rickhelmus.github.io/patRoon/reference/newProject.md)`(``)`
+\
+[`library`](https://rdrr.io/r/base/library.html)`(`[`patRoon`](https://github.com/rickhelmus/patRoon)`)`\
+[`newProject`](https://rickhelmus.github.io/patRoon/reference/newProject.md)`(``)`
 
 The
 [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md)
@@ -218,8 +228,8 @@ Software*, 7(71), 4029
 Rick Helmus, Jan C. Specker, Christine Gallampois and Emma L.
 Schymanski. [patRoon 3.0: Enhanced non-target analysis workflows with
 ion mobility separation and other major
-improvements](https://doi.org/10.21203/rs.3.rs-9517980/v1) *PREPRINT at
-Research Square*
+improvements](https://doi.org/10.1186/s13321-026-01302-6). *Journal of
+Cheminformatics* (2026)
 
 `patRoon` builds on many open-source software tools and open data
 sources. Therefore, it is important to also cite their work when using

@@ -19,7 +19,7 @@ compoundScorings(
 
 - algorithm:
 
-  The algorithm: `"metfrag"` or `"sirius"`. Set to `NULL` to return all
+  The algorithm: currently just `"metfrag"`. Set to `NULL` to return all
   scorings.
 
 - database:

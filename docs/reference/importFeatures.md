@@ -18,7 +18,7 @@ importFeatures(input, type, ...)
 - type:
 
   What type of data should be imported: `"xcms"`, `"xcms3"`, `"kpic2"`,
-  `"table"`, or `"envimass"`.
+  `"sirius"`, `"table"`, or `"envimass"`.
 
 - ...:
 
@@ -46,6 +46,7 @@ output class and its methods and the algorithm specific functions:
 [`importFeaturesXCMS`](https://rickhelmus.github.io/patRoon/reference/importFeaturesXCMS.md),
 [`importFeaturesXCMS3`](https://rickhelmus.github.io/patRoon/reference/importFeaturesXCMS3.md),
 [`importFeaturesKPIC2`](https://rickhelmus.github.io/patRoon/reference/importFeaturesKPIC2.md),
+[`importFeaturesSIRIUS`](https://rickhelmus.github.io/patRoon/reference/findFeaturesSIRIUS.md),
 [`importFeaturesTable`](https://rickhelmus.github.io/patRoon/reference/importFeaturesTable.md),
 [`importFeaturesEnviMass`](https://rickhelmus.github.io/patRoon/reference/importFeaturesEnviMass.md)
 

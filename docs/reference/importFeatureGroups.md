@@ -19,8 +19,8 @@ importFeatureGroups(input, type, ...)
 - type:
 
   What type of data should be imported: `"xcms"`, `"xcms3"`, `"kpic2"`,
-  `"table"`, `"brukerpa"` (Bruker ProfileAnalysis), `"brukertasq"`
-  (Bruker TASQ) or `"envimass"`.
+  `"sirius"`, `"table"`, `"brukerpa"` (Bruker ProfileAnalysis),
+  `"brukertasq"` (Bruker TASQ) or `"envimass"`.
 
 - ...:
 
@@ -48,6 +48,7 @@ output class and its methods and the algorithm specific functions:
 [`importFeatureGroupsXCMS`](https://rickhelmus.github.io/patRoon/reference/importFeatureGroupsXCMS.md),
 [`importFeatureGroupsXCMS3`](https://rickhelmus.github.io/patRoon/reference/importFeatureGroupsXCMS3.md),
 [`importFeatureGroupsKPIC2`](https://rickhelmus.github.io/patRoon/reference/importFeatureGroupsKPIC2.md),
+[`importFeatureGroupsSIRIUS`](https://rickhelmus.github.io/patRoon/reference/groupFeaturesSIRIUS.md),
 [`importFeatureGroupsTable`](https://rickhelmus.github.io/patRoon/reference/importFeatureGroupsTable.md),
 [`importFeatureGroupsBrukerPA`](https://rickhelmus.github.io/patRoon/reference/importFeatureGroupsBrukerPA.md),
 [`importFeatureGroupsBrukerTASQ`](https://rickhelmus.github.io/patRoon/reference/importFeatureGroupsBrukerTASQ.md),

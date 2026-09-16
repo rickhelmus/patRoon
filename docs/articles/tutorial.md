@@ -64,6 +64,7 @@ yourself. Both approaches will be discussed in the next sections.
 
 Ensure that RStudio is active and start the new project utility:
 
+\
 `patRoon``::`[`newProject`](https://rickhelmus.github.io/patRoon/reference/newProject.md)`(``)`
 
 > ***NOTE*** Currently
@@ -99,7 +100,10 @@ For RStudio users it is easiest to simply create a new RStudio project
 ensure that the working directory is set whenever you re-open it.
 Alternatively, you can do this manually, for instance:
 
-`projDir`` ``<-`` ``"~/myProjectDir"`` `[`dir.create`](https://rdrr.io/r/base/files2.html)`(``projDir``)`` `[`setwd`](https://rdrr.io/r/base/getwd.html)`(``projDir``)`
+\
+`projDir`` ``<-`` ``"~/myProjectDir"`\
+[`dir.create`](https://rdrr.io/r/base/files2.html)`(``projDir``)`\
+[`setwd`](https://rdrr.io/r/base/getwd.html)`(``projDir``)`
 
 The next step is to create a new `R` script. For this tutorial simply
 copy the script that is shown in the next section to a new `.R` file.
@@ -113,7 +117,70 @@ still have to add and modify some of its code. In the next sections you
 will learn more about each part of the script, make the necessary
 changes and run its code.
 
-`# Script automatically generated on Tue Feb 17 08:05:32 2026`` `` `[`library`](https://rdrr.io/r/base/library.html)`(`[`patRoon`](https://github.com/rickhelmus/patRoon)`)`` `` ``# -------------------------`` ``# initialization`` ``# -------------------------`` `` ``workPath`` ``<-`` ``"C:/myproject"`` `[`setwd`](https://rdrr.io/r/base/getwd.html)`(``workPath``)`` `` ``# Example data from patRoonData package (triplicate solvent blank + triplicate standard)`` ``anaInfo`` ``<-`` ``patRoonData``::`[`exampleAnalysisInfo`](https://rdrr.io/pkg/patRoonData/man/patRoonData.html)`(``"positive"``)`` `` ``# -------------------------`` ``# features`` ``# -------------------------`` `` ``# Find all features`` ``# NOTE: see the reference manual for many more options`` ``fList`` ``<-`` `[`findFeatures`](https://rickhelmus.github.io/patRoon/reference/findFeatures.md)`(``anaInfo``, ``"openms"``, noiseThrInt ``=`` ``1000``, chromSNR ``=`` ``3``, chromFWHM ``=`` ``5``, minFWHM ``=`` ``1``, maxFWHM ``=`` ``30``)`` `` ``# Group and align features between analyses`` ``fGroups`` ``<-`` `[`groupFeatures`](https://rickhelmus.github.io/patRoon/reference/groupFeatures.md)`(``fList``, ``"openms"``, rtalign ``=`` ``TRUE``)`` `` ``# Basic rule based filtering`` ``fGroups`` ``<-`` `[`filter`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``fGroups``, preAbsMinIntensity ``=`` ``100``, absMinIntensity ``=`` ``10000``, relMinReplicateAbundance ``=`` ``1``,`` `` maxReplicateIntRSD ``=`` ``0.75``, blankThreshold ``=`` ``5``, removeBlanks ``=`` ``TRUE``, retentionRange ``=`` ``NULL``,`` `` mzRange ``=`` ``NULL``)`` `` ``# Update group properties`` ``fGroups`` ``<-`` `[`updateGroups`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)`(``fGroups``, what ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"ret"``, ``"mz"``, ``"mobility"``)``, intWeight ``=`` ``FALSE``)`` `` ``# -------------------------`` ``# annotation`` ``# -------------------------`` `` ``# Retrieve MS peak lists`` ``avgMSListParams`` ``<-`` `[`getDefAvgPListParams`](https://rickhelmus.github.io/patRoon/reference/getDefAvgPListParams.md)`(``clusterMzWindow ``=`` ``0.005``)`` ``mslists`` ``<-`` `[`generateMSPeakLists`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakLists.md)`(``fGroups``, avgFeatParams ``=`` ``avgMSListParams``, avgFGroupParams ``=`` ``avgMSListParams``)`` ``# Rule based filtering of MS peak lists. You may want to tweak this. See the manual for more information.`` ``mslists`` ``<-`` `[`filter`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``mslists``, MSLevel ``=`` ``2``, absMinIntensity ``=`` ``NULL``, relMinIntensity ``=`` ``0.05``, topMostPeaks ``=`` ``25``,`` `` maxMZOverPrec ``=`` ``4``)`` `` ``# Calculate formula candidates`` ``formulas`` ``<-`` `[`generateFormulas`](https://rickhelmus.github.io/patRoon/reference/generateFormulas.md)`(``fGroups``, ``mslists``, ``"genform"``, adduct ``=`` ``"[M+H]+"``, elements ``=`` ``"CHNOP"``, oc ``=`` ``FALSE``,`` `` calculateFeatures ``=`` ``FALSE``)`` ``formulas`` ``<-`` `[`estimateIDConfidence`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)`(``formulas``, IDFile ``=`` ``"idlevelrules.yml"``)`` `` ``# Calculate compound structure candidates`` ``compounds`` ``<-`` `[`generateCompounds`](https://rickhelmus.github.io/patRoon/reference/generateCompounds.md)`(``fGroups``, ``mslists``, ``"metfrag"``, adduct ``=`` ``"[M+H]+"``, database ``=`` ``"pubchemlite"``,`` `` maxCandidatesToStop ``=`` ``2500``)`` ``compounds`` ``<-`` `[`addFormulaScoring`](https://rickhelmus.github.io/patRoon/reference/compounds-class.md)`(``compounds``, ``formulas``, updateScore ``=`` ``TRUE``)`` `` ``compounds`` ``<-`` `[`estimateIDConfidence`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)`(``compounds``, MSPeakLists ``=`` ``mslists``, formulas ``=`` ``formulas``, IDFile ``=`` ``"idlevelrules.yml"``)`` `` ``# -------------------------`` ``# reporting`` ``# -------------------------`` `` ``# Advanced report settings can be edited in the report.yml file.`` `[`report`](https://rickhelmus.github.io/patRoon/reference/reporting.md)`(``fGroups``, MSPeakLists ``=`` ``mslists``, formulas ``=`` ``formulas``, compounds ``=`` ``compounds``, components ``=`` ``NULL``,`` `` settingsFile ``=`` ``"report.yml"``, openReport ``=`` ``TRUE``)`
+\
+`# Script automatically generated on Tue Feb 17 08:05:32 2026`\
+\
+[`library`](https://rdrr.io/r/base/library.html)`(`[`patRoon`](https://github.com/rickhelmus/patRoon)`)`\
+\
+`# -------------------------`\
+`# initialization`\
+`# -------------------------`\
+\
+`workPath`` ``<-`` ``"C:/myproject"`\
+[`setwd`](https://rdrr.io/r/base/getwd.html)`(``workPath``)`\
+\
+`# Example data from patRoonData package (triplicate solvent blank + triplicate standard)`\
+`anaInfo`` ``<-`` ``patRoonData``::`[`exampleAnalysisInfo`](https://rdrr.io/pkg/patRoonData/man/patRoonData.html)`(``"positive"``)`\
+\
+`# -------------------------`\
+`# features`\
+`# -------------------------`\
+\
+`# Find all features`\
+`# NOTE: see the reference manual for many more options`\
+`fList`` ``<-`` `[`findFeatures`](https://rickhelmus.github.io/patRoon/reference/findFeatures.md)`(``anaInfo``, ``"openms"``, noiseThrInt ``=`` ``1000``, chromSNR ``=`` ``3``, chromFWHM ``=`` ``5``, minFWHM ``=`` ``1``, maxFWHM ``=`` ``30``)`\
+\
+`# Group and align features between analyses`\
+`fGroups`` ``<-`` `[`groupFeatures`](https://rickhelmus.github.io/patRoon/reference/groupFeatures.md)`(``fList``, ``"openms"``, rtalign ``=`` ``TRUE``)`\
+\
+`# Basic rule based filtering`\
+`fGroups`` ``<-`` `[`filter`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``fGroups``, preAbsMinIntensity ``=`` ``100``, absMinIntensity ``=`` ``10000``, relMinReplicateAbundance ``=`` ``1``,`\
+`                  maxReplicateIntRSD ``=`` ``0.75``, blankThreshold ``=`` ``5``, removeBlanks ``=`` ``TRUE``, retentionRange ``=`` ``NULL``,`\
+`                  mzRange ``=`` ``NULL``)`\
+\
+`# Update group properties`\
+`fGroups`` ``<-`` `[`updateGroups`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)`(``fGroups``, what ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"ret"``, ``"mz"``, ``"mobility"``)``, intWeight ``=`` ``FALSE``)`\
+\
+`# -------------------------`\
+`# annotation`\
+`# -------------------------`\
+\
+`# Retrieve MS peak lists`\
+`avgMSListParams`` ``<-`` `[`getDefAvgPListParams`](https://rickhelmus.github.io/patRoon/reference/getDefAvgPListParams.md)`(``clusterMzWindow ``=`` ``0.005``)`\
+`mslists`` ``<-`` `[`generateMSPeakLists`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakLists.md)`(``fGroups``, avgFeatParams ``=`` ``avgMSListParams``, avgFGroupParams ``=`` ``avgMSListParams``)`\
+`# Rule based filtering of MS peak lists. You may want to tweak this. See the manual for more information.`\
+`mslists`` ``<-`` `[`filter`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``mslists``, MSLevel ``=`` ``2``, absMinIntensity ``=`` ``NULL``, relMinIntensity ``=`` ``0.05``, topMostPeaks ``=`` ``25``,`\
+`                  maxMZOverPrec ``=`` ``4``)`\
+\
+`# Calculate formula candidates`\
+`formulas`` ``<-`` `[`generateFormulas`](https://rickhelmus.github.io/patRoon/reference/generateFormulas.md)`(``fGroups``, ``mslists``, ``"genform"``, adduct ``=`` ``"[M+H]+"``, elements ``=`` ``"CHNOP"``, oc ``=`` ``FALSE``,`\
+`                             calculateFeatures ``=`` ``FALSE``)`\
+`formulas`` ``<-`` `[`estimateIDConfidence`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)`(``formulas``, IDFile ``=`` ``"idlevelrules.yml"``)`\
+\
+`# Calculate compound structure candidates`\
+`compounds`` ``<-`` `[`generateCompounds`](https://rickhelmus.github.io/patRoon/reference/generateCompounds.md)`(``fGroups``, ``mslists``, ``"metfrag"``, adduct ``=`` ``"[M+H]+"``, database ``=`` ``"pubchemlite"``,`\
+`                               maxCandidatesToStop ``=`` ``2500``)`\
+`compounds`` ``<-`` `[`addFormulaScoring`](https://rickhelmus.github.io/patRoon/reference/compounds-class.md)`(``compounds``, ``formulas``, updateScore ``=`` ``TRUE``)`\
+\
+`compounds`` ``<-`` `[`estimateIDConfidence`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)`(``compounds``, MSPeakLists ``=`` ``mslists``, formulas ``=`` ``formulas``, IDFile ``=`` ``"idlevelrules.yml"``)`\
+\
+`# -------------------------`\
+`# reporting`\
+`# -------------------------`\
+\
+`# Advanced report settings can be edited in the report.yml file.`\
+[`report`](https://rickhelmus.github.io/patRoon/reference/reporting.md)`(``fGroups``, MSPeakLists ``=`` ``mslists``, formulas ``=`` ``formulas``, compounds ``=`` ``compounds``, components ``=`` ``NULL``,`\
+`       settingsFile ``=`` ``"report.yml"``, openReport ``=`` ``TRUE``)`
 
 ## Workflow
 
@@ -132,12 +199,20 @@ The first part of the script loads `patRoon`, makes sure the current
 working directory is set correctly and loads information about the
 analyses. This part in your script looks more or less like this:
 
-[`library`](https://rdrr.io/r/base/library.html)`(`[`patRoon`](https://github.com/rickhelmus/patRoon)`)`` `` ``workPath`` ``<-`` ``"C:/my_project"`` `[`setwd`](https://rdrr.io/r/base/getwd.html)`(``workPath``)`` `` ``# Example data from patRoonData package (triplicate solvent blank + triplicate standard)`` ``anaInfo`` ``<-`` ``patRoonData``::`[`exampleAnalysisInfo`](https://rdrr.io/pkg/patRoonData/man/patRoonData.html)`(``"positive"``)`
+\
+[`library`](https://rdrr.io/r/base/library.html)`(`[`patRoon`](https://github.com/rickhelmus/patRoon)`)`\
+\
+`workPath`` ``<-`` ``"C:/my_project"`\
+[`setwd`](https://rdrr.io/r/base/getwd.html)`(``workPath``)`\
+\
+`# Example data from patRoonData package (triplicate solvent blank + triplicate standard)`\
+`anaInfo`` ``<-`` ``patRoonData``::`[`exampleAnalysisInfo`](https://rdrr.io/pkg/patRoonData/man/patRoonData.html)`(``"positive"``)`
 
 After you ran this part the analysis information should be stored in the
 `anaInfo` variable. This information is important as it will be required
 for subsequent steps in the workflow. Lets peek at its contents:
 
+\
 `anaInfo`
 
     #>         analysis                                         path_centroid path_raw path_profile path_ims    replicate       blank
@@ -175,7 +250,9 @@ automatically fills in the `path` and `analysis` columns from this
 information. In addition, you can pass replicate and blank information
 to this function. Example:
 
-[`generateAnalysisInfo`](https://rickhelmus.github.io/patRoon/reference/analysis-information.md)`(``fromCentroid ``=`` ``patRoonData``::`[`exampleDataPath`](https://rdrr.io/pkg/patRoonData/man/patRoonData.html)`(``)``, replicate ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(`[`rep`](https://rdrr.io/r/base/rep.html)`(``"solvent-pos"``, ``3``)``, `[`rep`](https://rdrr.io/r/base/rep.html)`(``"standard-pos"``, ``3``)``)``,`` `` blank ``=`` ``"solvent"``)`
+\
+[`generateAnalysisInfo`](https://rickhelmus.github.io/patRoon/reference/analysis-information.md)`(``fromCentroid ``=`` ``patRoonData``::`[`exampleDataPath`](https://rdrr.io/pkg/patRoonData/man/patRoonData.html)`(``)``, replicate ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(`[`rep`](https://rdrr.io/r/base/rep.html)`(``"solvent-pos"``, ``3``)``, `[`rep`](https://rdrr.io/r/base/rep.html)`(``"standard-pos"``, ``3``)``)``,`\
+`                     blank ``=`` ``"solvent"``)`
 
     #>         analysis                                         path_centroid path_raw path_profile path_ims    replicate   blank
     #> 1  solvent-pos-1 /usr/local/lib/R/site-library/patRoonData/extdata/pos                                 solvent-pos solvent
@@ -217,7 +294,8 @@ hence, it is important to evaluate results afterwards.
 In this tutorial we will use the [OpenMS](http://openms.de/) software to
 find features and stick with default parameters:
 
-`fList`` ``<-`` `[`findFeatures`](https://rickhelmus.github.io/patRoon/reference/findFeatures.md)`(``anaInfo``, ``"openms"``, noiseThrInt ``=`` ``1000``, chromSNR ``=`` ``3``, chromFWHM ``=`` ``5``, minFWHM ``=`` ``1``, maxFWHM ``=`` ``30``)`
+\
+`fList`` ``<-`` `[`findFeatures`](https://rickhelmus.github.io/patRoon/reference/findFeatures.md)`(``anaInfo``, ``"openms"``, noiseThrInt ``=`` ``1000``, chromSNR ``=`` ``3``, chromFWHM ``=`` ``5``, minFWHM ``=`` ``1``, maxFWHM ``=`` ``30``)`
 
     #> Finding features with OpenMS for 6 analyses ...
     #> ================================================================================
@@ -247,7 +325,8 @@ To group features the
 [`groupFeatures()`](https://rickhelmus.github.io/patRoon/reference/groupFeatures.md)
 function is used:
 
-`fGroups`` ``<-`` `[`groupFeatures`](https://rickhelmus.github.io/patRoon/reference/groupFeatures.md)`(``fList``, ``"openms"``, rtalign ``=`` ``TRUE``)`
+\
+`fGroups`` ``<-`` `[`groupFeatures`](https://rickhelmus.github.io/patRoon/reference/groupFeatures.md)`(``fList``, ``"openms"``, rtalign ``=`` ``TRUE``)`
 
     #> Grouping features with OpenMS...
     #> ===========
@@ -275,7 +354,11 @@ in the previous section (stored in the the `fGroups` variable). Note
 that in this tutorial the `absMinIntensity` was increased to `1E5` to
 simplify the results.
 
-`fGroups`` ``<-`` `[`filter`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``fGroups``, preAbsMinIntensity ``=`` ``100``, absMinIntensity ``=`` ``1E5``,`` `` relMinReplicateAbundance ``=`` ``1``, maxReplicateIntRSD ``=`` ``0.75``,`` `` blankThreshold ``=`` ``5``, removeBlanks ``=`` ``TRUE``,`` `` retentionRange ``=`` ``NULL``, mzRange ``=`` ``NULL``)`
+\
+`fGroups`` ``<-`` `[`filter`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``fGroups``, preAbsMinIntensity ``=`` ``100``, absMinIntensity ``=`` ``1E5``,`\
+`                  relMinReplicateAbundance ``=`` ``1``, maxReplicateIntRSD ``=`` ``0.75``,`\
+`                  blankThreshold ``=`` ``5``, removeBlanks ``=`` ``TRUE``,`\
+`                  retentionRange ``=`` ``NULL``, mzRange ``=`` ``NULL``)`
 
     #> Applying intensity filter... Done! Filtered 0 (0.00%) features and 0 (0.00%) feature groups. Remaining: 24380 features in 7302 groups.
     #> Applying replicate abundance filter... Done! Filtered 8006 (32.84%) features and 3849 (52.71%) feature groups. Remaining: 16374 features in 3453 groups.
@@ -328,18 +411,21 @@ function is called to update the feature group properties (retention
 time and m/z). This can improve their accuracy, since e.g. false
 positives don’t attribute to the group properties anymore.
 
-`fGroups`` ``<-`` `[`updateGroups`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)`(``fGroups``, what ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"ret"``, ``"mz"``, ``"mobility"``)``, intWeight ``=`` ``FALSE``)`
+\
+`fGroups`` ``<-`` `[`updateGroups`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)`(``fGroups``, what ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"ret"``, ``"mz"``, ``"mobility"``)``, intWeight ``=`` ``FALSE``)`
 
 To simplify processing, we only continue with the first 25 feature
 groups:
 
-`fGroups`` ``<-`` ``fGroups``[``, ``1``:``25``]`
+\
+`fGroups`` ``<-`` ``fGroups``[``, ``1``:``25``]`
 
 ### Inspecting results
 
 In order to have a quick peek at the results we can use the default
 printing method:
 
+\
 `fGroups`
 
     #> A featureGroupsOpenMS object
@@ -365,6 +451,7 @@ Furthermore, the
 function can be used to have a look at generated feature groups and
 their intensities (*i.e.* peak heights) across all analyses:
 
+\
 [`as.data.table`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``fGroups``)`
 
     #>              group       ret       mz standard-pos-1_intensity standard-pos-2_intensity standard-pos-3_intensity
@@ -385,6 +472,7 @@ An overview of group properties is returned by the
 [`groupInfo()`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)
 method:
 
+\
 [`head`](https://rdrr.io/r/utils/head.html)`(`[`groupInfo`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)`(``fGroups``)``)`
 
     #>            group       ret       mz
@@ -399,7 +487,9 @@ method:
 Finally, we can have a quick look at our data by plotting some nice
 extracted ion chromatograms (EICs) for all feature groups:
 
-[`plotChroms`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``fGroups``, groupBy ``=`` ``"fGroups"``, showFGroupRect ``=`` ``FALSE``, showPeakArea ``=`` ``TRUE``,`` `` EICParams ``=`` `[`getDefEICParams`](https://rickhelmus.github.io/patRoon/reference/EIXParams.md)`(``topMost ``=`` ``1``)``, showLegend ``=`` ``FALSE``)`
+\
+[`plotChroms`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``fGroups``, groupBy ``=`` ``"fGroups"``, showFGroupRect ``=`` ``FALSE``, showPeakArea ``=`` ``TRUE``,`\
+`           EICParams ``=`` `[`getDefEICParams`](https://rickhelmus.github.io/patRoon/reference/EIXParams.md)`(``topMost ``=`` ``1``)``, showLegend ``=`` ``FALSE``)`
 
     #> Using 'mzr' backend for reading MS data.
     #> ================================================================================
@@ -428,7 +518,9 @@ function will perform this action for us and will generate so called *MS
 peak lists* in the process. These lists are basically (averaged) spectra
 in a tabular form.
 
-`avgPListParams`` ``<-`` `[`getDefAvgPListParams`](https://rickhelmus.github.io/patRoon/reference/getDefAvgPListParams.md)`(``clusterMzWindow ``=`` ``0.002``)`` ``mslists`` ``<-`` `[`generateMSPeakLists`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakLists.md)`(``fGroups``, avgFeatParams ``=`` ``avgPListParams``, avgFGroupParams ``=`` ``avgPListParams``)`
+\
+`avgPListParams`` ``<-`` `[`getDefAvgPListParams`](https://rickhelmus.github.io/patRoon/reference/getDefAvgPListParams.md)`(``clusterMzWindow ``=`` ``0.002``)`\
+`mslists`` ``<-`` `[`generateMSPeakLists`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakLists.md)`(``fGroups``, avgFeatParams ``=`` ``avgPListParams``, avgFGroupParams ``=`` ``avgPListParams``)`
 
     #> Loading all MS peak lists for 25 feature groups and 3 analyses...
     #> Using 'mzr' backend for reading MS data.
@@ -444,7 +536,9 @@ Similar to feature groups the
 [`filter()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
 generic function can be used to clean up the peak lists afterwards:
 
-`mslists`` ``<-`` `[`filter`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``mslists``, MSLevel ``=`` ``2``, absMinIntensity ``=`` ``NULL``, relMinIntensity ``=`` ``0.02``, topMostPeaks ``=`` ``10``,`` `` maxMZOverPrec ``=`` ``4``)`
+\
+`mslists`` ``<-`` `[`filter`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``mslists``, MSLevel ``=`` ``2``, absMinIntensity ``=`` ``NULL``, relMinIntensity ``=`` ``0.02``, topMostPeaks ``=`` ``10``,`\
+`                  maxMZOverPrec ``=`` ``4``)`
 
     #> Done! Filtered 1332 (15.42%) MS peaks. Remaining: 7307
 
@@ -468,7 +562,9 @@ step. The code below will use
 [GenForm](https://sourceforge.net/projects/genform/) to perform this
 step. Again running this code may take some time.
 
-`formulas`` ``<-`` `[`generateFormulas`](https://rickhelmus.github.io/patRoon/reference/generateFormulas.md)`(``fGroups``, ``mslists``, ``"genform"``, adduct ``=`` ``"[M+H]+"``, elements ``=`` ``"CHNOPSCl"``,`` `` oc ``=`` ``FALSE``, calculateFeatures ``=`` ``FALSE``)`
+\
+`formulas`` ``<-`` `[`generateFormulas`](https://rickhelmus.github.io/patRoon/reference/generateFormulas.md)`(``fGroups``, ``mslists``, ``"genform"``, adduct ``=`` ``"[M+H]+"``, elements ``=`` ``"CHNOPSCl"``,`\
+`                             oc ``=`` ``FALSE``, calculateFeatures ``=`` ``FALSE``)`
 
     #> Loading all formulas...
     #> Converting to algorithm specific adducts... Done!
@@ -476,7 +572,8 @@ step. Again running this code may take some time.
     #> Loaded 36 formulas for 23 feature groups (92.00%).
     #> Calculating annotation similarities... Done!
 
-`formulas`` ``<-`` `[`estimateIDConfidence`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)`(``formulas``, IDFile ``=`` ``"idlevelrules.yml"``)`
+\
+`formulas`` ``<-`` `[`estimateIDConfidence`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)`(``formulas``, IDFile ``=`` ``"idlevelrules.yml"``)`
 
     #> Estimating identification levels for 23 feature groups with a total of 36 candidates...
 
@@ -511,7 +608,9 @@ Then
 [`generateCompounds()`](https://rickhelmus.github.io/patRoon/reference/generateCompounds.md)
 is used to execute MetFrag and generate the `compounds`.
 
-`compounds`` ``<-`` `[`generateCompounds`](https://rickhelmus.github.io/patRoon/reference/generateCompounds.md)`(``fGroups``, ``mslists``, ``"metfrag"``, adduct ``=`` ``"[M+H]+"``, database ``=`` ``"pubchemlite"``,`` `` maxCandidatesToStop ``=`` ``2500``)`
+\
+`compounds`` ``<-`` `[`generateCompounds`](https://rickhelmus.github.io/patRoon/reference/generateCompounds.md)`(``fGroups``, ``mslists``, ``"metfrag"``, adduct ``=`` ``"[M+H]+"``, database ``=`` ``"pubchemlite"``,`\
+`                               maxCandidatesToStop ``=`` ``2500``)`
 
     #> Identifying 25 feature groups with MetFrag...
     #> Converting to algorithm specific adducts... Done!
@@ -534,12 +633,14 @@ calculation data from the previous step, and use
 again to estimate identification confidence levels for each of the
 candidates.
 
-`compounds`` ``<-`` `[`addFormulaScoring`](https://rickhelmus.github.io/patRoon/reference/compounds-class.md)`(``compounds``, ``formulas``, updateScore ``=`` ``TRUE``)`
+\
+`compounds`` ``<-`` `[`addFormulaScoring`](https://rickhelmus.github.io/patRoon/reference/compounds-class.md)`(``compounds``, ``formulas``, updateScore ``=`` ``TRUE``)`
 
     #> Adding formula scoring...
     #> ================================================================================
 
-`compounds`` ``<-`` `[`estimateIDConfidence`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)`(``compounds``, MSPeakLists ``=`` ``mslists``, formulas ``=`` ``formulas``, IDFile ``=`` ``"idlevelrules.yml"``)`
+\
+`compounds`` ``<-`` `[`estimateIDConfidence`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)`(``compounds``, MSPeakLists ``=`` ``mslists``, formulas ``=`` ``formulas``, IDFile ``=`` ``"idlevelrules.yml"``)`
 
     #> Estimating identification levels for 19 feature groups with a total of 936 candidates...
     #> ================================================================================
@@ -548,6 +649,7 @@ candidates.
 
 Similar as feature groups we can quickly peek at some results:
 
+\
 `mslists`
 
     #> A MSPeakLists object
@@ -564,6 +666,7 @@ Similar as feature groups we can quickly peek at some results:
     #> Total peak lists: 128 (MS: 75 - MS/MS: 53)
     #> Average peak lists/analysis: 43 (MS: 25 - MS/MS: 18)
 
+\
 `formulas`
 
     #> A formulas object
@@ -586,6 +689,7 @@ Similar as feature groups we can quickly peek at some results:
     #>   - Total formula count: 36
     #>   - Average formulas per feature group: 1.6
 
+\
 `compounds`
 
     #> A compoundsMF object
@@ -598,6 +702,7 @@ Similar as feature groups we can quickly peek at some results:
     #> Number of feature groups with compounds in this object: 19
     #> Number of compounds: 936 (total), 49.3 (mean), 1 - 100 (min - max)
 
+\
 [`as.data.table`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``mslists``)`
 
     #>                group   type    ID        mz intensity fgroup_abundance_rel fgroup_abundance_abs feat_abundance_rel feat_abundance_abs precursor
@@ -614,7 +719,8 @@ Similar as feature groups we can quickly peek at some results:
     #> 1514: M186_R293_1568   MSMS    47 186.22173 277026.44                    1                    3          1.0000000           4.666667      TRUE
     #> 1515: M186_R293_1568   MSMS    48 187.22490  42499.82                    1                    3          1.0000000           4.666667     FALSE
 
-[`as.data.table`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``formulas``)``[``, ``1``:``7``]`` ``# only show first columns for clarity`
+\
+[`as.data.table`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``formulas``)``[``, ``1``:``7``]`` ``# only show first columns for clarity`
 
     #>              group neutral_formula ion_formula neutralMass ion_formula_mz error   dbe
     #>             <char>          <char>      <char>       <num>          <num> <num> <num>
@@ -630,7 +736,8 @@ Similar as feature groups we can quickly peek at some results:
     #> 35: M183_R313_1489        CH10N8OS    CH11N8OS    182.0698       183.0771  -4.2     1
     #> 36: M186_R293_1568         C12H27N     C12H28N    185.2143       186.2216   1.3     0
 
-[`as.data.table`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``compounds``)``[``, ``1``:``5``]`` ``# only show first columns for clarity`
+\
+[`as.data.table`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``compounds``)``[``, ``1``:``5``]`` ``# only show first columns for clarity`
 
     #>               group explainedPeaks    score neutralMass                SMILES
     #>              <char>          <int>    <num>       <num>                <char>
@@ -646,15 +753,18 @@ Similar as feature groups we can quickly peek at some results:
     #> 935: M186_R293_1568              3 2.043274    185.2143 CC(C)CC(C)NC(C)CC(C)C
     #> 936: M186_R293_1568              3 2.042262    185.2143   CCCC(CCC)(CCC)N(C)C
 
-[`plotSpectrum`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``mslists``, ``"M186_R293_1568"``, MSLevel ``=`` ``2``)`
+\
+[`plotSpectrum`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``mslists``, ``"M186_R293_1568"``, MSLevel ``=`` ``2``)`
 
 ![](tutorial_files/figure-html/plotSpectrum-1.png)
 
-[`plotSpectrum`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``formulas``, ``1``, ``"M109_R192_157"``, MSPeakLists ``=`` ``mslists``)`
+\
+[`plotSpectrum`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``formulas``, ``1``, ``"M109_R192_157"``, MSPeakLists ``=`` ``mslists``)`
 
 ![](tutorial_files/figure-html/plotSpectrum-2.png)
 
-[`plotSpectrum`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``compounds``, ``1``, ``"M120_R268_288"``, ``mslists``, plotStruct ``=`` ``TRUE``)`
+\
+[`plotSpectrum`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``compounds``, ``1``, ``"M120_R268_288"``, ``mslists``, plotStruct ``=`` ``TRUE``)`
 
 ![](tutorial_files/figure-html/plotSpectrum-3.png)
 
@@ -665,14 +775,17 @@ The last step of the workflow is typically to report all the data. The
 function combines all workflow data in an easy to use interactive `HTML`
 document.
 
-[`report`](https://rickhelmus.github.io/patRoon/reference/reporting.md)`(``fGroups``, MSPeakLists ``=`` ``mslists``, formulas ``=`` ``formulas``, compounds ``=`` ``compounds``,`` `` components ``=`` ``NULL``, settingsFile ``=`` ``"report.yml"``, openReport ``=`` ``TRUE``)`
+\
+[`report`](https://rickhelmus.github.io/patRoon/reference/reporting.md)`(``fGroups``, MSPeakLists ``=`` ``mslists``, formulas ``=`` ``formulas``, compounds ``=`` ``compounds``,`\
+`       components ``=`` ``NULL``, settingsFile ``=`` ``"report.yml"``, openReport ``=`` ``TRUE``)`
 
 > ***NOTE*** If you did *not* use
 > [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md)
 > and created the project manually then you *first* need to generate a
 > new report settings file:
 
-[`genReportSettingsFile`](https://rickhelmus.github.io/patRoon/reference/reporting.md)`(``)`` ``# only run this if the project was created manually without newProject() `
+\
+[`genReportSettingsFile`](https://rickhelmus.github.io/patRoon/reference/reporting.md)`(``)`` ``# only run this if the project was created manually without  newProject() `
 
 The output of
 [`report()`](https://rickhelmus.github.io/patRoon/reference/reporting.md)
@@ -685,7 +798,12 @@ optimization or exploring the various algorithms and their parameters.
 In this case you can simply cherry pick the data that you want to
 report, for instance:
 
-`# only report feature groups (i.e. the bare minimum)`` `[`report`](https://rickhelmus.github.io/patRoon/reference/reporting.md)`(``fGroups``)`` `` ``# report formulas. Note that MSPeakLists (mslists variable) are required for formula/compound reporting`` `[`report`](https://rickhelmus.github.io/patRoon/reference/reporting.md)`(``fGroups``, MSPeakLists ``=`` ``mslists``, formulas ``=`` ``formulas``)`
+\
+`# only report feature groups (i.e. the bare minimum)`\
+[`report`](https://rickhelmus.github.io/patRoon/reference/reporting.md)`(``fGroups``)`\
+\
+`# report formulas. Note that MSPeakLists (mslists variable) are required for formula/compound reporting`\
+[`report`](https://rickhelmus.github.io/patRoon/reference/reporting.md)`(``fGroups``, MSPeakLists ``=`` ``mslists``, formulas ``=`` ``formulas``)`
 
 ## Final script
 
@@ -693,4 +811,67 @@ In the previous sections the different parts of the processing script
 were discussed and where necessary modified. As a reference, the final
 script look similar ot this:
 
-`# Script automatically generated on Tue Feb 17 08:05:32 2026`` `` `[`library`](https://rdrr.io/r/base/library.html)`(`[`patRoon`](https://github.com/rickhelmus/patRoon)`)`` `` ``# -------------------------`` ``# initialization`` ``# -------------------------`` `` ``workPath`` ``<-`` ``"C:/myproject"`` `[`setwd`](https://rdrr.io/r/base/getwd.html)`(``workPath``)`` `` ``# Example data from patRoonData package (triplicate solvent blank + triplicate standard)`` ``anaInfo`` ``<-`` ``patRoonData``::`[`exampleAnalysisInfo`](https://rdrr.io/pkg/patRoonData/man/patRoonData.html)`(``"positive"``)`` `` ``# -------------------------`` ``# features`` ``# -------------------------`` `` ``# Find all features`` ``# NOTE: see the reference manual for many more options`` ``fList`` ``<-`` `[`findFeatures`](https://rickhelmus.github.io/patRoon/reference/findFeatures.md)`(``anaInfo``, ``"openms"``, noiseThrInt ``=`` ``1000``, chromSNR ``=`` ``3``, chromFWHM ``=`` ``5``, minFWHM ``=`` ``1``, maxFWHM ``=`` ``30``)`` `` ``# Group and align features between analyses`` ``fGroups`` ``<-`` `[`groupFeatures`](https://rickhelmus.github.io/patRoon/reference/groupFeatures.md)`(``fList``, ``"openms"``, rtalign ``=`` ``TRUE``)`` `` ``# Basic rule based filtering`` ``fGroups`` ``<-`` `[`filter`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``fGroups``, preAbsMinIntensity ``=`` ``100``, absMinIntensity ``=`` ``1E5``, relMinReplicateAbundance ``=`` ``1``,`` `` maxReplicateIntRSD ``=`` ``0.75``, blankThreshold ``=`` ``5``, removeBlanks ``=`` ``TRUE``, retentionRange ``=`` ``NULL``,`` `` mzRange ``=`` ``NULL``)`` `` ``# Update group properties`` ``fGroups`` ``<-`` `[`updateGroups`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)`(``fGroups``, what ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"ret"``, ``"mz"``, ``"mobility"``)``, intWeight ``=`` ``FALSE``)`` `` ``# -------------------------`` ``# annotation`` ``# -------------------------`` `` ``# Retrieve MS peak lists`` ``avgMSListParams`` ``<-`` `[`getDefAvgPListParams`](https://rickhelmus.github.io/patRoon/reference/getDefAvgPListParams.md)`(``clusterMzWindow ``=`` ``0.002``)`` ``mslists`` ``<-`` `[`generateMSPeakLists`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakLists.md)`(``fGroups``, avgFeatParams ``=`` ``avgMSListParams``, avgFGroupParams ``=`` ``avgMSListParams``)`` ``# Rule based filtering of MS peak lists. You may want to tweak this. See the manual for more information.`` ``mslists`` ``<-`` `[`filter`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``mslists``, MSLevel ``=`` ``2``, absMinIntensity ``=`` ``NULL``, relMinIntensity ``=`` ``0.02``, topMostPeaks ``=`` ``10``,`` `` maxMZOverPrec ``=`` ``4``)`` `` ``# Calculate formula candidates`` ``formulas`` ``<-`` `[`generateFormulas`](https://rickhelmus.github.io/patRoon/reference/generateFormulas.md)`(``fGroups``, ``mslists``, ``"genform"``, adduct ``=`` ``"[M+H]+"``, elements ``=`` ``"CHNOPSCl"``, oc ``=`` ``FALSE``,`` `` calculateFeatures ``=`` ``FALSE``)`` ``formulas`` ``<-`` `[`estimateIDConfidence`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)`(``formulas``, IDFile ``=`` ``"idlevelrules.yml"``)`` `` ``# Calculate compound structure candidates`` ``compounds`` ``<-`` `[`generateCompounds`](https://rickhelmus.github.io/patRoon/reference/generateCompounds.md)`(``fGroups``, ``mslists``, ``"metfrag"``, adduct ``=`` ``"[M+H]+"``, database ``=`` ``"pubchemlite"``,`` `` maxCandidatesToStop ``=`` ``2500``)`` ``compounds`` ``<-`` `[`addFormulaScoring`](https://rickhelmus.github.io/patRoon/reference/compounds-class.md)`(``compounds``, ``formulas``, updateScore ``=`` ``TRUE``)`` `` ``compounds`` ``<-`` `[`estimateIDConfidence`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)`(``compounds``, MSPeakLists ``=`` ``mslists``, formulas ``=`` ``formulas``, IDFile ``=`` ``"idlevelrules.yml"``)`` `` ``# -------------------------`` ``# reporting`` ``# -------------------------`` `` ``# Advanced report settings can be edited in the report.yml file.`` `[`report`](https://rickhelmus.github.io/patRoon/reference/reporting.md)`(``fGroups``, MSPeakLists ``=`` ``mslists``, formulas ``=`` ``formulas``, compounds ``=`` ``compounds``, components ``=`` ``NULL``,`` `` settingsFile ``=`` ``"report.yml"``, openReport ``=`` ``TRUE``)`
+\
+`# Script automatically generated on Tue Feb 17 08:05:32 2026`\
+\
+[`library`](https://rdrr.io/r/base/library.html)`(`[`patRoon`](https://github.com/rickhelmus/patRoon)`)`\
+\
+`# -------------------------`\
+`# initialization`\
+`# -------------------------`\
+\
+`workPath`` ``<-`` ``"C:/myproject"`\
+[`setwd`](https://rdrr.io/r/base/getwd.html)`(``workPath``)`\
+\
+`# Example data from patRoonData package (triplicate solvent blank + triplicate standard)`\
+`anaInfo`` ``<-`` ``patRoonData``::`[`exampleAnalysisInfo`](https://rdrr.io/pkg/patRoonData/man/patRoonData.html)`(``"positive"``)`\
+\
+`# -------------------------`\
+`# features`\
+`# -------------------------`\
+\
+`# Find all features`\
+`# NOTE: see the reference manual for many more options`\
+`fList`` ``<-`` `[`findFeatures`](https://rickhelmus.github.io/patRoon/reference/findFeatures.md)`(``anaInfo``, ``"openms"``, noiseThrInt ``=`` ``1000``, chromSNR ``=`` ``3``, chromFWHM ``=`` ``5``, minFWHM ``=`` ``1``, maxFWHM ``=`` ``30``)`\
+\
+`# Group and align features between analyses`\
+`fGroups`` ``<-`` `[`groupFeatures`](https://rickhelmus.github.io/patRoon/reference/groupFeatures.md)`(``fList``, ``"openms"``, rtalign ``=`` ``TRUE``)`\
+\
+`# Basic rule based filtering`\
+`fGroups`` ``<-`` `[`filter`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``fGroups``, preAbsMinIntensity ``=`` ``100``, absMinIntensity ``=`` ``1E5``, relMinReplicateAbundance ``=`` ``1``,`\
+`                  maxReplicateIntRSD ``=`` ``0.75``, blankThreshold ``=`` ``5``, removeBlanks ``=`` ``TRUE``, retentionRange ``=`` ``NULL``,`\
+`                  mzRange ``=`` ``NULL``)`\
+\
+`# Update group properties`\
+`fGroups`` ``<-`` `[`updateGroups`](https://rickhelmus.github.io/patRoon/reference/featureGroups-class.md)`(``fGroups``, what ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"ret"``, ``"mz"``, ``"mobility"``)``, intWeight ``=`` ``FALSE``)`\
+\
+`# -------------------------`\
+`# annotation`\
+`# -------------------------`\
+\
+`# Retrieve MS peak lists`\
+`avgMSListParams`` ``<-`` `[`getDefAvgPListParams`](https://rickhelmus.github.io/patRoon/reference/getDefAvgPListParams.md)`(``clusterMzWindow ``=`` ``0.002``)`\
+`mslists`` ``<-`` `[`generateMSPeakLists`](https://rickhelmus.github.io/patRoon/reference/generateMSPeakLists.md)`(``fGroups``, avgFeatParams ``=`` ``avgMSListParams``, avgFGroupParams ``=`` ``avgMSListParams``)`\
+`# Rule based filtering of MS peak lists. You may want to tweak this. See the manual for more information.`\
+`mslists`` ``<-`` `[`filter`](https://rickhelmus.github.io/patRoon/reference/generics.md)`(``mslists``, MSLevel ``=`` ``2``, absMinIntensity ``=`` ``NULL``, relMinIntensity ``=`` ``0.02``, topMostPeaks ``=`` ``10``,`\
+`                  maxMZOverPrec ``=`` ``4``)`\
+\
+`# Calculate formula candidates`\
+`formulas`` ``<-`` `[`generateFormulas`](https://rickhelmus.github.io/patRoon/reference/generateFormulas.md)`(``fGroups``, ``mslists``, ``"genform"``, adduct ``=`` ``"[M+H]+"``, elements ``=`` ``"CHNOPSCl"``, oc ``=`` ``FALSE``,`\
+`                             calculateFeatures ``=`` ``FALSE``)`\
+`formulas`` ``<-`` `[`estimateIDConfidence`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)`(``formulas``, IDFile ``=`` ``"idlevelrules.yml"``)`\
+\
+`# Calculate compound structure candidates`\
+`compounds`` ``<-`` `[`generateCompounds`](https://rickhelmus.github.io/patRoon/reference/generateCompounds.md)`(``fGroups``, ``mslists``, ``"metfrag"``, adduct ``=`` ``"[M+H]+"``, database ``=`` ``"pubchemlite"``,`\
+`                               maxCandidatesToStop ``=`` ``2500``)`\
+`compounds`` ``<-`` `[`addFormulaScoring`](https://rickhelmus.github.io/patRoon/reference/compounds-class.md)`(``compounds``, ``formulas``, updateScore ``=`` ``TRUE``)`\
+\
+`compounds`` ``<-`` `[`estimateIDConfidence`](https://rickhelmus.github.io/patRoon/reference/id-conf.md)`(``compounds``, MSPeakLists ``=`` ``mslists``, formulas ``=`` ``formulas``, IDFile ``=`` ``"idlevelrules.yml"``)`\
+\
+`# -------------------------`\
+`# reporting`\
+`# -------------------------`\
+\
+`# Advanced report settings can be edited in the report.yml file.`\
+[`report`](https://rickhelmus.github.io/patRoon/reference/reporting.md)`(``fGroups``, MSPeakLists ``=`` ``mslists``, formulas ``=`` ``formulas``, compounds ``=`` ``compounds``, components ``=`` ``NULL``,`\
+`       settingsFile ``=`` ``"report.yml"``, openReport ``=`` ``TRUE``)`

@@ -9,7 +9,7 @@ SIRIUS+CSI:FingerID fingerprints using the MS2Quant package."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">patRoon</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -236,7 +236,7 @@ fingerprints), <code>"SMILES"</code> or <code>"both"</code>. Only relevant for <
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p><code>predictRespFactors</code> returns an object amended with response factors (<code>RF_SMILES</code>/<code>LRF_SIRFP</code>
+    <p><code>predictRespFactors</code> returns an object amended with response factors (<code>RF_SMILES</code>/<code>RF_SIRFP</code>
   columns).</p>
 <p><code>calculateConcs</code> returns a <code><a href="featureGroups-class.html">featureGroups</a></code> based object amended with concentrations for each
   feature group (accessed with the <code><a href="featureGroups-class.html">concentrations</a></code> method).</p>
@@ -291,6 +291,9 @@ with the <code>calculateConcs</code> method function.</p>
     <h2 id="predicting-response-factors">Predicting response factors<a class="anchor" aria-label="anchor" href="#predicting-response-factors"></a></h2>
     <p>The response factors are predicted with the <code>predictRespFactors</code> generic functions,
   which accepts the following input:</p>
+<p><strong>NOTE</strong>: Prediction from <code class="command">SIRIUS</code> fingerprints is <strong>not supported anymore</strong>, as the
+  required webservice from <code class="command">SIRIUS</code> 5 was taken offline. This functionality is hopefully restored when new
+  prediction models become available that are trained on <code class="command">SIRIUS</code> 6 fingerprints.</p>
 <ul><li><p><a href="suspect-screening.html">Suspect screening results</a>. The <acronym>SMILES</acronym> data is used to predict
 response factors for suspect hits.</p></li>
 <li><p>Formula annotation data obtained with <code>"sirius"</code> algorithm (<code><a href="generateFormulasSIRIUS.html">generateFormulasSIRIUS</a></code>). The

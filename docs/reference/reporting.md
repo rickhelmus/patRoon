@@ -307,5 +307,5 @@ Xie Y (2015). *Dynamic Documents with R and knitr*, 2nd edition. Chapman
 and Hall/CRC, Boca Raton, Florida. ISBN 978-1498716963,
 <https://yihui.org/knitr/>.\
 \
-Xie Y (2025). *knitr: A General-Purpose Package for Dynamic Report
-Generation in R*. R package version 1.51, <https://yihui.org/knitr/>.
+Xie Y (2026). *knitr: A General-Purpose Package for Dynamic Report
+Generation in R*. R package version 1.52, <https://yihui.org/knitr/>.

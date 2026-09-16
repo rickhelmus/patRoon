@@ -15,6 +15,7 @@
 <url><loc>https://rickhelmus.github.io/patRoon/reference/MSConversion.html</loc></url>
 <url><loc>https://rickhelmus.github.io/patRoon/reference/MSLibrary-class.html</loc></url>
 <url><loc>https://rickhelmus.github.io/patRoon/reference/MSPeakLists-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/SIRIUSLogin.html</loc></url>
 <url><loc>https://rickhelmus.github.io/patRoon/reference/TPLogicTransformations.html</loc></url>
 <url><loc>https://rickhelmus.github.io/patRoon/reference/adduct-class.html</loc></url>
 <url><loc>https://rickhelmus.github.io/patRoon/reference/adduct-utils.html</loc></url>
@@ -110,6 +111,7 @@
 <url><loc>https://rickhelmus.github.io/patRoon/reference/getIMSRangeParams.html</loc></url>
 <url><loc>https://rickhelmus.github.io/patRoon/reference/getMSFileFormats.html</loc></url>
 <url><loc>https://rickhelmus.github.io/patRoon/reference/getMSFileTypes.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/getSIRIUSConfig.html</loc></url>
 <url><loc>https://rickhelmus.github.io/patRoon/reference/groupFeatures.html</loc></url>
 <url><loc>https://rickhelmus.github.io/patRoon/reference/groupFeaturesGreedy.html</loc></url>
 <url><loc>https://rickhelmus.github.io/patRoon/reference/groupFeaturesKPIC2.html</loc></url>

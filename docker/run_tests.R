@@ -16,7 +16,11 @@ data.table::update_dev_pkg()
 # errors.
 devtools::load_all()
 
-SIRIUSAPI <- patRoon:::startSIRIUS() # HACK start it now so we can share it between tests and makes things faster.
+# disabled: consumes too much RAM on CircleCI
+# SIRIUSAPI <- patRoon:::startSIRIUS() # HACK start it now so we can share it between tests and makes things faster.
+SIRIUSAPI <- NULL
+# --> start SIRIUS manually with limited instances/cores
+SIRProc <- processx::process$new(patRoon:::getExtDepPath("sirius"), c("--cores", "1", "--buffer", "1", "REST", "-s", "--headless"))
 
 if (!is.null(Sys.getenv("PATROON_SIRUSER")) && nzchar(Sys.getenv("PATROON_SIRUSER")) &&
     !is.null(Sys.getenv("PATROON_SIRPASS")) && nzchar(Sys.getenv("PATROON_SIRPASS")))
@@ -29,5 +33,14 @@ if (!is.null(Sys.getenv("PATROON_SIRUSER")) && nzchar(Sys.getenv("PATROON_SIRUSE
 tret <- as.data.frame(devtools::test(reporter = testthat::MultiReporter$new(list(testthat::SummaryReporter$new(),
                                                                                  testthat::JunitReporter$new(file = "~/junit.xml")))))
 print(tret)
+
+if (SIRProc$is_alive())
+{
+    SIRProc$interrupt()
+    Sys.sleep(3)
+    if (SIRProc$is_alive())
+        SIRProc$kill()
+}
+
 if (sum(tret$failed) > 0 || any(tret$error))
     q(status = 1)

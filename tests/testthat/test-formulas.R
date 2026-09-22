@@ -22,19 +22,23 @@ formsGFMS <- doGenForms(fGroups, plists, "genform", MSMode = "ms")
 
 if (doSIRIUS)
 {
+    sir <- maybeStartSIRIUS()
+    
     # UNDONE!! Disabled until https://github.com/sirius-ms/sirius-client-openAPI/issues/193 is fixed
     # formsSIR <- doGenForms(fGroups, plists, "sirius")
-    formsSIREmpty <- doGenForms(fGroupsEmpty, plistsEmpty, "sirius")
-    formsSIREmptyPL <- doGenForms(fGroups, plistsEmpty, "sirius")
-    formsSIREmptyPLMS <- doGenForms(fGroups, plistsEmptyMS, "sirius")
+    formsSIREmpty <- doGenForms(fGroupsEmpty, plistsEmpty, "sirius", SIRIUSAPI = sir$SIRAPI)
+    formsSIREmptyPL <- doGenForms(fGroups, plistsEmpty, "sirius", SIRIUSAPI = sir$SIRAPI)
+    formsSIREmptyPLMS <- doGenForms(fGroups, plistsEmptyMS, "sirius", SIRIUSAPI = sir$SIRAPI)
     if (FALSE)
-        updateSIRIUSFormFPsProj(fGroups, plists)
+        updateSIRIUSFormFPsProj(fGroups, plists, SIRIUSAPI = sir$SIRAPI)
     
-    formsSIRFPs <- doGenFormsSIRFPs(fGroups, plists)
+    formsSIRFPs <- doGenFormsSIRFPs(fGroups, plists, SIRIUSAPI = sir$SIRAPI)
     
     # UNDONE!! See above
     formsSIR <- copy(formsSIRFPs)
     formsSIR@setObjects <- lapply(formsSIR@setObjects, \(so) { so@fingerprints <- list(); so })
+    
+    maybeStopSIRIUS(sir)
 }
 
 # disabled: deprecated

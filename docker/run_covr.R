@@ -17,22 +17,6 @@ pkgload::load_all()
 install.packages(c("testthat", "vdiffr"))
 remotes::install_github("rickhelmus/covr@live-console-update")
 
-# disabled: consumes too much RAM on CircleCI
-# SIRIUSAPI <- patRoon:::startSIRIUS() # HACK start it now so we can share it between tests and makes things faster.
-SIRIUSAPI <- NULL
-
-if (!is.null(Sys.getenv("PATROON_SIRUSER")) && nzchar(Sys.getenv("PATROON_SIRUSER")) &&
-    !is.null(Sys.getenv("PATROON_SIRPASS")) && nzchar(Sys.getenv("PATROON_SIRPASS")))
-{
-    SIRIUSLogin(login = c(username = Sys.getenv("PATROON_SIRUSER"), password = Sys.getenv("PATROON_SIRPASS")),
-                SIRIUSAPI = SIRIUSAPI)
-}
-
-# --> start SIRIUS manually with limited instances/cores
-# HACK: do after login, as that call quits SIRIUS
-SIRProc <- processx::process$new(patRoon:::getExtDepPath("sirius"), c("--cores", "1", "--buffer", "1", "REST", "-s", "--headless"))
-Sys.sleep(3) # give SIRIUS some time to start up
-
 withr::with_envvar(list(NOT_CRAN = "true"), covr::codecov(quiet = FALSE, errorsAreFatal = FALSE, clean = FALSE,
                                                           type = "none", code = 'testthat::test_package("patRoon")',
                                                           code_stdout = TRUE))

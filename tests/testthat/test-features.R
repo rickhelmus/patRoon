@@ -13,9 +13,14 @@ ffXCMS3 <- findFeatures(anaInfoOne, "xcms3", xcms::CentWaveParam(noise = 3E4))
 # UNDONE: ignore warnings about clusters...
 ffKPIC2 <- withCallingHandlers(findFeatures(anaInfoOne, "kpic2", level = 1E5),
                                warning = function(w) if (grepl("number of clusters", w, fixed = TRUE)) invokeRestart("muffleWarning"))
+
+sir <- maybeStartSIRIUS()
 SIRProjPath <- tempfile("sirius_proj", fileext = ".sirius")
-# NOTE: run w/out cache so we can import stuff later
-ffSIRIUS <- withOpt(cache.mode = "none", findFeatures(anaInfoOne, "sirius", projectPath = SIRProjPath, noiseIntensity = 3E5))
+# NOTE: run w/out cache so we can import stuff below
+ffSIRIUS <- withOpt(cache.mode = "none", findFeatures(anaInfoOne, "sirius", projectPath = SIRProjPath, noiseIntensity = 3E5,
+                                                      SIRIUSAPI = sir$SIRAPI))
+ffSIRIUSImp <- importFeatures(SIRProjPath, "sirius", anaInfoOne, SIRIUSAPI = sir$SIRAPI)
+maybeStopSIRIUS(sir)
 
 # generate mzXML files for enviPick
 exDataFiles <- list.files(patRoonData::exampleDataPath(), "\\.mzML$", full.names = TRUE)
@@ -72,7 +77,7 @@ test_that("verify feature finder output", {
                  OpenMSFTable(getTestFeatures(anaInfo,
                                               extraOpts = list("-algorithm:common:noise_threshold_int" = 30000))))
 
-    expect_equal(ffSIRIUS, importFeatures(SIRProjPath, "sirius", anaInfoOne))
+    expect_equal(ffSIRIUS, ffSIRIUSImp)
     
     skip_if_not(doDATests())
     expect_known_val(featureTable(ffDA), "ff-DA")

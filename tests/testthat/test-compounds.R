@@ -25,12 +25,16 @@ if (doMetFrag)
 
 if (doSIRIUS)
 {
-    if (FALSE)
-        updateSIRIUSCompProj(fGroups, plists)
+    sir <- maybeStartSIRIUS()
     
-    compsSIR <- doGenCompsSIR(fGroups, plists)
-    compsSIREmpty <- doGenComps(fGroupsEmpty, plistsEmpty, "sirius")
-    compsSIREmptyPL <- doGenComps(fGroups, plistsEmpty, "sirius")
+    if (FALSE)
+        updateSIRIUSCompProj(fGroups, plists, SIRIUSAPI = sir$SIRAPI)
+    
+    compsSIR <- doGenCompsSIR(fGroups, plists, SIRIUSAPI = sir$SIRAPI)
+    compsSIREmpty <- doGenComps(fGroupsEmpty, plistsEmpty, "sirius", SIRIUSAPI = sir$SIRAPI)
+    compsSIREmptyPL <- doGenComps(fGroups, plistsEmpty, "sirius", SIRIUSAPI = sir$SIRAPI)
+    
+    maybeStopSIRIUS(sir)
 }
 
 mslibrary <- loadMSLibrary(getMSLibJSONPath(), "json")

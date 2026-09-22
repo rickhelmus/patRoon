@@ -259,13 +259,13 @@ testRegrTab <- function(fg, feat, rb, avg)
 
 maybeStartSIRIUS <- function()
 {
-    # start a SIRIUS instance on CI: this will be shared with all tests in a file. Use force so we one instance per
+    # start a SIRIUS instance on CI: this will be shared with all tests in a file. Use force so we have one instance per
     # parallel R instance. NOTE: having one shared instance continuously uses too much RAM on CircleCI, so we shutdown
     # SIRIUS after tests completed.
     if (isTRUE(as.logical(Sys.getenv("CI", "false")))) # from testthat::skip_on_ci()
     {
         sdk <- RSirius::SiriusSDK$new()
-        SIRAPI <- RSirius::start_sirius(sirius_path = getExtDepPath("sirius"), headless = TRUE, force = TRUE)
+        SIRAPI <- sdk$start_sirius(sirius_path = patRoon:::getExtDepPath("sirius"), headless = TRUE, force = TRUE)
         if (!is.null(Sys.getenv("PATROON_SIRUSER")) && nzchar(Sys.getenv("PATROON_SIRUSER")) &&
             !is.null(Sys.getenv("PATROON_SIRPASS")) && nzchar(Sys.getenv("PATROON_SIRPASS")))
         {

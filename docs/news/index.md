@@ -112,6 +112,10 @@ welcome!
 - Fixed: setting `annotate` for
   [`plotChroms()`](https://rickhelmus.github.io/patRoon/reference/generics.md)/[`plotMobilograms()`](https://rickhelmus.github.io/patRoon/reference/feature-plotting.md)
   generated warnings
+- Fixed:
+  [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md)
+  did not refresh the analysis info table when selecting a set (reported
+  by Alessia Ore)
 
 ## patRoon 3.0
 

@@ -257,32 +257,6 @@ testRegrTab <- function(fg, feat, rb, avg)
         expect_true(any(!is.na(tab[[col]]) & !is.nan(tab[[col]])), info = col)
 }
 
-maybeStartSIRIUS <- function()
-{
-    # start a SIRIUS instance on CI: this will be shared with all tests in a file. Use force so we have one instance per
-    # parallel R instance. NOTE: having one shared instance continuously uses too much RAM on CircleCI, so we shutdown
-    # SIRIUS after tests completed.
-    if (isTRUE(as.logical(Sys.getenv("CI", "false")))) # from testthat::skip_on_ci()
-    {
-        sdk <- RSirius::SiriusSDK$new()
-        SIRAPI <- sdk$start_sirius(sirius_path = patRoon:::getExtDepPath("sirius"), headless = TRUE, force = TRUE)
-        if (!is.null(Sys.getenv("PATROON_SIRUSER")) && nzchar(Sys.getenv("PATROON_SIRUSER")) &&
-            !is.null(Sys.getenv("PATROON_SIRPASS")) && nzchar(Sys.getenv("PATROON_SIRPASS")))
-        {
-            SIRIUSLogin(login = c(username = Sys.getenv("PATROON_SIRUSER"), password = Sys.getenv("PATROON_SIRPASS")),
-                        SIRIUSAPI = SIRAPI)
-        }
-        
-        return(list(sdk = sdk, SIRAPI = SIRAPI))
-    }
-    return(list(sdk = NULL, SIRAPI = NULL))
-}
-maybeStopSIRIUS <- function(sir)
-{
-    if (!is.null(sir$sdk))
-        sir$sdk$shutdown_sirius()
-}
-
 doGenFormsSIRFPs <- function(fGroups, plists, ...) doGenForms(fGroups, plists, "sirius", runMode = "read", calculateFeatures = FALSE,
                                                               getFingerprints = TRUE,
                                                               projectPath = c(testSIRFormFPs = getSIRFormFPsProjPath()), ...)

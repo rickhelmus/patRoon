@@ -13,15 +13,12 @@ fgXCMS3 <- groupFeatures(fList, "xcms3")
 fgKPIC2 <- groupFeatures(fList, "kpic2")
 fgGreedy <- groupFeatures(fList, "greedy")
 
-sir <- maybeStartSIRIUS()
 SIRProjPath <- tempfile("sirius_proj", fileext = ".sirius")
 # only do first analysis to avoid long run times
 # NOTE: run w/out cache so we can import stuff below
 fgSIRIUS <- withOpt(cache.mode = "none",
-                    groupFeatures(analysisInfo(fList)[1,], "sirius", projectPath = SIRProjPath, noiseIntensity = 3E5,
-                                  SIRIUSAPI = sir$SIRAPI))
-fgSIRIUSImp <- importFeatureGroups(SIRProjPath, "sirius", analysisInfo(fgSIRIUS), SIRIUSAPI = sir$SIRAPI)
-maybeStopSIRIUS(sir)
+                    groupFeatures(analysisInfo(fList)[1,], "sirius", projectPath = SIRProjPath, noiseIntensity = 3E5))
+fgSIRIUSImp <- importFeatureGroups(SIRProjPath, "sirius", analysisInfo(fgSIRIUS))
 
 fgIMS <- groupFeatures(getTestFeaturesIMS(intThr = 2E5), "greedy")
 fgIMSEmpty <- groupFeatures(getEmptyFeaturesIMS(), "greedy")

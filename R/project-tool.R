@@ -123,7 +123,7 @@ newProjectServer <- function(destPath)
             checkAnas <- if (settingsGen$ionization != "both")
                 input[[n]]
             else
-                input[paste0(n, c("Pos", "Neg"))]
+                c(input[[paste0(n, "Pos")]], input[[paste0(n, "Neg")]])
             for (f in checkAnas)
             {
                 p <- file.path(settingsGen$destination, f)

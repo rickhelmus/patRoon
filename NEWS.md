@@ -47,6 +47,7 @@ to `maxRelCumIntensity`.
 * Added the `maxReplicateIntRSDPres` filter that ignores absent (zero intensity) filters in its RSD calculation, and clarified in the docs that the legacy `maxReplicateIntRSD` filter doesn't (issue #162)
 * `fixedIsolationWindow` can now be a two-sized vector to specify asymmetric isolation windows (issue #161)
 * Fixed: setting `annotate` for `plotChroms()`/`plotMobilograms()` generated warnings
+* Fixed: `newProject()` did not refresh the analysis info table when selecting a set (reported by Alessia Ore)
 
 
 # patRoon 3.0

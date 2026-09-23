@@ -313,6 +313,10 @@ newProjectAnalysesServer <- function(id, ionization, IMSMode, settings)
             moveHOTSel(session, dir, sel, ns("analysesHOT"))
         }
         
+        observeEvent(input$currentSetStatic, {
+            triggerAnaInfoHOTUpdate()
+        })
+        
         observeEvent(input$analysesHOT, {
             # HACK: maxRows: make sure we don't have empty table as hot_to_r errors otherwise
             if (!is.null(input$analysesHOT) && input$analysesHOT$params$maxRows > 0)

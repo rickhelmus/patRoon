@@ -213,6 +213,9 @@ getSIRIUSFormulaCandidates <- function(projectID, SIRForms, PLMS2)
         if (is.null(l[["totalExplainedIntensity"]]))
             l$totalExplainedIntensity <- NA_real_
         l$annotatedSpectrum <- l$predictedFingerprint <- NULL # you are for later
+        # BUG: seems to be there, even if we didn't ask for it?
+        if (!is.null(l[["lipidAnnotation"]]) && length(l$lipidAnnotation) > 0)
+            l$lipidAnnotation <- paste0(paste0(names(l$lipidAnnotation), ":", unlist(l$lipidAnnotation)), collapse = ";")
         return(l)
     }), fill = TRUE)
     # NOTE: explainedPeaks is re-calculated later, but putting it now places the column before explainablePeaks

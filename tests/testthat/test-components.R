@@ -237,6 +237,7 @@ test_that("plotting works", {
     expect_doppel("component-ic-heat", function() plotHeatMap(compsInt, interactive = FALSE))
 
     expect_HTML(plotGraph(compsNet, analysis = analyses(fGroups)[1], set = "positive"))
+    expect_HTML(plotGraph(compsNet, analysis = analyses(fGroups)[1], group = FALSE, set = "negative"))
 })
 
 fGroupsSI <- selectIons(fGroups, compsRC, prefAdduct = c("[M+H]+", "[M-H]-"), onlyMonoIso = TRUE)

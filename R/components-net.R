@@ -805,19 +805,22 @@ setMethod("generateComponentsNet", "featureGroupsSet", function(fGroups, ionizat
 #'
 #' @param obj The \code{componentsNet} object to plot.
 #' @param analysis The name of the analysis to plot.
+#' @param group Whether to color nodes by their feature component.
 #'
 #' @template plotGraph
 #'
 #' @references \addCitations{igraph}
 #'
 #' @export
-setMethod("plotGraph", "componentsNet", function(obj, analysis, width = NULL, height = NULL)
+setMethod("plotGraph", "componentsNet", function(obj, analysis, group = TRUE, width = NULL, height = NULL)
 {
     checkmate::assertChoice(analysis, names(obj@featureGraphs))
+    checkmate::assertFlag(group)
     
     data <- visNetwork::toVisNetworkData(obj@featureGraphs[[analysis]])
     nodes <- as.data.table(data$nodes)
-    nodes[, group := sapply(id, \(x) which(sapply(obj@featureComponents[[analysis]], \(y) x %chin% y$group))[1])]
+    if (group)
+        nodes[, group := sapply(id, \(x) which(sapply(obj@featureComponents[[analysis]], \(y) x %chin% y$group))[1])]
     edges <- data$edges
     edges$value <- edges$weight; edges$title <- round(edges$weight, 2)
     nodes <- nodes[id %in% c(edges$from, edges$to)] # UNDONE: remove singletons during componentization?

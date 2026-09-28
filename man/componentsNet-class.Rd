@@ -13,7 +13,7 @@
 \alias{unset,componentsNetSet-method}
 \title{Components class for network-based componentization.}
 \usage{
-\S4method{plotGraph}{componentsNet}(obj, analysis, width = NULL, height = NULL)
+\S4method{plotGraph}{componentsNet}(obj, analysis, group = TRUE, width = NULL, height = NULL)
 
 \S4method{plotGraph}{componentsNetSet}(obj, analysis, set, ...)
 
@@ -23,6 +23,8 @@
 \item{obj}{The \code{componentsNet} object to plot.}
 
 \item{analysis}{The name of the analysis to plot.}
+
+\item{group}{Whether to color nodes by their feature component.}
 
 \item{width, height}{Passed to \code{\link{visNetwork}}.}
 

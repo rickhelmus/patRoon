@@ -603,7 +603,7 @@ assertEIXParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
 assertEICParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
     assertEIXParams(x, .var.name = .var.name, add = add)
-    assertListVal(x, "gapFactor", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+    assertListVal(x, "maxGap", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     invisible(NULL)
 }
 
@@ -1253,7 +1253,7 @@ assertPiekGenEICParams <- function(x, .var.name = checkmate::vname(x), add = NUL
                   .var.name = .var.name, add = add)
     
     assertListVal(x, "retRange", assertRange, null.ok = TRUE, .var.name = .var.name, add = add)
-    assertListVal(x, "gapFactor", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+    assertListVal(x, "maxGap", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "sumWindowMZ", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "sumWindowMob", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "smoothWindowMZ", checkmate::assertCount, positive = FALSE, .var.name = .var.name, add = add)

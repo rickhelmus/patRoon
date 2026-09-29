@@ -912,7 +912,7 @@ NULL
 #' @param ranges A \code{list} with for each analysis a \code{data.frame} with \code{numeric} columns \code{"retmin"},
 #'   \code{"retmax"}, \code{"mzmin"}, \code{"mzmax"} with the lower/upper ranges of the retention time and \emph{m/z}.
 #'   Furthermore, columns \code{"mobmin"} and \code{"mobmax"} can be added for mobility lower/upper ranges in IMS data.
-#' @param gapFactor A \code{numeric} that configures gap filling. See \code{\link{getDefEICParams}} for more details.
+#' @param maxGap A \code{numeric} that configures gap filling. See \code{\link{getDefEICParams}} for more details.
 #' @param output Should be \code{"fill"}, \code{"pad"} or \code{"raw"}. Internally, EIC data is compressed by omitting
 #'   any zero intensity data points. If \code{output="fill"} then the zero intensity points are re-added to obtain
 #'   continuous chromatograms. If \code{output="pad"} then zero intensity points are only re-added that surround others,

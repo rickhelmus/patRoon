@@ -573,7 +573,7 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
             rngList <- list(ranges)
             names(rngList) <- input$analysis
             print(ranges)
-            getEICs(analysisInfo[analysis == input$analysis], rngList, gapFactor = 3, output = "pad")
+            getEICs(analysisInfo[analysis == input$analysis], rngList, maxGap = 10, output = "pad")
         })
         
         eimData <- shiny::reactive({

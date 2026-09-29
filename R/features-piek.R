@@ -219,7 +219,7 @@ setMethod("delete", "featuresPiek", function(obj, i = NULL, j = NULL, ...)
 #'     \item \code{retRange} A \code{numeric} vector of length two that specifies the retention time range for the EICs.
 #'     Data outside this range is excluded. Set to \code{NULL} to use the full range.
 #'
-#'     \item \code{gapFactor} A \code{numeric} that configures gap filling for EICs. See \code{\link{getDefEICParams}}
+#'     \item \code{maxGap} A \code{numeric} that configures gap filling for EICs. See \code{\link{getDefEICParams}}
 #'     for further details.
 #'
 #'     \item \code{minEICIntensity} The minimum intensity of the highest data point in the EIC. Used to filter EICs.
@@ -447,7 +447,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams = getPiekEICParams(),
     getEICsAna <- function(backend, EICInfo, mode, topMost)
     {
         ret <- getEICList(backend, EICInfo$mzmin, EICInfo$mzmax, genEICParams$retRange[1], genEICParams$retRange[2],
-                          EICInfo$mobmin, EICInfo$mobmax, gapFactor = genEICParams$gapFactor,
+                          EICInfo$mobmin, EICInfo$mobmax, maxGap = genEICParams$maxGap,
                           minIntensityIMS = minIntensityIMS, mode = mode, sumWindowMZ = genEICParams$sumWindowMZ,
                           sumWindowMob = genEICParams$sumWindowMob, smoothWindowMZ = genEICParams$smoothWindowMZ,
                           smoothExtMZ = genEICParams$smoothExtMZ, smoothWindowMob = genEICParams$smoothWindowMob,
@@ -748,7 +748,7 @@ getPiekEICParams <- function(..., IMS = getLimIMS())
     ret <- list(filter = "none", filterIMS = "none",  mzRange = c(80, 800), mzStep = 0.02,
                 mobRange = c(0.4, 1.3), mobStep = 0.08, sumWindowMZ = defaultLim("retention", "narrow"),
                 sumWindowMob = defaultLim("retention", "narrow"), smoothWindowMZ = 3, smoothWindowMob = 15,
-                retRange = NULL, gapFactor = 3, saveMZProfiles = FALSE, saveEIMs = FALSE, minEICIntensity = 5000,
+                retRange = NULL, maxGap = 10, saveMZProfiles = FALSE, saveEIMs = FALSE, minEICIntensity = 5000,
                 minEICAdjTime = 0, minEICAdjPoints = 5, minEICAdjIntensity = 250, topMostEICMZ = 10000,
                 topMostEICMZMob = 10000, minEICsIMSPreCheck = 50000)
     

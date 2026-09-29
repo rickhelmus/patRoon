@@ -263,8 +263,8 @@ public:
     size_t size(void) const { return times.size(); }
     bool empty(void) const { return times.empty(); }
     
-    void fillGaps(SpectrumRawTypes::Time medRTDiff, double gapFactor, bool pad, SpectrumRawTypes::Time startTime,
-                  SpectrumRawTypes::Time endTime);
+    void fillGaps(SpectrumRawTypes::Time medRTDiff, SpectrumRawTypes::Time maxGap, bool pad,
+                  SpectrumRawTypes::Time startTime, SpectrumRawTypes::Time endTime);
     
     const auto &getTimes(void) const { return times; }
     const auto &getIntensities(void) const { return intensities; }

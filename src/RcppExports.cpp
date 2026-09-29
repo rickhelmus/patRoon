@@ -71,8 +71,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // getEICList
-Rcpp::List getEICList(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Mass>& startMZs, const std::vector<SpectrumRawTypes::Mass>& endMZs, const std::vector<SpectrumRawTypes::Time>& startTimes, const std::vector<SpectrumRawTypes::Time>& endTimes, const std::vector<SpectrumRawTypes::Mobility>& startMobs, const std::vector<SpectrumRawTypes::Mobility>& endMobs, SpectrumRawTypes::Time gapFactor, SpectrumRawTypes::Intensity minIntensityIMS, const std::string& mode, SpectrumRawTypes::Time sumWindowMZ, SpectrumRawTypes::Time sumWindowMob, unsigned smoothWindowMZ, unsigned smoothWindowMob, SpectrumRawTypes::Mass smoothExtMZ, SpectrumRawTypes::Mobility smoothExtMob, bool saveMZProfiles, bool saveEIMs, bool pad, SpectrumRawTypes::Intensity minEICIntensity, SpectrumRawTypes::Time minEICAdjTime, unsigned minEICAdjPoints, SpectrumRawTypes::Intensity minEICAdjIntensity, unsigned topMost);
-RcppExport SEXP _patRoon_getEICList(SEXP backendSEXP, SEXP startMZsSEXP, SEXP endMZsSEXP, SEXP startTimesSEXP, SEXP endTimesSEXP, SEXP startMobsSEXP, SEXP endMobsSEXP, SEXP gapFactorSEXP, SEXP minIntensityIMSSEXP, SEXP modeSEXP, SEXP sumWindowMZSEXP, SEXP sumWindowMobSEXP, SEXP smoothWindowMZSEXP, SEXP smoothWindowMobSEXP, SEXP smoothExtMZSEXP, SEXP smoothExtMobSEXP, SEXP saveMZProfilesSEXP, SEXP saveEIMsSEXP, SEXP padSEXP, SEXP minEICIntensitySEXP, SEXP minEICAdjTimeSEXP, SEXP minEICAdjPointsSEXP, SEXP minEICAdjIntensitySEXP, SEXP topMostSEXP) {
+Rcpp::List getEICList(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Mass>& startMZs, const std::vector<SpectrumRawTypes::Mass>& endMZs, const std::vector<SpectrumRawTypes::Time>& startTimes, const std::vector<SpectrumRawTypes::Time>& endTimes, const std::vector<SpectrumRawTypes::Mobility>& startMobs, const std::vector<SpectrumRawTypes::Mobility>& endMobs, SpectrumRawTypes::Time maxGap, SpectrumRawTypes::Intensity minIntensityIMS, const std::string& mode, SpectrumRawTypes::Time sumWindowMZ, SpectrumRawTypes::Time sumWindowMob, unsigned smoothWindowMZ, unsigned smoothWindowMob, SpectrumRawTypes::Mass smoothExtMZ, SpectrumRawTypes::Mobility smoothExtMob, bool saveMZProfiles, bool saveEIMs, bool pad, SpectrumRawTypes::Intensity minEICIntensity, SpectrumRawTypes::Time minEICAdjTime, unsigned minEICAdjPoints, SpectrumRawTypes::Intensity minEICAdjIntensity, unsigned topMost);
+RcppExport SEXP _patRoon_getEICList(SEXP backendSEXP, SEXP startMZsSEXP, SEXP endMZsSEXP, SEXP startTimesSEXP, SEXP endTimesSEXP, SEXP startMobsSEXP, SEXP endMobsSEXP, SEXP maxGapSEXP, SEXP minIntensityIMSSEXP, SEXP modeSEXP, SEXP sumWindowMZSEXP, SEXP sumWindowMobSEXP, SEXP smoothWindowMZSEXP, SEXP smoothWindowMobSEXP, SEXP smoothExtMZSEXP, SEXP smoothExtMobSEXP, SEXP saveMZProfilesSEXP, SEXP saveEIMsSEXP, SEXP padSEXP, SEXP minEICIntensitySEXP, SEXP minEICAdjTimeSEXP, SEXP minEICAdjPointsSEXP, SEXP minEICAdjIntensitySEXP, SEXP topMostSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -83,7 +83,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Time>& >::type endTimes(endTimesSEXP);
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mobility>& >::type startMobs(startMobsSEXP);
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mobility>& >::type endMobs(endMobsSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::Time >::type gapFactor(gapFactorSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Time >::type maxGap(maxGapSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensityIMS(minIntensityIMSSEXP);
     Rcpp::traits::input_parameter< const std::string& >::type mode(modeSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Time >::type sumWindowMZ(sumWindowMZSEXP);
@@ -100,7 +100,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< unsigned >::type minEICAdjPoints(minEICAdjPointsSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minEICAdjIntensity(minEICAdjIntensitySEXP);
     Rcpp::traits::input_parameter< unsigned >::type topMost(topMostSEXP);
-    rcpp_result_gen = Rcpp::wrap(getEICList(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, gapFactor, minIntensityIMS, mode, sumWindowMZ, sumWindowMob, smoothWindowMZ, smoothWindowMob, smoothExtMZ, smoothExtMob, saveMZProfiles, saveEIMs, pad, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity, topMost));
+    rcpp_result_gen = Rcpp::wrap(getEICList(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, maxGap, minIntensityIMS, mode, sumWindowMZ, sumWindowMob, smoothWindowMZ, smoothWindowMob, smoothExtMZ, smoothExtMob, saveMZProfiles, saveEIMs, pad, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity, topMost));
     return rcpp_result_gen;
 END_RCPP
 }

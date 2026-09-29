@@ -173,7 +173,7 @@ The \code{piek} algorithm extends and improves on the simple and fast feature de
     \item \code{retRange} A \code{numeric} vector of length two that specifies the retention time range for the EICs.
     Data outside this range is excluded. Set to \code{NULL} to use the full range.
 
-    \item \code{gapFactor} A \code{numeric} that configures gap filling for EICs. See \code{\link{getDefEICParams}}
+    \item \code{maxGap} A \code{numeric} that configures gap filling for EICs. See \code{\link{getDefEICParams}}
     for further details.
 
     \item \code{minEICIntensity} The minimum intensity of the highest data point in the EIC. Used to filter EICs.

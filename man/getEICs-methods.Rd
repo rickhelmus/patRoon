@@ -24,7 +24,7 @@
   output = "fill"
 )
 
-\S4method{getEICs}{data.table}(obj, ranges, gapFactor = 3, output = "fill", minIntensityIMS = 25)
+\S4method{getEICs}{data.table}(obj, ranges, maxGap = 10, output = "fill", minIntensityIMS = 25)
 
 \S4method{getEICs}{data.frame}(obj, ...)
 }
@@ -49,7 +49,7 @@ which is sufficient for \emph{e.g.} plotting. If \code{output="raw"} then the or
 \code{"retmax"}, \code{"mzmin"}, \code{"mzmax"} with the lower/upper ranges of the retention time and \emph{m/z}.
 Furthermore, columns \code{"mobmin"} and \code{"mobmax"} can be added for mobility lower/upper ranges in IMS data.}
 
-\item{gapFactor}{A \code{numeric} that configures gap filling. See \code{\link{getDefEICParams}} for more details.}
+\item{maxGap}{A \code{numeric} that configures gap filling. See \code{\link{getDefEICParams}} for more details.}
 
 \item{minIntensityIMS}{\IMSWF Raw intensity threshold for IMS data. This is primarily intended to speed up raw data
 processing.}

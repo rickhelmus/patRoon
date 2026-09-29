@@ -29,6 +29,7 @@ functionality is welcome!
 filters now correctly prioritize the most intense peaks and remove the lower intensity peaks that are above the filter
 threshold. For this reason the `minRelCumIntensity` and `relMinCumIntensity` (latter was named incorrectly) are renamed
 to `maxRelCumIntensity`.
+* **Important** The `gapFactor` EIC parameter is replaced by a new `maxGap` parameter, which is more intuitive and with a better default (issue #154).
 * Optimizations for very large datasets (issue #154)
 * The `window` EIC and EIM parameter can now be `Inf` to include the data points for the entire chromatogram or mobility trace
 * Small changes for `newProject()` to handle loading of MS peak lists for `generateComponentsNet()`

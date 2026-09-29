@@ -30,7 +30,7 @@ getEICs(
 )
 
 # S4 method for class 'data.table'
-getEICs(obj, ranges, gapFactor = 3, output = "fill", minIntensityIMS = 25)
+getEICs(obj, ranges, maxGap = 3, output = "fill", minIntensityIMS = 25)
 
 # S4 method for class 'data.frame'
 getEICs(obj, ...)
@@ -80,7 +80,7 @@ getEICs(obj, ...)
   `"mobmin"` and `"mobmax"` can be added for mobility lower/upper ranges
   in IMS data.
 
-- gapFactor:
+- maxGap:
 
   A `numeric` that configures gap filling. See
   [`getDefEICParams`](https://rickhelmus.github.io/patRoon/reference/EIXParams.md)

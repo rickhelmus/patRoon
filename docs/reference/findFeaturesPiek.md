@@ -250,7 +250,7 @@ The following general parameters exist:
   retention time range for the EICs. Data outside this range is
   excluded. Set to `NULL` to use the full range.
 
-- `gapFactor` A `numeric` that configures gap filling for EICs. See
+- `maxGap` A `numeric` that configures gap filling for EICs. See
   [`getDefEICParams`](https://rickhelmus.github.io/patRoon/reference/EIXParams.md)
   for further details.
 

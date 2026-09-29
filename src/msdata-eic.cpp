@@ -67,7 +67,7 @@ SpectrumRawTypes::Time medianRTDiff(const std::vector<SpectrumRawTypes::Time> &t
 
 std::pair<std::vector<size_t>, std::vector<SpectrumRawTypes::Time>> fillRTGaps(const std::vector<SpectrumRawTypes::Time> &EICTimes,
                                                                                SpectrumRawTypes::Time medRTDiff,
-                                                                               double gapFactor)
+                                                                               SpectrumRawTypes::Time maxGap)
 {
     // NOTE: Bruker TIMS data (and maybe others?) seem to omit zero intensity scans, leading to time gaps. Since
     // this leads to incorrect EICs, we pad here. To detect gaps, we take the median difference between scans
@@ -91,7 +91,7 @@ std::pair<std::vector<size_t>, std::vector<SpectrumRawTypes::Time>> fillRTGaps(c
             break;
         
         const auto diff = EICTimes[i + 1] - EICTimes[i];
-        if (diff > (medRTDiff * gapFactor)) // add dummy point after current
+        if (diff > maxGap) // add dummy point after current
         {
             filledInds.push_back(fakeIndex);
             filledTimes.push_back(EICTimes[i] + medRTDiff);
@@ -530,13 +530,13 @@ void EIC::finalize()
         setSummedFrameMob();
 }        
 
-void SimpleEIC::fillGaps(SpectrumRawTypes::Time medRTDiff, double gapFactor, bool pad,
+void SimpleEIC::fillGaps(SpectrumRawTypes::Time medRTDiff, SpectrumRawTypes::Time maxGap, bool pad,
                          SpectrumRawTypes::Time timeStart, SpectrumRawTypes::Time timeEnd)
 {
     if (times.size() < 2)
         return;
     
-    auto filled = fillRTGaps(times, medRTDiff, gapFactor);
+    auto filled = fillRTGaps(times, medRTDiff, maxGap);
     auto &filledTimes = filled.second;
     std::vector<SpectrumRawTypes::Intensity> filledInts(filled.first.size(), 0.0);
     // fill in intensities of existing time points, leave gaps at zero intensity
@@ -552,7 +552,7 @@ void SimpleEIC::fillGaps(SpectrumRawTypes::Time medRTDiff, double gapFactor, boo
         // add two points in front/back: one just before/after the first/last and the other at the start/end
         // time range
         auto diff = filledTimes.front() - timeStart;
-        if (diff > (medRTDiff * gapFactor))
+        if (diff > maxGap)
         {
             filledTimes.insert(filledTimes.begin(), filledTimes.front() - medRTDiff);
             filledInts.insert(filledInts.begin(), 0.0);
@@ -563,7 +563,7 @@ void SimpleEIC::fillGaps(SpectrumRawTypes::Time medRTDiff, double gapFactor, boo
             }
         }
         diff = timeEnd - filledTimes.back();
-        if (diff > (medRTDiff * gapFactor))
+        if (diff > maxGap)
         {
             filledTimes.push_back(filledTimes.back() + medRTDiff);
             filledInts.push_back(0.0);
@@ -586,7 +586,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::vector<SpectrumRawTypes::Time> &endTimes,
                       const std::vector<SpectrumRawTypes::Mobility> &startMobs,
                       const std::vector<SpectrumRawTypes::Mobility> &endMobs,
-                      SpectrumRawTypes::Time gapFactor,  SpectrumRawTypes::Intensity minIntensityIMS,
+                      SpectrumRawTypes::Time maxGap, SpectrumRawTypes::Intensity minIntensityIMS,
                       const std::string &mode = "simple", SpectrumRawTypes::Time sumWindowMZ = 0,
                       SpectrumRawTypes::Time sumWindowMob = 0, unsigned smoothWindowMZ = 3,
                       unsigned smoothWindowMob = 3, SpectrumRawTypes::Mass smoothExtMZ = 0,
@@ -912,11 +912,11 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         if (eicMode == EICMode::SIMPLE)
         {
             SimpleEIC simpleEIC(eic, specMeta.first.times);
-            if (gapFactor > 0.0)
+            if (maxGap > 0.0)
             {
                 const auto timeStart = (startTimes.size() == 1) ? startTimes[0] : startTimes[i];
                 const auto timeEnd = (endTimes.size() == 1) ? endTimes[0] : endTimes[i];
-                simpleEIC.fillGaps(medRTDiff, gapFactor, pad, timeStart,
+                simpleEIC.fillGaps(medRTDiff, maxGap, pad, timeStart,
                                    (timeEnd == 0.0) ? specMeta.first.times.back() : timeEnd);
             }
             
@@ -976,11 +976,11 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         eic.clear(saveMZProfiles, saveEIMs); // free memory as EICs may consume a lot
     }
     
-    if (gapFactor > 0.0 && eicMode != EICMode::TEST)
+    if (maxGap > 0.0 && eicMode != EICMode::TEST)
     {
         // For padding we just have to add additional time points, EIC decompression will assume these are zero
         // intensity points.
-        ret.attr("allXValues") = (fillRTGaps(specMeta.first.times, medRTDiff, gapFactor)).second;
+        ret.attr("allXValues") = (fillRTGaps(specMeta.first.times, medRTDiff, maxGap)).second;
     }
     
     if (anySpecHasMob && (eicMode == EICMode::FULL || eicMode == EICMode::FULL_MZ) && saveMZProfiles)

@@ -77,15 +77,15 @@ test_that("EICs", {
     EICInfoListOne <- EICInfoList
     EICInfoListOne[[1]] <- EICInfoListOne[[1]][1]
     
-    eicsRef <- getEICs(anaInfoIMSOne, EICInfoList[1], gapFactor = 3, output = "raw")
+    eicsRef <- getEICs(anaInfoIMSOne, EICInfoList[1], output = "raw")
     
     # Test adjacency and intensity filters
     # NOTE: the thresholds were based on manual EIC inspection...
-    eicsAdjP <- doGetEICs(anaInfoIMSOne, EICInfoListOne, gapFactor = 3, minEICAdjIntensity = 5E3,
+    eicsAdjP <- doGetEICs(anaInfoIMSOne, EICInfoListOne, minEICAdjIntensity = 5E3, maxGap = 10,
                           minEICAdjPoints = 7, minEICAdjTime = 0, mode = "simple")
-    eicsAdjT <- doGetEICs(anaInfoIMSOne, EICInfoListOne, gapFactor = 3, minEICAdjIntensity = 5E3,
+    eicsAdjT <- doGetEICs(anaInfoIMSOne, EICInfoListOne, minEICAdjIntensity = 5E3, maxGap = 10,
                           minEICAdjPoints = 0, minEICAdjTime = 4, mode = "simple")
-    eicsI <- doGetEICs(anaInfoIMSOne, EICInfoListOne, gapFactor = 3, minEICIntensity = 3E4, mode = "simple")
+    eicsI <- doGetEICs(anaInfoIMSOne, EICInfoListOne, minEICIntensity = 3E4, maxGap = 10, mode = "simple")
     
     expect_length(pruneList(eicsAdjP[[1]], checkZeroRows = TRUE), 0)
     expect_length(pruneList(eicsAdjT[[1]], checkZeroRows = TRUE), 0)
@@ -93,10 +93,10 @@ test_that("EICs", {
     expect_gt(length(pruneList(eicsRef[[1]])), 0)
     
     # Test smoothing and frame summing affects mz or mobility results
-    eicsSummed <- doGetEICs(anaInfoIMSOne, EICInfoListOne, gapFactor = 3, mode = "full", sumWindowMZ = 7,
-                            sumWindowMob = 7)
-    eicsSmoothed <- doGetEICs(anaInfoIMSOne, EICInfoListOne, gapFactor = 3, mode = "full", smoothWindowMZ = 3,
-                              smoothExtMZ = 0.02, smoothWindowMob = 7, smoothExtMob = 0.1)
+    eicsSummed <- doGetEICs(anaInfoIMSOne, EICInfoListOne, mode = "full", sumWindowMZ = 7,
+                            sumWindowMob = 7, maxGap = 10)
+    eicsSmoothed <- doGetEICs(anaInfoIMSOne, EICInfoListOne, mode = "full", smoothWindowMZ = 3,
+                              smoothExtMZ = 0.02, smoothWindowMob = 7, smoothExtMob = 0.1, maxGap = 10)
     for (col in c("mz", "mzBP", "mobility", "mobilityBP"))
     {
         expect_true(any(eicsSummed[[1]][[1]][, col] != eicsRef[[1]][[1]][, col]))
@@ -104,15 +104,24 @@ test_that("EICs", {
     }
 
     # Test topMost filter
-    eicsTop1 <- doGetEICs(anaInfoIMSOne, EICInfoList, gapFactor = 3, topMost = 1, mode = "full")
+    eicsTop1 <- doGetEICs(anaInfoIMSOne, EICInfoList, topMost = 1, mode = "full", maxGap = 10)
     expect_length(pruneList(eicsTop1[[1]], checkZeroRows = TRUE), 1)
     
     # Test pad=TRUE
-    eicsPadded <- getEICs(anaInfoIMSOne, EICInfoListOne, gapFactor = 3, output = "pad")
+    eicsPadded <- getEICs(anaInfoIMSOne, EICInfoListOne, output = "pad")
     expect_true(nrow(eicsPadded[[1]][[1]]) >= nrow(eicsRef[[1]][[1]]))
     expect_false(any(eicsRef[[1]][[1]][, "intensity"] == 0))
     expect_true(any(eicsPadded[[1]][[1]][, "intensity"] == 0))
-
+    
+    # Gap filling: there is a ~60 sec timegap in the test data
+    EICInfoListGap <- setNames(list(
+        data.table::data.table(mzmin = 100, mzmax = 150, retmin = 0, retmax = 90, mobmin = 0.5, mobmax = 0.9)
+    ), anaInfoIMSOne$analysis)
+    eicsGap <- getEICs(anaInfoIMSOne, EICInfoListGap, output = "pad", maxGap = 100)
+    eicsNoGap <- getEICs(anaInfoIMSOne, EICInfoListGap, output = "pad", maxGap = 30)
+    expect_doppel("eic-raw-gap", \() plot(eicsGap[[1]][[1]], type = "l"))
+    expect_doppel("eic-raw-nogap", \() plot(eicsNoGap[[1]][[1]], type = "l"))
+    
     expect_snapshot_value(list(
         eicsRef,
         eicsI,
@@ -133,7 +142,7 @@ test_that("EICs", {
     backEICsHRMS <- lapply(c("mstoolkit", "streamcraft", "mzr"), function(backend)
     {
         withOpt(MS.backends = backend, {
-            getEICs(anaInfoHRMSOne, EICInfoListHRMS[1], gapFactor = 3, output = "raw")
+            getEICs(anaInfoHRMSOne, EICInfoListHRMS[1], output = "raw")
         })
     })
     expect_equal(backEICsHRMS[["mstoolkit"]], backEICsHRMS[["streamcraft"]])
@@ -144,7 +153,7 @@ test_that("EICs", {
         if (!backend %in% availableBackends(verbose = FALSE))
             return(NULL)
         withOpt(MS.backends = backend, {
-            getEICs(anaInfoIMSOne, EICInfoList[1], gapFactor = 3, output = "raw")
+            getEICs(anaInfoIMSOne, EICInfoList[1], output = "raw")
         })
     })
     expect_equal(backEICsIMS[["mstoolkit"]], backEICsIMS[["streamcraft"]])

@@ -14,6 +14,8 @@ running SIRIUS 6.0 instance, which can speed up repeated job submission and may 
 SIRIUS 6 has a lot more functionality than is now interfaced in `patRoon`. Any feedback on the inclusion of specific
 functionality is welcome!
 
+Many thanks to \@MK3491 for testing and providing feedback on the SIRIUS 6 interface!
+
 **Other new functionality**
 
 * New network-based algorithm for fast, flexible and feature-based componentization. See `?generateComponentsNet` for details.

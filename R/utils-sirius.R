@@ -242,7 +242,12 @@ getSIRIUSFingerprints <- function(projectID, SIRForms, fingerIDData)
     for (i in seq_len(length(SIRForms)))
     {
         if (!is.null(SIRForms[[i]]$predictedFingerprint))
-            set(fps, j = SIRForms[[i]]$molecularFormula, value = unlist(SIRForms[[i]]$predictedFingerprint))
+        {
+            fp <- unlist(SIRForms[[i]]$predictedFingerprint)
+            # apparently missing fingerprints can also be represented with a single NA value (https://github.com/rickhelmus/patRoon/issues/166)
+            if (!all(is.na(fp)))
+                set(fps, j = SIRForms[[i]]$molecularFormula, value = fp)
+        }
     }
     
     if (nrow(fps) > 0)

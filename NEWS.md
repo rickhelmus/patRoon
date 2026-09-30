@@ -52,6 +52,7 @@ to `maxRelCumIntensity`.
 * Fixed: setting `annotate` for `plotChroms()`/`plotMobilograms()` generated warnings
 * Fixed: `newProject()` did not refresh the analysis info table when selecting a set (reported by Alessia Ore)
 * Fixed: Number of exported entries printed by `export()` method for `MSLibrary` was off by one (issue #167)
+* Fixed: `importFeatureGroupsTASQ()` did not properly handle import of features without RT information
 
 
 # patRoon 3.0

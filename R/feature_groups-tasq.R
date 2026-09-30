@@ -98,6 +98,9 @@ importFeatureGroupsBrukerTASQ <- function(input, analysisInfo, clusterRTWindow =
         set(ftindex, anai, grp, finds)
     }
 
+    # remove group column that was used to create initial grouping, so it can be properly updated later
+    fts@features <- lapply(fts@features, \(ft) { ft <- copy(ft); ft[, group := NULL]; return(ft) })
+    
     ret <- featureGroupsBrukerTASQ(groups = groups, groupInfo = gInfo, ftindex = ftindex, features = fts)
 
     return(ret)

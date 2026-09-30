@@ -30,7 +30,7 @@ getEICs(
 )
 
 # S4 method for class 'data.table'
-getEICs(obj, ranges, maxGap = 3, output = "fill", minIntensityIMS = 25)
+getEICs(obj, ranges, maxGap = 10, output = "fill", minIntensityIMS = 25)
 
 # S4 method for class 'data.frame'
 getEICs(obj, ...)

@@ -102,10 +102,10 @@ data processing.</p></li>
 ionized <em>m/z</em>. If a feature is completely absent in a particular set then it follows no adduct annotations are
 available and the value of <code>setsAdductPos</code> (positive ionization data) or <code>setsAdductNeg</code> (negative
 ionization data) will be used instead.</p></li>
-</ul><p>The following additional parameters exist specifically for EICs (<code>EICParams</code>):</p><ul><li><p><code>gapFactor</code> Bruker TIMS data (and maybe others?) seem to omit zero intensity scans, which will lead to
-  time gaps between spectra and incorrect EICs. To determine a time gap, the <code>gapFactor</code> is multiplied with the
-  median of time differences between scans. If a gap is detected, then appropriate zero intensity points are added to
-  the EIC. Set to <code>0</code> to disable this.</p></li>
+</ul><p>The following additional parameters exist specifically for EICs (<code>EICParams</code>):</p><ul><li><p><code>maxGap</code> Bruker TIMS data (and maybe others?) seem to omit zero intensity scans, which will lead to time
+  gaps between spectra and incorrect EICs. A gap is determined if two MS timepoints differ more than <code>maxGap</code>
+  seconds. If a gap is detected, then appropriate zero intensity points are added to the EIC with an interval based
+  on the median MS scan time. Set to <code>0</code> to disable this.</p></li>
 </ul><p>The following additional parameters exist specifically for EIMs (<code>EIMParams</code>):</p><ul><li><p><code>maxRTWindow</code> Maximum retention time window (seconds, +/- feature retention time) in which mobilograms
   are collected and averaged. Defaults to <code>defaultLim("retention", "very_narrow")</code> (see <a href="limits.html">limits</a>).</p></li>
 <li><p><code>smooth</code> The smoothing method that is applied to the EIM. Can be <code>"none"</code> for no smoothing,

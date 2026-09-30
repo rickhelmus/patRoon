@@ -234,7 +234,7 @@ ISSN 1097-0231.
     vector of length two that specifies the min/max <em>m/z</em> range. <code>mzStep</code> specifies the bin widths.</p></li>
 <li><p><code>retRange</code> A <code>numeric</code> vector of length two that specifies the retention time range for the EICs.
     Data outside this range is excluded. Set to <code>NULL</code> to use the full range.</p></li>
-<li><p><code>gapFactor</code> A <code>numeric</code> that configures gap filling for EICs. See <code><a href="EIXParams.html">getDefEICParams</a></code>
+<li><p><code>maxGap</code> A <code>numeric</code> that configures gap filling for EICs. See <code><a href="EIXParams.html">getDefEICParams</a></code>
     for further details.</p></li>
 <li><p><code>minEICIntensity</code> The minimum intensity of the highest data point in the EIC. Used to filter EICs.</p></li>
 <li><p><code>minEICAdjTime</code>,<code>minEICAdjPoints</code>,<code>minEICAdjIntensity</code> The EIC should have at least a

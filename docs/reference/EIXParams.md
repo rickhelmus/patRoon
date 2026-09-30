@@ -87,10 +87,10 @@ The following additional parameters exist specifically for EICs
 
 - `maxGap` Bruker TIMS data (and maybe others?) seem to omit zero
   intensity scans, which will lead to time gaps between spectra and
-  incorrect EICs. To determine a time gap, the `maxGap` is multiplied
-  with the median of time differences between scans. If a gap is
-  detected, then appropriate zero intensity points are added to the EIC.
-  Set to `0` to disable this.
+  incorrect EICs. A gap is determined if two MS timepoints differ more
+  than `maxGap` seconds. If a gap is detected, then appropriate zero
+  intensity points are added to the EIC with an interval based on the
+  median MS scan time. Set to `0` to disable this.
 
 The following additional parameters exist specifically for EIMs
 (`EIMParams`):

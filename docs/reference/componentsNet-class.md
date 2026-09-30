@@ -8,7 +8,7 @@ and is used to store results from network-based componentization.
 
 ``` r
 # S4 method for class 'componentsNet'
-plotGraph(obj, analysis, width = NULL, height = NULL)
+plotGraph(obj, analysis, group = TRUE, width = NULL, height = NULL)
 
 # S4 method for class 'componentsNetSet'
 plotGraph(obj, analysis, set, ...)
@@ -26,6 +26,10 @@ unset(obj, set)
 - analysis:
 
   The name of the analysis to plot.
+
+- group:
+
+  Whether to color nodes by their feature component.
 
 - width, height:
 

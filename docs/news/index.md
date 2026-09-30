@@ -23,6 +23,9 @@ SIRIUS 6 has a lot more functionality than is now interfaced in
 `patRoon`. Any feedback on the inclusion of specific functionality is
 welcome!
 
+Many thanks to [@MK3491](https://github.com/MK3491) for testing and
+providing feedback on the SIRIUS 6 interface!
+
 **Other new functionality**
 
 - New network-based algorithm for fast, flexible and feature-based
@@ -61,6 +64,9 @@ welcome!
   intensity peaks that are above the filter threshold. For this reason
   the `minRelCumIntensity` and `relMinCumIntensity` (latter was named
   incorrectly) are renamed to `maxRelCumIntensity`.
+- **Important** The `gapFactor` EIC parameter is replaced by a new
+  `maxGap` parameter, which is more intuitive and with a better default
+  (issue [\#154](https://github.com/rickhelmus/patRoon/issues/154)).
 - Optimizations for very large datasets (issue
   [\#154](https://github.com/rickhelmus/patRoon/issues/154))
 - The `window` EIC and EIM parameter can now be `Inf` to include the
@@ -116,6 +122,12 @@ welcome!
   [`newProject()`](https://rickhelmus.github.io/patRoon/reference/newProject.md)
   did not refresh the analysis info table when selecting a set (reported
   by Alessia Ore)
+- Fixed: Number of exported entries printed by
+  [`export()`](https://rickhelmus.github.io/patRoon/reference/generics.md)
+  method for `MSLibrary` was off by one (issue
+  [\#167](https://github.com/rickhelmus/patRoon/issues/167))
+- Fixed: `importFeatureGroupsTASQ()` did not properly handle import of
+  features without RT information
 
 ## patRoon 3.0
 

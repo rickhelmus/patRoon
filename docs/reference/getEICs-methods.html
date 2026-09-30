@@ -82,7 +82,7 @@ options).</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'data.table'</span></span>
-<span><span class="fu"><a href="generics.html">getEICs</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">ranges</span>, gapFactor <span class="op">=</span> <span class="fl">3</span>, output <span class="op">=</span> <span class="st">"fill"</span>, minIntensityIMS <span class="op">=</span> <span class="fl">25</span><span class="op">)</span></span>
+<span><span class="fu"><a href="generics.html">getEICs</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">ranges</span>, maxGap <span class="op">=</span> <span class="fl">10</span>, output <span class="op">=</span> <span class="st">"fill"</span>, minIntensityIMS <span class="op">=</span> <span class="fl">25</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'data.frame'</span></span>
 <span><span class="fu"><a href="generics.html">getEICs</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
@@ -124,7 +124,7 @@ which is sufficient for <em>e.g.</em> plotting. If <code>output="raw"</code> the
 Furthermore, columns <code>"mobmin"</code> and <code>"mobmax"</code> can be added for mobility lower/upper ranges in IMS data.</p></dd>
 
 
-<dt id="arg-gapfactor">gapFactor<a class="anchor" aria-label="anchor" href="#arg-gapfactor"></a></dt>
+<dt id="arg-maxgap">maxGap<a class="anchor" aria-label="anchor" href="#arg-maxgap"></a></dt>
 <dd><p>A <code>numeric</code> that configures gap filling. See <code><a href="EIXParams.html">getDefEICParams</a></code> for more details.</p></dd>
 
 

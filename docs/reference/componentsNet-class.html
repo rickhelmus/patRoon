@@ -53,7 +53,7 @@
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for class 'componentsNet'</span></span>
-<span><span class="fu"><a href="generics.html">plotGraph</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">analysis</span>, width <span class="op">=</span> <span class="cn">NULL</span>, height <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu"><a href="generics.html">plotGraph</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">analysis</span>, group <span class="op">=</span> <span class="cn">TRUE</span>, width <span class="op">=</span> <span class="cn">NULL</span>, height <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'componentsNetSet'</span></span>
 <span><span class="fu"><a href="generics.html">plotGraph</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">analysis</span>, <span class="va">set</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -72,6 +72,10 @@
 
 <dt id="arg-analysis">analysis<a class="anchor" aria-label="anchor" href="#arg-analysis"></a></dt>
 <dd><p>The name of the analysis to plot.</p></dd>
+
+
+<dt id="arg-group">group<a class="anchor" aria-label="anchor" href="#arg-group"></a></dt>
+<dd><p>Whether to color nodes by their feature component.</p></dd>
 
 
 <dt id="arg-width-height">width, height<a class="anchor" aria-label="anchor" href="#arg-width-height"></a></dt>

@@ -51,6 +51,7 @@ to `maxRelCumIntensity`.
 * `fixedIsolationWindow` can now be a two-sized vector to specify asymmetric isolation windows (issue #161)
 * Fixed: setting `annotate` for `plotChroms()`/`plotMobilograms()` generated warnings
 * Fixed: `newProject()` did not refresh the analysis info table when selecting a set (reported by Alessia Ore)
+* Fixed: Number of exported entries printed by `export()` method for `MSLibrary` was off by one (issue #167)
 
 
 # patRoon 3.0

@@ -253,7 +253,7 @@ void writeMSPLibrary(Rcpp::CharacterMatrix recordsM, Rcpp::List spectraList, Rcp
             outf << "\n";
             
             if (row > 0 && (row == (recordsM.nrow()-1) || (row % 25000) == 0))
-                Rcpp::Rcout << "Wrote " << row << " records\n";
+                Rcpp::Rcout << "Wrote " << row + 1 << " records\n";
         }
         outf.close();
     }

@@ -170,6 +170,9 @@ setGeneric("groupFeaturesXCMS3", function(feat, ...) standardGeneric("groupFeatu
 #' @rdname groupFeaturesXCMS3
 setGeneric("groupFeaturesPXCMS3", function(obj, ...) standardGeneric("groupFeaturesPXCMS3"))
 
+#' @rdname groupFeaturesSIRIUS
+setGeneric("groupFeaturesPSIRIUS", function(obj, ...) standardGeneric("groupFeaturesPSIRIUS"))
+
 #' @rdname groupFeaturesKPIC2
 setGeneric("groupFeaturesKPIC2", function(feat, ...) standardGeneric("groupFeaturesKPIC2"))
 

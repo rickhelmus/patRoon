@@ -90,9 +90,9 @@ setMethod("findFeaturesPPiek", "workflow",
           \(obj, param = NULL, ...) doWfFeat(obj, algo = "Piek", param = param, ...))
 
 
-doWfGroupFeat <- function(..., algo)
+doWfGroupFeat <- function(..., algo, slotIn = "features")
 {
-    doWfStep(func = paste0("groupFeaturesP", algo), slotNameIn = "features", slotNameOut = "fGroups",
+    doWfStep(func = paste0("groupFeaturesP", algo), slotNameIn = slotIn, slotNameOut = "fGroups",
              paramClass = paste0("FeatureGroups", algo, "Param"), ...)
 }
 
@@ -119,6 +119,14 @@ setMethod("groupFeaturesP", c("workflow", "FeatureGroupsKPIC2Param"),
 #' @rdname groupFeaturesKPIC2
 setMethod("groupFeaturesPKPIC2", "workflow",
           \(obj, param = NULL, ...) doWfGroupFeat(obj, algo = "KPIC2", param = param, ...))
+
+#' @rdname groupFeaturesSIRIUS
+setMethod("groupFeaturesP", c("workflow", "FeatureGroupsSIRIUSParam"),
+          \(obj, param = NULL, ...) doWfGroupFeat(obj, algo = "SIRIUS", param = param, ..., slotIn = "analysisInfo"))
+
+#' @rdname groupFeaturesSIRIUS
+setMethod("groupFeaturesPSIRIUS", "workflow",
+          \(obj, param = NULL, ...) doWfGroupFeat(obj, algo = "SIRIUS", param = param, ..., slotIn = "analysisInfo"))
 
 #' @rdname groupFeaturesGreedy
 setMethod("groupFeaturesP", c("workflow", "FeatureGroupsGreedyParam"),

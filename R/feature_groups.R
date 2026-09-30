@@ -1769,16 +1769,17 @@ setMethod("groupFeatures", "features", function(obj, algorithm, ..., verbose = T
     f(obj, ..., verbose = verbose)
 })
 
-# NOTE: obj is not dispatched, we only want to pass through here so it works with both anaInfo and workflow input
+# NOTE: obj is not dispatched, we only want to pass through here so it works with both features and workflow input
 setMethod("groupFeaturesP", c("ANY", "character"), function(obj, param, ...)
 {
-    checkmate::assertChoice(param, c("openms", "xcms3", "envipick", "kpic2", "safd", "piek"))
+    checkmate::assertChoice(param, c("openms", "xcms3", "kpic2", "greedy", "sirius"))
     
     f <- switch(param,
                 openms = groupFeaturesPOpenMS,
                 xcms3 = groupFeaturesPXCMS3,
                 kpic2 = groupFeaturesPKPIC2,
-                greedy = groupFeaturesPGreedy)
+                greedy = groupFeaturesPGreedy,
+                sirius = groupFeaturesPSIRIUS)
     
     f(obj, ...)
 })

@@ -35,6 +35,7 @@ test_that("all param classes can be constructed without errors", {
     expect_error(FeatureGroupsOpenMSParam(), NA)
     expect_error(FeatureGroupsXCMS3Param(), NA)
     expect_error(FeatureGroupsKPIC2Param(), NA)
+    expect_error(FeatureGroupsSIRIUSParam(), NA)
     expect_error(FeatureGroupsGreedyParam(), NA)
     expect_error(FilterFeatGroupsParam(), NA)
     expect_error(ScreenSuspectsParam(), NA)

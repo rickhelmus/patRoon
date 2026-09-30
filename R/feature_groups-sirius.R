@@ -4,6 +4,7 @@
 
 #' @include features.R
 #' @include feature_groups.R
+#' @include feature_groups-sirius-param.R
 NULL
 
 #' @rdname featureGroups-class
@@ -136,6 +137,21 @@ groupFeaturesSIRIUS <- function(analysisInfo, ..., login = "check", alwaysLogin 
     
     return(ret)
 }
+
+doGroupFeaturesPSIRIUS <- function(obj, param, ..., projectPath = NULL, runMode = "execute", SIRIUSAPI = NULL)
+{
+    do.call(groupFeaturesSIRIUS,
+            c(list(obj, projectPath = projectPath, runMode = runMode, SIRIUSAPI = SIRIUSAPI),
+              prepAndVerifyParamForCall(param, "FeatureGroupsSIRIUSParam", ...)))
+}
+
+#' @rdname groupFeaturesSIRIUS
+#' @export
+setMethod("groupFeaturesPSIRIUS", "data.frame", doGroupFeaturesPSIRIUS)
+
+#' @rdname groupFeaturesSIRIUS
+#' @export
+setMethod("groupFeaturesP", c("data.frame", "FeatureGroupsSIRIUSParam"), doGroupFeaturesPSIRIUS)
 
 #' @details \code{importFeatureGroupsSIRIUS} is a simple wrapper around \code{groupFeaturesSIRIUS} to import feature
 #'   groups from an existing SIRIUS project. It will set \code{runMode="read"} and \code{projectPath} to the provided

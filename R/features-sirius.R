@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 #' @include features.R
+#' @include features-sirius-param.R
 NULL
 
 #' @rdname features-class
@@ -134,6 +135,15 @@ findFeaturesSIRIUS <- function(analysisInfo, noiseIntensity = NULL, alignMaxRTDe
     
     return(ret)
 }
+
+doFindFeaturesPSIRIUS <- function(obj, param, ..., projectPath = NULL, runMode = "execute", SIRIUSAPI = NULL)
+{
+    do.call(findFeaturesSIRIUS, c(list(obj, projectPath = projectPath, runMode = runMode, SIRIUSAPI = SIRIUSAPI),
+                                  prepAndVerifyParamForCall(param, "FeaturesSIRIUSParam", ...)))
+}
+
+setMethod("findFeaturesPSIRIUS", "data.frame", doFindFeaturesPSIRIUS)
+setMethod("findFeaturesP", c("data.frame", "FeaturesSIRIUSParam"), doFindFeaturesPSIRIUS)
 
 #' @details \code{importFeaturesSIRIUS} is a simple wrapper around \code{findFeaturesSIRIUS} to import features from an
 #'   existing SIRIUS project. It will set \code{runMode="read"} and \code{projectPath} to the provided \code{input}

@@ -292,6 +292,7 @@ Collate:
     'features-piek.R'
     'features-safd-param.R'
     'features-safd.R'
+    'features-sirius-param.R'
     'features-sirius.R'
     'features-table.R'
     'features-tasq.R'

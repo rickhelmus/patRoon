@@ -73,6 +73,14 @@ setMethod("findFeaturesP", c("workflow", "FeaturesSAFDParam"),
 setMethod("findFeaturesPSAFD", "workflow",
           \(obj, param = NULL, ...) doWfFeat(obj, algo = "SAFD", param = param, ...))
 
+#' @rdname findFeaturesSIRIUS
+setMethod("findFeaturesP", c("workflow", "FeaturesSIRIUSParam"),
+          \(obj, param = NULL, ...) doWfFeat(obj, algo = "SIRIUS", param = param, ...))
+
+#' @rdname findFeaturesSIRIUS
+setMethod("findFeaturesPSIRIUS", "workflow",
+          \(obj, param = NULL, ...) doWfFeat(obj, algo = "SIRIUS", param = param, ...))
+
 #' @rdname findFeaturesPiek
 setMethod("findFeaturesP", c("workflow", "FeaturesPiekParam"),
           \(obj, param = NULL, ...) doWfFeat(obj, algo = "Piek", param = param, ...))

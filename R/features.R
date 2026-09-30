@@ -650,14 +650,14 @@ findFeatures <- function(obj, algorithm, ..., verbose = TRUE)
 # NOTE: obj is not dispatched, we only want to pass through here so it works with both anaInfo and workflow input
 setMethod("findFeaturesP", c("ANY", "character"), function(obj, param, ...)
 {
-    # UNDONE: add SIRIUS back when 6.0 is supported
-    checkmate::assertChoice(param, c("openms", "xcms3", "envipick", "kpic2", "safd", "piek"))
+    checkmate::assertChoice(param, c("openms", "xcms3", "envipick", "sirius", "kpic2", "safd", "piek"))
     
     f <- switch(param,
                 bruker = findFeaturesPBruker,
                 openms = findFeaturesPOpenMS,
                 xcms3 = findFeaturesPXCMS3,
                 envipick = findFeaturesPEnviPick,
+                sirius = findFeaturesPSIRIUS,
                 kpic2 = findFeaturesPKPIC2,
                 safd = findFeaturesPSAFD,
                 piek = findFeaturesPPiek)

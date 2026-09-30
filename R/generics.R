@@ -134,6 +134,9 @@ setGeneric("findFeaturesPEnviPick", function(obj, ...) standardGeneric("findFeat
 #' @rdname findFeaturesPKPIC2
 setGeneric("findFeaturesPKPIC2", function(obj, ...) standardGeneric("findFeaturesPKPIC2"))
 
+#' @rdname findFeaturesSIRIUS
+setGeneric("findFeaturesPSIRIUS", function(obj, ...) standardGeneric("findFeaturesPSIRIUS"))
+
 #' @rdname findFeaturesOpenMS
 setGeneric("findFeaturesPOpenMS", function(obj, ...) standardGeneric("findFeaturesPOpenMS"))
 

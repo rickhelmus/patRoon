@@ -231,6 +231,18 @@ setMethod("generateComponentsP", c("workflow", "ComponentsCliqueMSParam"),
 setMethod("generateComponentsPCliqueMS", "workflow",
           \(obj, param = NULL, ...) doWfCompon(obj, algo = "CliqueMS", param = param, ...))
 
+#' @rdname generateComponentsNet
+setMethod("generateComponentsP", c("workflow", "ComponentsNetParam"),
+          \(obj, param = NULL, ...) doWfStep(func = "generateComponentsPNet",
+                                             slotNameIn = c("fGroups", "MSPeakLists"), slotNameOut = "components",
+                                             paramClass = "ComponentsNetParam", obj = obj, param = param, ...))
+
+#' @rdname generateComponentsNet
+setMethod("generateComponentsPNet", "workflow",
+          \(obj, param = NULL, ...) doWfStep(func = "generateComponentsPNet",
+                                             slotNameIn = c("fGroups", "MSPeakLists"), slotNameOut = "components",
+                                             paramClass = "ComponentsNetParam", obj = obj, param = param, ...))
+
 #' @rdname generateComponentsSpecClust
 setMethod("generateComponentsPSpecClust", "workflow",
           \(obj, param = NULL, ...) doWfCompon(obj, algo = "SpecClust", param = param, ...))

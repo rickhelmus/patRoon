@@ -647,7 +647,7 @@ setMethod("generateComponents", "featureGroups", function(fGroups, algorithm, ..
 setMethod("generateComponentsP", c("ANY", "character"), function(obj, param, ...)
 {
     checkmate::assertChoice(param, c("ramclustr", "camera", "nontarget", "intclust",
-                                     "openms", "cliquems", "specclust", "tp"))
+                                     "openms", "cliquems", "net", "specclust", "tp"))
 
     f <- switch(param,
                 ramclustr = generateComponentsPRAMClustR,
@@ -656,6 +656,7 @@ setMethod("generateComponentsP", c("ANY", "character"), function(obj, param, ...
                 intclust = generateComponentsPIntClust,
                 openms = generateComponentsPOpenMS,
                 cliquems = generateComponentsPCliqueMS,
+                net = generateComponentsPNet,
                 specclust = generateComponentsPSpecClust,
                 tp = generateComponentsPTPs)
 

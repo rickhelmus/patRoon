@@ -659,7 +659,6 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
         checkmate::checkList(annotAdducts, types = "adduct", min.len = 2, any.missing = FALSE),
         .var.name = "annotAdducts", add = ac
     )
-    checkmate::assertCharacter(annotAdducts, min.chars = 1, any.missing = FALSE, unique = TRUE, add = ac)
     checkmate::assertCharacter(annotPrefAdducts, min.chars = 1, any.missing = FALSE, unique = TRUE, add = ac)
     checkmate::assertList(annotArgs, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", null.ok = TRUE, add = ac)
@@ -800,6 +799,24 @@ setMethod("generateComponentsNet", "featureGroupsSet", function(fGroups, ionizat
     generateComponentsSet(fGroups, ionization, generateComponentsNet, setIonization = TRUE, ...,
                           mzFragBelow = mzFragBelow, setArgs = msplArgs, classGenerator = componentsNetSet)
 })
+
+#' @rdname generateComponentsNet
+#' @export
+setMethod("generateComponentsPNet", "featureGroups", function(obj, param, ..., ionization = NULL, MSPeakLists = NULL)
+{
+    do.call(generateComponentsNet, c(list(obj, ionization = ionization, MSPeakLists = MSPeakLists),
+                                     prepAndVerifyParamForCall(param, "ComponentsNetParam", ...)))
+})
+
+#' @rdname generateComponentsNet
+#' @export
+setMethod("generateComponentsP", c("featureGroups", "ComponentsNetParam"), function(obj, param, ..., ionization = NULL,
+                                                                                    MSPeakLists = NULL)
+{
+    do.call(generateComponentsNet, c(list(obj, ionization = ionization, MSPeakLists = MSPeakLists),
+                                     prepAndVerifyParamForCall(param, "ComponentsNetParam", ...)))
+})
+
 
 #' @describeIn componentsNet Plots an interactive network graph for the feature components of an analysis.
 #'

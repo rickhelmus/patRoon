@@ -315,6 +315,9 @@ setGeneric("generateComponentsPRAMClustR", function(obj, ...) standardGeneric("g
 #' @rdname generateComponentsCAMERA
 setGeneric("generateComponentsPCAMERA", function(obj, ...) standardGeneric("generateComponentsPCAMERA"))
 
+#' @rdname generateComponentsNet
+setGeneric("generateComponentsPNet", function(obj, ...) standardGeneric("generateComponentsPNet"))
+
 #' @rdname generateComponentsNontarget
 setGeneric("generateComponentsPNontarget", function(obj, ...) standardGeneric("generateComponentsPNontarget"))
 

@@ -30,6 +30,7 @@ test_that("all param classes can be constructed without errors", {
     expect_error(ComponentsCliqueMSParam(), NA)
     expect_error(ComponentsCAMERAParam(), NA)
     expect_error(ComponentsTPsParam(), NA)
+    expect_error(ComponentsNetParam(), NA)
 
     # Feature group params
     expect_error(FeatureGroupsOpenMSParam(), NA)

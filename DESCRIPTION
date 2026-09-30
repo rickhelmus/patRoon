@@ -205,6 +205,7 @@ Collate:
     'components-intclust.R'
     'components-nontarget-param.R'
     'components-set.R'
+    'components-net-param.R'
     'components-net.R'
     'components-net-set.R'
     'components-nontarget.R'

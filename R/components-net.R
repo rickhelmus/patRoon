@@ -659,7 +659,6 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
         checkmate::checkList(annotAdducts, types = "adduct", min.len = 2, any.missing = FALSE),
         .var.name = "annotAdducts", add = ac
     )
-    checkmate::assertCharacter(annotAdducts, min.chars = 1, any.missing = FALSE, unique = TRUE, add = ac)
     checkmate::assertCharacter(annotPrefAdducts, min.chars = 1, any.missing = FALSE, unique = TRUE, add = ac)
     checkmate::assertList(annotArgs, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", null.ok = TRUE, add = ac)

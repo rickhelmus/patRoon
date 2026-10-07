@@ -10,6 +10,7 @@ screenSuspects(
   suspects,
   rtWindow = defaultLim("retention", "medium"),
   mzWindow = defaultLim("mz", "medium"),
+  mzWindowRel = NULL,
   IMSMatchParams = NULL,
   adduct = NULL,
   skipInvalid = TRUE,
@@ -25,6 +26,7 @@ screenSuspects(
   suspects,
   rtWindow,
   mzWindow,
+  mzWindowRel,
   IMSMatchParams,
   adduct,
   skipInvalid,
@@ -39,6 +41,7 @@ screenSuspects(
   suspects,
   rtWindow,
   mzWindow,
+  mzWindowRel,
   IMSMatchParams,
   adduct,
   skipInvalid,
@@ -54,6 +57,7 @@ screenSuspects(
   suspects,
   rtWindow,
   mzWindow,
+  mzWindowRel,
   IMSMatchParams,
   adduct,
   skipInvalid,
@@ -68,6 +72,7 @@ screenSuspects(
   suspects,
   rtWindow,
   mzWindow,
+  mzWindowRel,
   IMSMatchParams,
   adduct,
   skipInvalid,
@@ -97,10 +102,12 @@ screenSuspects(
   is to be used with which set (*e.g.*
   `suspects=list(positive=suspsPos, negative=suspsNeg)`).
 
-- rtWindow, mzWindow:
+- rtWindow, mzWindow, mzWindowRel:
 
-  The retention time window (in seconds) and *m/z* window that will be
-  used for matching a suspect (+/- feature data).
+  The tolerances for retention time (seconds), absolute *m/z* (Da) and
+  relative *m/z* (ppm) used for matching a suspect (+/- feature data).
+  Set to `NULL` to ignore. If both `mzWindow` and `mzWindowRel` are set,
+  the more stringent of the two is used.
 
 - IMSMatchParams:
 

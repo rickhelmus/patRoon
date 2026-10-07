@@ -4,6 +4,17 @@
 
 isFGSet <- function(fGroups) inherits(fGroups, "featureGroupsSet")
 
+getSetsAnaInfo <- function(anaInfoList)
+{
+    # combine anaInfo and tag
+    return(rbindlist(lapply(names(anaInfoList), function(set)
+    {
+        ret <- copy(anaInfoList[[set]])
+        data.table::set(ret, j = "set", value = if (nrow(ret) == 0) character() else set)
+        return(ret)
+    }), fill = TRUE))
+}
+
 getAnnotationsFromSetFeatures <- function(fGroups)
 {
     if (length(fGroups) > 0)

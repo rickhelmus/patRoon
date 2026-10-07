@@ -25,8 +25,12 @@ workflow <- setClass("workflow", slots = c(analysisInfo = "data.table", features
 
 setMethod("initialize", "workflow", function(.Object, analysisInfo, ...)
 {
-    # UNDONE: make anaInfo optional?
+    # UNDONE: make anaInfo optional? --> at least if features are given
     # UNDONE: don't store anaInfo and only keep it in features?
+    # UNDONE: more checks for ...
+    #   - ensure that all bojects are given (eg if only compounds are given, then also MSPL, fGroups etc must be there)
+    #   - ensure that objects are in sync (same features, anaInfo)
+    #   - if only fGroups are given, derive features/anaInfo from that. If only features, derive anaInfo from that
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo)
     callNextMethod(.Object, analysisInfo = analysisInfo, ...)
 })
@@ -56,28 +60,6 @@ setMethod("names", "workflow", function(x)
 
 #' @export
 setMethod("replicates", "workflow", function(obj) unique(analysisInfo(obj)$replicate))
-
-#' @export
-setMethod("sets", "workflow", function(obj)
-{
-    verifyWFHasFGroups(obj)
-    if (!is(obj@fGroups, "featureGroupsSet"))
-        stop("This workflow does not contain set feature groups", call. = FALSE)
-    sets(obj@fGroups)
-})
-
-#' @export
-setMethod("unset", "workflow", function(obj, set)
-{
-    verifyWFHasFGroups(obj)
-    assertSets(obj, set, FALSE)
-    for (n in names(obj))
-    {
-        if (!is.null(slot(obj, n)))
-            slot(obj, n) <- unset(slot(obj, n), set)
-    }
-    return(obj)
-})
 
 #' @export
 setMethod("report", "workflow", function(obj, MSPeakLists = obj@MSPeakLists, formulas = obj@formulas,

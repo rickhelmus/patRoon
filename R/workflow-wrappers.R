@@ -3,18 +3,50 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 #' @include workflow.R
+#' @include workflow-set.R
 NULL
 
 # Wrapper method functions.
 # NOTE: these are defined here to avoid circular dependencies between the workflow and the other classes.
 
-doWfStep <- function(obj, func, slotNameIn, slotNameOut, param, paramClass, ...)
+doWfStepFunc <- function(obj, func, inputObjs, param, paramClass, ...)
 {
     if (is.null(param))
         param <- new(paramClass, template = templateDir(obj))
-    args <- c(sapply(slotNameIn, slot, object = obj, simplify = FALSE), list(param = param, ...))
+    args <- c(inputObjs, list(param = param, ...))
     names(args)[1] <- "obj" # HACK: first should always be obj, any other slot inputs should remain
-    slot(obj, slotNameOut) <- do.call(func, args)
+    do.call(func, args)
+}
+
+doWfStep <- function(obj, func, slotNameIn, slotNameOut, ...)
+{
+    slot(obj, slotNameOut) <- doWfStepFunc(obj, func, sapply(slotNameIn, slot, object = obj, simplify = FALSE), ...)
+    return(obj)
+}
+
+doWfFeatSet <- function(obj, func, slotNameIn, slotNameOut, ..., sets = NULL)
+{
+    assertSets(obj, sets, multiple = TRUE, null.ok = TRUE)
+    
+    mySets <- sets(obj)
+    if (length(mySets) == 0)
+    {
+        warning("No sets available in this workflowSet object", call. = FALSE)
+        return(obj)
+    }
+    
+    if (is.null(sets))
+        sets <- mySets
+    
+    obj@setObjects[sets] <- Map(sets, setObjects(obj)[sets], f = function(sn, so)
+    {
+        if (is.null(so[[slotNameIn]]))
+            warning(sprintf("No %s available in set '%s'", slotNameIn, sn), call. = FALSE)
+        else
+            so[[slotNameOut]] <- doWfStepFunc(obj, func, so[slotNameIn], ...)
+        return(so)
+    })
+    
     return(obj)
 }
 
@@ -27,11 +59,17 @@ setMethod("convertMSFilesP", c("workflow", "ANY"), function(obj, param, ...)
 })
 
 
-doWfFeat <- function(..., algo)
+setMethod("doWfFeat", "workflow", function(obj, ..., algo)
 {
-    doWfStep(func = paste0("findFeaturesP", algo), slotNameIn = "analysisInfo", slotNameOut = "features",
+    doWfStep(obj, func = paste0("findFeaturesP", algo), slotNameIn = "analysisInfo", slotNameOut = "features",
              paramClass = paste0("Features", algo, "Param"), ...)
-}
+})
+
+setMethod("doWfFeat", "workflowSet", function(obj, ..., algo)
+{
+    doWfFeatSet(obj, func = paste0("findFeaturesP", algo), slotNameIn = "analysisInfo", slotNameOut = "features",
+                paramClass = paste0("Features", algo, "Param"), ...)
+})
 
 #' @rdname findFeaturesOpenMS
 setMethod("findFeaturesP", c("workflow", "FeaturesOpenMSParam"),
@@ -90,11 +128,21 @@ setMethod("findFeaturesPPiek", "workflow",
           \(obj, param = NULL, ...) doWfFeat(obj, algo = "Piek", param = param, ...))
 
 
-doWfGroupFeat <- function(..., algo, slotIn = "features")
+setMethod("doWfGroupFeat", "workflow", function(obj, ..., algo, slotIn = "features")
 {
-    doWfStep(func = paste0("groupFeaturesP", algo), slotNameIn = slotIn, slotNameOut = "fGroups",
+    doWfStep(obj, func = paste0("groupFeaturesP", algo), slotNameIn = slotIn, slotNameOut = "fGroups",
              paramClass = paste0("FeatureGroups", algo, "Param"), ...)
-}
+})
+
+setMethod("doWfGroupFeat", "workflowSet", function(obj, ..., algo, slotIn = "features")
+{
+    # if there already is a features object, makeSet was called and we can call groupFeatures() as usual. Otherwise,
+    # call it per set.
+    # UNDONE: make sure that this is documented
+    f <- if (is.null(obj@features)) doWfFeatSet else doWfStep
+    f(obj, func = paste0("groupFeaturesP", algo), slotNameIn = slotIn, slotNameOut = "fGroups",
+      paramClass = paste0("FeatureGroups", algo, "Param"), ...)
+})
 
 #' @rdname groupFeaturesOpenMS
 setMethod("groupFeaturesP", c("workflow", "FeatureGroupsOpenMSParam"),

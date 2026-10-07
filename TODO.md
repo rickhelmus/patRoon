@@ -13,15 +13,12 @@
     - keep objects configurable?
     - renamed fGroups --> obj and moved args from generic to fGroups method: update NEWS and docs
 - sets
-    - make a separate workflowSets object so that only for that methods have to be defined
-    - then make a makeSet method for WF that returns workSets object
-    - define findFeatures(..., set) methods
-    - define sets in constructor
-    - call makeSet() automatically for groupFeatures()? Can still define it for completeness
-    - OR:
-        - construct workflowSets directly by eg workflowSets(positive = anaInfoPos1, negative = anaInfoNeg)
-        - findFeatures() will be ran for each set and call makeSet() automatically
-        - easier, but cannot use makeSet(fGroups) anymore
+    - findFeatures() is either ran explicitly per set (set arg) or for all sets (set = NULL)
+        - if set = NULL, call makeSet automatically by default??
+    - if groupFeatures() is called, it will either do it for each non-sets objects or the sets object
+        - call makeSet() by default?
+    --> for now no default makeSet(), as it needs additional args (eg adducts, groupAlgo). Can re-check if we somehow avoid the need.
+    - makeSet(): set features slot to getFeatures(fGroups) if using fGroups input?
 - predictToxP()/predictRespFactorsP(): make it configurable which objects are used for prediction?
 
 ## Params

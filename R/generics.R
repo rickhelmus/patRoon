@@ -514,6 +514,8 @@ setGeneric("report", function(obj, ...) standardGeneric("report"))
 ### Workflow
 
 setGeneric("templateDir", function(obj) standardGeneric("templateDir"))
+setGeneric("doWfFeat", function(obj, ...) standardGeneric("doWfFeat"))
+setGeneric("doWfGroupFeat", function(obj, ...) standardGeneric("doWfGroupFeat"))
 setGeneric("wfWrap", function(obj, ...) standardGeneric("wfWrap"))
 
 ### Misc.

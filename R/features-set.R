@@ -52,13 +52,7 @@ doMakeFeaturesSet <- function(featuresList, adducts)
         neutralizedFeatures <- sapply(featuresList, neutralizeFeatures, adduct = NULL,
                                       simplify = FALSE)
     
-    # combine anaInfo and tag
-    combAnaInfo <- rbindlist(lapply(names(featuresList), function(set)
-    {
-        ret <- copy(analysisInfo(featuresList[[set]]))
-        data.table::set(ret, j = "set", value = if (nrow(ret) == 0) character() else set)
-        return(ret)
-    }), fill = TRUE)
+    combAnaInfo <- getSetsAnaInfo(sapply(featuresList, analysisInfo, simplify = FALSE))
     
     # combine (neutralized) features
     combFeatures <- Reduce(modifyList, lapply(neutralizedFeatures, featureTable))

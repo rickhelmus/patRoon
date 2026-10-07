@@ -363,7 +363,7 @@ selectFromSuspAdductCol <- function(tab, col, adductChrDef, gNames = NULL, fgAnn
     }))
 }
 
-doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSMatchParams, adduct, skipInvalid)
+doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, mzWindowRel, IMSMatchParams, adduct, skipInvalid)
 {
     gInfo <- groupInfo(fGroups)
     annTbl <- annotations(fGroups)
@@ -375,9 +375,9 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSMatchPara
     metaDataCols <- setdiff(metaDataCols, c("mobility", "mobility_input", "CCS", "CCS_input"))
     
     emptyResult <- data.table()
-    for (col in c(metaDataCols, "mobility_input", "CCS_input", "group", "d_rt", "d_mz"))
+    for (col in c(metaDataCols, "mobility_input", "CCS_input", "group", "d_rt", "d_mz", "d_mz_rel"))
     {
-        if (col %in% c("rt", "mz", "neutralMass", "mobility_input", "CCS_input", "d_rt", "d_mz"))
+        if (col %in% c("rt", "mz", "neutralMass", "mobility_input", "CCS_input", "d_rt", "d_mz", "d_mz_rel"))
             emptyResult[, (col) := numeric()]
         else
             emptyResult[, (col) := character()]
@@ -408,7 +408,7 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSMatchPara
             gi <- gInfo
             
             # only consider nearby eluting fGroups if RTs are available
-            if (hasRT)
+            if (hasRT && !is.null(rtWindow))
                 gi <- gInfo[numLTE(abs(ret - suspects$rt[ti]), rtWindow)]
             
             # match by mz, this is either done by...
@@ -420,11 +420,20 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSMatchPara
             
             if (is.na(suspects$mz[ti])) # no ionized suspect available, must use annotation data to compare neutral masses
             {
-                at <- annTbl[group %chin% gi$group & numLTE(abs(neutralMass - suspects[ti]$neutralMass), mzWindow)]
+                at <- annTbl[group %chin% gi$group]
+                if (is.null(mzWindow)) 
+                    at <- annTbl[numLTE(abs(mzDiff(neutralMass, suspects[ti]$neutralMass, ppm = FALSE)), mzWindow)]
+                if (!is.null(mzWindowRel))
+                    at <- at[numLTE(abs(mzDiff(neutralMass, suspects[ti]$neutralMass, ppm = TRUE)), mzWindowRel)]
                 gi <- gi[group %chin% at$group]
             }
             else
-                gi <- gi[numLTE(abs(gi$mz - suspects$mz[ti]), mzWindow)]
+            {
+                if (!is.null(mzWindow))
+                    gi <- gi[numLTE(abs(mzDiff(gi$mz, suspects$mz[ti], ppm = FALSE)), mzWindow)]
+                if (!is.null(mzWindowRel))
+                    gi <- gi[numLTE(abs(mzDiff(gi$mz, suspects$mz[ti], ppm = TRUE)), mzWindowRel)]
+            }
             
             if (nrow(gi) == 0)
                 hits <- copy(emptyResult) # no hits
@@ -439,9 +448,11 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSMatchPara
                     ret[, mobility_input := selectFromSuspAdductCol(suspects[ti], "mobility", adductTxt, g, annTbl)]
                     ret[, CCS_input := selectFromSuspAdductCol(suspects[ti], "CCS", adductTxt, g, annTbl)]
                     
-                    ret[, c("group", "d_rt", "d_mz") := .(g, d_rt = if (hasRT) gret - rt else NA_real_,
-                                                          ifelse(is.na(mz), annTbl[group == g]$neutralMass - neutralMass,
-                                                                 gmz - mz))]
+                    ret[, c("group", "d_rt", "d_mz", "d_mz_rel") := .(g, d_rt = if (hasRT) gret - rt else NA_real_,
+                                                                      ifelse(is.na(mz), mzDiff(annTbl[group == g]$neutralMass, neutralMass, ppm = FALSE),
+                                                                             mzDiff(gmz, mz, ppm = FALSE)),
+                                                                      ifelse(is.na(mz), mzDiff(annTbl[group == g]$neutralMass, neutralMass, ppm = TRUE),
+                                                                             mzDiff(gmz, mz, ppm = TRUE)))]
                     
                     return(ret)
                 }), fill = TRUE)
@@ -471,13 +482,13 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSMatchPara
 }
 
 # method definition for screening methods of screenSuspects()
-doScreenSuspectsAmend <- function(fGroups, suspects, rtWindow, mzWindow, IMSMatchParams, adduct, skipInvalid,
-                                  prefCalcChemProps, neutralChemProps, onlyHits, amend = FALSE)
+doScreenSuspectsAmend <- function(fGroups, suspects, rtWindow, mzWindow, mzWindowRel, IMSMatchParams, adduct,
+                                  skipInvalid, prefCalcChemProps, neutralChemProps, onlyHits, amend = FALSE)
 {
     aapply(checkmate::assertFlag, . ~ onlyHits + amend)
     
-    fGroupsScreened <- callNextMethod(fGroups, suspects, rtWindow, mzWindow, IMSMatchParams, adduct, skipInvalid,
-                                      prefCalcChemProps, neutralChemProps, onlyHits)
+    fGroupsScreened <- callNextMethod(fGroups, suspects, rtWindow, mzWindow, mzWindowRel, IMSMatchParams, adduct,
+                                      skipInvalid, prefCalcChemProps, neutralChemProps, onlyHits)
     if (!amend)
         return(fGroupsScreened)
     

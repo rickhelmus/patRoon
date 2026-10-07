@@ -1025,3 +1025,10 @@ estimateIdentificationLevel <- function(candidateName, candidateFGroup, candidat
 }
 
 setOMPThreads <- function() setOMPNumThreads(max(1, getOption("patRoon.threads", 1)))
+
+mzDiff <- function(mz1, mz2, ppm)
+{
+    if (ppm)
+        return((mz1 - mz2) / mz1 * 1E6)
+    return(mz1 - mz2)
+}

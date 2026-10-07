@@ -330,9 +330,9 @@ setGeneric("screenInfo", function(obj) standardGeneric("screenInfo"))
 #' @param \dots Further arguments specified to the methods.
 #' @name suspect-screening
 setGeneric("screenSuspects", function(fGroups, suspects, rtWindow = defaultLim("retention", "medium"),
-                                      mzWindow = defaultLim("mz", "medium"), IMSMatchParams = NULL,
-                                      adduct = NULL, skipInvalid = TRUE, prefCalcChemProps = TRUE,
-                                      neutralChemProps = FALSE,
+                                      mzWindow = defaultLim("mz", "medium"), mzWindowRel = NULL,
+                                      IMSMatchParams = NULL, adduct = NULL, skipInvalid = TRUE,
+                                      prefCalcChemProps = TRUE, neutralChemProps = FALSE,
                                       onlyHits = FALSE, ...) standardGeneric("screenSuspects"))
 
 ### Optimization

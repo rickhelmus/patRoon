@@ -15,6 +15,7 @@ screenSuspects(
   suspects,
   rtWindow = defaultLim("retention", "medium"),
   mzWindow = defaultLim("mz", "medium"),
+  mzWindowRel = NULL,
   IMSMatchParams = NULL,
   adduct = NULL,
   skipInvalid = TRUE,
@@ -29,6 +30,7 @@ screenSuspects(
   suspects,
   rtWindow,
   mzWindow,
+  mzWindowRel,
   IMSMatchParams,
   adduct,
   skipInvalid,
@@ -42,6 +44,7 @@ screenSuspects(
   suspects,
   rtWindow,
   mzWindow,
+  mzWindowRel,
   IMSMatchParams,
   adduct,
   skipInvalid,
@@ -56,6 +59,7 @@ screenSuspects(
   suspects,
   rtWindow,
   mzWindow,
+  mzWindowRel,
   IMSMatchParams,
   adduct,
   skipInvalid,
@@ -69,6 +73,7 @@ screenSuspects(
   suspects,
   rtWindow,
   mzWindow,
+  mzWindowRel,
   IMSMatchParams,
   adduct,
   skipInvalid,
@@ -87,8 +92,9 @@ screenSuspects(
   used for all sets). The \code{list} can be named with the sets names to mark which suspect list is to be used with
   which set (\emph{e.g.} \code{suspects=list(positive=suspsPos, negative=suspsNeg)}).}
 
-\item{rtWindow, mzWindow}{The retention time window (in seconds) and \emph{m/z} window that will be used for matching
-a suspect (+/- feature data).}
+\item{rtWindow, mzWindow, mzWindowRel}{The tolerances for retention time (seconds), absolute \emph{m/z} (Da) and
+relative \emph{m/z} (ppm) used for matching a suspect (+/- feature data). Set to \code{NULL} to ignore. If both
+\code{mzWindow} and \code{mzWindowRel} are set, the more stringent of the two is used.}
 
 \item{IMSMatchParams}{\IMSWF A \code{list} with parameters to be used for matching IMS data. See
 \code{\link{getIMSMatchParams}} for details and how to make such a parameter list.}

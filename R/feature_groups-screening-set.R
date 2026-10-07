@@ -11,7 +11,7 @@ NULL
 mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, screenInfo))
 {
     unCols <- c("rt", "mobility", "CCS", "mobility_input", "CCS_input", "formula", "SMILES", "InChI", "InChIKey",
-                "neutralMass", "d_rt", "d_mz", "d_mob", "d_mob_rel", "d_CCS", "d_CCS_rel", "LC50_SMILES")
+                "neutralMass", "d_rt", "d_mz", "d_mz_rel", "d_mob", "d_mob_rel", "d_CCS", "d_CCS_rel", "LC50_SMILES")
     
     renameDupCols <- function(si, suf, all)
     {
@@ -439,9 +439,9 @@ setMethod("assignMobilities", "featureGroupsScreeningSet", function(obj, mobPeak
 #'   \code{screenInfo} data marks in which sets the suspect hit was found.
 #' @rdname suspect-screening
 #' @export
-setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWindow, mzWindow, IMSMatchParams,
-                                                         adduct, skipInvalid, prefCalcChemProps, neutralChemProps,
-                                                         onlyHits)
+setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWindow, mzWindow, mzWindowRel,
+                                                         IMSMatchParams, adduct, skipInvalid, prefCalcChemProps,
+                                                         neutralChemProps, onlyHits)
 {
     verifyNoAdductIonizationArg(adduct)
     
@@ -450,8 +450,8 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
     unsetFGroupsList <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
     setObjects <- Map(unsetFGroupsList, suspects,
                       f = function(fg, s) screenSuspects(fg, s, rtWindow = rtWindow, mzWindow = mzWindow,
-                                                         IMSMatchParams = IMSMatchParams, adduct = NULL,
-                                                         skipInvalid = skipInvalid,
+                                                         mzWindowRel = mzWindowRel, IMSMatchParams = IMSMatchParams,
+                                                         adduct = NULL, skipInvalid = skipInvalid,
                                                          prefCalcChemProps = prefCalcChemProps,
                                                          neutralChemProps = neutralChemProps, onlyHits = onlyHits))
     

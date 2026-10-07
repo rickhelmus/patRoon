@@ -1,3 +1,9 @@
+# DEVEL
+
+* `screenSuspects()`
+    * `mzWindowRel` argument to match suspects by ppm (suggested by Carlo van Buiten)
+    * `rtWindow` and `mzWindow` arguments can be `NULL` to disable filtering
+
 # patRoon 3.1
 
 **SIRIUS 6.0 support**

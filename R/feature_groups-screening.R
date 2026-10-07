@@ -539,8 +539,9 @@ setMethod("assignMobilities", "featureGroupsScreening", function(obj, mobPeakPar
 #'   \setsWF Can also be a \code{list} with suspect lists to be used for each set (otherwise the same suspect lists is
 #'   used for all sets). The \code{list} can be named with the sets names to mark which suspect list is to be used with
 #'   which set (\emph{e.g.} \code{suspects=list(positive=suspsPos, negative=suspsNeg)}).
-#' @param rtWindow,mzWindow The retention time window (in seconds) and \emph{m/z} window that will be used for matching
-#'   a suspect (+/- feature data).
+#' @param rtWindow,mzWindow,mzWindowRel The tolerances for retention time (seconds), absolute \emph{m/z} (Da) and
+#'   relative \emph{m/z} (ppm) used for matching a suspect (+/- feature data). Set to \code{NULL} to ignore. If both
+#'   \code{mzWindow} and \code{mzWindowRel} are set, the more stringent of the two is used.
 #' @param adduct An \code{\link{adduct}} object (or something that can be converted to it with \code{\link{as.adduct}}).
 #'   Examples: \code{"[M-H]-"}, \code{"[M+Na]+"}. May be \code{NULL}, see \verb{Suspect list format} and \verb{Matching
 #'   of suspect masses} sections below.
@@ -622,9 +623,9 @@ setMethod("assignMobilities", "featureGroupsScreening", function(obj, mobPeakPar
 #' @aliases screenSuspects
 #' @aliases screenSuspects,featureGroups-method
 #' @export
-setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindow, mzWindow, IMSMatchParams,
-                                                      adduct, skipInvalid, prefCalcChemProps, neutralChemProps,
-                                                      onlyHits)
+setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindow, mzWindow, mzWindowRel,
+                                                      IMSMatchParams, adduct, skipInvalid, prefCalcChemProps,
+                                                      neutralChemProps, onlyHits)
 {
     checkmate::assertFlag(skipInvalid) # not in assert collection, should fail before assertSuspectList
 
@@ -633,7 +634,7 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
     
     ac <- checkmate::makeAssertCollection()
     assertSuspectList(suspects, needsAdduct = needsAdduct, skipInvalid, add = ac)
-    aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE,
+    aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow + mzWindowRel, lower = 0, finite = TRUE, null.ok = TRUE,
            fixed = list(add = ac))
     assertIMSMatchParams(IMSMatchParams, null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + onlyHits,
@@ -643,17 +644,20 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
     if (!is.null(adduct))
         adduct <- checkAndToAdduct(adduct, fGroups)
     
+    if (is.null(mzWindow) && is.null(mzWindowRel))
+        stop("Please set either mzWindow or mzWindowRel", call. = FALSE)
+    
     # do this before checking cache to ensure proper errors/warnings are thrown!
     suspects <- prepareSuspectList(suspects, adduct, skipInvalid, checkDesc = TRUE,
                                    prefCalcChemProps = prefCalcChemProps, neutralChemProps = neutralChemProps)
     
-    hash <- makeHash(fGroups, suspects, rtWindow, mzWindow, IMSMatchParams, adduct, skipInvalid, prefCalcChemProps,
-                     neutralChemProps, onlyHits)
+    hash <- makeHash(fGroups, suspects, rtWindow, mzWindow, mzWindowRel, IMSMatchParams, adduct, skipInvalid,
+                     prefCalcChemProps, neutralChemProps, onlyHits)
     cd <- loadCacheData("screenSuspects", hash)
     if (!is.null(cd))
         return(cd)
 
-    scr <- doScreenSuspects(fGroups, suspects, rtWindow, mzWindow, IMSMatchParams, adduct, skipInvalid)
+    scr <- doScreenSuspects(fGroups, suspects, rtWindow, mzWindow, mzWindowRel, IMSMatchParams, adduct, skipInvalid)
 
     if (onlyHits)
         fGroups <- fGroups[, scr$group]

@@ -16,7 +16,8 @@ susps[, formula := babelConvert(SMILES, "smi", "formula")]
 
 fGroups <- getTestFGroups(getTestAnaInfoAnn(), noiseThrInt = 1E4)
 fGroupsScr <- doScreen(fGroups, susps, onlyHits = TRUE)
-fGroupsScrNoRT <- doScreen(fGroups, susps[, -"rt"], onlyHits = TRUE)
+fGroupsScrNoRT <- doScreen(fGroups, susps, rtWindow = NULL, onlyHits = TRUE)
+fGroupsScrNoRTPPM <- doScreen(fGroups, susps, rtWindow = NULL, mzWindow = NULL, mzWindowRel = 10, onlyHits = TRUE)
 getScrInfo <- function(susps, ...) screenInfo(doScreen(fGroups, susps, onlyHits = TRUE, ...))
 
 scr <- getScrInfo(susps)
@@ -53,7 +54,10 @@ test_that("suspect screening is OK", {
     expect_setequal(names(fGroupsScr), screenInfo(fGroupsScr)$group)
 
     # check suspects without retention
-    expect_gte(nrow(getScrInfo(susps[, -3])), nrow(scr))
+    expect_gte(nrow(getScrInfo(susps)), nrow(scr))
+    
+    expect_range(screenInfo(fGroupsScrNoRT)$d_mz, defaultLim("mz", "medium") * c(-1, 1))
+    expect_range(screenInfo(fGroupsScrNoRTPPM)$d_mz_rel, c(-10, 10))
     
     # valid suspect names
     withr::with_options(list(patRoon.cache.mode = "none"), {
@@ -125,6 +129,7 @@ if (hasMF)
     fGroupsOnlyForms <- doEstIDC(fGroupsScr, MSPeakLists = plists, formulas = forms)
     fGroupsAnnNoRT <- doEstIDC(fGroupsScrNoRT, MSPeakLists = plists, formulas = forms, compounds = compsMFMoNa)
     
+    # NOTE: fully omit RT info to force IDL estimation w/out RTs
     fGroupsAnnFragNoRT <- doScreen(fGroupsScr, suspsFrag[, -"rt"], onlyHits = TRUE)
     fGroupsAnnFragNoRT <- doEstIDC(fGroupsAnnFragNoRT, MSPeakLists = plists)
     fGroupsAnnFrag <- doScreen(fGroupsScr, suspsFrag, onlyHits = TRUE)
@@ -134,7 +139,7 @@ if (hasMF)
     genIDLevelRulesFile(idlFrag, exLevels = "3a|c")
     fGroupsAnnFragFormNoRT <- doScreen(fGroups, suspsFragForm[, -"rt"], onlyHits = TRUE)
     fGroupsAnnFragForm <- doEstIDC(fGroupsAnnFragFormNoRT, MSPeakLists = plists, formulas = forms,
-                                  compounds = compsMF, IDFile = idlFrag)
+                                   compounds = compsMF, IDFile = idlFrag)
 }
 
 getAllSuspVals <- function(ann, col)

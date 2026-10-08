@@ -110,9 +110,10 @@ setMethod("initialize", "FilterMSPeakListsParam", function(.Object, ...)
     args <- list(...)
     defs <- getFilterMSPeakListsParamDefs()
     dotsConstr <- args[names(args) %in% names(defs)]
-    dotsConstr$extraOpts <- args[setdiff(names(args), names(defs))]
+    # HACK: only get relevant things from '...', not the most elegant way...
+    dotsConstr$extraOpts <- args[setdiff(names(args), c(names(defs), slotNames(.Object), "configDir"))]
 
-    do.call(callNextMethod, c(list(.Object, name = "FilterMSPeakListsParam", baseName = "filter_mslists", subDir = "annotation",
-                                   description = "Parameters for MSPeakLists filtering", version = "1.0",
-                                   definitions = defs), dotsConstr))
+    do.call(callNextMethod, c(list(.Object, name = "FilterMSPeakListsParam", baseName = "filter_mslists",
+                                   subDir = "annotation", description = "Parameters for MSPeakLists filtering",
+                                   version = "1.0", definitions = defs), dotsConstr))
 })

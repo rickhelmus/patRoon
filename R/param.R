@@ -22,6 +22,31 @@ paramListFillDefaults <- function(paramList, definitions)
     return(fillDefaults(paramList, sapply(definitions, "[[", "default", simplify = FALSE)))
 }
 
+getParamImportClosure <- function()
+{
+    cachedImports <- list()
+    function(configDir, subDir, baseName)
+    {
+        configFiles <- file.path(configDir, subDir, paste0(baseName, c(".R", ".json", ".yml")))
+        configTypes <- c("R", "json", "yaml")
+        configFileInd <- which(file.exists(configFiles))[1]
+        if (is.na(configFileInd))
+            return(NULL)
+        
+        configFile <- configFiles[[configFileInd]]
+        configHash <- makeFileHash(configFile)
+        cached <- cachedImports[[configFile]]
+        if (is.null(cached) || cached$hash != configHash)
+        {
+            cached <- list(hash = configHash, object = importParam(configTypes[[configFileInd]], configFile))
+            cachedImports[[configFile]] <<- cached
+        }
+        return(cached$object)
+    }
+}
+
+doGetParamImport <- getParamImportClosure()
+
 setMethod("show", "defaultParam", function(object)
 {
     printf("A %s object.\n", class(object))
@@ -32,23 +57,45 @@ param <- setClass("param", slots = c(name = "character", baseName = "character",
                                      definitions = "ParamConfigDefs", data = "list"),
                   contains = "VIRTUAL")
 
+
 setMethod("initialize", "param", function(.Object, name, baseName, subDir, description, version,
-          definitions, ..., template = character())
+                                          definitions, ..., configDir = file.path(getwd(), "config"),
+                                          template = character())
 {
-    # construct template data with defaults
-    makeDefsFromList <- function(li)
+    if (!is.null(configDir))
+        checkmate::assertString(configDir)
+
+    date <- Sys.time()
+    data <- NULL
+    if (!is.null(configDir))
     {
-        sapply(li, function(e)
+        objImp <- doGetParamImport(configDir, subDir, baseName)
+        if (!is.null(objImp))
         {
-            return(if (is.list(e) && !is.data.frame(e) && length(e) > 0) makeDefsFromList(e) else DEFAULT)
-        }, simplify = FALSE)
+            if (class(objImp) != class(.Object))
+                stop(sprintf("Imported parameter class is wrong; is '%s' but should be '%s'", class(objImp),
+                             class(.Object)), call. = FALSE)
+            name <- objImp@name; version <- objImp@version; date <- objImp@date; data <- objImp@data
+        }
     }
-    data <- sapply(definitions, "[[", "default", simplify = FALSE)
-    data <- makeDefsFromList(data)
+
+    if (is.null(data))
+    {
+        # construct template data with defaults
+        makeDefsFromList <- function(li)
+        {
+            sapply(li, function(e)
+            {
+                return(if (is.list(e) && !is.data.frame(e) && length(e) > 0) makeDefsFromList(e) else DEFAULT)
+            }, simplify = FALSE)
+        }
+        data <- sapply(definitions, "[[", "default", simplify = FALSE)
+        data <- makeDefsFromList(data)
+    }
     data <- modifyList(data, list(...), keep.null = TRUE)
  
     callNextMethod(.Object, name = name, baseName = baseName, subDir = subDir, description = description, version = version,
-                   date = Sys.time(), definitions = definitions, data = data)
+                   date = date, definitions = definitions, data = data)
 })
 
 setValidity("param", function(object)
@@ -207,7 +254,7 @@ importParam <- function(type, inFile)
         return(x)
     })
     
-    ret <- new(imp$class)
+    ret <- new(imp$class, configDir = NULL)
     ret@version <- imp$version
     ret@date <- as.POSIXct(imp$date)
     ret@data <- imp$data
@@ -264,7 +311,7 @@ exportAllParams <- function(type = "R", outDir = file.path(getwd(), "config"), o
     files <- character(length(classes))
     for (i in seq_along(classes))
     {
-        obj <- methods::new(classes[[i]])
+        obj <- new(classes[[i]], configDir = NULL)
         dir <- file.path(outDir, obj@subDir)
         if (!dir.exists(dir) && !dir.create(dir, recursive = TRUE))
             stop(sprintf("Unable to create output directory '%s'", dir), call. = FALSE)

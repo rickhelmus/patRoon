@@ -70,7 +70,8 @@ setMethod("initialize", "FilterFeatGroupsParam", function(.Object, ...)
     args <- list(...)
     defs <- getFilterFeatGroupsParamDefs()
     dotsConstr <- args[names(args) %in% names(defs)]
-    dotsConstr$extraOpts <- args[setdiff(names(args), names(defs))]
+    # HACK: only get relevant things from '...', not the most elegant way...
+    dotsConstr$extraOpts <- args[setdiff(names(args), c(names(defs), slotNames(.Object), "configDir"))]
     
     do.call(callNextMethod, c(list(.Object, name = "FilterFeatGroupsParam", baseName = "filter_featgroups", subDir = "featgroups",
                                    description = "Parameters for featureGroups filtering", version = "1.0",

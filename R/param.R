@@ -218,3 +218,61 @@ importParam <- function(type, inFile)
     validObject(ret)
     return(ret)
 }
+
+#' Export all parameter classes with their default values
+#'
+#' Discovers all concrete classes derived from the internal param class,
+#' constructs each class with its defaults, and exports it using the same format
+#' as export for an individual parameter object.
+#'
+#' Files are written below outDir, in the sub-directory specified by
+#' each object's subDir slot. Their names are constructed from the baseName
+#' slot and the selected format.
+#'
+#' @param type The output format: R, json, or yaml.
+#' @param outDir The root output directory. Defaults to the current working
+#'   directory.
+#'
+#' @return Invisibly, a character vector with the paths of the files written.
+#' @export
+exportAllParams <- function(type = "R", outDir = file.path(getwd(), "config"), overwrite = FALSE, clear = FALSE)
+{
+    # UNDONE: update LLM'd docs
+    # UNDONE: other function name?
+    # UNDONE: see why function is slow
+    
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertFlag, . ~ overwite, clear, fixed = list(add = ac))
+    checkmate::assertChoice(type, c("R", "json", "yaml"), add = ac)
+    checkmate::assertPathForOutput(outDir, overwrite = overwrite, add = ac)
+    
+    if (overwrite && clear && dir.exists(outDir))
+        unlink(outDir, recursive = TRUE)
+
+    getSubclasses <- function(className)
+    {
+        classDef <- methods::getClassDef(className)
+        subclasses <- names(classDef@subclasses)
+        if (!length(subclasses))
+            return(character())
+        return(unique(c(subclasses, unlist(lapply(subclasses, getSubclasses)))))
+    }
+    
+    classes <- getSubclasses("param")
+    classes <- classes[!sapply(classes, \(cn) methods::getClassDef(cn)@virtual)]
+    
+    ext <- if (type == "yaml") "yml" else type
+    files <- character(length(classes))
+    for (i in seq_along(classes))
+    {
+        obj <- methods::new(classes[[i]])
+        dir <- file.path(outDir, obj@subDir)
+        if (!dir.exists(dir) && !dir.create(dir, recursive = TRUE))
+            stop(sprintf("Unable to create output directory '%s'", dir), call. = FALSE)
+        
+        files[[i]] <- file.path(dir, paste0(obj@baseName, ".", ext))
+        export(obj, type, files[[i]])
+    }
+    
+    return(invisible(files))
+}

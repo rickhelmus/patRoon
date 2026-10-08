@@ -94,7 +94,7 @@ getFeatureGroupsXCMS3ParamDefs <- paramConfigDefsFact(list(
 FeatureGroupsXCMS3Param <- setClass("FeatureGroupsXCMS3Param", slots = c(lamas = "ANY"), contains = "param")
 setMethod("initialize", "FeatureGroupsXCMS3Param", function(.Object, ..., lamas = NULL)
 {
-    ret <- callNextMethod(.Object, name = "FeatureGroupsXCMS3Param", baseName = "FeatureGroupsXCMS3Param",
+    ret <- callNextMethod(.Object, name = "FeatureGroupsXCMS3Param", baseName = "xcms3", subDir = "featgroups",
                           description = "Parameters for XCMS3 feature grouping", version = "1.0",
                           definitions = getFeatureGroupsXCMS3ParamDefs(), ...)
     ret@lamas <- lamas # NOTE: assign here, as ... are passed to data slot in parent constructor

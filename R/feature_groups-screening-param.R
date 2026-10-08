@@ -56,7 +56,7 @@ getScreenSuspectsParamDefs <- paramConfigDefsFact(list(
 ScreenSuspectsParam <- setClass("ScreenSuspectsParam", contains = "param")
 setMethod("initialize", "ScreenSuspectsParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "ScreenSuspectsParam", baseName = "ScreenSuspectsParam",
+    callNextMethod(.Object, name = "ScreenSuspectsParam", baseName = "screen_suspects", subDir = "featgroups",
                    description = "Parameters for screenSuspects", version = "1.0",
                    definitions = getScreenSuspectsParamDefs(), ...)
 })

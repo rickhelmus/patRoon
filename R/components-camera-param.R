@@ -38,7 +38,7 @@ ComponentsCAMERAParam <- setClass("ComponentsCAMERAParam", contains = "param")
 
 setMethod("initialize", "ComponentsCAMERAParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "ComponentsCAMERAParam", baseName = "ComponentsCAMERAParam",
+    callNextMethod(.Object, name = "ComponentsCAMERAParam", baseName = "camera", subDir = "components",
                    description = "Parameters for CAMERA component generation", version = "1.0",
                    definitions = getComponentsCAMERAParamDefs(), ...)
 })

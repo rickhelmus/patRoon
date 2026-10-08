@@ -40,7 +40,7 @@ getFeatureGroupsGreedyParamDefs <- paramConfigDefsFact(list(
 FeatureGroupsGreedyParam <- setClass("FeatureGroupsGreedyParam", contains = "param")
 setMethod("initialize", "FeatureGroupsGreedyParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "FeatureGroupsGreedyParam", baseName = "FeatureGroupsGreedyParam",
+    callNextMethod(.Object, name = "FeatureGroupsGreedyParam", baseName = "greedy", subDir = "featgroups",
                    description = "Parameters for greedy feature grouping", version = "1.0",
                    definitions = getFeatureGroupsGreedyParamDefs(), ...)
 })

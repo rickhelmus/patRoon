@@ -42,7 +42,7 @@ getEstimateIDConfidenceParamDefs <- paramConfigDefsFact(list(
 EstimateIDConfidenceParam <- setClass("EstimateIDConfidenceParam", contains = "param")
 setMethod("initialize", "EstimateIDConfidenceParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "EstimateIDConfidenceParam", baseName = "EstimateIDConfidenceParam",
+    callNextMethod(.Object, name = "EstimateIDConfidenceParam", baseName = "estimate_id_confidence", subDir = "annotation",
                    description = "Parameters for estimateIDConfidence", version = "1.0",
                    definitions = getEstimateIDConfidenceParamDefs(), ...)
 })
@@ -96,7 +96,7 @@ getAssignMobilitiesCompoundsParamDefs <- paramConfigDefsFact(list(
 AssignMobilitiesCompoundsParam <- setClass("AssignMobilitiesCompoundsParam", contains = "param")
 setMethod("initialize", "AssignMobilitiesCompoundsParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "AssignMobilitiesCompoundsParam", baseName = "AssignMobilitiesCompoundsParam",
+    callNextMethod(.Object, name = "AssignMobilitiesCompoundsParam", baseName = "assign_mobilities_compounds", subDir = "annotation",
                    description = "Parameters for assignMobilities on compounds", version = "1.0",
                    definitions = getAssignMobilitiesCompoundsParamDefs(), ...)
 })
@@ -156,7 +156,7 @@ getPredictToxParamDefs <- paramConfigDefsFact(list(
 PredictToxParam <- setClass("PredictToxParam", contains = "param")
 setMethod("initialize", "PredictToxParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "PredictToxParam", baseName = "PredictToxParam",
+    callNextMethod(.Object, name = "PredictToxParam", baseName = "predict_tox", subDir = "annotation",
                    description = "Parameters for predictTox", version = "1.0",
                    definitions = getPredictToxParamDefs(), ...)
 })
@@ -219,7 +219,7 @@ getPredictRespFactorsParamDefs <- paramConfigDefsFact(list(
 PredictRespFactorsParam <- setClass("PredictRespFactorsParam", contains = "param")
 setMethod("initialize", "PredictRespFactorsParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "PredictRespFactorsParam", baseName = "PredictRespFactorsParam",
+    callNextMethod(.Object, name = "PredictRespFactorsParam", baseName = "predict_resp_factors", subDir = "annotation",
                    description = "Parameters for predictRespFactors", version = "1.0",
                    definitions = getPredictRespFactorsParamDefs(), ...)
 })

@@ -77,7 +77,7 @@ CompoundsLibraryParam <- setClass("CompoundsLibraryParam", contains = "param")
 
 setMethod("initialize", "CompoundsLibraryParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "CompoundsLibraryParam", baseName = "CompoundsLibraryParam",
+    callNextMethod(.Object, name = "CompoundsLibraryParam", baseName = "library", subDir = "annotation",
                    description = "Parameters for MS library compound generation", version = "1.0",
                    definitions = getCompoundsLibraryParamDefs(), ...)
 })

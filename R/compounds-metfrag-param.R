@@ -140,7 +140,7 @@ CompoundsMetFragParam <- setClass("CompoundsMetFragParam", contains = "param")
 
 setMethod("initialize", "CompoundsMetFragParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "CompoundsMetFragParam", baseName = "CompoundsMetFragParam",
+    callNextMethod(.Object, name = "CompoundsMetFragParam", baseName = "metfrag", subDir = "annotation",
                    description = "Parameters for MetFrag compound generation", version = "1.0",
                    definitions = getCompoundsMetFragParamDefs(), ...)
 })

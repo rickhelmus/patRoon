@@ -146,7 +146,7 @@ FormulasGenFormParam <- setClass("FormulasGenFormParam", contains = "param")
 
 setMethod("initialize", "FormulasGenFormParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "FormulasGenFormParam", baseName = "FormulasGenFormParam",
+    callNextMethod(.Object, name = "FormulasGenFormParam", baseName = "genform", subDir = "annotation",
                    description = "Parameters for GenForm formula generation", version = "1.0",
                    definitions = getFormulasGenFormParamDefs(), ...)
 })

@@ -138,7 +138,7 @@ getFeaturesOpenMSParamDefs <- paramConfigDefsFact(list(
 FeaturesOpenMSParam <- setClass("FeaturesOpenMSParam", contains = "param")
 setMethod("initialize", "FeaturesOpenMSParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "FeaturesOpenMSParam", baseName = "FeaturesOpenMSParam",
+    callNextMethod(.Object, name = "FeaturesOpenMSParam", baseName = "openms", subDir = "features",
                    description = "Parameters for OpenMS feature detection", version = "1.0",
                    definitions = getFeaturesOpenMSParamDefs(), ...)
 })

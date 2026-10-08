@@ -57,7 +57,7 @@ ComponentsIntClustParam <- setClass("ComponentsIntClustParam", contains = "param
 
 setMethod("initialize", "ComponentsIntClustParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "ComponentsIntClustParam", baseName = "ComponentsIntClustParam",
+    callNextMethod(.Object, name = "ComponentsIntClustParam", baseName = "intclust", subDir = "components",
                    description = "Parameters for intensity-clustering component generation", version = "1.0",
                    definitions = getComponentsIntClustParamDefs(), ...)
 })

@@ -67,7 +67,7 @@ TPsBioTransformerParam <- setClass("TPsBioTransformerParam", contains = "param")
 
 setMethod("initialize", "TPsBioTransformerParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "TPsBioTransformerParam", baseName = "BioTransformer",
+    callNextMethod(.Object, name = "TPsBioTransformerParam", baseName = "biotransformer", subDir = "tps",
                    description = "Parameters for BioTransformer TP generation", version = "1.0",
                    definitions = getTPsBioTransformerParamDefs(), ...)
 })

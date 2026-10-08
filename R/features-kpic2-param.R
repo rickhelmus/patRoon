@@ -33,7 +33,7 @@ getFeaturesKPIC2ParamDefs <- paramConfigDefsFact(list(
 FeaturesKPIC2Param <- setClass("FeaturesKPIC2Param", contains = "param")
 setMethod("initialize", "FeaturesKPIC2Param", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "FeaturesKPIC2Param", baseName = "FeaturesKPIC2Param",
+    callNextMethod(.Object, name = "FeaturesKPIC2Param", baseName = "kpic2", subDir = "features",
                    description = "Parameters for KPIC2 feature detection", version = "1.0",
                    definitions = getFeaturesKPIC2ParamDefs(), ...)
 })

@@ -42,7 +42,7 @@ getConvertMSFilesPWizParamDefs <- paramConfigDefsFact(list(
 ConvertMSFilesPWizParam <- setClass("ConvertMSFilesPWizParam", contains = "param")
 setMethod("initialize", "ConvertMSFilesPWizParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "ConvertMSFilesPWizParam", baseName = "ConvertMSFilesPWizParam",
+    callNextMethod(.Object, name = "ConvertMSFilesPWizParam", baseName = "pwiz", subDir = "convert",
                    description = "Parameters for ProteoWizard/MSConvert MS file conversion",
                    version = "1.0", definitions = getConvertMSFilesPWizParamDefs(), ...)
 })
@@ -60,7 +60,7 @@ getConvertMSFilesOpenMSParamDefs <- paramConfigDefsFact(list(
 ConvertMSFilesOpenMSParam <- setClass("ConvertMSFilesOpenMSParam", contains = "param")
 setMethod("initialize", "ConvertMSFilesOpenMSParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "ConvertMSFilesOpenMSParam", baseName = "ConvertMSFilesOpenMSParam",
+    callNextMethod(.Object, name = "ConvertMSFilesOpenMSParam", baseName = "openms", subDir = "convert",
                    description = "Parameters for OpenMS MS file conversion", version = "1.0",
                    definitions = getConvertMSFilesOpenMSParamDefs(), ...)
 })
@@ -71,7 +71,7 @@ getConvertMSFilesBrukerParamDefs <- paramConfigDefsFact(list())
 ConvertMSFilesBrukerParam <- setClass("ConvertMSFilesBrukerParam", contains = "param")
 setMethod("initialize", "ConvertMSFilesBrukerParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "ConvertMSFilesBrukerParam", baseName = "ConvertMSFilesBrukerParam",
+    callNextMethod(.Object, name = "ConvertMSFilesBrukerParam", baseName = "bruker", subDir = "convert",
                    description = "Parameters for Bruker MS file conversion", version = "1.0",
                    definitions = getConvertMSFilesBrukerParamDefs(), ...)
 })
@@ -135,7 +135,7 @@ getConvertMSFilesIMSCollapseParamDefs <- paramConfigDefsFact(list(
 ConvertMSFilesIMSCollapseParam <- setClass("ConvertMSFilesIMSCollapseParam", contains = "param")
 setMethod("initialize", "ConvertMSFilesIMSCollapseParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "ConvertMSFilesIMSCollapseParam", baseName = "ConvertMSFilesIMSCollapseParam",
+    callNextMethod(.Object, name = "ConvertMSFilesIMSCollapseParam", baseName = "imscollapse", subDir = "convert",
                    description = "Parameters for IMS-collapsing MS file conversion", version = "1.0",
                    definitions = getConvertMSFilesIMSCollapseParamDefs(), ...)
 })
@@ -164,7 +164,7 @@ getConvertMSFilesTIMSCONVERTParamDefs <- paramConfigDefsFact(list(
 ConvertMSFilesTIMSCONVERTParam <- setClass("ConvertMSFilesTIMSCONVERTParam", contains = "param")
 setMethod("initialize", "ConvertMSFilesTIMSCONVERTParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "ConvertMSFilesTIMSCONVERTParam", baseName = "ConvertMSFilesTIMSCONVERTParam",
+    callNextMethod(.Object, name = "ConvertMSFilesTIMSCONVERTParam", baseName = "timsconvert", subDir = "convert",
                    description = "Parameters for TIMSCONVERT MS file conversion", version = "1.0",
                    definitions = getConvertMSFilesTIMSCONVERTParamDefs(), ...)
 })

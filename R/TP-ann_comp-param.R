@@ -80,7 +80,7 @@ TPsAnnCompParam <- setClass("TPsAnnCompParam", contains = "param")
 
 setMethod("initialize", "TPsAnnCompParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "TPsAnnCompParam", baseName = "AnnComp",
+    callNextMethod(.Object, name = "TPsAnnCompParam", baseName = "ann_comp", subDir = "tps",
                    description = "Parameters for annotation-based compound TP generation", version = "1.0",
                    definitions = getTPsAnnCompParamDefs(), ...)
 })

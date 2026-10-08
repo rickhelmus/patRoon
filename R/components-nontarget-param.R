@@ -56,7 +56,7 @@ ComponentsNontargetParam <- setClass("ComponentsNontargetParam", contains = "par
 
 setMethod("initialize", "ComponentsNontargetParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "ComponentsNontargetParam", baseName = "ComponentsNontargetParam",
+    callNextMethod(.Object, name = "ComponentsNontargetParam", baseName = "nontarget", subDir = "components",
                    description = "Parameters for nontarget component generation", version = "1.0",
                    definitions = getComponentsNontargetParamDefs(), ...)
 })

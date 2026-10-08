@@ -20,7 +20,7 @@ TPsLogicParam <- setClass("TPsLogicParam", contains = "param")
 
 setMethod("initialize", "TPsLogicParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "TPsLogicParam", baseName = "Logic",
+    callNextMethod(.Object, name = "TPsLogicParam", baseName = "logic", subDir = "tps",
                    description = "Parameters for metabolic logic TP generation", version = "1.0",
                    definitions = getTPsLogicParamDefs(), ...)
 })

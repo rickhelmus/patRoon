@@ -63,7 +63,7 @@ getFeatureGroupsOpenMSParamDefs <- paramConfigDefsFact(list(
 FeatureGroupsOpenMSParam <- setClass("FeatureGroupsOpenMSParam", contains = "param")
 setMethod("initialize", "FeatureGroupsOpenMSParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "FeatureGroupsOpenMSParam", baseName = "FeatureGroupsOpenMSParam",
+    callNextMethod(.Object, name = "FeatureGroupsOpenMSParam", baseName = "openms", subDir = "featgroups",
                    description = "Parameters for OpenMS feature grouping", version = "1.0",
                    definitions = getFeatureGroupsOpenMSParamDefs(), ...)
 })

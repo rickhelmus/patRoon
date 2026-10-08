@@ -98,7 +98,7 @@ ComponentsOpenMSParam <- setClass("ComponentsOpenMSParam", contains = "param")
 
 setMethod("initialize", "ComponentsOpenMSParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "ComponentsOpenMSParam", baseName = "ComponentsOpenMSParam",
+    callNextMethod(.Object, name = "ComponentsOpenMSParam", baseName = "openms", subDir = "components",
                    description = "Parameters for OpenMS component generation", version = "1.0",
                    definitions = getComponentsOpenMSParamDefs(), ...)
 })

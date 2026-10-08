@@ -39,7 +39,7 @@ getFeatureGroupsKPIC2ParamDefs <- paramConfigDefsFact(list(
 FeatureGroupsKPIC2Param <- setClass("FeatureGroupsKPIC2Param", contains = "param")
 setMethod("initialize", "FeatureGroupsKPIC2Param", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "FeatureGroupsKPIC2Param", baseName = "FeatureGroupsKPIC2Param",
+    callNextMethod(.Object, name = "FeatureGroupsKPIC2Param", baseName = "kpic2", subDir = "featgroups",
                    description = "Parameters for KPIC2 feature grouping", version = "1.0",
                    definitions = getFeatureGroupsKPIC2ParamDefs(), ...)
 })

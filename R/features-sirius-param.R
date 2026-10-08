@@ -42,7 +42,7 @@ getFeaturesSIRIUSParamDefs <- paramConfigDefsFact(list(
 FeaturesSIRIUSParam <- setClass("FeaturesSIRIUSParam", contains = "param")
 setMethod("initialize", "FeaturesSIRIUSParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "FeaturesSIRIUSParam", baseName = "FeaturesSIRIUSParam",
+    callNextMethod(.Object, name = "FeaturesSIRIUSParam", baseName = "sirius", subDir = "features",
                    description = "Parameters for SIRIUS feature detection", version = "1.0",
                    definitions = getFeaturesSIRIUSParamDefs(), ...)
 })

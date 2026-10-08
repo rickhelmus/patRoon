@@ -96,7 +96,7 @@ ComponentsNetParam <- setClass("ComponentsNetParam", contains = "param")
 
 setMethod("initialize", "ComponentsNetParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "ComponentsNetParam", baseName = "ComponentsNetParam",
+    callNextMethod(.Object, name = "ComponentsNetParam", baseName = "net", subDir = "components",
                    description = "Parameters for network-based component generation", version = "1.0",
                    definitions = getComponentsNetParamDefs(), ...)
 })

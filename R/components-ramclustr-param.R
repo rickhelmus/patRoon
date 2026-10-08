@@ -85,7 +85,7 @@ ComponentsRAMClustRParam <- setClass("ComponentsRAMClustRParam", contains = "par
 
 setMethod("initialize", "ComponentsRAMClustRParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "ComponentsRAMClustRParam", baseName = "ComponentsRAMClustRParam",
+    callNextMethod(.Object, name = "ComponentsRAMClustRParam", baseName = "ramclustr", subDir = "components",
                    description = "Parameters for RAMClustR component generation", version = "1.0",
                    definitions = getComponentsRAMClustRParamDefs(), ...)
 })

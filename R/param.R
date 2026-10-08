@@ -27,12 +27,12 @@ setMethod("show", "defaultParam", function(object)
     printf("A %s object.\n", class(object))
 })
 
-param <- setClass("param", slots = c(name = "character", baseName = "character", description = "character",
-                                     version = "character", date = "POSIXct", definitions = "ParamConfigDefs",
-                                     data = "list"),
+param <- setClass("param", slots = c(name = "character", baseName = "character", subDir = "character",
+                                     description = "character", version = "character", date = "POSIXct",
+                                     definitions = "ParamConfigDefs", data = "list"),
                   contains = "VIRTUAL")
 
-setMethod("initialize", "param", function(.Object, name, baseName, description, version,
+setMethod("initialize", "param", function(.Object, name, baseName, subDir, description, version,
           definitions, ..., template = character())
 {
     # construct template data with defaults
@@ -47,7 +47,7 @@ setMethod("initialize", "param", function(.Object, name, baseName, description, 
     data <- makeDefsFromList(data)
     data <- modifyList(data, list(...), keep.null = TRUE)
  
-    callNextMethod(.Object, name = name, baseName = baseName, description = description, version = version,
+    callNextMethod(.Object, name = name, baseName = baseName, subDir = subDir, description = description, version = version,
                    date = Sys.time(), definitions = definitions, data = data)
 })
 
@@ -111,6 +111,8 @@ setMethod("show", "param", function(object)
     
     printf("Parameter class: %s\n", object@name)
     printf("Base name: %s\n", object@baseName)
+    printf("Sub-directory: %s
+", object@subDir)
     printf("Description: %s\n", object@description)
     printf("Version: %s\n", object@version)
     printf("Date created: %s\n", format(object@date))

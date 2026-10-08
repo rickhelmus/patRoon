@@ -47,7 +47,7 @@ ComponentsSpecClustParam <- setClass("ComponentsSpecClustParam", contains = "par
 
 setMethod("initialize", "ComponentsSpecClustParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "ComponentsSpecClustParam", baseName = "ComponentsSpecClustParam",
+    callNextMethod(.Object, name = "ComponentsSpecClustParam", baseName = "specclust", subDir = "components",
                    description = "Parameters for MS/MS spectral clustering component generation", version = "1.0",
                    definitions = getComponentsSpecClustParamDefs(), ...)
 })

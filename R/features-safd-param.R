@@ -91,7 +91,7 @@ getFeaturesSAFDParamDefs <- paramConfigDefsFact(list(
 FeaturesSAFDParam <- setClass("FeaturesSAFDParam", contains = "param")
 setMethod("initialize", "FeaturesSAFDParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "FeaturesSAFDParam", baseName = "FeaturesSAFDParam",
+    callNextMethod(.Object, name = "FeaturesSAFDParam", baseName = "safd", subDir = "features",
                    description = "Parameters for SAFD feature detection", version = "1.0",
                    definitions = getFeaturesSAFDParamDefs(), ...)
 })

@@ -24,7 +24,7 @@ getSelectIonsParamDefs <- paramConfigDefsFact(list(
 SelectIonsParam <- setClass("SelectIonsParam", contains = "param")
 setMethod("initialize", "SelectIonsParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "SelectIonsParam", baseName = "SelectIonsParam",
+    callNextMethod(.Object, name = "SelectIonsParam", baseName = "select_ions", subDir = "featgroups",
                    description = "Parameters for selectIons", version = "1.0",
                    definitions = getSelectIonsParamDefs(), ...)
 })
@@ -77,7 +77,7 @@ getNormIntsParamDefs <- paramConfigDefsFact(list(
 NormIntsParam <- setClass("NormIntsParam", contains = "param")
 setMethod("initialize", "NormIntsParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "NormIntsParam", baseName = "NormIntsParam",
+    callNextMethod(.Object, name = "NormIntsParam", baseName = "norm_ints", subDir = "featgroups",
                    description = "Parameters for normInts", version = "1.0",
                    definitions = getNormIntsParamDefs(), ...)
 })
@@ -129,7 +129,7 @@ getCalculatePeakQualitiesParamDefs <- paramConfigDefsFact(list(
 CalculatePeakQualitiesParam <- setClass("CalculatePeakQualitiesParam", contains = "param")
 setMethod("initialize", "CalculatePeakQualitiesParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "CalculatePeakQualitiesParam", baseName = "CalculatePeakQualitiesParam",
+    callNextMethod(.Object, name = "CalculatePeakQualitiesParam", baseName = "calculate_peak_qualities", subDir = "featgroups",
                    description = "Parameters for calculatePeakQualities", version = "1.0",
                    definitions = getCalculatePeakQualitiesParamDefs(), ...)
 })
@@ -218,7 +218,7 @@ getAssignMobilitiesFeatureGroupsParamDefs <- paramConfigDefsFact(list(
 AssignMobilitiesFeatureGroupsParam <- setClass("AssignMobilitiesFeatureGroupsParam", contains = "param")
 setMethod("initialize", "AssignMobilitiesFeatureGroupsParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "AssignMobilitiesFeatureGroupsParam", baseName = "AssignMobilitiesFeatureGroupsParam",
+    callNextMethod(.Object, name = "AssignMobilitiesFeatureGroupsParam", baseName = "assign_mobilities_feature_groups", subDir = "featgroups",
                    description = "Parameters for assignMobilities on feature groups", version = "1.0",
                    definitions = getAssignMobilitiesFeatureGroupsParamDefs(), ...)
 })

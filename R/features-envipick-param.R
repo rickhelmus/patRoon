@@ -22,7 +22,7 @@ getFeaturesEnviPickParamDefs <- paramConfigDefsFact(list(
 FeaturesEnviPickParam <- setClass("FeaturesEnviPickParam", contains = "param")
 setMethod("initialize", "FeaturesEnviPickParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "FeaturesEnviPickParam", baseName = "FeaturesEnviPickParam",
+    callNextMethod(.Object, name = "FeaturesEnviPickParam", baseName = "envipick", subDir = "features",
                    description = "Parameters for enviPick feature detection", version = "1.0",
                    definitions = getFeaturesEnviPickParamDefs(), ...)
 })

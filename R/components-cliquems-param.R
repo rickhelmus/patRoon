@@ -98,7 +98,7 @@ ComponentsCliqueMSParam <- setClass("ComponentsCliqueMSParam", contains = "param
 
 setMethod("initialize", "ComponentsCliqueMSParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "ComponentsCliqueMSParam", baseName = "ComponentsCliqueMSParam",
+    callNextMethod(.Object, name = "ComponentsCliqueMSParam", baseName = "cliquems", subDir = "components",
                    description = "Parameters for cliqueMS component generation", version = "1.0",
                    definitions = getComponentsCliqueMSParamDefs(), ...)
 })

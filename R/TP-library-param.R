@@ -57,7 +57,7 @@ TPsLibraryParam <- setClass("TPsLibraryParam", contains = "param")
 
 setMethod("initialize", "TPsLibraryParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "TPsLibraryParam", baseName = "Library",
+    callNextMethod(.Object, name = "TPsLibraryParam", baseName = "library", subDir = "tps",
                    description = "Parameters for library-based TP generation", version = "1.0",
                    definitions = getTPsLibraryParamDefs(), ...)
 })

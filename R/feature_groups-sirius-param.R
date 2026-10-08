@@ -43,7 +43,7 @@ getFeatureGroupsSIRIUSParamDefs <- paramConfigDefsFact(list(
 FeatureGroupsSIRIUSParam <- setClass("FeatureGroupsSIRIUSParam", contains = "param")
 setMethod("initialize", "FeatureGroupsSIRIUSParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "FeatureGroupsSIRIUSParam", baseName = "FeatureGroupsSIRIUSParam",
+    callNextMethod(.Object, name = "FeatureGroupsSIRIUSParam", baseName = "sirius", subDir = "featgroups",
                    description = "Parameters for SIRIUS feature grouping", version = "1.0",
                    definitions = getFeatureGroupsSIRIUSParamDefs(), ...)
 })

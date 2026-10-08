@@ -72,7 +72,7 @@ setMethod("initialize", "FilterFeatGroupsParam", function(.Object, ...)
     dotsConstr <- args[names(args) %in% names(defs)]
     dotsConstr$extraOpts <- args[setdiff(names(args), names(defs))]
     
-    do.call(callNextMethod, c(list(.Object, name = "FilterFeatGroupsParam", baseName = "FilterFeatGroupsParam",
+    do.call(callNextMethod, c(list(.Object, name = "FilterFeatGroupsParam", baseName = "filter_featgroups", subDir = "featgroups",
                                    description = "Parameters for featureGroups filtering", version = "1.0",
                                    definitions = defs), dotsConstr))
 })

@@ -40,7 +40,7 @@ TPsAnnFormParam <- setClass("TPsAnnFormParam", contains = "param")
 
 setMethod("initialize", "TPsAnnFormParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "TPsAnnFormParam", baseName = "AnnForm",
+    callNextMethod(.Object, name = "TPsAnnFormParam", baseName = "ann_form", subDir = "tps",
                    description = "Parameters for annotation-based formula TP generation", version = "1.0",
                    definitions = getTPsAnnFormParamDefs(), ...)
 })

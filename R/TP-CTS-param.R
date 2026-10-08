@@ -61,7 +61,7 @@ TPsCTSParam <- setClass("TPsCTSParam", contains = "param")
 
 setMethod("initialize", "TPsCTSParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "TPsCTSParam", baseName = "CTS",
+    callNextMethod(.Object, name = "TPsCTSParam", baseName = "cts", subDir = "tps",
                    description = "Parameters for CTS TP generation", version = "1.0",
                    definitions = getTPsCTSParamDefs(), ...)
 })

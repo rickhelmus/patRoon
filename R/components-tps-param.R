@@ -36,7 +36,7 @@ ComponentsTPsParam <- setClass("ComponentsTPsParam", contains = "param")
 
 setMethod("initialize", "ComponentsTPsParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "ComponentsTPsParam", baseName = "ComponentsTPsParam",
+    callNextMethod(.Object, name = "ComponentsTPsParam", baseName = "tp", subDir = "components",
                    description = "Parameters for TP component generation", version = "1.0",
                    definitions = getComponentsTPsParamDefs(), ...)
 })

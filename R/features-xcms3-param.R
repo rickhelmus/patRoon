@@ -54,7 +54,7 @@ getFeaturesXCMS3ParamDefs <- paramConfigDefsFact(list(
 FeaturesXCMS3Param <- setClass("FeaturesXCMS3Param", contains = "param")
 setMethod("initialize", "FeaturesXCMS3Param", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "FeaturesXCMS3Param", baseName = "FeaturesXCMS3Param",
+    callNextMethod(.Object, name = "FeaturesXCMS3Param", baseName = "xcms3", subDir = "features",
                    description = "Parameters for XCMS3 feature detection", version = "1.0",
                    definitions = getFeaturesXCMS3ParamDefs(), ...)
 })

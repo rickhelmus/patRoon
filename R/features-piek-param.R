@@ -86,7 +86,7 @@ getFeaturesPiekParamDefs <- paramConfigDefsFact(list(
 FeaturesPiekParam <- setClass("FeaturesPiekParam", contains = "param")
 setMethod("initialize", "FeaturesPiekParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "FeaturesPiekParam", baseName = "FeaturesPiekParam",
+    callNextMethod(.Object, name = "FeaturesPiekParam", baseName = "piek", subDir = "features",
                    description = "Parameters for piek feature detection", version = "1.0",
                    definitions = getFeaturesPiekParamDefs(), ...)
 })

@@ -39,7 +39,7 @@ getMSPeakListsParamDefs <- paramConfigDefsFact(list(
 MSPeakListsParam <- setClass("MSPeakListsParam", contains = "param")
 setMethod("initialize", "MSPeakListsParam", function(.Object, ...)
 {
-    callNextMethod(.Object, name = "MSPeakListsParam", baseName = "MSPeakListsParam",
+    callNextMethod(.Object, name = "MSPeakListsParam", baseName = "mslists", subDir = "annotation",
                    description = "Parameters for generateMSPeakLists", version = "1.0",
                    definitions = getMSPeakListsParamDefs(), ...)
 })
@@ -112,7 +112,7 @@ setMethod("initialize", "FilterMSPeakListsParam", function(.Object, ...)
     dotsConstr <- args[names(args) %in% names(defs)]
     dotsConstr$extraOpts <- args[setdiff(names(args), names(defs))]
 
-    do.call(callNextMethod, c(list(.Object, name = "FilterMSPeakListsParam", baseName = "FilterMSPeakListsParam",
+    do.call(callNextMethod, c(list(.Object, name = "FilterMSPeakListsParam", baseName = "filter_mslists", subDir = "annotation",
                                    description = "Parameters for MSPeakLists filtering", version = "1.0",
                                    definitions = defs), dotsConstr))
 })

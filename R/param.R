@@ -111,8 +111,7 @@ setMethod("show", "param", function(object)
     
     printf("Parameter class: %s\n", object@name)
     printf("Base name: %s\n", object@baseName)
-    printf("Sub-directory: %s
-", object@subDir)
+    printf("Sub-directory: %s\n", object@subDir)
     printf("Description: %s\n", object@description)
     printf("Version: %s\n", object@version)
     printf("Date created: %s\n", format(object@date))
@@ -242,7 +241,7 @@ exportAllParams <- function(type = "R", outDir = file.path(getwd(), "config"), o
     # UNDONE: see why function is slow
     
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertFlag, . ~ overwite, clear, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ overwrite, clear, fixed = list(add = ac))
     checkmate::assertChoice(type, c("R", "json", "yaml"), add = ac)
     checkmate::assertPathForOutput(outDir, overwrite = overwrite, add = ac)
     

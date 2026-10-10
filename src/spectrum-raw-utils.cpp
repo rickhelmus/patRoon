@@ -33,6 +33,8 @@ template<typename Spec> std::vector<size_t> flattenedSpecIDs(const std::vector<S
     return ret;
 }
 
+}
+
 bool precWithinIsoWindow(SpectrumRawTypes::Mass prec, SpectrumRawTypes::Mass specPrec,
                          NumRange<SpectrumRawTypes::Mass> fixedIsoWidth, NumRange<SpectrumRawTypes::Mass> range)
 {
@@ -46,14 +48,14 @@ bool precWithinIsoWindow(SpectrumRawTypes::Mass prec, SpectrumRawTypes::Mass spe
     return range.within(prec);
 }
 
-}
 
 std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata &specMeta,
                                                        const NumRange<SpectrumRawTypes::Time> &timeRange,
                                                        SpectrumRawTypes::MSLevel MSLevel,
                                                        SpectrumRawTypes::Mass precursor,
                                                        NumRange<SpectrumRawTypes::Mass> fixedIsoWidth,
-                                                       SpectrumRawTypes::Intensity minBPIntensity)
+                                                       SpectrumRawTypes::Intensity minBPIntensity,
+                                                       bool splitIMSFrameSels)
 {
     const SpectrumRawMetadataMS &metaMS = (MSLevel == SpectrumRawTypes::MSLevel::MS1) ? specMeta.first : specMeta.second;
     std::vector<SpectrumRawSelection> ret;
@@ -71,18 +73,31 @@ std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata
             if (minBPIntensity > 0 && metaMS.BPCs[i] < minBPIntensity)
                 continue;
             
-            SpectrumRawSelection sel(i);
-            
+            auto sel = SpectrumRawSelection(i);
+                
             if (isIMSMSMS)
             {
                 for (size_t j=0; j<specMeta.second.MSMSFrames[i].isolationRanges.size(); ++j)
                 {
                     if (precWithinIsoWindow(precursor, specMeta.second.MSMSFrames[i].precursorMZs[j], fixedIsoWidth,
                                             specMeta.second.MSMSFrames[i].isolationRanges[j]))
-                        sel.MSMSFrameIndices.push_back(j);
+                    {
+                        if (splitIMSFrameSels)
+                        {
+                            if (sel.MSMSFrameIndices.empty())
+                                sel.MSMSFrameIndices.push_back(j);
+                            else
+                                sel.MSMSFrameIndices[0] = j;
+                            ret.push_back(sel);
+                        }
+                        else
+                            sel.MSMSFrameIndices.push_back(j);
+                    }
                 }
                 if (sel.MSMSFrameIndices.empty())
                     continue; // no MS/MS data for this one
+                if (splitIMSFrameSels)
+                    continue; // already dealt with
             }
             else if (isMSMS)
             {

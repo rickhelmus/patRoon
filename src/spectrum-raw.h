@@ -175,14 +175,18 @@ struct SpectrumRawSelection
     SpectrumRawSelection(SpectrumRawTypes::Scan i) : index(i) { }
     bool operator==(const SpectrumRawSelection &o) const { return index == o.index && MSMSFrameIndices == o.MSMSFrameIndices; }
     bool operator!=(const SpectrumRawSelection &o) const { return index != o.index || MSMSFrameIndices != o.MSMSFrameIndices; }
+    bool operator <(const SpectrumRawSelection &o) const { return index < o.index || (index == o.index && MSMSFrameIndices < o.MSMSFrameIndices); }
 };
 
+bool precWithinIsoWindow(SpectrumRawTypes::Mass prec, SpectrumRawTypes::Mass specPrec,
+                         NumRange<SpectrumRawTypes::Mass> fixedIsoWidth, NumRange<SpectrumRawTypes::Mass> range);
 std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata &specMeta,
                                                        const NumRange<SpectrumRawTypes::Time> &timeRange,
                                                        SpectrumRawTypes::MSLevel MSLevel,
                                                        SpectrumRawTypes::Mass precursor,
                                                        NumRange<SpectrumRawTypes::Mass> fixedIsoWidth = { },
-                                                       SpectrumRawTypes::Intensity minBPIntensity = 0);
+                                                       SpectrumRawTypes::Intensity minBPIntensity = 0,
+                                                       bool splitIMSFrameSels = false);
 NumRange<SpectrumRawTypes::Mass> makeIsolationWidthRange(const std::vector<SpectrumRawTypes::Mass> &fixedIsoWidth);
 SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilter &filter,
                               SpectrumRawTypes::Mass precursor);

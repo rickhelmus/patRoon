@@ -605,14 +605,18 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         std::vector<SpectrumRawTypes::Mass> mzs;
         std::vector<SpectrumRawTypes::Intensity> intensities;
         std::vector<SpectrumRawTypes::Mobility> mobilities;
+        std::vector<size_t> MSMSFrameIndices;
         AllPeaks() = default;
-        AllPeaks(size_t size, bool withMob) : indices(size), mzs(size), intensities(size), mobilities((withMob) ? size : 0) { }
+        AllPeaks(size_t size, bool withMob, bool withIMSMSMS) : indices(size), mzs(size), intensities(size),
+                                                                mobilities((withMob) ? size : 0),
+                                                                MSMSFrameIndices((withIMSMSMS) ? size : 0) { }
         void clear(void)
         {
             indices.clear();
             mzs.clear();
             intensities.clear();
             mobilities.clear();
+            MSMSFrameIndices.clear();
         }
     };
     
@@ -669,23 +673,24 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     SimpleTimer timer(false);
     
     // get scan selections: if EICCount is small, we minimize them to save file reads. For larger counts, we just read
-    // the full min/max time range, as figuring out the specifics will take relatively long
+    // the full min/max time range, as figuring out the specifics will take relatively long.
+    // NOTE: for MS2 we sort out precursors later in case EICCount is large.
     std::vector<std::vector<SpectrumRawSelection>> scanSels(1);
     
     if (EICCount < 1000)
     {
         timer.start("Collecting all scans (selectively)");
-        std::set<SpectrumRawTypes::Scan> allScans;
+        std::set<SpectrumRawSelection> allScanSelections;
         for (size_t i=0; i<startTimes.size(); ++i)
         {
             const auto sels = getSpecRawSelections(specMeta, makeNumRange(startTimes[i], endTimes[i]),
                                                    MSLev, (MSLev == SpectrumRawTypes::MSLevel::MS2) ? precursorMZs[i] : 0,
-                                                   fixedIsoWidthRange);
+                                                   fixedIsoWidthRange, 0, true);
             for (const auto &sel : sels)
-                allScans.insert(sel.index);
+                allScanSelections.insert(sel);
         }
-        for (const auto &scan : allScans)
-            scanSels[0].emplace_back(scan);
+        for (const auto &sel : allScanSelections)
+            scanSels[0].push_back(std::move(sel));
         timer.stop();
     }
     else
@@ -693,7 +698,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         timer.start("Collecting all scans (range)");
         scanSels[0] = getSpecRawSelections(specMeta, makeNumRange(*std::min_element(startTimes.begin(), startTimes.end()),
                                                                   *std::max_element(endTimes.begin(), endTimes.end())),
-                                                          MSLev, 0, fixedIsoWidthRange);
+                                                                  MSLev, 0, fixedIsoWidthRange, 0, true);
         timer.stop();
     }
     
@@ -723,7 +728,10 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         smoothExtMob = 0;
     }
     
-    AllPeaks allPeaks(totalPeaks, anySpecHasMob);
+    const bool doCheckMS2Prec = (MSLev == SpectrumRawTypes::MSLevel::MS2 && !precursorMZs.empty() &&
+                                 std::find_if(precursorMZs.begin(), precursorMZs.end(), [](auto mz) { return mz != 0.0; }) != precursorMZs.end());
+    
+    AllPeaks allPeaks(totalPeaks, anySpecHasMob, anySpecHasMob && doCheckMS2Prec);
     for (size_t i=0, peaksi=0; i<allSpectra[0].size(); ++i)
     {
         if (allSpectra[0][i].getMZs().empty())
@@ -739,6 +747,11 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         {
             std::copy(allSpectra[0][i].getMobilities().begin(), allSpectra[0][i].getMobilities().end(),
                       allPeaks.mobilities.begin() + peaksi);
+            if (doCheckMS2Prec)
+            {
+                std::fill(allPeaks.MSMSFrameIndices.begin() + peaksi, allPeaks.MSMSFrameIndices.begin() + peaksi + allSpectra[0][i].size(),
+                          scanSels[0][i].MSMSFrameIndices[0]);
+            }
         }
         
         peaksi += allSpectra[0][i].size();
@@ -750,7 +763,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     timer.start("Sorting all peaks");
     auto sortedInds = getSortedInds(allPeaks.mzs);
     
-    AllPeaks allPeaksSorted(allPeaks.indices.size(), anySpecHasMob);
+    AllPeaks allPeaksSorted(allPeaks.indices.size(), anySpecHasMob, anySpecHasMob && doCheckMS2Prec);
     for (size_t i=0; i<sortedInds.size(); ++i)
     {
         const auto j = sortedInds[i];
@@ -758,7 +771,12 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         allPeaksSorted.mzs[i] = allPeaks.mzs[j];
         allPeaksSorted.intensities[i] = allPeaks.intensities[j];
         if (anySpecHasMob)
+        {
             allPeaksSorted.mobilities[i] = allPeaks.mobilities[j];
+            
+            if (doCheckMS2Prec)
+                allPeaksSorted.MSMSFrameIndices[i] = allPeaks.MSMSFrameIndices[j];
+        }
     }
     allPeaks.clear();
     sortedInds.clear();
@@ -835,6 +853,26 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             const auto time = specMetaMS.times[scanInd];
             if (!timeGTE(time, timeStart) || (timeEnd != 0.0 && !timeLTE(time, timeEnd)))
                 continue;
+            
+            if (doCheckMS2Prec)
+            {
+                if (anySpecHasMob)
+                {
+                    const auto fi = allPeaksSorted.MSMSFrameIndices[allPeaksSortedInd];
+                    if (!precWithinIsoWindow(precursorMZs[i], specMeta.second.MSMSFrames[scanInd].precursorMZs[fi],
+                                             fixedIsoWidthRange, specMeta.second.MSMSFrames[scanInd].isolationRanges[fi]))
+                        continue;
+                }
+                else
+                {
+                    if (!precWithinIsoWindow(precursorMZs[i], specMeta.second.precursorMZs[scanInd],
+                                             fixedIsoWidthRange, specMeta.second.isolationRanges[scanInd]))
+                    {
+                        // Rcpp::Rcout << "Checking MS2 prec: " << i << "/" << scanInd << "/" << allPeaksSortedInd << "/" << precursorMZs[i] << "/" << specMeta.second.precursorMZs[scanInd] << "/" << specMeta.second.isolationRanges[scanInd].start << "/" << specMeta.second.isolationRanges[scanInd].end << "\n";
+                        continue;
+                    }
+                }
+            }
             
             //Rcpp::Rcout << "EIC: " << allPeaksSortedInd << "/" << j << "/" << specMetaMS.times[allPeaksSorted.indices[allPeaksSortedInd]] << "/" << mz << "/" << mzStart << "/" << mzEnd << "\n";
             const auto mz = allPeaksSorted.mzs[allPeaksSortedInd];

@@ -846,6 +846,8 @@ getMSPLEICs <- function(MSPeakLists, fGroups, groupName, analysis, gapFactor = 3
 filterMSPLCor <- function(MSPeakLists, fGroups, MSLevel, threshold, fixedIsolationWidth = FALSE,
                           gapFactor = 3, mzWindow = defaultLim("mz", "medium"))
 {
+    # UNDONE: update for maxGap
+    
     fTable <- featureTable(fGroups)
     
     # EICs: get complete chromatograms so these can be compared, however, only keep the feature signal so other peaks
@@ -901,8 +903,10 @@ filterMSPLCor <- function(MSPeakLists, fGroups, MSLevel, threshold, fixedIsolati
                 if (!is.null(eic))
                 {
                     idx <- findInterval(at, eic[, "time"])
+                    tab <- data.table(time = at, intensity = eic[, "intensity"], idx = idx)
+                        browser()
                     # UNDONE: verify this further, and handle multiple MS2 scans belonging to one MS1
-                    eic <- cbind(time = at, intensity = eic[idx, "intensity"])
+                    eic <- cbind(time = at, intensity = fifelse(idx == 0, 0, eic[idx, "intensity"]))
                     corrSpec1Prec <- cor(eic[, "intensity"], eicm, use = "pairwise.complete.obs")
                 }
             }

@@ -227,7 +227,8 @@ doGetEICs <- function(anaInfo, EICInfoList, maxGap, minIntensityIMS = 0, MSLevel
             anaEICHash <- makeHash(anaHashes[[ana]], baseHash)
             # NOTE: subset columns here, so any additional columns from e.g. feature tables are not considered
             hashes <- EICInfo[, makeHash(anaEICHash, .SD), by = seq_len(nrow(EICInfo)),
-                              .SDcols = c("retmin", "retmax", "mzmin", "mzmax", "mobmin", "mobmax")][[2]]
+                              .SDcols = c("retmin", "retmax", "mzmin", "mzmax", "mobmin", "mobmax",
+                                          if (MSLevel == 2) "precursorMZ")][[2]]
             
             EICs <- unname(loadCacheData(category = "EICs", hashes, dbArg = cacheDB, simplify = FALSE, fixDTs = FALSE))
             ax <- loadCacheData(category = "EICAllTimes", anaEICHash, dbArg = cacheDB)

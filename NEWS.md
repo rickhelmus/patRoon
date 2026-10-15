@@ -3,6 +3,9 @@
 * `screenSuspects()`
     * `mzWindowRel` argument to match suspects by ppm (suggested by Carlo van Buiten)
     * `rtWindow` and `mzWindow` arguments can be `NULL` to disable filtering
+* `checkFeatures()/checkComponents`
+    * Fixed: sorting the table and subsequently toggling a 'keep' value would lead to incorrect table selections (reported by Alessia Ore and Nikoline Marxen)
+    * Fixed: Next/Previous buttons did not work properly when the table was sorted
 
 # patRoon 3.1
 

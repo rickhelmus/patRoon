@@ -276,6 +276,13 @@ runCheckUI <- function(UIInterface)
                   });
                 }", tab)
     
+    hotSortEventJSFunc <- function(tab) htmlwidgets::JS(sprintf("
+      function() {
+          var sorting = this.getPlugin('columnSorting').getSortConfig();
+          Shiny.setInputValue('%sSort', {sorts: sorting}, {priority: 'event'});
+      }
+    ", tab))
+    
     settings <- getUISettings(UIInterface$UISettingsFileName(), UIInterface$UISettingsVersion(),
                               UIInterface$defaultUISettings(), UIInterface$upgradeUISettings)
     sessionChanged <- FALSE
@@ -292,9 +299,18 @@ runCheckUI <- function(UIInterface)
         
         rValues <- UIInterface$init(rValues)
         
+        getPrimTabInstance <- function()
+        {
+            ret <- rhandsontable::hot_to_r(input$primaryHot)
+            # BUG: the table **may** have been sorted, specifically, if a column was sorted and *then* a keep flag was
+            # toggled... For now just counter any sorting that was performed.
+            ord <- match(UIInterface$primarySelections, ret[[1]])
+            ret[ord]
+        }
+        
         getCurPrimaryRow <- function()
         {
-            tbl <- rhandsontable::hot_to_r(input$primaryHot)
+            tbl <- getPrimTabInstance()
             tblRow <- match(rValues$currentPrimSel, tbl[[1]])
             if (is.na(tblRow))
                 warning("Cannot find row!")
@@ -314,10 +330,21 @@ runCheckUI <- function(UIInterface)
         
         advancePrimaryRow <- function(dir)
         {
-            tbl <- rhandsontable::hot_to_r(input$primaryHot)
+            tbl <- getPrimTabInstance()
             tblRow <- getCurPrimaryRow()
             if (!is.na(tblRow))
             {
+                if (length(input$primaryTabSort))
+                {
+                    # apply custom sorting
+                    coln <- names(tbl)[input$primaryTabSort$sorts[[1]]$column + 1]
+                    if (coln != "keep") # BUG: keep column cannot be sorted
+                    {
+                        setorderv(tbl, coln, if (input$primaryTabSort$sorts[[1]]$sortOrder == "asc") 1L else -1L)
+                        tblRow <- match(rValues$currentPrimSel, tbl[[1]])
+                    }
+                }
+                
                 tblRow <- tblRow + dir
                 if (tblRow < 1)
                     tblRow <- 1
@@ -432,7 +459,7 @@ runCheckUI <- function(UIInterface)
             # HACK: input$primaryHot$params$maxRows: make sure we don't have empty table as hot_to_r errors otherwise
             if (input$primaryHot$params$maxRows > 0)
             {
-                tbl <- rhandsontable::hot_to_r(input$primaryHot)
+                tbl <- getPrimTabInstance()
                 keep <- tbl[keep == TRUE][[1]]
                 notkeep <- tbl[keep == FALSE][[1]]
                 oldsel <- rValues$removeFully
@@ -464,7 +491,7 @@ runCheckUI <- function(UIInterface)
         })
         
         observeEvent(input$primaryHot_select$select$r, {
-            tbl <- rhandsontable::hot_to_r(input$primaryHot)
+            tbl <- getPrimTabInstance()
             updatePrimaryRow(tbl[[1]][input$primaryHot_select$select$rAll[1]])
         })
         
@@ -489,6 +516,9 @@ runCheckUI <- function(UIInterface)
             # HACK: input$secondaryHot$params$maxRows: make sure we don't have empty table as hot_to_r errors otherwise
             if (input$secondaryHot$params$maxRows > 0)
             {
+                # NOTE: we don't have to do any sorting workarounds here, since oldsel/newsel don't rely on the table
+                # order
+                
                 tbl <- rhandsontable::hot_to_r(input$secondaryHot)
                 oldsel <- rValues$removePartially[[rValues$currentPrimSel]]
                 newsel <- UIInterface$getSecondarySelectionsFromTab(tbl)[!tbl$keep]
@@ -552,7 +582,8 @@ runCheckUI <- function(UIInterface)
                 tabData <- tabData[keep == TRUE, ]
             
             hot <- do.call(rhandsontable::rhandsontable,
-                           c(list(tabData, width = NULL, height = 200, maxRows = nrow(tabData)),
+                           c(list(tabData, width = NULL, height = 200, maxRows = nrow(tabData),
+                                  afterColumnSort = hotSortEventJSFunc("primaryTab")),
                              hotOpts)) %>%
                 # rhandsontable::hot_cols(valign = "htMiddle", fixedColumnsLeft = 2) %>%
                 rhandsontable::hot_cols(valign = "htMiddle", fixedColumnsLeft = 2) %>%

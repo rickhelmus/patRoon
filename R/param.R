@@ -47,11 +47,6 @@ getParamImportClosure <- function()
 
 doGetParamImport <- getParamImportClosure()
 
-setMethod("show", "defaultParam", function(object)
-{
-    printf("A %s object.\n", class(object))
-})
-
 param <- setClass("param", slots = c(name = "character", baseName = "character", subDir = "character",
                                      description = "character", version = "character", date = "POSIXct",
                                      definitions = "ParamConfigDefs", data = "list"),
@@ -86,7 +81,7 @@ setMethod("initialize", "param", function(.Object, name, baseName, subDir, descr
         {
             sapply(li, function(e)
             {
-                return(if (is.list(e) && !is.data.frame(e) && length(e) > 0) makeDefsFromList(e) else DEFAULT)
+                return(if (is.list(e) && !is.data.frame(e) && length(e) > 0) makeDefsFromList(e) else .default(e))
             }, simplify = FALSE)
         }
         data <- sapply(definitions, "[[", "default", simplify = FALSE)
@@ -219,7 +214,7 @@ setMethod("export", "param", function(obj, type, out)
     }
     
     if (type == "R")
-        constructive::construct_dump(list(param = exp), out, data = list(DEFAULT = DEFAULT))
+        constructive::construct_dump(list(param = exp), out)
     else if (type == "json")
     {
         # unbox scalars
@@ -247,12 +242,15 @@ importParam <- function(type, inFile)
     else # if (type == "yaml")
         yaml::read_yaml(inFile)
     
-    imp <- rapply(imp, classes = "character", how = "replace", f = function(x)
+    if (type != "R")
     {
-        if (x == "__default")
-            x <- DEFAULT
-        return(x)
-    })
+        imp <- rapply(imp, classes = "character", how = "replace", f = function(x)
+        {
+            if (x == "__default")
+                x <- .default()
+            return(x)
+        })
+    }
     
     ret <- new(imp$class, configDir = NULL)
     ret@version <- imp$version

@@ -2,9 +2,32 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-defaultParam <- setClass("defaultParam", slots = c(dummy = "ANY"))
-DEFAULT <- defaultParam()
-isDefault <- function(x) inherits(x, "defaultParam")
+.default <- setClass(".default", slots = c(def = "ANY"))
+isDefault <- function(x) inherits(x, ".default")
+hasDefaultSet <- function(x) !is.na(x@def) || is.null(attr(x@def, "missing")) || !attr(x@def, "missing")
+
+setMethod("initialize", ".default", function(.Object, d, ...)
+{
+    if (missing(d))
+    {
+        d <- NA
+        attr(d, "missing") <- TRUE
+    }
+    callNextMethod(.Object, def = d, ...)
+})
+
+setMethod("show", ".default", function(object)
+{
+    printf("A %s object.\n", class(object))
+})
+
+#' @exportS3Method constructive::.cstr_construct
+.cstr_construct..default <- function(x, ...)
+{
+    args <- if (hasDefaultSet(x)) list(x@def) else list()
+    code <- constructive::.cstr_apply(args, fun = ".default", ...)
+    constructive::.cstr_repair_attributes(x, code, ..., ignore = "def", idiomatic_class = class(x), flag_s4 = FALSE)
+}
 
 # The param config defs are an environment, so they can be shared across objects and be read only
 ParamConfigDefs <- setClass("ParamConfigDefs", contains = "environment")

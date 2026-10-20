@@ -200,16 +200,19 @@ setMethod("export", "param", function(obj, type, out)
         name = obj@name,
         classType = class(obj),
         version = obj@version,
-        date = obj@date,
+        date = obj@date, # UNDONE: fix this for YAML export
         data = obj@data
     )
     
     if (type != "R")
     {
         # prep defaults
-        exp$data <- rapply(exp$data, classes = "defaultParam", how = "replace", function(x)
+        exp$data <- rapply(exp$data, classes = ".default", how = "replace", function(x)
         {
-            if (type == "json") jsonlite::unbox("__default") else "__default"
+            if (!hasDefaultSet(x))
+                return(if (type == "json") jsonlite::unbox(".default") else ".default")
+
+            return(list(.default = x@def))
         })
     }
     
@@ -222,8 +225,8 @@ setMethod("export", "param", function(obj, type, out)
         exp[n] <- lapply(exp[n], jsonlite::unbox)
         exp$data <- Map(names(exp$data), exp$data, f = function(name, value)
         {
-            if (obj@definitions[[name]]$type %in% c("number", "string", "flag", "choice", "count"))
-                value <- jsonlite::unbox(value)
+            if (obj@definitions[[name]]$type %in% c("number", "string", "flag", "choice", "count") && !is.list(value))
+                value <- tryCatch(jsonlite::unbox(value), error = \(...) NULL)
             return(value)
         })
         jsonlite::write_json(exp, out, pretty = TRUE)
@@ -244,12 +247,22 @@ importParam <- function(type, inFile)
     
     if (type != "R")
     {
-        imp <- rapply(imp, classes = "character", how = "replace", f = function(x)
+        convertDefaults <- function(x)
         {
-            if (x == "__default")
-                x <- .default()
+            if (is.character(x) && length(x) == 1 && identical(x, ".default"))
+                return(.default())
+
+            if (is.list(x) && !is.data.frame(x))
+            {
+                if (length(x) == 1 && identical(names(x), ".default"))
+                    return(.default(x[[1]]))
+
+                return(lapply(x, convertDefaults))
+            }
+
             return(x)
-        })
+        }
+        imp <- convertDefaults(imp)
     }
     
     ret <- new(imp$class, configDir = NULL)

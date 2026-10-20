@@ -4,7 +4,7 @@
 
 .default <- setClass(".default", slots = c(def = "ANY"))
 isDefault <- function(x) inherits(x, ".default")
-hasDefaultSet <- function(x) !is.na(x@def) || is.null(attr(x@def, "missing")) || !attr(x@def, "missing")
+hasDefaultSet <- function(x) length(x@def) > 1 || !is.na(x@def) || is.null(attr(x@def, "missing")) || !attr(x@def, "missing")
 
 setMethod("initialize", ".default", function(.Object, d, ...)
 {

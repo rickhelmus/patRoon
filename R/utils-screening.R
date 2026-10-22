@@ -421,7 +421,7 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, mzWindowRel,
             if (is.na(suspects$mz[ti])) # no ionized suspect available, must use annotation data to compare neutral masses
             {
                 at <- annTbl[group %chin% gi$group]
-                if (is.null(mzWindow)) 
+                if (!is.null(mzWindow)) 
                     at <- annTbl[numLTE(abs(mzDiff(neutralMass, suspects[ti]$neutralMass, ppm = FALSE)), mzWindow)]
                 if (!is.null(mzWindowRel))
                     at <- at[numLTE(abs(mzDiff(neutralMass, suspects[ti]$neutralMass, ppm = TRUE)), mzWindowRel)]

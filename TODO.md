@@ -1,10 +1,17 @@
 # Priority
 
-- tests for getEICs() with MSLevel
+- getEICs()
+    - tests for getEICs() with MSLevel and snapToMS1
+    - dedup getEICs() methods by calling DT method?
+    - get rid of old(?) getEICs() in utils-exported.R
+    - add other MS2 args (isowindow, precursorMZs)
+    - doc and test new args
+    - doc/force that MS2 EICs only work in simple mode
 - doc/NEWS: mzPeakWindow
 - doc that topMost is always for feature intensities and not MSPL (UNDONE?)
 - split EIXParams in base and feat classes so the former can also used by DT and MSPL methods?
     - feat EIC params inherit from base EIC params
+- why are simple EICs gap filled also if padding==FALSE
 
 ## general
 

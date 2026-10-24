@@ -182,7 +182,8 @@ public:
     void addPoint(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten);
     void addPoint(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Mobility mob, SpectrumRawTypes::Intensity inten);
     void commit(SpectrumRawTypes::Scan curScanInd, SpectrumRawTypes::Time curTime);
-    void finalize(void);
+    void finalizeSummers(void);
+    void snapAndAggregateToMS1(const std::vector<SpectrumRawTypes::Time> &MS1Times);
     void pad(SpectrumRawTypes::Scan scanStart, SpectrumRawTypes::Scan scanEnd);
     
     bool verifyAdjancency(void) const

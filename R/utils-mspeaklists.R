@@ -901,14 +901,7 @@ filterMSPLCor <- function(MSPeakLists, fGroups, MSLevel, threshold, fixedIsolati
             {
                 eic <- EICsFeat[[ana]][[grp]]
                 if (!is.null(eic))
-                {
-                    idx <- findInterval(at, eic[, "time"])
-                    tab <- data.table(time = at, intensity = eic[, "intensity"], idx = idx)
-                        browser()
-                    # UNDONE: verify this further, and handle multiple MS2 scans belonging to one MS1
-                    eic <- cbind(time = at, intensity = fifelse(idx == 0, 0, eic[idx, "intensity"]))
                     corrSpec1Prec <- cor(eic[, "intensity"], eicm, use = "pairwise.complete.obs")
-                }
             }
             
             if (length(corrSpecPrec) > 0 && length(corrSpec1Prec) > 0)

@@ -761,7 +761,7 @@ setMethod("plotChroms", "MSPeakLists", function(obj, fGroups, groupName, analysi
                                                 rtWindow = defaultLim("retention", "wide"),
                                                 mzWindow = defaultLim("mz", "medium"),
                                                 retMin = FALSE, title = NULL, showLegend = TRUE, IMS = "maybe",
-                                                xlim = NULL, ylim = NULL, gapFactor = 3, ...)
+                                                xlim = NULL, ylim = NULL, maxGap = 10, ...)
 {
     # UNDONE: checkmates
     # UNDONE: allow analysis==NULL: take topMost
@@ -781,7 +781,7 @@ setMethod("plotChroms", "MSPeakLists", function(obj, fGroups, groupName, analysi
     xlab <- if (retMin) "Retention Time (min)" else "Retention Time (s)"
     
     # UNDONE: EICParams; check if it should be used and fix things below
-    EICs <- getMSPLEICs(obj, fGroups, groupName, analysis, gapFactor = gapFactor, MSLevel = MSLevel,
+    EICs <- getMSPLEICs(obj, fGroups, groupName, analysis, maxGap = maxGap, MSLevel = MSLevel,
                         fixedIsolationWidth = fixedIsolationWidth, rtWindow = rtWindow, mzWindow = mzWindow, pad = TRUE)
     
     EICs <- EICs[[1]][[1]] # so far only one groupName and analysis is supported

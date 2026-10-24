@@ -821,12 +821,12 @@ getMSPLEICsInfo <- function(MSPeakLists, fGroups, groupName, analysis, MSLevel, 
     }, simplify = FALSE)
 }
 
-getMSPLEICs <- function(MSPeakLists, fGroups, groupName, analysis, gapFactor = 3, MSLevel, fixedIsolationWidth = FALSE,
+getMSPLEICs <- function(MSPeakLists, fGroups, groupName, analysis, maxGap = 3, MSLevel, fixedIsolationWidth = FALSE,
                         rtWindow = defaultLim("retention", "wide"), mzWindow = defaultLim("mz", "medium"), ...)
 {
     inputTabs <- getMSPLEICsInfo(MSPeakLists, fGroups, groupName, analysis, MSLevel, fixedIsolationWidth, rtWindow,
                                  mzWindow)
-    EICs <- doGetEICs(analysisInfo(fGroups), inputTabs, gapFactor = gapFactor, MSLevel = MSLevel,
+    EICs <- doGetEICs(analysisInfo(fGroups), inputTabs, maxGap = maxGap, MSLevel = MSLevel,
                       fixedIsolationWidth = fixedIsolationWidth, ...)
     
     EICs <- Map(names(EICs), EICs, f = function(ana, anaEICs)
@@ -844,7 +844,7 @@ getMSPLEICs <- function(MSPeakLists, fGroups, groupName, analysis, gapFactor = 3
 }
 
 filterMSPLCor <- function(MSPeakLists, fGroups, MSLevel, threshold, fixedIsolationWidth = FALSE,
-                          gapFactor = 3, mzWindow = defaultLim("mz", "medium"))
+                          maxGap = 3, mzWindow = defaultLim("mz", "medium"))
 {
     # UNDONE: update for maxGap
     
@@ -852,7 +852,7 @@ filterMSPLCor <- function(MSPeakLists, fGroups, MSLevel, threshold, fixedIsolati
     
     # EICs: get complete chromatograms so these can be compared, however, only keep the feature signal so other peaks
     # will not interfere correlation calculations.
-    EICs <- getMSPLEICs(MSPeakLists, fGroups, names(fGroups), analyses(fGroups), gapFactor = gapFactor,
+    EICs <- getMSPLEICs(MSPeakLists, fGroups, names(fGroups), analyses(fGroups), maxGap = maxGap,
                         MSLevel = MSLevel, fixedIsolationWidth = fixedIsolationWidth, rtWindow = 0,
                         mzWindow = mzWindow)
     
@@ -860,7 +860,7 @@ filterMSPLCor <- function(MSPeakLists, fGroups, MSLevel, threshold, fixedIsolati
     EICsFeat <- NULL
     if (MSLevel == 2)
     {
-        EICsFeat <- getFeatureEIXs(fGroups, "EIC", EIXParams = getDefEICParams(gapFactor = gapFactor, window = 0))
+        EICsFeat <- getFeatureEIXs(fGroups, "EIC", EIXParams = getDefEICParams(maxGap = maxGap, window = 0))
         EICsFeat <- Map(names(EICsFeat), EICsFeat, f = function(ana, anaEICs)
         {
             at <- attr(anaEICs, "allXValues")

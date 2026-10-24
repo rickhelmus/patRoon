@@ -587,7 +587,7 @@ void EIC::finalizeSummers()
 }        
 
 
-void SimpleEIC::fillGaps(SpectrumRawTypes::Time medRTDiff, double maxGap, bool pad,
+void SimpleEIC::fillGaps(SpectrumRawTypes::Time medRTDiff, SpectrumRawTypes::Time maxGap, bool pad,
                          SpectrumRawTypes::Time timeStart, SpectrumRawTypes::Time timeEnd)
 {
     if (times.size() < 2)

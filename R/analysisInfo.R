@@ -7,7 +7,7 @@
 #' Various parsing and plotting functions for the analysisInfo data.frame.
 #'
 #' @param obj An \code{analysisInfo} data.frame object as obtained by \link[patRoon]{generateAnalysisInfo} function.
-#' @param MSLevel Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) to obtain traces.
+#' @param MSLevel Integer with the MS level (i.e., 1 for MS1 or 2 for MS2) to obtain traces.
 #' @param retentionRange Range of retention time (in seconds), m/z, respectively. Should be a numeric vector with length
 #'   of two containing the min/max values. The maximum can be Inf to specify no maximum range. Set to NULL to skip this
 #'   step.

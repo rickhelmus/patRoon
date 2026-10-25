@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-10-22" />
+<meta name="date" content="2026-10-25" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -412,8 +412,8 @@ div.csl-indent {
 <div id="features" class="section level2 hasAnchor" number="4.5">
 <h2><span class="header-section-number">4.5</span> Features<a href="features.html#features" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Collecting features from the analyses consists of finding all features, grouping them across analyses (optionally after retention time alignment), and if desired suspect screening:</p>
-<div id="htmlwidget-67efc1990f81c4aeaf82" style="width:500px;height:70px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-67efc1990f81c4aeaf82">{"x":{"diagram":"\ndigraph Features {\n  graph [ rankdir = LR, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features\" -> \"Group features\"\n    \"Suspect screening\"\n    \"Group features\" -> \"Suspect screening\" [style=dashed]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-32c3d7a199029094ed3d" style="width:500px;height:70px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-32c3d7a199029094ed3d">{"x":{"diagram":"\ndigraph Features {\n  graph [ rankdir = LR, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features\" -> \"Group features\"\n    \"Suspect screening\"\n    \"Group features\" -> \"Suspect screening\" [style=dashed]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <div id="findFeat" class="section level3 hasAnchor" number="4.5.1">
 <h3><span class="header-section-number">4.5.1</span> Finding features<a href="features.html#findFeat" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Several algorithms are available for finding features. These are listed in the table below alongside their usage and general remarks.</p>
@@ -552,8 +552,8 @@ div.csl-indent {
 <span id="cb30-5"><a href="features.html#cb30-5" tabindex="-1"></a>fListOMS2 <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;openms&quot;</span>, <span class="at">noiseThrInt =</span> <span class="dv">500</span>, <span class="at">chromSNR =</span> <span class="dv">10</span>) <span class="co"># OpenMS, adjusted minimum intensity and S/N</span></span>
 <span id="cb30-6"><a href="features.html#cb30-6" tabindex="-1"></a>fListXCMS <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;xcms&quot;</span>, <span class="at">ppm =</span> <span class="dv">10</span>) <span class="co"># XCMS</span></span>
 <span id="cb30-7"><a href="features.html#cb30-7" tabindex="-1"></a>fListXCMS3 <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;xcms3&quot;</span>, <span class="fu">CentWaveParam</span>(<span class="at">peakwidth =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">15</span>))) <span class="co"># XCMS3</span></span>
-<span id="cb30-8"><a href="features.html#cb30-8" tabindex="-1"></a>fListEP <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;envipick&quot;</span>, <span class="at">minint =</span> <span class="fl">1E3</span>) <span class="co"># enviPick</span></span>
-<span id="cb30-9"><a href="features.html#cb30-9" tabindex="-1"></a>fListKPIC2 <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;kpic2&quot;</span>, <span class="at">kmeans =</span> <span class="cn">TRUE</span>, <span class="at">level =</span> <span class="fl">1E4</span>) <span class="co"># KPIC2</span></span>
+<span id="cb30-8"><a href="features.html#cb30-8" tabindex="-1"></a>fListEP <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;envipick&quot;</span>, <span class="at">minint =</span> <span class="dv">1</span>E3) <span class="co"># enviPick</span></span>
+<span id="cb30-9"><a href="features.html#cb30-9" tabindex="-1"></a>fListKPIC2 <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;kpic2&quot;</span>, <span class="at">kmeans =</span> <span class="cn">TRUE</span>, <span class="at">level =</span> <span class="dv">1</span>E4) <span class="co"># KPIC2</span></span>
 <span id="cb30-10"><a href="features.html#cb30-10" tabindex="-1"></a>fListSIRIUS <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;sirius&quot;</span>) <span class="co"># SIRIUS</span></span></code></pre></div>
 <div id="piek" class="section level4 hasAnchor" number="4.5.1.1">
 <h4><span class="header-section-number">4.5.1.1</span> Feature detection with piek<a href="features.html#piek" class="anchor-section" aria-label="Anchor link to header"></a></h4>
@@ -585,7 +585,7 @@ div.csl-indent {
 <span id="cb31-18"><a href="features.html#cb31-18" tabindex="-1"></a><span class="co"># use DDA MS/MS data to find features</span></span>
 <span id="cb31-19"><a href="features.html#cb31-19" tabindex="-1"></a><span class="co"># only find features with data between two and ten minutes retention time.</span></span>
 <span id="cb31-20"><a href="features.html#cb31-20" tabindex="-1"></a><span class="co"># increase minimum spectrum TIC to focus on features with high intensity MS/MS data</span></span>
-<span id="cb31-21"><a href="features.html#cb31-21" tabindex="-1"></a>genEICParams <span class="ot">&lt;-</span> <span class="fu">getPiekEICParams</span>(<span class="at">filter =</span> <span class="st">&quot;ms2&quot;</span>, <span class="at">retRange =</span> <span class="fu">c</span>(<span class="dv">120</span>, <span class="dv">600</span>), <span class="at">minTIC =</span> <span class="fl">1E5</span>)</span>
+<span id="cb31-21"><a href="features.html#cb31-21" tabindex="-1"></a>genEICParams <span class="ot">&lt;-</span> <span class="fu">getPiekEICParams</span>(<span class="at">filter =</span> <span class="st">&quot;ms2&quot;</span>, <span class="at">retRange =</span> <span class="fu">c</span>(<span class="dv">120</span>, <span class="dv">600</span>), <span class="at">minTIC =</span> <span class="dv">1</span>E5)</span>
 <span id="cb31-22"><a href="features.html#cb31-22" tabindex="-1"></a>peakParams <span class="ot">&lt;-</span> <span class="fu">getDefPeakParams</span>(<span class="st">&quot;chrom&quot;</span>, <span class="st">&quot;openms&quot;</span>)</span>
 <span id="cb31-23"><a href="features.html#cb31-23" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;piek&quot;</span>, <span class="at">genEICParams =</span> genEICParams, <span class="at">peakParams =</span> peakParams)</span></code></pre></div>
 <p>For more details, please see the reference manual (<code>?findFeaturesPiek</code>).</p>

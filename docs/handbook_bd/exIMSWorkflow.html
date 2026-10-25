@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-10-22" />
+<meta name="date" content="2026-10-25" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -428,7 +428,7 @@ div.csl-indent {
 <span id="cb289-11"><a href="exIMSWorkflow.html#cb289-11" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fList, <span class="st">&quot;openms&quot;</span>)</span>
 <span id="cb289-12"><a href="exIMSWorkflow.html#cb289-12" tabindex="-1"></a></span>
 <span id="cb289-13"><a href="exIMSWorkflow.html#cb289-13" tabindex="-1"></a><span class="co"># perform basic filtering</span></span>
-<span id="cb289-14"><a href="exIMSWorkflow.html#cb289-14" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">absMinIntensity =</span> <span class="fl">1E4</span>, <span class="at">relMinReplicateAbundance =</span> <span class="dv">1</span>)</span>
+<span id="cb289-14"><a href="exIMSWorkflow.html#cb289-14" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">absMinIntensity =</span> <span class="dv">1</span>E4, <span class="at">relMinReplicateAbundance =</span> <span class="dv">1</span>)</span>
 <span id="cb289-15"><a href="exIMSWorkflow.html#cb289-15" tabindex="-1"></a></span>
 <span id="cb289-16"><a href="exIMSWorkflow.html#cb289-16" tabindex="-1"></a><span class="co"># assign mobilities and CCS values</span></span>
 <span id="cb289-17"><a href="exIMSWorkflow.html#cb289-17" tabindex="-1"></a>CCSParams <span class="ot">&lt;-</span> <span class="fu">getCCSParams</span>(<span class="st">&quot;mason-schamp_1/k&quot;</span>)</span>

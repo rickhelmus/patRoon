@@ -120,7 +120,7 @@ Csárdi G, Nepusz T, Traag V, Horvát S, Zanini F, Noom D, Müller K,
 Schoch D, Salmon M (2026). *igraph: Network Analysis and Visualization
 in R*.
 [doi:10.5281/zenodo.7682609](https://doi.org/10.5281/zenodo.7682609) . R
-package version 2.3.3, <https://CRAN.R-project.org/package=igraph>.
+package version 2.3.4, <https://CRAN.R-project.org/package=igraph>.
 
 ## See also
 

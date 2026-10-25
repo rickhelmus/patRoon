@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-10-22" />
+<meta name="date" content="2026-10-25" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -518,11 +518,11 @@ div.csl-indent {
 <span id="cb288-8"><a href="processing-data-1.html#cb288-8" tabindex="-1"></a>fGroupsIMSPar <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">IMS =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb288-9"><a href="processing-data-1.html#cb288-9" tabindex="-1"></a></span>
 <span id="cb288-10"><a href="processing-data-1.html#cb288-10" tabindex="-1"></a><span class="co"># perform various filtering steps and ensure that only IMS features with an IMS precursor are kept</span></span>
-<span id="cb288-11"><a href="processing-data-1.html#cb288-11" tabindex="-1"></a>fGroupsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">absMinIntensity =</span> <span class="fl">1E5</span>, <span class="at">relMinReplicateAbundance =</span> <span class="dv">1</span>,</span>
+<span id="cb288-11"><a href="processing-data-1.html#cb288-11" tabindex="-1"></a>fGroupsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">absMinIntensity =</span> <span class="dv">1</span>E5, <span class="at">relMinReplicateAbundance =</span> <span class="dv">1</span>,</span>
 <span id="cb288-12"><a href="processing-data-1.html#cb288-12" tabindex="-1"></a>                   <span class="at">withIMSPrecursor =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb288-13"><a href="processing-data-1.html#cb288-13" tabindex="-1"></a></span>
 <span id="cb288-14"><a href="processing-data-1.html#cb288-14" tabindex="-1"></a><span class="co"># perform various filtering steps, but not on IMS features</span></span>
-<span id="cb288-15"><a href="processing-data-1.html#cb288-15" tabindex="-1"></a>fGroupsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">absMinIntensity =</span> <span class="fl">1E5</span>, <span class="at">relMinReplicateAbundance =</span> <span class="dv">1</span>,</span>
+<span id="cb288-15"><a href="processing-data-1.html#cb288-15" tabindex="-1"></a>fGroupsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">absMinIntensity =</span> <span class="dv">1</span>E5, <span class="at">relMinReplicateAbundance =</span> <span class="dv">1</span>,</span>
 <span id="cb288-16"><a href="processing-data-1.html#cb288-16" tabindex="-1"></a>                   <span class="at">applyIMS =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb288-17"><a href="processing-data-1.html#cb288-17" tabindex="-1"></a></span>
 <span id="cb288-18"><a href="processing-data-1.html#cb288-18" tabindex="-1"></a><span class="co"># only keep compound candidates within a defined CCS range</span></span>

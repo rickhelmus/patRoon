@@ -77,7 +77,7 @@ The CCS calculation depends on the `method` parameter:
     parameter.
 
 - `mason-schamp_1/k`: as `mason-schamp_k` but assuming an inversed
-  mobility (\\\frac{1}{k}\\). This is meant for TIMS data. Compared to
+  mobility (\\(\frac{1}{k}\\)). This is meant for TIMS data. Compared to
   `method="bruker"`, this doesn't rely on the `TDF-SDK` but may produce
   results with very minor differences (George et al. 2024) .
 
@@ -86,8 +86,9 @@ The CCS calculation depends on the `method` parameter:
   \$\$CCS = (mobility - t\_{fix}) \cdot \frac{charge}{\beta} \cdot
   \frac{1}{\sqrt{\frac{m\_{ion}}{m\_{ion} + m\_{gas}}}}\$\$
 
-  With \\t\_{fix}\\ and \\\beta\\ the `TFix` and `beta` values from the
-  calibration data. The `massGas` parameter sets the \\m\_{gas}\\ value.
+  With \\(t\_{fix}\\) and \\(\beta\\) the `TFix` and `beta` values from
+  the calibration data. The `massGas` parameter sets the \\(m\_{gas}\\)
+  value.
 
 The `getCCSParams` function generates such parameter list with defaults.
 

@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-10-22" />
+<meta name="date" content="2026-10-25" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -545,10 +545,10 @@ div.csl-indent {
 </table>
 <p>Some examples for this:</p>
 <div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb116-1"><a href="deleting-data.html#cb116-1" tabindex="-1"></a><span class="co"># remove features with intensities below 5000</span></span>
-<span id="cb116-2"><a href="deleting-data.html#cb116-2" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">delete</span>(fList, <span class="at">j =</span> <span class="cf">function</span>(f, ...) f<span class="sc">$</span>intensity <span class="sc">&lt;=</span> <span class="fl">5E3</span>)</span>
+<span id="cb116-2"><a href="deleting-data.html#cb116-2" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">delete</span>(fList, <span class="at">j =</span> <span class="cf">function</span>(f, ...) f<span class="sc">$</span>intensity <span class="sc">&lt;=</span> <span class="dv">5</span>E3)</span>
 <span id="cb116-3"><a href="deleting-data.html#cb116-3" tabindex="-1"></a></span>
 <span id="cb116-4"><a href="deleting-data.html#cb116-4" tabindex="-1"></a><span class="co"># same, but for features in all feature groups from specific analyses</span></span>
-<span id="cb116-5"><a href="deleting-data.html#cb116-5" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">delete</span>(fGroups, <span class="at">i =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="at">j =</span> <span class="cf">function</span>(g, ...) g <span class="sc">&lt;=</span> <span class="fl">5E3</span>)</span>
+<span id="cb116-5"><a href="deleting-data.html#cb116-5" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">delete</span>(fGroups, <span class="at">i =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="at">j =</span> <span class="cf">function</span>(g, ...) g <span class="sc">&lt;=</span> <span class="dv">5</span>E3)</span>
 <span id="cb116-6"><a href="deleting-data.html#cb116-6" tabindex="-1"></a></span>
 <span id="cb116-7"><a href="deleting-data.html#cb116-7" tabindex="-1"></a><span class="co"># remove hits for suspects with mass above 400 Da</span></span>
 <span id="cb116-8"><a href="deleting-data.html#cb116-8" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">delete</span>(fGroupsSusp, <span class="at">k =</span> <span class="cf">function</span>(tab) tab<span class="sc">$</span>neutralMass <span class="sc">&gt;</span> <span class="dv">400</span>)</span>

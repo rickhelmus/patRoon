@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-10-22" />
+<meta name="date" content="2026-10-25" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -493,8 +493,8 @@ detection, even if processing IMS-HRMS data. To enable the use of IMS data, the 
 <span id="cb262-9"><a href="performing-ims-workflows.html#cb262-9" tabindex="-1"></a></span>
 <span id="cb262-10"><a href="performing-ims-workflows.html#cb262-10" tabindex="-1"></a><span class="co"># focus on low m/z and mobility features with high intensity</span></span>
 <span id="cb262-11"><a href="performing-ims-workflows.html#cb262-11" tabindex="-1"></a><span class="co"># don&#39;t load and process more than 10,000 EICs at a time</span></span>
-<span id="cb262-12"><a href="performing-ims-workflows.html#cb262-12" tabindex="-1"></a>genEICParams <span class="ot">&lt;-</span> <span class="fu">getPiekEICParams</span>(<span class="at">mzRange =</span> <span class="fu">c</span>(<span class="dv">100</span>, <span class="dv">300</span>), <span class="at">mobRange =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.8</span>), <span class="at">minEICIntensity =</span> <span class="fl">1E5</span>)</span>
-<span id="cb262-13"><a href="performing-ims-workflows.html#cb262-13" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;piek&quot;</span>, <span class="at">IMS =</span> <span class="cn">TRUE</span>, <span class="at">genEICParams =</span> genEICParams, <span class="at">EICBatchSize =</span> <span class="fl">1E4</span>)</span></code></pre></div>
+<span id="cb262-12"><a href="performing-ims-workflows.html#cb262-12" tabindex="-1"></a>genEICParams <span class="ot">&lt;-</span> <span class="fu">getPiekEICParams</span>(<span class="at">mzRange =</span> <span class="fu">c</span>(<span class="dv">100</span>, <span class="dv">300</span>), <span class="at">mobRange =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.8</span>), <span class="at">minEICIntensity =</span> <span class="dv">1</span>E5)</span>
+<span id="cb262-13"><a href="performing-ims-workflows.html#cb262-13" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;piek&quot;</span>, <span class="at">IMS =</span> <span class="cn">TRUE</span>, <span class="at">genEICParams =</span> genEICParams, <span class="at">EICBatchSize =</span> <span class="dv">1</span>E4)</span></code></pre></div>
 </div>
 <div id="mz-and-mobility-determination" class="section level5 hasAnchor" number="8.2.3.1.2">
 <h5><span class="header-section-number">8.2.3.1.2</span> m/z and mobility determination<a href="performing-ims-workflows.html#mz-and-mobility-determination" class="anchor-section" aria-label="Anchor link to header"></a></h5>

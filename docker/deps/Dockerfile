@@ -9,7 +9,7 @@ ENV SETUPDIR=/usr/local/setup
 RUN --mount=type=cache,id=cache_apt,target=/var/cache/apt --mount=type=cache,id=lib_apt,target=/var/lib/apt apt-get update -y && \
     apt-get install -y --no-install-recommends libssl-dev libssh2-1-dev wget libnode-dev openbabel \
         libxml2-dev openjdk-17-jdk libmagick++-dev pandoc git texinfo libfribidi-dev ghostscript \
-        zlib1g-dev libxml2-dev libnetcdf-dev libglpk-dev tzdata libnetcdf-dev netcdf-bin ccache bzip2 \
+        zlib1g-dev libxml2-dev libnetcdf-dev libglpk-dev tzdata libnetcdf-dev netcdf-bin ccache bzip2 xz-utils \
         python3-venv python3-pip python3-dev libqt6network6t64 libsvm3 libxerces-c3.2t64 libboost-regex1.74.0 \
         libsnappy1v5 && \
     mkdir -p $SETUPDIR && \

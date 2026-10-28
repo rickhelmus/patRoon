@@ -312,8 +312,8 @@ generateTPs <- function(algorithm, ...)
 # NOTE: obj is not dispatched, we only want to pass through here so it works with any input
 setMethod("generateTPsP", c("ANY", "character"), function(obj, param, ...)
 {
-    checkmate::assertChoice(param, c("biotransformer", "cts", "library", "ann_form", "ann_comp", "library_formula",
-                                         "logic"))
+    checkmate::assertChoice(param, c("biotransformer", "logic", "library", "library_formula", "cts", "ann_form",
+                                     "ann_comp"))
     
     f <- switch(param,
                 biotransformer = generateTPsPBioTransformer,

@@ -9,45 +9,62 @@ NULL
 # Wrapper method functions.
 # NOTE: these are defined here to avoid circular dependencies between the workflow and the other classes.
 
-doWfStepFunc <- function(obj, func, inputObjs, param, paramClass, ...)
+doWfStepFunc <- function(func, inputObjs, param, paramClass, templDir, ..., setFirstArgObj = TRUE)
 {
     if (is.null(param))
-        param <- new(paramClass, template = templateDir(obj))
+        param <- new(paramClass, template = templDir)
     args <- c(inputObjs, list(param = param, ...))
-    names(args)[1] <- "obj" # HACK: first should always be obj, any other slot inputs should remain
+    if (setFirstArgObj)
+        names(args)[1] <- "obj" # HACK: set first arg to "obj", any other slot inputs should remain
     do.call(func, args)
 }
 
-doWfStep <- function(obj, func, slotNameIn, slotNameOut, ...)
+makeSlotNameInNamed <- function(slotNameIn)
 {
-    slot(obj, slotNameOut) <- doWfStepFunc(obj, func, sapply(slotNameIn, slot, object = obj, simplify = FALSE), ...)
-    return(obj)
+    names(slotNameIn) <- if (!is.null(names(slotNameIn)))
+        fifelse(nzchar(names(slotNameIn)), names(slotNameIn), slotNameIn)
+    else
+        slotNameIn
+    return(slotNameIn)
 }
 
-doWfFeatSet <- function(obj, func, slotNameIn, slotNameOut, ..., sets = NULL)
+doWfStep <- function(object, func, slotNameIn, slotNameOut, ...)
 {
-    assertSets(obj, sets, multiple = TRUE, null.ok = TRUE)
+    slotNameIn <- makeSlotNameInNamed(slotNameIn)
     
-    mySets <- sets(obj)
+    # NOTE: the first argument, object, is not called obj, so that '...' can contain obj arguments
+    slot(object, slotNameOut) <- doWfStepFunc(func, sapply(slotNameIn, slot, object = object, simplify = FALSE),
+                                              templDir = templateDir(object), ...)
+    return(object)
+}
+
+doWfFeatSet <- function(object, func, slotNameIn, slotNameOut, ..., sets = NULL)
+{
+    assertSets(object, sets, multiple = TRUE, null.ok = TRUE)
+    
+    mySets <- sets(object)
     if (length(mySets) == 0)
     {
         warning("No sets available in this workflowSet object", call. = FALSE)
-        return(obj)
+        return(object)
     }
     
     if (is.null(sets))
         sets <- mySets
     
-    obj@setObjects[sets] <- Map(sets, setObjects(obj)[sets], f = function(sn, so)
+    slotNameIn <- makeSlotNameInNamed(slotNameIn)
+    
+    object@setObjects[sets] <- Map(sets, setObjects(object)[sets], f = function(sn, so)
     {
         if (is.null(so[[slotNameIn]]))
             warning(sprintf("No %s available in set '%s'", slotNameIn, sn), call. = FALSE)
         else
-            so[[slotNameOut]] <- doWfStepFunc(obj, func, so[slotNameIn], ...)
+            so[[slotNameOut]] <- doWfStepFunc(func, setNames(so[slotNameIn], names(slotNameIn)),
+                                              templDir = templateDir(object), ...)
         return(so)
     })
     
-    return(obj)
+    return(object)
 }
 
 
@@ -307,69 +324,87 @@ setMethod("generateComponentsP", c("workflow", "ComponentsNontargetParam"),
 setMethod("generateComponentsPNontarget", "workflow",
           \(obj, param = NULL, ...) doWfCompon(obj, algo = "Nontarget", param = param, ...))
 
-doWfTPs <- function(..., algo)
+doWfTPs <- function(obj, ..., parents, algo, slotNameIn = character())
+{
+    if (identical(parents, "fGroups"))
+    {
+        if (is.null(obj@fGroups) || !isScreening(obj@fGroups))
+            stop("No suspect information in this workflow object! You may need to perform a prior suspect screening or adapt the parents argument.", call. = FALSE)
+        parents <- obj@fGroups
+    }
+    else if (identical(parents, "compounds"))
+    {
+        stop("No compound annotations in this workflow object!", call. = FALSE)
+        parents <- obj@compounds
+    }
+    doWfStep(func = paste0("generateTPsP", algo), slotNameIn = slotNameIn, slotNameOut = "TPs",
+             paramClass = paste0("TPs", algo, "Param"), object = obj, obj = parents, setFirstArgObj = FALSE, ...)
+}
+
+doWfTPsLogic <- function(..., algo)
 {
     doWfStep(func = paste0("generateTPsP", algo), slotNameIn = "fGroups", slotNameOut = "TPs",
              paramClass = paste0("TPs", algo, "Param"), ...)
 }
 
+
 #' @rdname generateTPsBioTransformer
 setMethod("generateTPsP", c("workflow", "TPsBioTransformerParam"),
-          \(obj, param = NULL, ...) doWfTPs(obj, algo = "BioTransformer", param = param, ...))
+          \(obj, param = NULL, parents = "fGroups", ...) doWfTPs(obj, algo = "BioTransformer", param = param, ..., parents = parents))
 
 #' @rdname generateTPsBioTransformer
 setMethod("generateTPsPBioTransformer", "workflow",
-          \(obj, param = NULL, ...) doWfTPs(obj, algo = "BioTransformer", param = param, ...))
+          \(obj, param = NULL, parents = "fGroups", ...) doWfTPs(obj, algo = "BioTransformer", param = param, ..., parents = parents))
 
 
 #' @rdname generateTPsCTS
 setMethod("generateTPsP", c("workflow", "TPsCTSParam"),
-          \(obj, param = NULL, ...) doWfTPs(obj, algo = "CTS", param = param, ...))
+          \(obj, param = NULL, ..., parents = "fGroups") doWfTPs(obj, algo = "CTS", param = param, ..., parents = parents))
 
 #' @rdname generateTPsCTS
 setMethod("generateTPsPCTS", "workflow",
-          \(obj, param = NULL, ...) doWfTPs(obj, algo = "CTS", param = param, ...))
+          \(obj, param = NULL, ..., parents = "fGroups") doWfTPs(obj, algo = "CTS", param = param, ..., parents = parents))
 
 #' @rdname generateTPsLibrary
 setMethod("generateTPsP", c("workflow", "TPsLibraryParam"),
-          \(obj, param = NULL, ...) doWfTPs(obj, algo = "Library", param = param, ...))
+          \(obj, param = NULL, parents = "fGroups", ...) doWfTPs(obj, algo = "Library", param = param, ..., parents = parents))
 
 #' @rdname generateTPsLibrary
 setMethod("generateTPsPLibrary", "workflow",
-          \(obj, param = NULL, ...) doWfTPs(obj, algo = "Library", param = param, ...))
+          \(obj, param = NULL, parents = "fGroups", ...) doWfTPs(obj, algo = "Library", param = param, ..., parents = parents))
 
 
 #' @rdname generateTPsAnnForm
 setMethod("generateTPsP", c("workflow", "TPsAnnFormParam"),
-          \(obj, param = NULL, ...) doWfTPs(obj, algo = "AnnForm", param = param, ...))
+          \(obj, param = NULL, parents = "fGroups", ...) doWfTPs(obj, algo = "AnnForm", param = param, ..., parents = parents, slotNameIn = "formulas"))
 
 #' @rdname generateTPsAnnForm
 setMethod("generateTPsPAnnForm", "workflow",
-          \(obj, param = NULL, ...) doWfTPs(obj, algo = "AnnForm", param = param, ...))
+          \(obj, param = NULL, parents = "fGroups", ...) doWfTPs(obj, algo = "AnnForm", param = param, ..., parents = parents, slotNameIn = "formulas"))
 
 #' @rdname generateTPsAnnComp
 setMethod("generateTPsP", c("workflow", "TPsAnnCompParam"),
-          \(obj, param = NULL, ...) doWfTPs(obj, algo = "AnnComp", param = param, ...))
+          \(obj, param = NULL, parents = "fGroups", ...) doWfTPs(obj, algo = "AnnComp", param = param, ..., parents = parents, slotNameIn = c("compounds", fGroupsComps = "fGroups")))
 
 #' @rdname generateTPsAnnComp
 setMethod("generateTPsPAnnComp", "workflow",
-          \(obj, param = NULL, ...) doWfTPs(obj, algo = "AnnComp", param = param, ...))
+          \(obj, param = NULL, parents = "fGroups", ...) doWfTPs(obj, algo = "AnnComp", param = param, ..., parents = parents, slotNameIn = c("compounds", fGroupsComps = "fGroups")))
 
 #' @rdname generateTPsLibraryFormula
 setMethod("generateTPsP", c("workflow", "TPsLibraryFormulaParam"),
-          \(obj, param = NULL, ...) doWfTPs(obj, algo = "LibraryFormula", param = param, ...))
+          \(obj, param = NULL, parents = "fGroups", ...) doWfTPs(obj, algo = "LibraryFormula", param = param, ..., parents = parents))
 
 #' @rdname generateTPsLibraryFormula
 setMethod("generateTPsPLibraryFormula", "workflow",
-          \(obj, param = NULL, ...) doWfTPs(obj, algo = "LibraryFormula", param = param, ...))
+          \(obj, param = NULL, parents = "fGroups", ...) doWfTPs(obj, algo = "LibraryFormula", param = param, ..., parents = parents))
 
 #' @rdname generateTPsLogic
 setMethod("generateTPsP", c("workflow", "TPsLogicParam"),
-          \(obj, param = NULL, ...) doWfTPs(obj, algo = "Logic", param = param, ...))
+          \(obj, param = NULL, ...) doWfTPsLogic(obj, algo = "Logic", param = param, ...))
 
 #' @rdname generateTPsLogic
 setMethod("generateTPsPLogic", "workflow",
-          \(obj, param = NULL, ...) doWfTPs(obj, algo = "Logic", param = param, ...))
+          \(obj, param = NULL, ...) doWfTPsLogic(obj, algo = "Logic", param = param, ...))
 
 
 doWfFilter <- function(obj, slotName, paramClass, param = NULL, ...)

@@ -20,6 +20,7 @@
     --> for now no default makeSet(), as it needs additional args (eg adducts, groupAlgo). Can re-check if we somehow avoid the need.
     - makeSet(): set features slot to getFeatures(fGroups) if using fGroups input?
 - predictToxP()/predictRespFactorsP(): make it configurable which objects are used for prediction?
+- generateTPsAnnComp and other: clearly document which objects are automatically set
 
 ## Params
 

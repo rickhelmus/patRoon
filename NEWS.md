@@ -6,6 +6,7 @@
 * `checkFeatures()/checkComponents`
     * Fixed: sorting the table and subsequently toggling a 'keep' value would lead to incorrect table selections (reported by Alessia Ore and Nikoline Marxen)
     * Fixed: Next/Previous buttons did not work properly when the table was sorted
+* Fixed: `generateTPsAnnComp()` did not properly handle multiple suspect hits for parents
 
 # patRoon 3.1
 

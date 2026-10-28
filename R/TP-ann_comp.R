@@ -336,8 +336,8 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps =
             if (!is.null(parentsTab[["InChIKey"]]) && !is.null(annTable[["logP"]]))
             {
                 parentsTab[, IK1 := getIKBlock1(parentsTab$InChIKey)]
-                parentsTab <- merge(parentsTab, annTable[, c("UID", "logP"), with = FALSE], by.x = "IK1", by.y = "UID",
-                                    all.x = TRUE, sort = FALSE)
+                parentsTab <- merge(parentsTab, unique(annTable[, c("UID", "logP"), with = FALSE], by = "UID"),
+                                    by.x = "IK1", by.y = "UID", all.x = TRUE, sort = FALSE)
                 parentsTab[, IK1 := NULL]
             }
             

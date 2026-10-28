@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-10-25" />
+<meta name="date" content="2026-10-28" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -493,17 +493,17 @@ div.csl-indent {
 <span id="cb70-2"><a href="procInspect.html#cb70-2" tabindex="-1"></a>fList[[<span class="st">&quot;standard-pos-1&quot;</span>]][, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;                          ID     ret        mz       area intensity  retmin
 #&gt;                      &lt;char&gt;   &lt;num&gt;     &lt;num&gt;      &lt;num&gt;     &lt;num&gt;   &lt;num&gt;
-#&gt;   1:  f_7529508948993244299  14.139  98.97533 4778875.00    330176   5.945
-#&gt;   2:  f_1936161471938538293   4.750  98.97542   96640.85    125856   4.351
-#&gt;   3: f_15770447795014172398   7.144 100.11199  470442.00    283356   5.945
-#&gt;   4: f_13128747632539073157  28.127 100.11208 5225358.00    304644  11.141
-#&gt;   5: f_12655209576005575464   4.550 100.11208  168080.50     76724   1.961
+#&gt;   1:  f_3979319468670975098  14.139  98.97533 4778875.00    330176   5.945
+#&gt;   2:  f_6554627833635962299   4.750  98.97542   96640.85    125856   4.351
+#&gt;   3: f_13125489545198779919   7.144 100.11199  470442.00    283356   5.945
+#&gt;   4:  f_1402107537483085414  28.127 100.11208 5225358.00    304644  11.141
+#&gt;   5:   f_584759411377036388   4.550 100.11208  168080.50     76724   1.961
 #&gt;  ---                                                                      
-#&gt; 543: f_13068195240952384969 383.363 415.21303  364565.80    135352 381.122
-#&gt; 544: f_11685280300007479784   9.143 425.15511  415152.60    121928   8.143
-#&gt; 545: f_10964597734603903077 319.805 425.18879  732124.40    210844 317.060
-#&gt; 546: f_11306368199673827436  10.142 427.03246  365056.90    114896   8.143
-#&gt; 547:  f_8610888154802143419   9.143 433.00456 3165097.00    946000   8.143</code></pre>
+#&gt; 543:  f_5120637855781231985 383.363 415.21303  364565.80    135352 381.122
+#&gt; 544: f_16558520602350428694   9.143 425.15511  415152.60    121928   8.143
+#&gt; 545:  f_1127416553690238708 319.805 425.18879  732124.40    210844 317.060
+#&gt; 546: f_17473757547868186080  10.142 427.03246  365056.90    114896   8.143
+#&gt; 547: f_12463482240201959981   9.143 433.00456 3165097.00    946000   8.143</code></pre>
 <div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="procInspect.html#cb72-1" tabindex="-1"></a><span class="co"># Feature group intensities</span></span>
 <span id="cb72-2"><a href="procInspect.html#cb72-2" tabindex="-1"></a>fGroups<span class="sc">$</span>M120_R268_30</span></code></pre></div>
 <pre><code>#&gt; [1] 264836 245372 216560</code></pre>
@@ -563,17 +563,17 @@ div.csl-indent {
 <span id="cb84-2"><a href="procInspect.html#cb84-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fList)[, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;             analysis                     ID     ret        mz      area intensity
 #&gt;               &lt;char&gt;                 &lt;char&gt;   &lt;num&gt;     &lt;num&gt;     &lt;num&gt;     &lt;num&gt;
-#&gt;    1:  solvent-pos-1  f_5165066387882410465  13.176  98.97537 4345232.0    391476
-#&gt;    2:  solvent-pos-1 f_14035867131187880146   7.181 100.11197  797112.1    426956
-#&gt;    3:  solvent-pos-1 f_14373668056580319613 192.178 100.11211 9609998.0    750532
-#&gt;    4:  solvent-pos-1 f_16179002877281948182  19.171 100.11217 5784411.0    370376
-#&gt;    5:  solvent-pos-1  f_9261820162684910978   4.786 100.11220  551723.6    567312
+#&gt;    1:  solvent-pos-1  f_6640495999850719780  13.176  98.97537 4345232.0    391476
+#&gt;    2:  solvent-pos-1  f_5291053501243938166   7.181 100.11197  797112.1    426956
+#&gt;    3:  solvent-pos-1 f_15514200172834252947 192.178 100.11211 9609998.0    750532
+#&gt;    4:  solvent-pos-1  f_7190403705906130493  19.171 100.11217 5784411.0    370376
+#&gt;    5:  solvent-pos-1 f_13906437946831452619   4.786 100.11220  551723.6    567312
 #&gt;   ---                                                                            
-#&gt; 2922: standard-pos-3  f_5987840309455117917 318.892 425.18866  666531.5    232636
-#&gt; 2923: standard-pos-3  f_6903395391643639695   9.114 427.03242  362024.1    114744
-#&gt; 2924: standard-pos-3  f_9002431184782783692 318.892 427.18678  200193.5     77768
-#&gt; 2925: standard-pos-3 f_15496542670200933958 382.682 432.23984  217612.9     97648
-#&gt; 2926: standard-pos-3 f_18103810550049301174   9.114 433.00457 3086864.0    912920</code></pre>
+#&gt; 2922: standard-pos-3  f_2465300046941298093 318.892 425.18866  666531.5    232636
+#&gt; 2923: standard-pos-3  f_8327810221339132318   9.114 427.03242  362024.1    114744
+#&gt; 2924: standard-pos-3  f_2531241450846642796 318.892 427.18678  200193.5     77768
+#&gt; 2925: standard-pos-3 f_13064355663551286098 382.682 432.23984  217612.9     97648
+#&gt; 2926: standard-pos-3 f_14914731060370840248   9.114 433.00457 3086864.0    912920</code></pre>
 <div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb86-1"><a href="procInspect.html#cb86-1" tabindex="-1"></a><span class="co"># Returns group info and intensity values for each feature group</span></span>
 <span id="cb86-2"><a href="procInspect.html#cb86-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroups, <span class="at">average =</span> <span class="cn">TRUE</span>) <span class="co"># average intensities for replicates</span></span></code></pre></div>
 <pre><code>#&gt;              group      ret       mz standard-pos_intensity

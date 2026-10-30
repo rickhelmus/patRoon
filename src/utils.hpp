@@ -218,13 +218,14 @@ template <typename NumType> std::vector<int> clusterNums(const std::vector<NumTy
         {
             int curBinSize = 0;
             NumType binSum = 0;
+            size_t previousSortedInd = 0;
             for (auto i : sortedNumInds)
             {
                 if (curBinSize > 0)// && (nums[i] - (binSum / static_cast<NumType>(curBinSize))) > window)
                 {
                     const auto diff = (method == clusterMethod::DISTANCE_MEAN)
                         ? nums[i] - (binSum / static_cast<NumType>(curBinSize))
-                        : nums[i] - nums[i - 1];
+                        : nums[i] - nums[previousSortedInd];
                     if (diff > window)
                     {
                         ++curCluster;
@@ -236,6 +237,7 @@ template <typename NumType> std::vector<int> clusterNums(const std::vector<NumTy
                 ret[i] = curCluster;
                 binSum += nums[i];
                 ++curBinSize;
+                previousSortedInd = i;
             }
         }
     }

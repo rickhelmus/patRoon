@@ -817,8 +817,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // doAverageSpectraList
-Rcpp::List doAverageSpectraList(Rcpp::List specsList, const std::string& method, SpectrumRawTypes::Mass window, SpectrumRawTypes::Intensity minIntensity, SpectrumRawTypes::PeakAbundance relMinAbundance, SpectrumRawTypes::PeakAbundance absMinAbundance);
-RcppExport SEXP _patRoon_doAverageSpectraList(SEXP specsListSEXP, SEXP methodSEXP, SEXP windowSEXP, SEXP minIntensitySEXP, SEXP relMinAbundanceSEXP, SEXP absMinAbundanceSEXP) {
+Rcpp::List doAverageSpectraList(Rcpp::List specsList, const std::string& method, SpectrumRawTypes::Mass window, SpectrumRawTypes::Intensity minIntensity, SpectrumRawTypes::PeakAbundance relMinAbundance, SpectrumRawTypes::PeakAbundance absMinAbundance, bool getClusts);
+RcppExport SEXP _patRoon_doAverageSpectraList(SEXP specsListSEXP, SEXP methodSEXP, SEXP windowSEXP, SEXP minIntensitySEXP, SEXP relMinAbundanceSEXP, SEXP absMinAbundanceSEXP, SEXP getClustsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -828,7 +828,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensity(minIntensitySEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::PeakAbundance >::type relMinAbundance(relMinAbundanceSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::PeakAbundance >::type absMinAbundance(absMinAbundanceSEXP);
-    rcpp_result_gen = Rcpp::wrap(doAverageSpectraList(specsList, method, window, minIntensity, relMinAbundance, absMinAbundance));
+    Rcpp::traits::input_parameter< bool >::type getClusts(getClustsSEXP);
+    rcpp_result_gen = Rcpp::wrap(doAverageSpectraList(specsList, method, window, minIntensity, relMinAbundance, absMinAbundance, getClusts));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1063,7 +1064,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_testSpecFilter", (DL_FUNC) &_patRoon_testSpecFilter, 7},
     {"_patRoon_testClusterNums", (DL_FUNC) &_patRoon_testClusterNums, 3},
     {"_patRoon_testClusterNums2", (DL_FUNC) &_patRoon_testClusterNums2, 3},
-    {"_patRoon_doAverageSpectraList", (DL_FUNC) &_patRoon_doAverageSpectraList, 6},
+    {"_patRoon_doAverageSpectraList", (DL_FUNC) &_patRoon_doAverageSpectraList, 7},
     {"_patRoon_testCentroidIMSFrame", (DL_FUNC) &_patRoon_testCentroidIMSFrame, 7},
     {"_patRoon_loadEICIntensities", (DL_FUNC) &_patRoon_loadEICIntensities, 3},
     {"_patRoon_loadEICs", (DL_FUNC) &_patRoon_loadEICs, 5},

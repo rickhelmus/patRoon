@@ -12,7 +12,7 @@ syncMSPeakListsSetObjects <- function(MSPeakListsSet)
     if (length(setObjects(MSPeakListsSet)) >= 2)
     {
         MSPeakListsSet@peakLists <- Reduce(modifyList, lapply(MSPeakListsSet@setObjects, peakLists))
-        MSPeakListsSet@averagedPeakLists <- averageMSPeakLists(MSPeakListsSet)
+        MSPeakListsSet <- averageMSPeakLists(MSPeakListsSet)
     }
     else if (length(setObjects(MSPeakListsSet)) == 1)
     {
@@ -68,8 +68,6 @@ MSPeakListsSet <- setClass("MSPeakListsSet",
                            slots = c(analysisInfo = "data.table"),
                            contains = c("MSPeakLists", "workflowStepSet"))
 
-setMethod("initialize", "MSPeakListsSet", function(.Object, ...) callNextMethod(.Object, ..., setIDs = FALSE))
-    
 setMethod("averageMSPeakLists", "MSPeakListsSet", function(obj)
 {
     # create 'averaged' peak lists by simply merging the averaged lists from the setObjects
@@ -96,7 +94,8 @@ setMethod("averageMSPeakLists", "MSPeakListsSet", function(obj)
         saveCacheData("MSPeakListsSetAvg", avgPLists, hash)
     }
 
-    return(avgPLists)
+    obj@averagedPeakLists <- avgPLists
+    return(obj)
 })
 
 
@@ -458,6 +457,6 @@ setMethod("unset", "MSPeakListsSet", function(obj, set)
     
     return(MSPeakListsUnset(peakLists = if (hasSO) obj@setObjects[[1]]@peakLists else list(),
                             averagedPeakLists = if (hasSO) averagedPeakLists(obj@setObjects[[1]]) else list(),
-                            metadata = list(), avgPeakListArgs = avArgs, setIDs = FALSE, doAverage = FALSE,
+                            metadata = list(), avgPeakListArgs = avArgs, doAverage = FALSE,
                             origFGNames = obj@origFGNames, algorithm = paste0(algorithm(obj), "_unset")))
 })

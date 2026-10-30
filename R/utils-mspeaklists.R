@@ -218,13 +218,19 @@ getDefSpecSimParams <- function(...)
 
 averageSpectraList <- function(spectraList, clusterMzWindow, topMost, minIntensityPre, minIntensityPost,
                                relMinAbundance, absMinAbundance, maxRelCumIntensity, method, assignPrecursor,
-                               withPrecursor, pruneMissingPrecursor, retainPrecursor)
+                               withPrecursor, pruneMissingPrecursor, retainPrecursor, getClusts = FALSE)
 {
     # pre-treat
     spectraList <- lapply(spectraList, function(spectra)
     {
         lapply(spectra, function(s)
         {
+            if (getClusts)
+            {
+                s <- copy(s)
+                s[, origRow := seq_len(.N)]
+            }
+            
             if (withPrecursor && !any(s$precursor))
                 return(s[0])
             
@@ -235,7 +241,7 @@ averageSpectraList <- function(spectraList, clusterMzWindow, topMost, minIntensi
                 keep <- ord[seq_len(topMost)]
                 if (retainPrecursor)
                     keep <- union(keep, which(s$precursor))
-                s <- s[keep]
+                s <- s[seq_len(nrow(s)) %in% keep]
             }
             
             if (maxRelCumIntensity < 1)
@@ -245,18 +251,32 @@ averageSpectraList <- function(spectraList, clusterMzWindow, topMost, minIntensi
                 s <- s[cumInt <= maxRelCumIntensity]
                 s[, cumInt := NULL]
             }
+            
             return(s)
         })
     })
 
     averagedSpectra <- doAverageSpectraList(spectraList, method, clusterMzWindow, minIntensityPost, relMinAbundance,
-                                            absMinAbundance)
+                                            absMinAbundance, getClusts)
 
     # post-treat
     averagedSpectra <- lapply(seq_along(averagedSpectra), function(i)
     {
+        grouping <- NULL
+        if (getClusts)
+        {
+            grouping <- attr(averagedSpectra[[i]], "clusts")
+            grouping <- lapply(seq_along(grouping), function(j)
+            {
+                # C++ to R index and map to original row
+                data.table(grpInd = grouping[[j]] + 1, 
+                           origRow = spectraList[[i]][[j]]$origRow)
+            })
+        }
         avgSpec <- averagedSpectra[[i]]
         setDT(avgSpec)
+        if (getClusts)
+            attr(avgSpec, "grouping") <- grouping
         
         if (nrow(avgSpec) == 0)
             return(avgSpec)
@@ -789,7 +809,7 @@ getMSPLEICsInfo <- function(MSPeakLists, fGroups, groupName, analysis, MSLevel, 
         tabs <- sapply(groupName, function(grp)
         {
             ftab <- getFeatures(fGroups)[[ana]][group == grp]
-            if (nrow(tab) == 0)
+            if (nrow(ftab) == 0)
                 return(NULL)
             
             spec <- getSpec(MSPeakLists, grp, MSLevel, ana)

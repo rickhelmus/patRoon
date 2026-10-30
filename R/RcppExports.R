@@ -185,8 +185,8 @@ testClusterNums2 <- function(nums, method, window) {
     .Call(`_patRoon_testClusterNums2`, nums, method, window)
 }
 
-doAverageSpectraList <- function(specsList, method, window, minIntensity, relMinAbundance, absMinAbundance) {
-    .Call(`_patRoon_doAverageSpectraList`, specsList, method, window, minIntensity, relMinAbundance, absMinAbundance)
+doAverageSpectraList <- function(specsList, method, window, minIntensity, relMinAbundance, absMinAbundance, getClusts = FALSE) {
+    .Call(`_patRoon_doAverageSpectraList`, specsList, method, window, minIntensity, relMinAbundance, absMinAbundance, getClusts)
 }
 
 testCentroidIMSFrame <- function(mzs, ints, mobStart, mobEnd, smoothWindow, halfWindow, maxGap = 0.0) {

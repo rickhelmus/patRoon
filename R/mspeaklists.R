@@ -104,19 +104,16 @@ MSPeakLists <- setClass("MSPeakLists",
                         contains = "workflowStep")
 
 
-setMethod("initialize", "MSPeakLists", function(.Object, setIDs = TRUE, doAverage = TRUE, ...)
+setMethod("initialize", "MSPeakLists", function(.Object, doAverage = TRUE, ...)
 {
     .Object <- callNextMethod(.Object, ...)
 
     # average if not already done (eg unset objects may do themselves)
     if (doAverage)
-        .Object@averagedPeakLists <- averageMSPeakLists(.Object)
+        .Object <- averageMSPeakLists(.Object)
     .Object@peakLists <- makeEmptyListNamed(.Object@peakLists)
     .Object@averagedPeakLists <- makeEmptyListNamed(.Object@averagedPeakLists)
     
-    if (setIDs)
-        .Object <- assignMSPLIDs(.Object)
-
     return(.Object)
 })
 
@@ -126,7 +123,9 @@ setMethod("averageMSPeakLists", "MSPeakLists", function(obj)
     
     pLists <- peakLists(obj)
     hash <- makeHash(pLists, obj@avgPeakListArgs)
-    avgPLists <- loadCacheData("MSPeakListsAvg", hash)
+    cached <- loadCacheData("MSPeakListsAvg", hash)
+    if (!is.null(cached))
+        return(cached)
     
     # figure out feature groups from (non-averaged) peak lists
     gNames <- unique(unlist(sapply(pLists, names, simplify = FALSE), use.names = FALSE))
@@ -134,24 +133,44 @@ setMethod("averageMSPeakLists", "MSPeakLists", function(obj)
     gCount <- length(gNames)
     
     if (gCount == 0 || length(obj@avgPeakListArgs) == 0)
-        avgPLists <- makeEmptyListNamed(list())
-    else if (is.null(avgPLists))
+        obj@averagedPeakLists <- makeEmptyListNamed(list())
+    else
     {
         doAvg <- function(mode, ...)
         {
             allPL <- sapply(gNames, function(grp)
             {
-                pruneList(lapply(pLists, function(pl) pl[[grp]][[mode]]), checkZeroRows = TRUE)
+                pruneList(sapply(pLists, function(pl) pl[[grp]][[mode]], simplify = FALSE), checkZeroRows = TRUE)
             }, simplify = FALSE)
-            avgPL <- setNames(averageSpectraList(allPL, ...), gNames)
-            return(lapply(avgPL, function(pl)
+            avgPL <- setNames(averageSpectraList(allPL, ..., getClusts = TRUE), gNames)
+
+            return(Map(gNames, avgPL, f = function(grp, pl)
             {
                 pl <- copy(pl)
+                pl[, ID := seq_len(nrow(pl))]
+                setcolorder(pl, "ID")
+                
                 if (nrow(pl) == 0)
                     pl[, c("abundance_prev_rel", "abundance_prev_abs") := numeric()] # won't be set by averaging if zero rows
-                
                 setnames(pl, c("abundance_rel", "abundance_abs", "abundance_prev_rel", "abundance_prev_abs"),
                          c("fgroup_abundance_rel", "fgroup_abundance_abs", "feat_abundance_rel", "feat_abundance_abs"))
+                
+                grouping <- attr(pl, "grouping")
+                names(grouping) <- names(allPL[[grp]])
+                obj@peakLists <<- Map(obj@peakLists, names(obj@peakLists), f = function(plAna, ana)
+                {
+                    plm <- copy(plAna[[grp]][[mode]])
+                    if (is.null(plm))
+                        return(plAna)
+                    
+                    if (is.null(grouping[[ana]]))
+                        plm[, groupID := NA_integer_]
+                    else
+                        plm[grouping[[ana]]$origRow, groupID := grouping[[ana]]$grpInd]
+                    plAna[[grp]][[mode]] <- plm
+                    return(plAna)
+                })
+                
                 return(pl)
             }))
         }
@@ -179,12 +198,13 @@ setMethod("averageMSPeakLists", "MSPeakLists", function(obj)
         
         avgPLists <- pruneList(avgPLists, checkEmptyElements = TRUE)
 
-        saveCacheData("MSPeakListsAvg", avgPLists, hash)
+        obj@averagedPeakLists <- avgPLists
+        saveCacheData("MSPeakListsAvg", obj, hash)
     }
 
     cat("Done!\n")
     
-    return(avgPLists)
+    return(obj)
 })
 
 #' @describeIn MSPeakLists Accessor method to obtain the MS peak lists.
@@ -448,14 +468,10 @@ setMethod("delete", "MSPeakLists", function(obj, i = NULL, j = NULL, k = NULL, r
                 obj@averagedPeakLists <- pruneList(obj@averagedPeakLists, checkEmptyElements = TRUE)
             }
         }
-        
     }
 
     if (reAverage)
-    {
-        obj@averagedPeakLists <- averageMSPeakLists(obj)
-        obj <- assignMSPLIDs(obj) # re-generate as IDs are cleared by re-averaging
-    }
+        obj <- averageMSPeakLists(obj)
     
     return(obj)
 })
@@ -1073,6 +1089,8 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRTWindo
             pl <- assignPrecursorToMSPeakList(pl, pmz)
             if (params$pruneMissingPrecursor && !any(pl$precursor))
                 pl <- pl[0]
+            pl[, ID := seq_len(nrow(pl))]
+            setcolorder(pl, "ID")
             return(pl)
         })
         ret <- pruneList(ret)

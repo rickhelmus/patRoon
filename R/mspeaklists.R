@@ -703,6 +703,102 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
     return(obj)
 })
 
+setMethod("deconvolute", "MSPeakLists", function(obj, fGroups, MSLevel, threshold, fixedIsolationWidth = FALSE,
+                                                 maxGap = 10, mzWindow = defaultLim("mz", "medium"))
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    checkmate::assertChoice(MSLevel, 1:2, add = ac)
+    checkmate::assertNumber(threshold, lower = 0, upper = 1, finite = TRUE, add = ac)
+    checkmate::assertFlag(fixedIsolationWidth, add = ac)
+    checkmate::assertNumber(maxGap, lower = 0, add = ac)
+    checkmate::assertNumber(mzWindow, lower = 0, add = ac)
+    checkmate::reportAssertions(ac)
+
+    fTable <- featureTable(fGroups)
+    
+    hash <- makeHash(obj, fTable, MSLevel, threshold, fixedIsolationWidth, maxGap, mzWindow)
+    cached <- loadCacheData("deconvoluteMSPeakLists", hash)
+    if (!is.null(cached))
+        return(cached)
+    
+    EICs <- getMSPLEICs(obj, fGroups, names(fGroups), analyses(fGroups), maxGap = maxGap,
+                        MSLevel = MSLevel, fixedIsolationWidth = fixedIsolationWidth, rtWindow = 0,
+                        mzWindow = mzWindow)
+    
+    
+    # UNDONE: specify EICParams as arg?
+    EICsFeat <- NULL
+    if (MSLevel == 2)
+    {
+        EICsFeat <- getFeatureEIXs(fGroups, "EIC", EIXParams = getDefEICParams(maxGap = maxGap, window = 0))
+        EICsFeat <- Map(names(EICsFeat), EICsFeat, f = function(ana, anaEICs)
+        {
+            at <- attr(anaEICs, "allXValues")
+            return(Map(names(anaEICs), anaEICs, f = function(fg, eic)
+            {
+                cbind(time = at, intensity = doFillEIXIntensities(at, eic[, "time"], eic[, "intensity"]))
+            }))
+        })
+    }
+    
+    correlations <- Map(names(EICs), EICs, f = function(ana, anaEICs)
+    {
+        at <- attr(anaEICs, "allXValues")
+        Map(names(anaEICs), anaEICs, f = function(grp, grpEICs)
+        {
+            grpEICs <- Map(names(grpEICs), grpEICs, f = function(id, eic)
+            {
+                m <- cbind(time = at, intensity = doFillEIXIntensities(at, eic[, "time"], eic[, "intensity"]))
+                return(m)
+            })
+            eicm <- do.call(cbind, lapply(grpEICs, \(eic) eic[, "intensity"]))
+            colnames(eicm) <- names(grpEICs)
+            
+            spec <- getSpec(obj, grp, MSLevel, ana)
+            precID <- as.character(spec[precursor == TRUE]$ID) # NOTE: IDs are stored as strings in EIC list
+            corrSpecPrec <- numeric()
+            if (length(precID) != 0L)
+            {
+                precInd <- which(names(grpEICs) == precID)
+                if (length(precInd) != 0L)
+                    corrSpecPrec <- cor(eicm[, precInd], eicm, use = "pairwise.complete.obs")
+            }
+            
+            corrSpec1Prec <- numeric()
+            if (MSLevel == 2)
+            {
+                eic <- EICsFeat[[ana]][[grp]]
+                if (!is.null(eic))
+                    corrSpec1Prec <- cor(eic[, "intensity"], eicm, use = "pairwise.complete.obs")
+            }
+            
+            if (length(corrSpecPrec) > 0 && length(corrSpec1Prec) > 0)
+                return(pmax(corrSpecPrec, corrSpec1Prec))
+            else if (length(corrSpecPrec) > 0)
+                return(corrSpecPrec)
+            return(corrSpec1Prec)
+        })
+    })
+    
+    ret <- delete(obj, j = function(pl, grp, ana, type)
+    {
+        if ((type == "MS" && MSLevel == 2) || (type == "MSMS" && MSLevel == 1) || is.null(ana))
+            return(FALSE)
+        
+        corrs <- correlations[[ana]][[grp]]
+        if (length(corrs) == 0)
+            return(FALSE)
+        
+        return(!pl$ID %in% colnames(corrs)[corrs >= threshold])
+    })
+    
+    ret <- averageMSPeakLists(ret)
+    saveCacheData("deconvoluteMSPeakLists", ret, hash)
+    
+    return(ret)
+})
+
 #' @describeIn MSPeakLists Plots a spectrum using MS or MS/MS peak lists for a given feature group. Two spectra can be
 #'   compared when two feature groups are specified.
 #'

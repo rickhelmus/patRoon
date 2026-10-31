@@ -187,6 +187,9 @@ setGeneric("peakLists", function(obj, ...) standardGeneric("peakLists"))
 setGeneric("averagedPeakLists", function(obj, ...) standardGeneric("averagedPeakLists"))
 
 #' @name MSPeakLists-class
+setGeneric("deconvolute", function(obj, ...) standardGeneric("deconvolute"))
+
+#' @name MSPeakLists-class
 setGeneric("spectrumSimilarity", function(obj, ...) standardGeneric("spectrumSimilarity"))
 
 #' @name MSPeakLists-class

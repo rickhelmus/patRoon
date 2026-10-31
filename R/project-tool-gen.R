@@ -526,7 +526,7 @@ genScriptFeaturesBlock <- function(ionization, IMS, settingsFeat, generator)
     }
 }
 
-genScriptMSPLBlock <- function(generator)
+genScriptMSPLBlock <- function(generator, diaConv)
 {
     generator$addHeader("retrieve MS peak lists")
     generator$addCall("avgMSListParams", "getDefAvgPListParams", list(name = "clusterMzWindow", value = defaultLim("mz", "medium")))
@@ -535,6 +535,15 @@ genScriptMSPLBlock <- function(generator)
         list(name = "avgFeatParams", value = "avgMSListParams"),
         list(name = "avgFGroupParams", value = "avgMSListParams")
     ))
+    if (diaConv)
+    {
+        generator$addCall("mslists", "deconvolute", list(
+            list(value = "mslists"),
+            list(value = "fGroups"),
+            list(name = "MSLevel", value = 2),
+            list(name = "threshold", value = 0.9)
+        ))
+    }
 }
 
 genScriptComponBlock <- function(ionization, settingsAnnon, generator)
@@ -960,7 +969,7 @@ getScriptCode <- function(CCSCalibrant, anaInfoData, settings, noDate)
     if (nzchar(settings$annotation$componAlgo))
     {
         if (doMSPLCompon)
-            genScriptMSPLBlock(generator) # needed for ISF annotations
+            genScriptMSPLBlock(generator, settings$annotation$diaConv) # needed for ISF annotations
         genScriptComponBlock(ionization, settings$annotation, generator)
     }
     
@@ -981,7 +990,7 @@ getScriptCode <- function(CCSCalibrant, anaInfoData, settings, noDate)
     if (nzchar(settings$annotation$formulasAlgo) || nzchar(settings$annotation$compoundsAlgo))
     {
         if (!doMSPLCompon)
-            genScriptMSPLBlock(generator)
+            genScriptMSPLBlock(generator, settings$annotation$diaConv)
         addMFDB <- doTPsStructScr && settings$TP$TPDoMFDB
         genScriptAnnBlock(ionization, settings$general$IMS, settings$annotation, adductArg, doSusps, addMFDB, generator)
     }

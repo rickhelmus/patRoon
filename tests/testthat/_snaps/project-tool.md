@@ -247,6 +247,9 @@
       $annotations$compoundsAlgo
       [1] "MetFrag"
       
+      $annotations$diaConv
+      [1] FALSE
+      
       $annotations$MSLibraryFormat
       [1] "msp"
       

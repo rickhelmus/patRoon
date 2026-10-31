@@ -61,7 +61,7 @@ getNewProjectUI <- function()
     )
 }
 
-curProjectSettingsVersion <- \() 3L
+curProjectSettingsVersion <- \() 4L
 
 # NOTE: the read/write functions below are also used by tests
 readProjectSettings <- function(file, destPath)

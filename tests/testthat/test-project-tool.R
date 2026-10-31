@@ -365,6 +365,7 @@ test_that("annotation settings", {
     testNewProj(annotations = list(componAlgo = "net", annotateISF = TRUE), name = "annotations-compon_net-mspl")
     
     testNewProj(annotations = list(formulasAlgo = "GenForm"), name = "annotations-formulas_genform")
+    testNewProj(annotations = list(formulasAlgo = "GenForm", diaConv = TRUE), name = "annotations-dia_conv")
     testNewProj(annotations = list(formulasAlgo = "SIRIUS", estIDConf = character()),
                 name = "annotations-formulas_sirius_noann")
     

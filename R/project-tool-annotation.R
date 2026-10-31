@@ -75,6 +75,14 @@ newProjectAnnotationUI <- function(id)
                     )
                 )
             ),
+            conditionalPanel(
+                condition = "(input.componAlgo == \"net\" && input.annotateISF) || input.formulasAlgo != \"\" || input.compoundsAlgo != \"\"",
+                ns = ns,
+                fillCol(
+                    height = 25,
+                    checkboxInput(ns("diaConv"), "DIA convolution of MS peak lists")
+                )
+            ),
             hr(),
             fillRow(
                 flex = c(2, 1),
@@ -113,6 +121,7 @@ newProjectAnnotationServer <- function(id, hasSuspects, IMSMode, settings)
             updateCheckboxInput(session, "selectIons", value = settings()$selectIons)
             updateSelectInput(session, "formulasAlgo", selected = settings()$formulasAlgo)
             updateSelectInput(session, "compoundsAlgo", selected = settings()$compoundsAlgo)
+            updateCheckboxInput(session, "diaConv", value = settings()$diaConv)
             updateSelectInput(session, "MSLibraryFormat", selected = settings()$MSLibraryFormat)
             updateTextInput(session, "MSLibraryPath", value = settings()$MSLibraryPath)
             updateCheckboxGroupInput(session, "estIDConf", selected = settings()$estIDConf)
@@ -141,6 +150,7 @@ newProjectAnnotationServer <- function(id, hasSuspects, IMSMode, settings)
                 selectIons = input$selectIons,
                 formulasAlgo = input$formulasAlgo,
                 compoundsAlgo = input$compoundsAlgo,
+                diaConv = input$diaConv,
                 MSLibraryFormat = input$MSLibraryFormat,
                 MSLibraryPath = input$MSLibraryPath,
                 estIDConf = input$estIDConf,
@@ -158,6 +168,7 @@ defaultAnnotationSettings <- function()
         selectIons = TRUE,
         formulasAlgo = "",
         compoundsAlgo = "",
+        diaConv = FALSE,
         MSLibraryFormat = "msp",
         MSLibraryPath = "",
         estIDConf = unname(getIDConfUIOpts()),

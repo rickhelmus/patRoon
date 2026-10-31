@@ -869,13 +869,28 @@ setMethod("plotSpectrumHash", "MSPeakLists", function(obj, groupName, analysis =
 })
 
 #' @export
-setMethod("plotChroms", "MSPeakLists", function(obj, fGroups, groupName, analysis, MSLevel, fixedIsolationWidth = FALSE,
+setMethod("plotChroms", "MSPeakLists", function(obj, fGroups, groupName, analysis = NULL, MSLevel = 1,
+                                                fixedIsolationWidth = FALSE,
                                                 rtWindow = defaultLim("retention", "wide"),
                                                 mzWindow = defaultLim("mz", "medium"),
                                                 retMin = FALSE, title = NULL, showLegend = TRUE, IMS = "maybe",
                                                 xlim = NULL, ylim = NULL, maxGap = 10, ...)
 {
-    # UNDONE: checkmates
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    checkmate::assertCharacter(groupName, any.missing = FALSE, min.len = 1, add = ac)
+    checkmate::assertCharacter(analysis, any.missing = FALSE, min.len = 1, null.ok = TRUE, add = ac)
+    checkmate::assertChoice(MSLevel, 1:2, add = ac)
+    checkmate::assertFlag(fixedIsolationWidth, add = ac)
+    checkmate::assertNumber(rtWindow, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertNumber(mzWindow, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertFlag(retMin, add = ac)
+    checkmate::assertString(title, null.ok = TRUE, add = ac)
+    checkmate::assertFlag(showLegend, add = ac)
+    assertIMSArg(IMS, add = ac)
+    assertXYLim(xlim, ylim, add = ac)
+    checkmate::assertNumber(maxGap, lower = 0, add = ac)
+    checkmate::reportAssertions(ac)
     
     if (!identical(IMS, "both") && !setequal(groupName, names(obj)))
         IMS <- "both" # make sure selection is always plotted

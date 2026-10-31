@@ -869,14 +869,10 @@ getMSPLEICs <- function(MSPeakLists, fGroups, groupName, analysis, maxGap = 3, M
 }
 
 filterMSPLCor <- function(MSPeakLists, fGroups, MSLevel, threshold, fixedIsolationWidth = FALSE,
-                          maxGap = 3, mzWindow = defaultLim("mz", "medium"))
+                          maxGap = 10, mzWindow = defaultLim("mz", "medium"))
 {
-    # UNDONE: update for maxGap
-    
     fTable <- featureTable(fGroups)
     
-    # EICs: get complete chromatograms so these can be compared, however, only keep the feature signal so other peaks
-    # will not interfere correlation calculations.
     EICs <- getMSPLEICs(MSPeakLists, fGroups, names(fGroups), analyses(fGroups), maxGap = maxGap,
                         MSLevel = MSLevel, fixedIsolationWidth = fixedIsolationWidth, rtWindow = 0,
                         mzWindow = mzWindow)
@@ -904,8 +900,6 @@ filterMSPLCor <- function(MSPeakLists, fGroups, MSLevel, threshold, fixedIsolati
             grpEICs <- Map(names(grpEICs), grpEICs, f = function(id, eic)
             {
                 m <- cbind(time = at, intensity = doFillEIXIntensities(at, eic[, "time"], eic[, "intensity"]))
-                # ft <- fTable[[ana]][group == grp]
-                # m[m[, "time"] < ft$retmin | m[, "time"] > ft$retmax, "intensity"] <- 0
                 return(m)
             })
             eicm <- do.call(cbind, lapply(grpEICs, \(eic) eic[, "intensity"]))
@@ -948,6 +942,8 @@ filterMSPLCor <- function(MSPeakLists, fGroups, MSLevel, threshold, fixedIsolati
 
         return(!pl$ID %in% colnames(corrs)[corrs >= threshold])
     })
+    
+    ret@averagedPeakLists <- averageMSPeakLists(ret)
 
     return(ret)
 }

@@ -804,41 +804,46 @@ mergeBinnedAndAnnPL <- function(binPL, annPL, which)
 
 getMSPLEICsInfo <- function(MSPeakLists, fGroups, groupName, analysis, MSLevel, fixedIsolationWidth, rtWindow, mzWindow)
 {
-    sapply(analysis, function(ana)
+    MST <- if (MSLevel == 1) "MS" else "MSMS"
+    tabMSPLFeats <- as.data.table(MSPeakLists, averaged = FALSE)
+    tabMSPLFeats <- tabMSPLFeats[group %chin% groupName & type == MST]
+    
+    useGroupPLs <- is.null(analysis)
+    tabMSPLFGs <- NULL
+    if (useGroupPLs)
     {
-        tabs <- sapply(groupName, function(grp)
-        {
-            ftab <- getFeatures(fGroups)[[ana]][group == grp]
-            if (nrow(ftab) == 0)
-                return(NULL)
-            
-            spec <- getSpec(MSPeakLists, grp, MSLevel, ana)
-            if (is.null(spec))
-                return(NULL)
-            pl <- copy(spec)
-            pl <- pl[, c("ID", "mz", "precursor"), with = FALSE]
-            precMZ <- pl[precursor == TRUE]$mz
-            if (length(precMZ) == 0)
-                precMZ <- groupInfo(fGroups)[group == grp]$mz # UNDONE: doc
-            pl[, precursorMZ := precMZ]
-            
-            for (col in c("retmin", "retmax", "mobmin", "mobmax"))
-            {
-                if (col %in% names(ftab))
-                    pl[, (col) := ftab[[col]]]
-            }
-            
-            if (is.infinite(rtWindow))
-                pl[, c("retmin", "retmax") := 0]
-            else
-                pl[, c("retmin", "retmax") := .(retmin - rtWindow, retmax + rtWindow)]
-            
-            pl[, c("mzmin", "mzmax") := .(mz - mzWindow, mz + mzWindow)]
-            
-            return(pl[])
-        }, simplify = FALSE)
-        tab <- rbindlist(tabs, idcol = "group")
-    }, simplify = FALSE)
+        analysis <- analyses(MSPeakLists)
+        tabMSPLFGs <- as.data.table(MSPeakLists, averaged = TRUE)
+        tabMSPLFGs <- tabMSPLFGs[group %chin% groupName & type == MST]
+        tabMSPLFeats[, keep := {
+            fgtab <- tabMSPLFGs[group == group[1] & ID == groupID[1]]
+            if (nrow(fgtab) > 0) seq_len(.N) == which.max(intensity) else FALSE
+        }, by = c("group", "groupID")]
+        tabMSPLFeats <- tabMSPLFeats[keep == TRUE]
+    }
+    
+    fTab <- as.data.table(getFeatures(fGroups))
+    fTab <- subsetDTColumnsIfPresent(fTab, c("group", "analysis", "retmin", "retmax", "mobmin", "mobmax"))
+    tabMSPLFeats <- merge(tabMSPLFeats, fTab, by = c("group", "analysis"), all.x = TRUE)
+    gInfo <- groupInfo(fGroups)
+    tabMSPLFeats[, precursorMZ := {
+        pmz <- mz[precursor == TRUE]
+        if (length(pmz) == 0)
+            pmz <- gInfo$mz[gInfo$group == group[1]]$mz # UNDONE: doc
+        pmz
+    }, by = c("group", "analysis")]
+    
+    if (is.infinite(rtWindow))
+        tabMSPLFeats[, c("retmin", "retmax") := 0]
+    else
+        tabMSPLFeats[, c("retmin", "retmax") := .(retmin - rtWindow, retmax + rtWindow)]
+    
+    tabMSPLFeats[, c("mzmin", "mzmax") := .(mz - mzWindow, mz + mzWindow)]
+    
+    ret <- split(tabMSPLFeats, by = "analysis", keep.by = FALSE)
+    ret <- ret[intersect(analysis, names(ret))] # keep order of analysis arg
+    
+    return(ret)
 }
 
 getMSPLEICs <- function(MSPeakLists, fGroups, groupName, analysis, maxGap = 3, MSLevel, fixedIsolationWidth = FALSE,

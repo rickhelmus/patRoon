@@ -780,7 +780,6 @@ setMethod("plotChroms", "MSPeakLists", function(obj, fGroups, groupName, analysi
                                                 xlim = NULL, ylim = NULL, maxGap = 10, ...)
 {
     # UNDONE: checkmates
-    # UNDONE: allow analysis==NULL: take topMost
     
     if (!identical(IMS, "both") && !setequal(groupName, names(obj)))
         IMS <- "both" # make sure selection is always plotted
@@ -788,7 +787,8 @@ setMethod("plotChroms", "MSPeakLists", function(obj, fGroups, groupName, analysi
     fGroups <- prepIMSFGroupsForPlot(fGroups, IMS)
     if (IMS != "both")
     {
-        analysis <- intersect(analysis, analyses(fGroups))
+        if (!is.null(analysis))
+            analysis <- intersect(analysis, analyses(fGroups))
         groupName <- intersect(groupName, names(fGroups))
     }
     
@@ -800,7 +800,11 @@ setMethod("plotChroms", "MSPeakLists", function(obj, fGroups, groupName, analysi
     EICs <- getMSPLEICs(obj, fGroups, groupName, analysis, maxGap = maxGap, MSLevel = MSLevel,
                         fixedIsolationWidth = fixedIsolationWidth, rtWindow = rtWindow, mzWindow = mzWindow, pad = TRUE)
     
-    EICs <- EICs[[1]][[1]] # so far only one groupName and analysis is supported
+    # EICs <- EICs[[1]][[1]] # so far only one groupName and analysis is supported
+    
+    # So far only one unique groupName and one unique analysis is supported, however, these are distributed over the
+    # list structure if analysis==NULL. Simplify the EICs here to a flat list
+    EICs <- unlist(EICs, recursive = FALSE) |> unlist(recursive = FALSE)
     
     # prepare EICs for plotting
     if (retMin)

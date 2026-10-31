@@ -307,6 +307,9 @@ test_that("basic functionality", {
     expect_equal(nrow(as.data.table(plists, averaged = FALSE)), length(plists))
     checkmate::expect_names(names(as.data.table(plists, fGroups = fGroups)),
                             must.include = c("ret", "group_mz"))
+    
+    expect_lt(length(deconvolute(plists, fGroups, MSLevel = 1, threshold = 0.9)),
+              length(deconvolute(plists, fGroups, MSLevel = 1, threshold = 0.2)))
 })
 
 testSpecSim <- function(obj, groupName1, groupName2, ..., expectNA = FALSE, expectOne = FALSE)

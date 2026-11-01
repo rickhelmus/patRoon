@@ -920,11 +920,15 @@ setMethod("plotChroms", "MSPeakLists", function(obj, fGroups, groupName, analysi
         EICs <- lapply(EICs, function(anaEICs) anaEICs[names(anaEICs) %chin% groupName])
     }
     
-    # EICs <- EICs[[1]][[1]] # so far only one groupName and analysis is supported
-    
     # So far only one unique groupName and one unique analysis is supported, however, these are distributed over the
     # list structure if analysis==NULL. Simplify the EICs here to a flat list
     EICs <- unlist(EICs, recursive = FALSE) |> unlist(recursive = FALSE)
+    
+    if (length(EICs) == 0)
+    {
+        noDataPlot()
+        return(invisible(NULL))
+    }
     
     # prepare EICs for plotting
     if (retMin)

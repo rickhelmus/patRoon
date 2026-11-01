@@ -802,7 +802,8 @@ mergeBinnedAndAnnPL <- function(binPL, annPL, which)
     return(annPL)
 }
 
-getMSPLEICsInfo <- function(MSPeakLists, fGroups, groupName, analysis, MSLevel, fixedIsolationWidth, rtWindow, mzWindow)
+setMethod("getMSPLEICsInfo", "MSPeakLists", function(MSPeakLists, fGroups, groupName, analysis, MSLevel,
+                                                     fixedIsolationWidth, rtWindow, mzWindow)
 {
     MST <- if (MSLevel == 1) "MS" else "MSMS"
     tabMSPLFeats <- as.data.table(MSPeakLists, averaged = FALSE)
@@ -818,6 +819,11 @@ getMSPLEICsInfo <- function(MSPeakLists, fGroups, groupName, analysis, MSLevel, 
         tabMSPLFeats[, keep := seq_len(.N) == which.max(intensity), by = c("group", "groupID")]
         tabMSPLFeats <- tabMSPLFeats[keep == TRUE]
     }
+    else
+        tabMSPLFeats <- tabMSPLFeats[analysis %chin% analysis]
+    
+    if (nrow(tabMSPLFeats) == 0)
+        return(list())
     
     fTab <- as.data.table(getFeatures(fGroups))
     fTab <- subsetDTColumnsIfPresent(fTab, c("group", "analysis", "retmin", "retmax", "mobmin", "mobmax"))
@@ -840,8 +846,22 @@ getMSPLEICsInfo <- function(MSPeakLists, fGroups, groupName, analysis, MSLevel, 
     ret <- split(tabMSPLFeats, by = "analysis", keep.by = FALSE)
     ret <- ret[intersect(analysis, names(ret))] # keep order of analysis arg
     
-    return(ret)
-}
+    return(pruneList(ret))
+})
+
+setMethod("getMSPLEICsInfo", "MSPeakListsSet", function(MSPeakLists, fGroups, groupName, analysis, ...)
+{
+    checkmate::assertClass(fGroups, "featureGroupsSet")
+    
+    fgUS <- checkAndUnSetOther(sets(MSPeakLists), fGroups, "featureGroups")
+    ret <- Map(setObjects(MSPeakLists), fgUS, f = getMSPLEICsInfo,
+               MoreArgs = list(groupName = groupName, analysis = analysis, ...))
+    ret <- unlist(ret, recursive = FALSE)
+    names(ret) <- gsub(sprintf("(%s)\\.", paste0(sets(MSPeakLists), collapse = "|")), "", names(ret)) # remove set prefix
+    
+    anaOrder <- if (is.null(analysis)) analyses(MSPeakLists) else analysis
+    return(pruneList(ret[intersect(anaOrder, names(ret))]))
+})
 
 getMSPLEICs <- function(MSPeakLists, fGroups, groupName, analysis, maxGap = 3, MSLevel, fixedIsolationWidth = FALSE,
                         rtWindow = defaultLim("retention", "wide"), mzWindow = defaultLim("mz", "medium"), ...)

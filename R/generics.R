@@ -52,6 +52,8 @@ setGeneric("getKeptXCMSPeakInds", function(old, new, xd) standardGeneric("getKep
 
 setGeneric("initMSReadBackend", function(backend, genMobilities) standardGeneric("initMSReadBackend"))
 
+setGeneric("getMSPLEICsInfo", function(MSPeakLists, fGroups, ...) standardGeneric("getMSPLEICsInfo"))
+
 ### Features and feature groups
 
 #' @name featureGroups-class

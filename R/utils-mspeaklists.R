@@ -815,10 +815,7 @@ getMSPLEICsInfo <- function(MSPeakLists, fGroups, groupName, analysis, MSLevel, 
         analysis <- analyses(MSPeakLists)
         tabMSPLFGs <- as.data.table(MSPeakLists, averaged = TRUE)
         tabMSPLFGs <- tabMSPLFGs[group %chin% groupName & type == MST]
-        tabMSPLFeats[, keep := {
-            fgtab <- tabMSPLFGs[group == group[1] & ID == groupID[1]]
-            if (nrow(fgtab) > 0) seq_len(.N) == which.max(intensity) else FALSE
-        }, by = c("group", "groupID")]
+        tabMSPLFeats[, keep := seq_len(.N) == which.max(intensity), by = c("group", "groupID")]
         tabMSPLFeats <- tabMSPLFeats[keep == TRUE]
     }
     
@@ -829,7 +826,7 @@ getMSPLEICsInfo <- function(MSPeakLists, fGroups, groupName, analysis, MSLevel, 
     tabMSPLFeats[, precursorMZ := {
         pmz <- mz[precursor == TRUE]
         if (length(pmz) == 0)
-            pmz <- gInfo$mz[gInfo$group == group[1]]$mz # UNDONE: doc
+            pmz <- gInfo$mz[gInfo$group == group[1]] # UNDONE: doc
         pmz
     }, by = c("group", "analysis")]
     

@@ -898,6 +898,7 @@ assertAndPrepareReportSettings <- function(settings, setAggr = TRUE)
     
     checkmate::assertList(settings$MSPeakLists)
     checkmate::assertFlag(settings$MSPeakLists$spectra, add = ac)
+    checkmate::assertFlag(settings$MSPeakLists$chromatograms, add = ac)
     
     checkmate::assertList(settings$formulas)
     checkmate::assertFlag(settings$formulas$include, add = ac)

@@ -137,6 +137,12 @@ function updateTabSelFGroups(rowValues, rowIndex)
             specEl.src = (reportPlots.featsAndAnns[grp].MSPeakLists && reportPlots.featsAndAnns[grp].MSPeakLists.MS) || "";
             document.getElementById('spectrumMSMS').src = (reportPlots.featsAndAnns[grp].MSPeakLists && reportPlots.featsAndAnns[grp].MSPeakLists.MSMS) || "";
         }
+        let chromEl = document.getElementById('mspl_chroms_MS');
+        if (chromEl) // not present if !settings$MSPeakLists$chromatograms
+        {
+            chromEl.src = (reportPlots.featsAndAnns[grp].MSPeakLists && reportPlots.featsAndAnns[grp].MSPeakLists.chromsMS) || "";
+            document.getElementById('mspl_chroms_MSMS').src = (reportPlots.featsAndAnns[grp].MSPeakLists && reportPlots.featsAndAnns[grp].MSPeakLists.chromsMSMS) || "";
+        }
     }
 
     for (ann of [ "formulas", "compounds" ])

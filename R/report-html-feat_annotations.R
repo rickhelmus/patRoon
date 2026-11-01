@@ -151,26 +151,44 @@ genHTMLReportPlotsStructs <- function(fGroups, compounds, components, settings, 
     return(list())
 }
 
-genHTMLReportPlotsMSPeakLists <- function(grp, MSPeakLists, settings, outPath)
+genHTMLReportPlotsMSPeakLists <- function(grp, MSPeakLists, fGroups, settings, outPath, MSPLEICs = NULL)
 {
-    if (!settings$MSPeakLists$spectra || length(MSPeakLists) == 0 || is.null(MSPeakLists[[grp]]))
+    if ((!settings$MSPeakLists$spectra && !settings$MSPeakLists$chromatograms) ||
+        length(MSPeakLists) == 0 || is.null(MSPeakLists[[grp]]))
         return("")
     
     ret <- list()
-    
-    args <- list(MSPeakLists, groupName = grp, title = "")
     pp <- list(mar = c(4.1, 4.1, 0.2, 0.2))
     
-    ret$MS <- makeHTMLReportPlot("spec-MS", outPath, "plotSpectrum", c(list(MSLevel = 1), args), parParams = pp,
-                                 width = 7, height = 4)
-    
-    ret$MSMS <- if (!is.null(MSPeakLists[[grp]][["MSMS"]]))
+    if (settings$MSPeakLists$spectra)
     {
-        makeHTMLReportPlot("spec-MSMS", outPath, "plotSpectrum", c(list(MSLevel = 2), args), parParams = pp,
-                           width = 7, height = 4)
+        args <- list(MSPeakLists, groupName = grp, title = "")
+        
+        ret$MS <- makeHTMLReportPlot("spec-MS", outPath, "plotSpectrum", c(list(MSLevel = 1), args), parParams = pp,
+                                     width = 7, height = 4)
+        
+        ret$MSMS <- if (!is.null(MSPeakLists[[grp]][["MSMS"]]))
+        {
+            makeHTMLReportPlot("spec-MSMS", outPath, "plotSpectrum", c(list(MSLevel = 2), args), parParams = pp,
+                               width = 7, height = 4)
+        }
+        else
+            ""
     }
-    else
-        ""
+
+    if (settings$MSPeakLists$chromatograms)
+    {
+        cargs <- list(MSPeakLists, fGroups, groupName = grp, title = "")
+        ret$chromsMS <- makeHTMLReportPlot("mspl-chroms-MS", outPath, "plotChroms",
+                                           c(list(MSLevel = 1, EICs = MSPLEICs$MS), cargs),
+                                           parParams = pp, width = 7, height = 4)
+        ret$chromsMSMS <- if (!is.null(MSPeakLists[[grp]][["MSMS"]]))
+            makeHTMLReportPlot("mspl-chroms-MSMS", outPath, "plotChroms",
+                               c(list(MSLevel = 2, EICs = MSPLEICs$MSMS), cargs),
+                               parParams = pp, width = 7, height = 4)
+        else
+            ""
+    }
     
     return(ret)
 }

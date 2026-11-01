@@ -1,5 +1,5 @@
 general:
-    version: 3
+    version: 4
     format: html
     path: report
     keepUnusedPlots: 7
@@ -22,6 +22,7 @@ features:
     aggregateTox: mean
 MSPeakLists:
     spectra: true
+    chromatograms: false
 formulas:
     include: true
     normalizeScores: max

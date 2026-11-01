@@ -874,7 +874,7 @@ setMethod("plotChroms", "MSPeakLists", function(obj, fGroups, groupName, analysi
                                                 rtWindow = defaultLim("retention", "wide"),
                                                 mzWindow = defaultLim("mz", "medium"),
                                                 retMin = FALSE, title = NULL, showLegend = TRUE, IMS = "maybe",
-                                                xlim = NULL, ylim = NULL, maxGap = 10, ...)
+                                                xlim = NULL, ylim = NULL, maxGap = 10, EICs = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
@@ -908,8 +908,17 @@ setMethod("plotChroms", "MSPeakLists", function(obj, fGroups, groupName, analysi
     xlab <- if (retMin) "Retention Time (min)" else "Retention Time (s)"
     
     # UNDONE: EICParams; check if it should be used and fix things below
-    EICs <- getMSPLEICs(obj, fGroups, groupName, analysis, maxGap = maxGap, MSLevel = MSLevel,
-                        fixedIsolationWidth = fixedIsolationWidth, rtWindow = rtWindow, mzWindow = mzWindow, pad = TRUE)
+    if (is.null(EICs))
+        EICs <- getMSPLEICs(obj, fGroups, groupName, analysis, maxGap = maxGap, MSLevel = MSLevel,
+                            fixedIsolationWidth = fixedIsolationWidth, rtWindow = rtWindow, mzWindow = mzWindow,
+                            pad = TRUE)
+    else
+    {
+        # filter to relevant analyses and groups (analogous to filterEIXs for featureGroups)
+        if (!is.null(analysis))
+            EICs <- EICs[names(EICs) %chin% analysis]
+        EICs <- lapply(EICs, function(anaEICs) anaEICs[names(anaEICs) %chin% groupName])
+    }
     
     # EICs <- EICs[[1]][[1]] # so far only one groupName and analysis is supported
     
@@ -963,6 +972,25 @@ setMethod("plotChroms", "MSPeakLists", function(obj, fGroups, groupName, analysi
         makeLegend(par("usr")[2], par("usr")[4])
     
     invisible(NULL)
+})
+
+setMethod("plotChromsHash", "MSPeakLists", function(obj, fGroups, groupName, analysis = NULL, MSLevel = 1,
+                                                    fixedIsolationWidth = FALSE,
+                                                    rtWindow = defaultLim("retention", "wide"),
+                                                    mzWindow = defaultLim("mz", "medium"),
+                                                    retMin = FALSE, title = NULL, showLegend = TRUE, IMS = "maybe",
+                                                    xlim = NULL, ylim = NULL, maxGap = 10, EICs = NULL, ...)
+{
+    args <- allArgs(FALSE)
+    if (!is.null(EICs))
+    {
+        # filter to relevant analyses/groups to speed up hashing
+        if (!is.null(analysis))
+            EICs <- EICs[names(EICs) %chin% analysis]
+        EICs <- lapply(EICs, function(anaEICs) anaEICs[names(anaEICs) %chin% groupName])
+    }
+    makeHash(args[setdiff(names(args), c("obj", "fGroups", "EICs"))], EICs, obj@peakLists,
+             groupInfo(fGroups)[group %chin% groupName], as.data.table(fGroups)[group %chin% groupName])
 })
 
 #' @describeIn MSPeakLists Calculates the spectral similarity between two or more spectra.

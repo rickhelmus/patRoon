@@ -738,6 +738,8 @@ reportHTMLUtils$methods(
                                 htmltools::strong("MS/MS"),
                                 maybeInclUI(settings$MSPeakLists$spectra, htmltools::img(id = "spectrumMS", style = "min-width: 20%;")),
                                 maybeInclUI(settings$MSPeakLists$spectra, htmltools::img(id = "spectrumMSMS", style = "min-width: 20%;")),
+                                maybeInclUI(settings$MSPeakLists$chromatograms, htmltools::img(id = "mspl_chroms_MS", style = "min-width: 20%;")),
+                                maybeInclUI(settings$MSPeakLists$chromatograms, htmltools::img(id = "mspl_chroms_MSMS", style = "min-width: 20%;")),
                                 genMSPLTable(1),
                                 genMSPLTable(2)
                         )

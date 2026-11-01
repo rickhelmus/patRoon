@@ -6,7 +6,7 @@
 NULL
 
 generateHTMLReportPlotsFeatAnn <- function(grp, fGroups, MSPeakLists, formulas, compounds, compsCluster, settings,
-                                           outPath, EICs, EICParams, EIMs, EIMParams)
+                                           outPath, EICs, EICParams, EIMs, EIMParams, MSPLEICs)
 {
     ret <- list()
     
@@ -21,7 +21,7 @@ generateHTMLReportPlotsFeatAnn <- function(grp, fGroups, MSPeakLists, formulas, 
     ret$intPlot <- genHTMLReportPlotsIntPlot(grp, fGroups, settings, outPath)
     
     if (!is.null(MSPeakLists))
-        ret$MSPeakLists <- genHTMLReportPlotsMSPeakLists(grp, MSPeakLists, settings, outPath)    
+        ret$MSPeakLists <- genHTMLReportPlotsMSPeakLists(grp, MSPeakLists, fGroups, settings, outPath, MSPLEICs)
     if (!is.null(formulas))
         ret$formulas <- genHTMLReportPlotsFormulas(grp, formulas, MSPeakLists, settings, outPath)
     if (!is.null(compounds))
@@ -33,7 +33,7 @@ generateHTMLReportPlotsFeatAnn <- function(grp, fGroups, MSPeakLists, formulas, 
 }
 
 generateHTMLReportPlotsFeatsAnns <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster, settings, outPath,
-                                             EICs, EICParams, EIMs, EIMParams, parallel)
+                                             EICs, EICParams, EIMs, EIMParams, MSPLEICs, parallel)
     
 {
     cat("Generate feature and annotation plots...")
@@ -42,11 +42,11 @@ generateHTMLReportPlotsFeatsAnns <- function(fGroups, MSPeakLists, formulas, com
           MoreArgs = list(fGroups, if (!is.null(MSPeakLists)) MSPeakLists[, gNames],
                           if (!is.null(formulas)) formulas[gNames], if (!is.null(compounds)) compounds[gNames],
                           if (!is.null(compsCluster)) compsCluster[gNames], settings, outPath, EICs, EICParams,
-                          EIMs, EIMParams))
+                          EIMs, EIMParams, MSPLEICs))
 }
 
 generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster, components, TPs, settings,
-                                    outPath, EICs, EICParams, EIMs, EIMParams, specSimParams, parallel)
+                                    outPath, EICs, EICParams, EIMs, EIMParams, specSimParams, MSPLEICs, parallel)
 {
     ret <- list()
     
@@ -100,7 +100,8 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
     cat(" Done!\n")
     
     ret$featsAndAnns <- generateHTMLReportPlotsFeatsAnns(fGroups, MSPeakLists, formulas, compounds, compsCluster,
-                                                         settings, outPath, EICs, EICParams, EIMs, EIMParams, parallel)
+                                                         settings, outPath, EICs, EICParams, EIMs, EIMParams, MSPLEICs,
+                                                         parallel)
     
     ret$structs <- genHTMLReportPlotsStructs(fGroups, compounds, components, settings, outPath, parallel)
     
@@ -300,8 +301,20 @@ doReportHTML <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster
         
     }
     
+    MSPLEICs <- NULL
+    if (!is.null(MSPeakLists) && settings$MSPeakLists$chromatograms)
+    {
+        cat("Loading MS peak list EICs... ")
+        MSPLEICs <- list(
+            MS = getMSPLEICs(MSPeakLists, fGroups, names(fGroups), NULL, MSLevel = 1, pad = TRUE),
+            MSMS = getMSPLEICs(MSPeakLists, fGroups, names(fGroups), NULL, MSLevel = 2, pad = TRUE)
+        )
+        cat("Done!\n")
+    }
+    
     allPlots <- generateHTMLReportPlots(fGroups, MSPeakLists, formulas, compounds, compsCluster, components, TPs,
-                                        settings, path, EICs, EICParams, EIMs, EIMParams, specSimParams, parallel)
+                                        settings, path, EICs, EICParams, EIMs, EIMParams, specSimParams, MSPLEICs,
+                                        parallel)
     
     reportEnv <- new.env()
     

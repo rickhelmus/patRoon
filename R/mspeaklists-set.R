@@ -262,6 +262,18 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., removeMZs = NULL, withM
     return(obj)
 })
 
+#' @rdname MSPeakLists-class
+#' @export
+setMethod("deconvolute", "MSPeakListsSet", function(obj, fGroups, ...)
+{
+    checkmate::assertClass(fGroups, "featureGroupsSet")
+    
+    unsetFGroups <- checkAndUnSetOther(sets(obj), fGroups, "featureGroups")
+    obj@setObjects <- Map(setObjects(obj), unsetFGroups, f = deconvolute, MoreArgs = list(...))
+    
+    return(syncMSPeakListsSetObjects(obj))
+})
+
 #' @param perSet,mirror \setsWF If \code{perSet=TRUE} then the set specific mass peaks are annotated separately.
 #'   Furthermore, if \code{mirror=TRUE} (and there are two sets in the object) then a mirror plot is generated.
 #' @rdname MSPeakLists-class

@@ -111,7 +111,7 @@ setMethod("plotBPCs", "data.table", function(obj, retentionRange = NULL, MSLevel
 #'   mobility ranges (method for \code{data.table}).
 #' @export
 setMethod("getEICs", "data.table", function(obj, ranges, maxGap = 10, output = "fill", minIntensityIMS = 25,
-                                            MSLevel = 1)
+                                            MSLevel = 1, fixedIsolationWidth = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     obj <- assertAndPrepareAnaInfo(obj, add = ac)
@@ -124,6 +124,7 @@ setMethod("getEICs", "data.table", function(obj, ranges, maxGap = 10, output = "
            fixed = list(add = ac))
     checkmate::assertChoice(output, c("fill", "pad", "raw"), add = ac)
     checkmate::assertChoice(MSLevel, 1:2, add = ac)
+    assertFixedIsoArg(fixedIsolationWidth, add = ac)
     checkmate::reportAssertions(ac)
     
     if (checkmate::testDataFrame(ranges))
@@ -143,7 +144,8 @@ setMethod("getEICs", "data.table", function(obj, ranges, maxGap = 10, output = "
     }
     
     ret <- doGetEICs(obj, ranges, maxGap, minIntensityIMS = minIntensityIMS, MSLevel = MSLevel,
-                     mode = if (output == "raw") "full" else "simple", pad = output == "pad")
+                     fixedIsolationWidth = fixedIsolationWidth, mode = if (output == "raw") "full" else "simple",
+                     pad = output == "pad")
     if (output == "fill")
         ret <- doFillEICOutput(ret)
     return(ret)

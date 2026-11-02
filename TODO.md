@@ -3,7 +3,6 @@
 - getEICs()
     - tests for getEICs() with MSLevel and snapToMS1
     - dedup getEICs() methods by calling DT method?
-    - get rid of old(?) getEICs() in utils-exported.R
     - add other MS2 args (isowindow, precursorMZs)
     - doc and test new args
     - doc/force that MS2 EICs only work in simple mode
@@ -14,7 +13,7 @@
 - why are simple EICs gap filled also if padding==FALSE
 - NEWS/docs
     - groupID column in MSPL --> clear cache
-- sets support
+
 
 ## general
 

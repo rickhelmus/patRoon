@@ -2,8 +2,6 @@
 
 - getEICs()
     - tests for getEICs() with MSLevel and snapToMS1
-    - dedup getEICs() methods by calling DT method?
-    - add other MS2 args (isowindow, precursorMZs)
     - doc and test new args
     - doc/force that MS2 EICs only work in simple mode
 - doc that topMost is always for feature intensities and not MSPL (UNDONE?)

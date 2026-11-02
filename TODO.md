@@ -1,13 +1,19 @@
 # Priority
 
 - getEICs()
-    - tests for getEICs() with MSLevel and snapToMS1
+    - tests for getEICs() with MSLevel
     - doc and test new args
     - doc/force that MS2 EICs only work in simple mode
 - doc that topMost is always for feature intensities and not MSPL (UNDONE?)
 - split EIXParams in base and feat classes so the former can also used by DT and MSPL methods?
     - feat EIC params inherit from base EIC params
     - there should at least be a param for MSPLs, so it can be used in reporting (now not done, also not all settings are currently configurable in plotChroms())
+    - MSPL param
+        - maxGap
+        - minIntensityIMS
+        - rtWindow, mzWindow
+        - fixedIsolationWindow
+    - DT param: as above, but w/out windows
 - why are simple EICs gap filled also if padding==FALSE
 - NEWS/docs
     - groupID column in MSPL --> clear cache

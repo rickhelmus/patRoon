@@ -863,7 +863,7 @@ setMethod("getMSPLEICsInfo", "MSPeakListsSet", function(MSPeakLists, fGroups, gr
     return(pruneList(ret[intersect(anaOrder, names(ret))]))
 })
 
-getMSPLEICs <- function(MSPeakLists, fGroups, groupName, analysis, maxGap = 3, MSLevel, fixedIsolationWidth = FALSE,
+getMSPLEICs <- function(MSPeakLists, fGroups, groupName, analysis, maxGap = 10, MSLevel, fixedIsolationWidth = FALSE,
                         rtWindow = defaultLim("retention", "wide"), mzWindow = defaultLim("mz", "medium"), ...)
 {
     inputTabs <- getMSPLEICsInfo(MSPeakLists, fGroups, groupName, analysis, MSLevel, fixedIsolationWidth, rtWindow,

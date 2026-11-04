@@ -99,6 +99,13 @@ setMethod("averageMSPeakLists", "MSPeakListsSet", function(obj)
     return(avgPLists)
 })
 
+setMethod("reorderAnalyses", "MSPeakListsSet", function(obj, anas)
+{
+    obj <- callNextMethod(obj, anas)
+    obj@analysisInfo <- obj@analysisInfo[match(anas, obj@analysisInfo$analysis)]
+    return(obj)
+})
+
 
 #' @rdname MSPeakLists-class
 #' @export

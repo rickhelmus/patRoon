@@ -7,6 +7,8 @@
 # workflow
 
 - findFeatures: update docs (fix analysisInfo --> obj), NEWS
+- test
+    - complex [ method
 - docs/NEWS
     - new generics
     - clearly document wrappers that use getWFFGroupsOrFeats()
@@ -26,12 +28,11 @@
 - predictToxP()/predictRespFactorsP(): make it configurable which objects are used for prediction?
 - generateTPsAnnComp and other: clearly document which objects are automatically set
 - add missing methods
-    - annotatedPeakList
     - `filter` (non P) & delete
+        - or make params for all filters?
     - `spectrumSimilarity`?
     - `spectrumSimilarityIMS`?
     - `plotSpectrum`? to auto add foms/compounds, but a bit incostent with no other plotting functions
-    - `annotatedPeakList`
     - `addFormulaScoring`
     - `consensus`?
     - `expandForIMS`?

@@ -188,7 +188,6 @@ setMethod("getEICs", "workflow", function(obj, ...) getEICs(getWFFGroupsOrFeats(
 #' @export
 setMethod("getTICs", "workflow", function(obj, ...) getTICs(getWFFGroupsOrFeats(obj), ...))
 
-#' @describeIn workflow Returns names of the workflow data slots that contain non-NULL objects.
 #' @export
 setMethod("names", "workflow", function(x)
 {
@@ -197,6 +196,112 @@ setMethod("names", "workflow", function(x)
 
 #' @export
 setMethod("replicates", "workflow", function(obj) unique(analysisInfo(obj)$replicate))
+
+#' @export
+setMethod("[", c("workflow", "ANY", "ANY", "missing"), function(x, i, j, ..., ni, replicates, IMS, results,
+                                                                reorder = FALSE, drop = TRUE)
+{
+    checkmate::assertFlag(reorder)
+    
+    doFilterByResults <- !missing(results)
+    if (doFilterByResults)
+    {
+        if (isTRUE(results))
+            results <- c("formulas", "compounds", "components")
+        else
+            checkmate::assertChoice(results, c("formulas", "compounds", "components"))
+    }
+
+    if (!missing(i) && !missing(ni))
+        stop("Cannot simultaneously specify i and ni arguments.", call. = FALSE)
+
+    if (!is.null(x@fGroups))
+    {
+        # Resolve ni here so that the same analysis selection can be used for all workflow slots.
+        if (!missing(ni))
+        {
+            ai <- x@analysisInfo
+            env <- parent.frame()
+            ai <- eval(substitute(ai[.ni], list(.ni = substitute(ni))), envir = env)
+            i <- ai$analysis
+        }
+        else if (missing(i))
+            i <- x@analysisInfo$analysis
+
+        i <- assertSubsetArgAndToChr(i, x@analysisInfo$analysis)
+
+        if (missing(j))
+            x@fGroups <- x@fGroups[i, , ..., replicates = replicates, IMS = IMS, reorder = reorder, drop = drop]
+        else
+            x@fGroups <- x@fGroups[i, j, ..., replicates = replicates, IMS = IMS, reorder = reorder, drop = drop]
+
+        selectedAnalyses <- analyses(x@fGroups)
+        selectedGroups <- groupNames(x@fGroups)
+
+        if (doFilterByResults)
+        {
+            resultGroups <- unique(unlist(lapply(results, function(slotName)
+            {
+                resultObj <- slot(x, slotName)
+                if (is.null(resultObj))
+                    return(character())
+                return(groupNames(resultObj))
+            }), use.names = FALSE))
+            selectedGroups <- intersect(selectedGroups, resultGroups)
+            x@fGroups <- x@fGroups[, selectedGroups]
+        }
+    }
+    else
+    {
+        if ((!missing(replicates) && !is.null(replicates)) ||
+            (!missing(IMS) && !is.null(IMS)) || doFilterByResults)
+            stop("replicates, IMS, and results filters require feature groups in this workflow", call. = FALSE)
+
+        if (!missing(ni))
+        {
+            ai <- x@analysisInfo
+            env <- parent.frame()
+            ai <- eval(substitute(ai[.ni], list(.ni = substitute(ni))), envir = env)
+            i <- ai$analysis
+        }
+        else if (missing(i))
+            i <- x@analysisInfo$analysis
+
+        selectedAnalyses <- assertSubsetArgAndToChr(i, x@analysisInfo$analysis)
+        selectedGroups <- NULL
+    }
+
+    if (reorder)
+        x@analysisInfo <- x@analysisInfo[match(selectedAnalyses, analysis)]
+    else
+        x@analysisInfo <- x@analysisInfo[analysis %in% selectedAnalyses]
+
+    if (!is.null(x@features))
+        x@features <- x@features[selectedAnalyses, reorder = reorder]
+
+    if (!is.null(x@MSPeakLists))
+    {
+        if (is.null(selectedGroups))
+            x@MSPeakLists <- x@MSPeakLists[selectedAnalyses, ]
+        else
+            x@MSPeakLists <- x@MSPeakLists[selectedAnalyses, selectedGroups]
+
+        if (reorder)
+            x@MSPeakLists <- reorderAnalyses(x@MSPeakLists, intersect(selectedAnalyses, analyses(x@MSPeakLists)))
+    }
+
+    if (!is.null(selectedGroups))
+    {
+        if (!is.null(x@formulas))
+            x@formulas <- x@formulas[selectedGroups]
+        if (!is.null(x@compounds))
+            x@compounds <- x@compounds[selectedGroups]
+        if (!is.null(x@components))
+            x@components <- x@components[, selectedGroups]
+    }
+
+    return(x)
+})
 
 #' @export
 setMethod("[[", c("workflow", "ANY", "missing"), function(x, i, j)

@@ -289,6 +289,15 @@ setMethod("[", c("MSPeakLists", "ANY", "ANY", "missing"), function(x, i, j, ...,
     return(x)
 })
 
+setMethod("reorderAnalyses", "MSPeakLists", function(obj, anas)
+{
+    order <- match(anas, analyses(obj))
+    obj@peakLists <- obj@peakLists[order]
+    if (length(obj@metadata) > 0 && !is.null(names(obj@metadata)))
+        obj@metadata <- obj@metadata[intersect(anas, names(obj@metadata))]
+    return(obj)
+})
+
 #' @describeIn MSPeakLists Extract a list with MS and MS/MS (if available) peak
 #'   lists. If the second argument (\code{j}) is not specified the averaged peak
 #'   lists for the group specified by the first argument (\code{i}) will be

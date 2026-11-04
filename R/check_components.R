@@ -175,7 +175,8 @@ checkComponentsInterface$methods(
 #' @rdname check-GUI
 #' @aliases checkComponents
 #' @export
-setMethod("checkComponents", "components", function(obj, fGroups, session, EICParams, clearSession)
+setMethod("checkComponents", "components", function(obj, fGroups, session = "checked-components.yml",
+                                                    EICParams = getDefEICParams(), clearSession = FALSE)
 {
     checkmate::assertClass(fGroups, "featureGroups") # do first so we can sync
     checkmate::assertFlag(clearSession)

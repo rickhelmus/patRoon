@@ -186,9 +186,7 @@ setGeneric("groupFeaturesGreedy", function(feat, ...) standardGeneric("groupFeat
 setGeneric("groupFeaturesPGreedy", function(obj, ...) standardGeneric("groupFeaturesPGreedy"))
 
 #' @name check-GUI
-setGeneric("checkFeatures", function(obj, session = "checked-features.yml", EICParams = getDefEICParams(),
-                                     EIMParams = getDefEIMParams(),
-                                     clearSession = FALSE) standardGeneric("checkFeatures"))
+setGeneric("checkFeatures", function(obj, ...) standardGeneric("checkFeatures"))
 
 
 ### utils (XCMS)
@@ -271,9 +269,7 @@ setGeneric("componentInfo", function(obj) standardGeneric("componentInfo"))
 setGeneric("findFGroup", function(obj, fGroup) standardGeneric("findFGroup"))
 
 #' @name check-GUI
-setGeneric("checkComponents", function(obj, fGroups, session = "checked-components.yml",
-                                       EICParams = getDefEICParams(),
-                                       clearSession = FALSE) standardGeneric("checkComponents"))
+setGeneric("checkComponents", function(obj, fGroups, ...) standardGeneric("checkComponents"))
 
 #' @rdname generateComponents
 setGeneric("generateComponents", function(fGroups, algorithm, ...) standardGeneric("generateComponents"))

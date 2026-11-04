@@ -27,7 +27,7 @@ getWFObject <- function(obj, n)
 {
     n <- substitute(n)
     if (!is.character(n))
-        n <- deparse(n))
+        n <- deparse(n)
     ret <- slot(obj, n)
     if (is.null(ret))
         stop(sprintf("No %s available in this workflow object", n), call. = FALSE)
@@ -183,7 +183,7 @@ setMethod("show", "workflow", function(object)
 setMethod("getBPCs", "workflow", function(obj, ...) getBPCs(getWFFGroupsOrFeats(obj), ...))
 
 #' @export
-setMethod("getEICs", "workflow", function(obj, ...) getEICs(getWFFGroupsOrFeats(obj), ...)))
+setMethod("getEICs", "workflow", function(obj, ...) getEICs(getWFFGroupsOrFeats(obj), ...))
 
 #' @export
 setMethod("getTICs", "workflow", function(obj, ...) getTICs(getWFFGroupsOrFeats(obj), ...))

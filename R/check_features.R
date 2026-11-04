@@ -408,7 +408,9 @@ importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, rtWindow 
 #' @rdname check-GUI
 #' @aliases checkFeatures
 #' @export
-setMethod("checkFeatures", "featureGroups", function(obj, session, EICParams, EIMParams, clearSession)
+setMethod("checkFeatures", "featureGroups", function(obj, session = "checked-features.yml",
+                                                     EICParams = getDefEICParams(), EIMParams = getDefEIMParams(),
+                                                     clearSession = FALSE)
 {
     if (length(obj) == 0)
         stop("No feature groups, nothing to check...")

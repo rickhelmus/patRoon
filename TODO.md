@@ -11,6 +11,7 @@
     - new generics
     - clearly document wrappers that use getWFFGroupsOrFeats()
     - renaming of some first arguments of generics (eg checkFeatures() --> fGroups to obj) --> see workflow.R
+        - checkFeatures()/checkComponents(): moved args from generic to fGroups/components methods
 - wfWrap: don't wrap analysisInfo?
 - report()
     - keep objects configurable?
@@ -25,9 +26,6 @@
 - predictToxP()/predictRespFactorsP(): make it configurable which objects are used for prediction?
 - generateTPsAnnComp and other: clearly document which objects are automatically set
 - add missing methods
-    - adducts?
-    - adducts<- ?
-    - annotations?
     - annotatedPeakList
     - `filter` (non P) & delete
     - `spectrumSimilarity`?

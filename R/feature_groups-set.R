@@ -59,12 +59,12 @@ setMethod("sets", "featureGroupsSet", function(obj) sets(getFeatures(obj)))
 
 #' @rdname featureGroups-class
 #' @export
-setMethod("internalStandardAssignments", "featureGroupsSet", function(fGroups, set = NULL)
+setMethod("internalStandardAssignments", "featureGroupsSet", function(obj, set = NULL)
 {
     if (is.null(set))
-        return(fGroups@ISTDAssignments)
-    assertSets(fGroups, set, FALSE)
-    return(fGroups@ISTDAssignments[[set]])
+        return(obj@ISTDAssignments)
+    assertSets(obj, set, FALSE)
+    return(obj@ISTDAssignments[[set]])
 })
 
 #' @rdname featureGroups-class

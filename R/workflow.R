@@ -8,6 +8,32 @@ verifyWFHasFGroups <- function(obj)
         stop("No feature groups available in this workflow object", call. = FALSE)
 }
 
+getWFFGroupsOrFeats <- function(obj) 
+{
+    if (!is.null(obj@fGroups))
+        return(obj@fGroups)
+    if (!is.null(obj@features))
+        return(obj@features)
+    stop("No feature groups or features available in this workflow object", call. = FALSE)
+}
+
+getWFFGroups <- function(obj) 
+{
+    verifyWFHasFGroups(obj)
+    return(obj@fGroups)
+}
+
+getWFObject <- function(obj, n)
+{
+    n <- substitute(n)
+    if (!is.character(n))
+        n <- deparse(n))
+    ret <- slot(obj, n)
+    if (is.null(ret))
+        stop(sprintf("No %s available in this workflow object", n), call. = FALSE)
+    return(ret)
+}
+
 setOptClass <- \(baseName) setClassUnion(paste0(baseName, "Opt"), c(baseName, "NULL"))
 setOptClass("features")
 setOptClass("featureGroups")
@@ -66,15 +92,88 @@ setMethod("analysisInfo", "workflow", function(obj, df = FALSE)
     return(if (df) as.data.frame(obj@analysisInfo) else obj@analysisInfo)
 })
 
+#' @export
+setMethod("analyses", "featureGroups", function(obj) analysisInfo(obj)$analysis)
+
 setMethod("templateDir", "workflow", function(obj) obj@templateDir)
 
-#' @describeIn workflow Obtain feature group names. Requires feature groups to be available.
 #' @export
-setMethod("groupNames", "workflow", function(obj)
+setMethod("getFeatures", "workflow", function(obj) getFeatures(getWFFGroupsOrFeats(obj)))
+
+#' @export
+setMethod("featureTable", "workflow", function(obj, ...) featureTable(getWFFGroupsOrFeats(obj), ...))
+
+#' @export
+setMethod("getFeatureQualityNames", "workflow", function(obj, ...) getFeatureQualityNames(getWFFGroupsOrFeats(obj), ...))
+
+#' @export
+setMethod("fromIMS", "workflow", function(obj) fromIMS(getWFFGroupsOrFeats(obj)))
+
+#' @export
+setMethod("hasIMS", "workflow", function(obj) hasIMS(getWFFGroupsOrFeats(obj)))
+
+#' @export
+setMethod("groupNames", "workflow", function(obj) groupNames(getWFObj(obj, fGroups)))
+
+#' @export
+setMethod("updateGroups", "workflow", function(obj, ...) updateGroups(getWFObj(obj, fGroups), ...))
+
+#' @export
+setMethod("groupTable", "workflow", function(obj, ...) groupTable(getWFObj(obj, fGroups), ...))
+
+#' @export
+setMethod("groupFeatIndex", "workflow", function(obj) groupFeatIndex(getWFObj(obj, fGroups)))
+
+#' @export
+setMethod("groupInfo", "workflow", function(obj) groupInfo(getWFObj(obj, fGroups)))
+
+#' @export
+setMethod("groupQualities", "workflow", function(obj) groupQualities(getWFObj(obj, fGroups)))
+
+#' @export
+setMethod("groupScores", "workflow", function(obj) groupScores(getWFObj(obj, fGroups)))
+
+#' @export
+setMethod("internalStandards", "workflow", function(obj) internalStandards(getWFObj(obj, fGroups)))
+
+#' @export
+setMethod("internalStandardAssignments", "workflow", function(obj, ...) internalStandardAssignments(getWFObj(obj, fGroups), ...))
+
+#' @export
+setMethod("checkFeatures", "workflow", function(obj, ...) checkFeatures(getWFObj(obj, fGroups), ...))
+
+#' @export
+setMethod("peakLists", "workflow", function(obj, ...) peakLists(getWFObj(obj, MSPeakLists), ...))
+
+#' @export
+setMethod("averagedPeakLists", "workflow", function(obj, ...) averagedPeakLists(getWFObj(obj, MSPeakLists), ...))
+
+#' @export
+setMethod("componentTable", "workflow", function(obj) componentTable(getWFObj(obj, components)))
+
+#' @export
+setMethod("componentInfo", "workflow", function(obj) componentInfo(getWFObj(obj, components)))
+
+#' @export
+setMethod("checkComponents", "workflow", function(obj, ...)
 {
-    verifyWFHasFGroups(obj)
-    groupNames(obj@fGroups)
+    checkComponents(getWFObj(obj, components), getWFObj(obj, fGroups), ...)
 })
+
+#' @export
+setMethod("show", "workflow", function(object)
+{
+    # UNDONE
+})
+
+#' @export
+setMethod("getBPCs", "workflow", function(obj, ...) getBPCs(getWFFGroupsOrFeats(obj), ...))
+
+#' @export
+setMethod("getEICs", "workflow", function(obj, ...) getEICs(getWFFGroupsOrFeats(obj), ...)))
+
+#' @export
+setMethod("getTICs", "workflow", function(obj, ...) getTICs(getWFFGroupsOrFeats(obj), ...))
 
 #' @describeIn workflow Returns names of the workflow data slots that contain non-NULL objects.
 #' @export

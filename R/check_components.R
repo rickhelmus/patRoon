@@ -175,15 +175,15 @@ checkComponentsInterface$methods(
 #' @rdname check-GUI
 #' @aliases checkComponents
 #' @export
-setMethod("checkComponents", "components", function(components, fGroups, session, EICParams, clearSession)
+setMethod("checkComponents", "components", function(obj, fGroups, session, EICParams, clearSession)
 {
     checkmate::assertClass(fGroups, "featureGroups") # do first so we can sync
     checkmate::assertFlag(clearSession)
     
-    if (length(components) == 0 || length(fGroups) == 0)
+    if (length(obj) == 0 || length(fGroups) == 0)
         stop("No components or feature groups, nothing to check...")
     
-    if (!all(groupNames(components) %in% names(fGroups)))
+    if (!all(groupNames(obj) %in% names(fGroups)))
         stop("The components object contains results for feature groups not present in the given featureGroups object. ",
              "You may need to sync the components object, eg: components <- components[, names(fGroups)]")
     
@@ -195,9 +195,9 @@ setMethod("checkComponents", "components", function(components, fGroups, session
     if (clearSession && file.exists(session))
         file.remove(session)
     
-    fGroups <- fGroups[, groupNames(components)] # remove any fGroups not in components
+    fGroups <- fGroups[, groupNames(obj)] # remove any fGroups not in components
     
-    cmpNames <- names(components)
+    cmpNames <- names(obj)
     
     EICs <- getFeatureEIXs(fGroups, type = "EIC", EIXParams = modifyList(EICParams,
                                                                          list(topMost = 1, topMostByReplicate = FALSE)),
@@ -209,7 +209,7 @@ setMethod("checkComponents", "components", function(components, fGroups, session
     else
         curSession <- list(removeFully = character(), removePartially = list())
     
-    int <- checkComponentsInterface$new(components = collapseComponents(components), fGroups = fGroups, EICs = EICs,
+    int <- checkComponentsInterface$new(components = collapseComponents(obj), fGroups = fGroups, EICs = EICs,
                                         primarySelections = cmpNames, curSession = curSession,
                                         session = session)
     return(runCheckUI(int))

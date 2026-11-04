@@ -7,7 +7,10 @@
 # workflow
 
 - findFeatures: update docs (fix analysisInfo --> obj), NEWS
-- doc new generics
+- docs/NEWS
+    - new generics
+    - clearly document wrappers that use getWFFGroupsOrFeats()
+    - renaming of some first arguments of generics (eg checkFeatures() --> fGroups to obj) --> see workflow.R
 - wfWrap: don't wrap analysisInfo?
 - report()
     - keep objects configurable?
@@ -21,6 +24,27 @@
     - makeSet(): set features slot to getFeatures(fGroups) if using fGroups input?
 - predictToxP()/predictRespFactorsP(): make it configurable which objects are used for prediction?
 - generateTPsAnnComp and other: clearly document which objects are automatically set
+- add missing methods
+    - adducts?
+    - adducts<- ?
+    - annotations?
+    - annotatedPeakList
+    - `filter` (non P) & delete
+    - `spectrumSimilarity`?
+    - `spectrumSimilarityIMS`?
+    - `plotSpectrum`? to auto add foms/compounds, but a bit incostent with no other plotting functions
+    - `annotatedPeakList`
+    - `addFormulaScoring`
+    - `consensus`?
+    - `expandForIMS`?
+    - `export`? Maybe later
+    - `getXCMSSet`?
+    - `getXCMSnExp`?
+    - `as.data.table` / `as.data.frame`
+    - [
+    - show
+    - reportCSV/reportPDF?
+    - length/lengths? length() could give non-null objects and lengths() calls length() on those?
 
 ## Params
 

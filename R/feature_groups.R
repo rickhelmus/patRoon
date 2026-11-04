@@ -230,18 +230,18 @@ setMethod("show", "featureGroups", function(object)
 #' @describeIn featureGroups Accessor for \code{groups} slot.
 #' @aliases groupTable
 #' @export
-setMethod("groupTable", "featureGroups", function(object, areas = FALSE, normalized = FALSE)
+setMethod("groupTable", "featureGroups", function(obj, areas = FALSE, normalized = FALSE)
 {
     checkmate::assertFlag(areas)
     checkmate::assertFlag(normalized)
 
-    if (length(object) == 0 || (!areas && !normalized))
-        return(object@groups)
+    if (length(obj) == 0 || (!areas && !normalized))
+        return(obj@groups)
 
-    anaInfo <- analysisInfo(object)
-    ret <- copy(object@groups)
-    ftindex <- object@ftindex
-    fTable <- featureTable(object)
+    anaInfo <- analysisInfo(obj)
+    ret <- copy(obj@groups)
+    ftindex <- obj@ftindex
+    fTable <- featureTable(obj)
     
     if (normalized && is.null(fTable[[1]][["intensity_rel"]]))
         stop("There is no normalized data, did you run normInts()?")
@@ -296,7 +296,7 @@ setReplaceMethod("analysisInfo", "featureGroups", function(obj, value)
 #' @describeIn featureGroups Accessor for \code{groupInfo} slot.
 #' @aliases groupInfo
 #' @export
-setMethod("groupInfo", "featureGroups", function(fGroups) fGroups@groupInfo)
+setMethod("groupInfo", "featureGroups", function(obj) obj@groupInfo)
 
 #' @describeIn featureGroups Obtain feature information (see \code{\link{features}}).
 #' @export
@@ -336,17 +336,17 @@ setMethod("getFeatures", "featureGroups", function(obj) obj@features)
 #' @describeIn featureGroups Accessor for \code{ftindex} slot.
 #' @aliases groupFeatIndex
 #' @export
-setMethod("groupFeatIndex", "featureGroups", function(fGroups) fGroups@ftindex)
+setMethod("groupFeatIndex", "featureGroups", function(obj) obj@ftindex)
 
 #' @describeIn featureGroups Accessor for \code{groupQualities} slot.
 #' @aliases groupQualities
 #' @export
-setMethod("groupQualities", "featureGroups", function(fGroups) fGroups@groupQualities)
+setMethod("groupQualities", "featureGroups", function(obj) obj@groupQualities)
 
 #' @describeIn featureGroups Accessor for \code{groupScores} slot.
 #' @aliases groupScores
 #' @export
-setMethod("groupScores", "featureGroups", function(fGroups) fGroups@groupScores)
+setMethod("groupScores", "featureGroups", function(obj) obj@groupScores)
 
 #' @describeIn featureGroups Returns feature quality names that were calculated for this object.
 #' @param feat,group If \code{TRUE} then names specific to features and feature groups are returned, respectively.
@@ -380,12 +380,12 @@ setMethod("annotations", "featureGroups", function(obj) obj@annotations)
 #' @describeIn featureGroups Accessor for \code{ISTDs} slot.
 #' @aliases internalStandards
 #' @export
-setMethod("internalStandards", "featureGroups", function(fGroups) fGroups@ISTDs)
+setMethod("internalStandards", "featureGroups", function(obj) obj@ISTDs)
 
 #' @describeIn featureGroups Accessor for \code{ISTDAssignments} slot.
 #' @aliases internalStandardAssignments
 #' @export
-setMethod("internalStandardAssignments", "featureGroups", function(fGroups) fGroups@ISTDAssignments)
+setMethod("internalStandardAssignments", "featureGroups", function(obj) obj@ISTDAssignments)
 
 #' @describeIn featureGroups Returns a named \code{character} with adduct annotations assigned to each feature group (if
 #'   available).
@@ -1687,19 +1687,19 @@ setMethod("getEICs", "featureGroups", function(obj, analysis = analyses(obj), gr
 #'
 #' @aliases updateGroups
 #' @export
-setMethod("updateGroups", "featureGroups", function(fGroups, what = c("ret", "mz", "mobility", "CCS"), intWeight = FALSE)
+setMethod("updateGroups", "featureGroups", function(obj, what = c("ret", "mz", "mobility", "CCS"), intWeight = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertSubset(what, empty.ok = FALSE, choices = c("ret", "mz", "mobility", "CCS"), add = ac)
     checkmate::assertFlag(intWeight, add = ac)
     checkmate::reportAssertions(ac)
     
-    if (length(fGroups) == 0)
-        return(fGroups)
+    if (length(obj) == 0)
+        return(obj)
     
-    gInfo <- copy(groupInfo(fGroups))
+    gInfo <- copy(groupInfo(obj))
     
-    tab <- as.data.table(fGroups, features = TRUE)
+    tab <- as.data.table(obj, features = TRUE)
     for (col in what)
     {
         if (is.null(tab[[col]]))
@@ -1711,9 +1711,9 @@ setMethod("updateGroups", "featureGroups", function(fGroups, what = c("ret", "mz
         gInfo[match(gVal$group, group), (col) := gVal[["V1"]]]
     }
 
-    fGroups@groupInfo <- gInfo
+    obj@groupInfo <- gInfo
     
-    return(fGroups)
+    return(obj)
 })
 
 #' Grouping of features

@@ -408,9 +408,9 @@ importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, rtWindow 
 #' @rdname check-GUI
 #' @aliases checkFeatures
 #' @export
-setMethod("checkFeatures", "featureGroups", function(fGroups, session, EICParams, EIMParams, clearSession)
+setMethod("checkFeatures", "featureGroups", function(obj, session, EICParams, EIMParams, clearSession)
 {
-    if (length(fGroups) == 0)
+    if (length(obj) == 0)
         stop("No feature groups, nothing to check...")
     
     ac <- checkmate::makeAssertCollection()
@@ -423,13 +423,13 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, EICParams
     if (clearSession && file.exists(session))
         file.remove(session)
     
-    gNames <- names(fGroups)
-    fTable <- featureTable(fGroups)
-    ftind <- groupFeatIndex(fGroups)
+    gNames <- names(obj)
+    fTable <- featureTable(obj)
+    ftind <- groupFeatIndex(obj)
     
     prepEIXs <- function(type, params)
     {
-        args <- list(fGroups, type = type, EIXParams = modifyList(params, list(topMost = 1, topMostByReplicate = FALSE)))
+        args <- list(obj, type = type, EIXParams = modifyList(params, list(topMost = 1, topMostByReplicate = FALSE)))
         if (type == "EIC")
             args$pad <- TRUE
         topMost <- do.call(getFeatureEIXs, args)
@@ -440,7 +440,7 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, EICParams
         colMin <- if (type == "EIC") "retmin" else "mobmin"; colMax <- if (type == "EIC") "retmax" else "mobmax"
         previews <- Map(previews, names(previews), f = function(eix, grp)
         {
-            anai <- which.max(fGroups[[grp]])
+            anai <- which.max(obj[[grp]])
             return(eix[numGTE(eix[, 1], fTable[[anai]][[colMin]][ftind[[grp]][anai]]) &
                            numLTE(eix[, 1], fTable[[anai]][[colMax]][ftind[[grp]][anai]]), ])
         })
@@ -448,7 +448,7 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, EICParams
     }
     
     EIC <- prepEIXs("EIC", EICParams)
-    EIM <- if (hasIMS(fGroups)) prepEIXs("EIM", EIMParams) else list() # UNDONE: also get EIMs if there is IMS raw data?
+    EIM <- if (hasIMS(obj)) prepEIXs("EIM", EIMParams) else list() # UNDONE: also get EIMs if there is IMS raw data?
 
     curSession <- NULL
     if (file.exists(session))
@@ -456,7 +456,7 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, EICParams
     else
         curSession <- list(removeFully = character(), removePartially = list())
     
-    int <- checkFeaturesInterface$new(fGroups = fGroups, EIC = EIC, EIM = EIM, primarySelections = gNames,
+    int <- checkFeaturesInterface$new(fGroups = obj, EIC = EIC, EIM = EIM, primarySelections = gNames,
                                       curSession = curSession, session = session)
     return(runCheckUI(int))
 })

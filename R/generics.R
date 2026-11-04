@@ -58,13 +58,13 @@ setGeneric("convertMSFilesP", function(obj, param, ...) standardGeneric("convert
 ### Features and feature groups
 
 #' @name featureGroups-class
-setGeneric("groupTable", function(object, ...) standardGeneric("groupTable"))
+setGeneric("groupTable", function(obj, ...) standardGeneric("groupTable"))
 
 #' @name featureGroups-class
-setGeneric("groupFeatIndex", function(fGroups) standardGeneric("groupFeatIndex"))
+setGeneric("groupFeatIndex", function(obj) standardGeneric("groupFeatIndex"))
 
 #' @name featureGroups-class
-setGeneric("groupInfo", function(fGroups) standardGeneric("groupInfo"))
+setGeneric("groupInfo", function(obj) standardGeneric("groupInfo"))
 
 #' @name featureGroups-class
 setGeneric("unique", function(x, incomparables = FALSE, ...) standardGeneric("unique"))
@@ -86,16 +86,16 @@ setGeneric("comparison", function(..., groupAlgo,
 setGeneric("replicateSubtract", function(fGroups, replicates, threshold = 0) standardGeneric("replicateSubtract"))
 
 #' @name featureGroups-class
-setGeneric("groupQualities", function(fGroups) standardGeneric("groupQualities"))
+setGeneric("groupQualities", function(obj) standardGeneric("groupQualities"))
 
 #' @name featureGroups-class
-setGeneric("groupScores", function(fGroups) standardGeneric("groupScores"))
+setGeneric("groupScores", function(obj) standardGeneric("groupScores"))
 
 #' @name featureGroups-class
-setGeneric("internalStandards", function(fGroups) standardGeneric("internalStandards"))
+setGeneric("internalStandards", function(obj) standardGeneric("internalStandards"))
 
 #' @name featureGroups-class
-setGeneric("internalStandardAssignments", function(fGroups, ...) standardGeneric("internalStandardAssignments"))
+setGeneric("internalStandardAssignments", function(obj, ...) standardGeneric("internalStandardAssignments"))
 
 #' @name featureGroups-class
 setGeneric("normInts", function(fGroups, featNorm = "none", groupNorm = FALSE, normFunc = max, standards = NULL,
@@ -117,7 +117,7 @@ setGeneric("toxicities", function(fGroups, ...) standardGeneric("toxicities"))
 setGeneric("calculateTox", function(fGroups, ...) standardGeneric("calculateTox"))
 
 #' @name featureGroups-class
-setGeneric("updateGroups", function(fGroups, ...) standardGeneric("updateGroups"))
+setGeneric("updateGroups", function(obj, ...) standardGeneric("updateGroups"))
 
 #' @name feature-plotting
 setGeneric("plotMobilograms", function(obj, ...) standardGeneric("plotMobilograms"))
@@ -186,7 +186,7 @@ setGeneric("groupFeaturesGreedy", function(feat, ...) standardGeneric("groupFeat
 setGeneric("groupFeaturesPGreedy", function(obj, ...) standardGeneric("groupFeaturesPGreedy"))
 
 #' @name check-GUI
-setGeneric("checkFeatures", function(fGroups, session = "checked-features.yml", EICParams = getDefEICParams(),
+setGeneric("checkFeatures", function(obj, session = "checked-features.yml", EICParams = getDefEICParams(),
                                      EIMParams = getDefEIMParams(),
                                      clearSession = FALSE) standardGeneric("checkFeatures"))
 
@@ -271,7 +271,7 @@ setGeneric("componentInfo", function(obj) standardGeneric("componentInfo"))
 setGeneric("findFGroup", function(obj, fGroup) standardGeneric("findFGroup"))
 
 #' @name check-GUI
-setGeneric("checkComponents", function(components, fGroups, session = "checked-components.yml",
+setGeneric("checkComponents", function(obj, fGroups, session = "checked-components.yml",
                                        EICParams = getDefEICParams(),
                                        clearSession = FALSE) standardGeneric("checkComponents"))
 

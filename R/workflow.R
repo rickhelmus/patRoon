@@ -149,6 +149,19 @@ setMethod("peakLists", "workflow", function(obj, ...) peakLists(getWFObj(obj, MS
 setMethod("averagedPeakLists", "workflow", function(obj, ...) averagedPeakLists(getWFObj(obj, MSPeakLists), ...))
 
 #' @export
+setMethod("annotatedPeakList", "workflow", function(obj, index, groupName, onlyAnnotated = FALSE)
+{
+    if (!is.null(obj@compounds))
+        return(annotatedPeakList(obj@compounds, index = index, groupName = groupName,
+                                 MSPeakLists = obj@MSPeakLists, formulas = obj@formulas,
+                                 onlyAnnotated = onlyAnnotated))
+    if (!is.null(obj@formulas))
+        return(annotatedPeakList(obj@formulas, index = index, groupName = groupName,
+                                 MSPeakLists = obj@MSPeakLists, onlyAnnotated = onlyAnnotated))
+    stop("No compounds or formulas available in this workflow object", call. = FALSE)
+})
+
+#' @export
 setMethod("componentTable", "workflow", function(obj) componentTable(getWFObj(obj, components)))
 
 #' @export

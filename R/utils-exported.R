@@ -645,6 +645,57 @@ getDefEIMParams <- function(..., IMS = getLimIMS())
     return(modifyList(def, list(...), keep.null = TRUE))
 }
 
+#' Extracted Ion Chromatogram parameters for MS peak lists
+#'
+#' Parameters for creation of extracted ion chromatograms (EICs) from \link{MSPeakLists}.
+#'
+#' These parameters configure the creation of EICs that are generated for \link{MSPeakLists}, \emph{e.g.} by the
+#' \code{\link[=MSPeakLists-class]{plotChroms}} method for MSPeakLists, \code{\link[=MSPeakLists-class]{deconvolute}}
+#' method for MSPeakLists and \code{\link{report}}. They should be passed as a named \code{list} as the
+#' \code{MSPLEICParams} argument to the respective functions. The \code{getDefMSPLEICParams} function generates such
+#' parameter list with defaults.
+#'
+#' The following parameters exist: \itemize{
+#'
+#' \item \code{maxGap} Bruker TIMS data (and maybe others?) seem to omit zero intensity scans, which will lead to time
+#' gaps between spectra and incorrect EICs. A gap is determined if two MS timepoints differ more than \code{maxGap}
+#' seconds. If a gap is detected, then appropriate zero intensity points are added to the EIC with an interval based on
+#' the median MS scan time. Set to \code{0} to disable this.
+#'
+#' \item \code{minIntensityIMS} \IMSWF Raw intensity threshold for IMS data. This is primarily intended to speed up raw
+#' data processing.
+#'
+#' \item \code{rtWindow} Additional retention time window (seconds) that is subtracted from and added to the minimum and
+#' maximum retention time of the feature, respectively. Set to \code{Inf} to use the full retention time range. Defaults
+#' to \code{defaultLim("retention", "wide")} (see \link{limits}).
+#'
+#' \item \code{mzWindow} Additional \emph{m/z} window that is subtracted from and added to the \emph{m/z} of the
+#' feature, respectively. Defaults to \code{defaultLim("mz", "medium")} (see \link{limits}).
+#'
+#' \item \code{fixedIsolationWindow} The fixed isolation window (in \emph{m/z}) to use when collecting MS/MS precursor
+#' related data. Set to \code{FALSE} (default) to use the isolation window as defined in the raw data, \code{NA} to
+#' determine the isolation window automatically, or a single or two-sized \code{numeric} to use a fixed (symmetrical or
+#' asymmetrical) isolation window.
+#'
+#' }
+#'
+#' @param \dots optional named arguments that override defaults.
+#'
+#' @name MSPLEICParams
+#' @export
+getDefMSPLEICParams <- function(...)
+{
+    def <- list(
+        maxGap = 10,
+        minIntensityIMS = 25,
+        rtWindow = defaultLim("retention", "wide"),
+        mzWindow = defaultLim("mz", "medium"),
+        fixedIsolationWindow = FALSE
+    )
+
+    return(modifyList(def, list(...)))
+}
+
 #' Parameters to handle TP data with structural information
 #'
 #' Parameters used by \code{\link{generateTPs}} with algorithms that use structural information.

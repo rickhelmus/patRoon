@@ -582,7 +582,7 @@ assertEIXParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
     checkmate::assertList(x, names = "unique", .var.name = .var.name) # no add: should fail
     
-    assertListVal(x, "window", checkmate::assertNumber, lower = 0, finite = FALSE, .var.name = .var.name, add = add)
+    assertListVal(x, "window", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "mzExpWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "mzExpMobWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "minIntensityIMS", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
@@ -604,6 +604,20 @@ assertEICParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
     assertEIXParams(x, .var.name = .var.name, add = add)
     assertListVal(x, "maxGap", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+    invisible(NULL)
+}
+
+assertMSPLEICParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
+{
+    checkmate::assertList(x, names = "unique", .var.name = .var.name) # no add: should fail
+
+    assertListVal(x, "maxGap", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+    assertListVal(x, "minIntensityIMS", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,
+                  add = add)
+    assertListVal(x, "rtWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+    assertListVal(x, "mzWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+    assertListVal(x, "fixedIsolationWindow", assertFixedIsoArg, .var.name = .var.name, add = add)
+
     invisible(NULL)
 }
 

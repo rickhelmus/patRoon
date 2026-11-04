@@ -37,6 +37,7 @@ adjustReportSettings <- function(settings, adjSettings) return(modifyList(settin
 #'
 #' @template EICParams-arg
 #' @template EIMParams-arg
+#' @template MSPLEICParams-arg
 #' @template specSimParams-arg
 #' 
 #' @templateVar append \strong{NOTE}: parallelization is disabled by default, as it may slow down reporting on some systems (\emph{e.g.} Windows) and under some circumstances. It is best to experiment with this setting to see if it speeds up report generation for your system and data.
@@ -171,8 +172,8 @@ adjustReportSettings <- function(settings, adjSettings) return(modifyList(settin
 #' @rdname reporting
 #' @export
 setMethod("report", "featureGroups", function(fGroups, MSPeakLists, formulas, compounds, compsCluster, components,
-                                              TPs, settingsFile, path, EICParams, EIMParams, specSimParams, clearPath,
-                                              openReport, parallel, overrideSettings)
+                                              TPs, settingsFile, path, EICParams, EIMParams, MSPLEICParams,
+                                              specSimParams, clearPath, openReport, parallel, overrideSettings)
 {
     ac <- checkmate::makeAssertCollection()
     if (!is.null(path))
@@ -184,6 +185,7 @@ setMethod("report", "featureGroups", function(fGroups, MSPeakLists, formulas, co
     checkmate::assertFileExists(settingsFile, "r", add = ac)
     assertEICParams(EICParams, add = ac)
     assertEIMParams(EIMParams, add = ac)
+    assertMSPLEICParams(MSPLEICParams, add = ac)
     assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertList(overrideSettings, any.missing = FALSE, names = "unique", add = ac)
     checkmate::reportAssertions(ac)
@@ -209,7 +211,7 @@ setMethod("report", "featureGroups", function(fGroups, MSPeakLists, formulas, co
     # UNDONE: check format setting here, when others are supported
     
     doReportHTML(fGroups, MSPeakLists, formulas, compounds, compsCluster, components, TPs, settings, path,
-                 EICParams, EIMParams, specSimParams, openReport, parallel)
+                 EICParams, EIMParams, MSPLEICParams, specSimParams, openReport, parallel)
     
     invisible(NULL)
 })

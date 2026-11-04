@@ -250,7 +250,7 @@ reportHTMLUtils$methods(
 
 
 doReportHTML <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster, components, TPs, settings, path,
-                         EICParams, EIMParams, specSimParams, openReport, parallel)
+                         EICParams, EIMParams, MSPLEICParams, specSimParams, openReport, parallel)
 {
     workPath <- file.path(tempdir(TRUE), "report")
     unlink(workPath, TRUE)
@@ -306,8 +306,14 @@ doReportHTML <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster
     {
         cat("Loading MS peak list EICs... ")
         MSPLEICs <- list(
-            MS = getMSPLEICs(MSPeakLists, fGroups, names(fGroups), NULL, MSLevel = 1, pad = TRUE),
-            MSMS = getMSPLEICs(MSPeakLists, fGroups, names(fGroups), NULL, MSLevel = 2, pad = TRUE)
+            MS = getMSPLEICs(MSPeakLists, fGroups, names(fGroups), NULL, maxGap = MSPLEICParams$maxGap,
+                             MSLevel = 1, fixedIsolationWidth = MSPLEICParams$fixedIsolationWindow,
+                             rtWindow = MSPLEICParams$rtWindow, mzWindow = MSPLEICParams$mzWindow,
+                             minIntensityIMS = MSPLEICParams$minIntensityIMS, pad = TRUE),
+            MSMS = getMSPLEICs(MSPeakLists, fGroups, names(fGroups), NULL, maxGap = MSPLEICParams$maxGap,
+                               MSLevel = 2, fixedIsolationWidth = MSPLEICParams$fixedIsolationWindow,
+                               rtWindow = MSPLEICParams$rtWindow, mzWindow = MSPLEICParams$mzWindow,
+                               minIntensityIMS = MSPLEICParams$minIntensityIMS, pad = TRUE)
         )
         cat("Done!\n")
     }

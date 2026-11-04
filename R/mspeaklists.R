@@ -703,35 +703,36 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
     return(obj)
 })
 
-setMethod("deconvolute", "MSPeakLists", function(obj, fGroups, MSLevel, threshold, fixedIsolationWidth = FALSE,
-                                                 maxGap = 10, mzWindow = defaultLim("mz", "medium"))
+setMethod("deconvolute", "MSPeakLists", function(obj, fGroups, MSLevel, threshold, MSPLEICParams = getDefMSPLEICParams())
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertChoice(MSLevel, 1:2, add = ac)
     checkmate::assertNumber(threshold, lower = 0, upper = 1, finite = TRUE, add = ac)
-    checkmate::assertFlag(fixedIsolationWidth, add = ac)
-    checkmate::assertNumber(maxGap, lower = 0, add = ac)
-    checkmate::assertNumber(mzWindow, lower = 0, add = ac)
+    assertMSPLEICParams(MSPLEICParams, add = ac)
     checkmate::reportAssertions(ac)
+
+    # deconvolution considers the exact feature retention time window, so rtWindow is always zero here
+    MSPLEICParams <- modifyList(MSPLEICParams, list(rtWindow = 0))
 
     fTable <- featureTable(fGroups)
     
-    hash <- makeHash(obj, fTable, MSLevel, threshold, fixedIsolationWidth, maxGap, mzWindow)
+    hash <- makeHash(obj, fTable, MSLevel, threshold, MSPLEICParams)
     cached <- loadCacheData("deconvoluteMSPeakLists", hash)
     if (!is.null(cached))
         return(cached)
     
-    EICs <- getMSPLEICs(obj, fGroups, names(fGroups), analyses(fGroups), maxGap = maxGap,
-                        MSLevel = MSLevel, fixedIsolationWidth = fixedIsolationWidth, rtWindow = 0,
-                        mzWindow = mzWindow)
+    EICs <- getMSPLEICs(obj, fGroups, names(fGroups), analyses(fGroups), maxGap = MSPLEICParams$maxGap,
+                        minIntensityIMS = MSPLEICParams$minIntensityIMS, MSLevel = MSLevel,
+                        fixedIsolationWidth = MSPLEICParams$fixedIsolationWindow, rtWindow = MSPLEICParams$rtWindow,
+                        mzWindow = MSPLEICParams$mzWindow)
     
     
     # UNDONE: specify EICParams as arg?
     EICsFeat <- NULL
     if (MSLevel == 2)
     {
-        EICsFeat <- getFeatureEIXs(fGroups, "EIC", EIXParams = getDefEICParams(maxGap = maxGap, window = 0))
+        EICsFeat <- getFeatureEIXs(fGroups, "EIC", EIXParams = getDefEICParams(maxGap = MSPLEICParams$maxGap, window = 0))
         EICsFeat <- Map(names(EICsFeat), EICsFeat, f = function(ana, anaEICs)
         {
             at <- attr(anaEICs, "allXValues")
@@ -870,26 +871,21 @@ setMethod("plotSpectrumHash", "MSPeakLists", function(obj, groupName, analysis =
 
 #' @export
 setMethod("plotChroms", "MSPeakLists", function(obj, fGroups, groupName, analysis = NULL, MSLevel = 1,
-                                                fixedIsolationWidth = FALSE,
-                                                rtWindow = defaultLim("retention", "wide"),
-                                                mzWindow = defaultLim("mz", "medium"),
+                                                MSPLEICParams = getDefMSPLEICParams(),
                                                 retMin = FALSE, title = NULL, showLegend = TRUE, IMS = "maybe",
-                                                xlim = NULL, ylim = NULL, maxGap = 10, EICs = NULL, ...)
+                                                xlim = NULL, ylim = NULL, EICs = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertCharacter(groupName, any.missing = FALSE, min.len = 1, add = ac)
     checkmate::assertCharacter(analysis, any.missing = FALSE, min.len = 1, null.ok = TRUE, add = ac)
     checkmate::assertChoice(MSLevel, 1:2, add = ac)
-    checkmate::assertFlag(fixedIsolationWidth, add = ac)
-    checkmate::assertNumber(rtWindow, lower = 0, finite = TRUE, add = ac)
-    checkmate::assertNumber(mzWindow, lower = 0, finite = TRUE, add = ac)
+    assertMSPLEICParams(MSPLEICParams, add = ac)
     checkmate::assertFlag(retMin, add = ac)
     checkmate::assertString(title, null.ok = TRUE, add = ac)
     checkmate::assertFlag(showLegend, add = ac)
     assertIMSArg(IMS, add = ac)
     assertXYLim(xlim, ylim, add = ac)
-    checkmate::assertNumber(maxGap, lower = 0, add = ac)
     checkmate::reportAssertions(ac)
     
     if (!identical(IMS, "both") && !setequal(groupName, names(obj)))
@@ -907,10 +903,11 @@ setMethod("plotChroms", "MSPeakLists", function(obj, fGroups, groupName, analysi
         title <- getMSPeakListPlotTitle(MSLevel, analysis, groupName)
     xlab <- if (retMin) "Retention Time (min)" else "Retention Time (s)"
     
-    # UNDONE: EICParams; check if it should be used and fix things below
     if (is.null(EICs))
-        EICs <- getMSPLEICs(obj, fGroups, groupName, analysis, maxGap = maxGap, MSLevel = MSLevel,
-                            fixedIsolationWidth = fixedIsolationWidth, rtWindow = rtWindow, mzWindow = mzWindow,
+        EICs <- getMSPLEICs(obj, fGroups, groupName, analysis, maxGap = MSPLEICParams$maxGap,
+                            minIntensityIMS = MSPLEICParams$minIntensityIMS, MSLevel = MSLevel,
+                            fixedIsolationWidth = MSPLEICParams$fixedIsolationWindow,
+                            rtWindow = MSPLEICParams$rtWindow, mzWindow = MSPLEICParams$mzWindow,
                             pad = TRUE)
     else
     {
@@ -979,11 +976,9 @@ setMethod("plotChroms", "MSPeakLists", function(obj, fGroups, groupName, analysi
 })
 
 setMethod("plotChromsHash", "MSPeakLists", function(obj, fGroups, groupName, analysis = NULL, MSLevel = 1,
-                                                    fixedIsolationWidth = FALSE,
-                                                    rtWindow = defaultLim("retention", "wide"),
-                                                    mzWindow = defaultLim("mz", "medium"),
+                                                    MSPLEICParams = getDefMSPLEICParams(),
                                                     retMin = FALSE, title = NULL, showLegend = TRUE, IMS = "maybe",
-                                                    xlim = NULL, ylim = NULL, maxGap = 10, EICs = NULL, ...)
+                                                    xlim = NULL, ylim = NULL, EICs = NULL, ...)
 {
     args <- allArgs(FALSE)
     if (!is.null(EICs))

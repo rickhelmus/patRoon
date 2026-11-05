@@ -34,7 +34,6 @@
     - `spectrumSimilarity`?
     - `spectrumSimilarityIMS`?
     - `plotSpectrum`? to auto add foms/compounds, but a bit incostent with no other plotting functions
-    - `addFormulaScoring`
     - `consensus`?
     - `expandForIMS`?
     - `export`? Maybe later

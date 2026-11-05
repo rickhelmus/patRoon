@@ -202,7 +202,7 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
 #'
 #' @aliases addFormulaScoring
 #' @export
-setMethod("addFormulaScoring", "compounds", function(compounds, formulas, updateScore, formulaScoreWeight)
+setMethod("addFormulaScoring", "compounds", function(obj, formulas, updateScore = FALSE, formulaScoreWeight = 1)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(formulas, "formulas", add = ac)
@@ -210,14 +210,14 @@ setMethod("addFormulaScoring", "compounds", function(compounds, formulas, update
     checkmate::assertNumber(formulaScoreWeight, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
-    if (length(compounds) == 0)
-        return(compounds)
+    if (length(obj) == 0)
+        return(obj)
 
-    cTable <- annotations(compounds)
+    cTable <- annotations(obj)
     cGNames <- names(cTable)
 
     # UNDONE?
-    if (length(mergedConsensusNames(compounds, FALSE)) > 0)
+    if (length(mergedConsensusNames(obj, FALSE)) > 0)
         stop("Currently formula scoring cannot be calculated for consensus results. Please add the scorings before calling consensus()")
     
     calculateScores <- function(cr, forms)
@@ -255,9 +255,9 @@ setMethod("addFormulaScoring", "compounds", function(compounds, formulas, update
     setTxtProgressBar(prog, length(cTable))
     close(prog)
 
-    compounds@groupAnnotations <- cTable
+    obj@groupAnnotations <- cTable
     
-    return(addCompoundScore(compounds, "formulaScore", updateScore, formulaScoreWeight))
+    return(addCompoundScore(obj, "formulaScore", updateScore, formulaScoreWeight))
 })
 
 #' @describeIn compounds Calculates the maximum common substructure (MCS)

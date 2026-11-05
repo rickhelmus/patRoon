@@ -212,17 +212,17 @@ setMethod("plotSpectrumHash", "compoundsSet", function(obj, index, groupName, MS
 
 #' @rdname compounds-class
 #' @export
-setMethod("addFormulaScoring", "compoundsSet", function(compounds, formulas, updateScore,
-                                                        formulaScoreWeight)
+setMethod("addFormulaScoring", "compoundsSet", function(obj, formulas = NULL, updateScore = FALSE,
+                                                        formulaScoreWeight = 1)
 {
     checkmate::assertClass(formulas, "formulasSet")
     
-    unsetFormulas <- checkAndUnSetOther(sets(compounds), formulas, "formulas")
-    compounds@setObjects <- Map(setObjects(compounds), unsetFormulas, f = addFormulaScoring,
+    unsetFormulas <- checkAndUnSetOther(sets(obj), formulas, "formulas")
+    obj@setObjects <- Map(setObjects(obj), unsetFormulas, f = addFormulaScoring,
                                 MoreArgs = list(updateScore = updateScore, formulaScoreWeight = formulaScoreWeight))
-    compounds <- updateSetConsensus(compounds)
+    obj <- updateSetConsensus(obj)
     
-    return(compounds)
+    return(obj)
 })
 
 #' @rdname compounds-class

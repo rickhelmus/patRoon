@@ -360,8 +360,7 @@ setGeneric("generateFormulasPGenForm", function(obj, ...) standardGeneric("gener
 ### Compounds
 
 #' @name compounds-class
-setGeneric("addFormulaScoring", function(compounds, formulas, updateScore = FALSE,
-                                         formulaScoreWeight = 1) standardGeneric("addFormulaScoring"))
+setGeneric("addFormulaScoring", function(obj, ...) standardGeneric("addFormulaScoring"))
 
 #' @name compoundsMF-class
 setGeneric("settings", function(compoundsMF) standardGeneric("settings"))

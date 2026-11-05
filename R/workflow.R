@@ -148,6 +148,9 @@ setMethod("peakLists", "workflow", function(obj, ...) peakLists(getWFObj(obj, MS
 setMethod("averagedPeakLists", "workflow", function(obj, ...) averagedPeakLists(getWFObj(obj, MSPeakLists), ...))
 
 #' @export
+setMethod("addFormulaScoring", "workflow", function(obj, ...) addFormulaScoring(getWFObject(obj, compounds), getWFObject(obj, formulas), ...))
+
+#' @export
 setMethod("annotatedPeakList", "workflow", function(obj, index, groupName, onlyAnnotated = FALSE)
 {
     if (!is.null(obj@compounds))

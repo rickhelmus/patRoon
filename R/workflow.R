@@ -66,7 +66,6 @@ setValidity("workflow", function(object)
 {
     # UNDONE: ensure that objects are in sync (same features, anaInfo)?
     
-    hasFGroups <- !is.null(object@fGroups)
     if (is.null(object@fGroups))
     {
         for (slotName in c("MSPeakLists", "formulas", "compounds", "components"))
@@ -225,16 +224,18 @@ setMethod("[", c("workflow", "ANY", "ANY", "missing"), function(x, i, j, ..., ni
             ai <- eval(substitute(ai[.ni], list(.ni = substitute(ni))), envir = env)
             i <- ai$analysis
         }
-        else if (missing(i))
-            i <- x@analysisInfo$analysis
 
-        i <- assertSubsetArgAndToChr(i, x@analysisInfo$analysis)
-
-        if (missing(j))
-            x@fGroups <- x@fGroups[i, , ..., replicates = replicates, IMS = IMS, reorder = reorder, drop = drop]
-        else
-            x@fGroups <- x@fGroups[i, j, ..., replicates = replicates, IMS = IMS, reorder = reorder, drop = drop]
-
+        fgSubSetArgs <- list(x@fGroups, ..., reorder = reorder)
+        if (!missing(i))
+            fgSubSetArgs$i <- i
+        if (!missing(j))
+            fgSubSetArgs$j <- j
+        if (!missing(replicates))
+            fgSubSetArgs$replicates <- replicates
+        if (!missing(IMS))
+            fgSubSetArgs$IMS <- IMS
+        x@fGroups <- do.call(`[`, fgSubSetArgs)
+        
         selectedAnalyses <- analyses(x@fGroups)
         selectedGroups <- groupNames(x@fGroups)
 

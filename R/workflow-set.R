@@ -30,6 +30,8 @@ setMethod("initialize", "workflowSet", function(.Object, ...)
             }
         }
     }
+    else
+        stop("All arguments to workflowSet constructor must be named", call. = FALSE)
     
     setNames <- names(.Object@setObjects)
     if (checkmate::testNames(setNames))
@@ -75,9 +77,12 @@ setMethod("makeSet", "workflowSet", function(obj, ...)
     checkIfAllSOPresent(featsSO, "features")
     fGroupsSO <- pruneList(getAllWFSetsObject(obj, "fGroups"))
     checkIfAllSOPresent(fGroupsSO, "fGroups")
-    
     if (length(pruneList(fGroupsSO)) == 0)
+    {
+        if (!is.null(args[["groupAlgo"]]))
+            stop("Cannot specify groupAlgo when calling makeSet() on features", call. = FALSE)
         obj@features <- do.call(makeSet, c(unname(featsSO), args))
+    }
     else
         obj@fGroups <- do.call(makeSet, c(unname(fGroupsSO), args))
     

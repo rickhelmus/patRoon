@@ -14,6 +14,7 @@
     - clearly document wrappers that use getWFFGroupsOrFeats()
     - renaming of some first arguments of generics (eg checkFeatures() --> fGroups to obj) --> see workflow.R
         - checkFeatures()/checkComponents(): moved args from generic to fGroups/components methods
+    - workflowSet: features can be NULL when makeSet() is called after grouping
 - wfWrap: don't wrap analysisInfo?
 - report()
     - keep objects configurable?
@@ -40,6 +41,8 @@
     - `getXCMSSet`?
     - `getXCMSnExp`?
     - `as.data.table` / `as.data.frame`
+        - specify which object(s), and merge results if >1
+            - or implement this in fGroups method?
     - [
     - show
     - reportCSV/reportPDF?

@@ -226,6 +226,14 @@ setMethod("generateFormulasP", c("workflow", "FormulasGenFormParam"),
 setMethod("generateFormulasPGenForm", "workflow",
           \(obj, param = NULL, ...) doWfFormulas(obj, algo = "GenForm", param = param, ...))
 
+#' @rdname generateFormulasSIRIUS
+setMethod("generateFormulasPSIRIUS", "workflow",
+          \(obj, param = NULL, ...) doWfFormulas(obj, algo = "SIRIUS", param = param, ...))
+
+#' @rdname generateFormulasSIRIUS
+setMethod("generateFormulasP", c("workflow", "FormulasSIRIUSParam"),
+          \(obj, param = NULL, ...) doWfFormulas(obj, algo = "SIRIUS", param = param, ...))
+
 
 doWfCompounds <- function(..., algo)
 {
@@ -248,6 +256,14 @@ setMethod("generateCompoundsPLibrary", "workflow",
 #' @rdname generateCompoundsLibrary
 setMethod("generateCompoundsP", c("workflow", "CompoundsLibraryParam"),
           \(obj, param = NULL, ...) doWfCompounds(obj, algo = "Library", param = param, ...))
+
+#' @rdname generateCompoundsSIRIUS
+setMethod("generateCompoundsPSIRIUS", "workflow",
+          \(obj, param = NULL, ...) doWfCompounds(obj, algo = "SIRIUS", param = param, ...))
+
+#' @rdname generateCompoundsSIRIUS
+setMethod("generateCompoundsP", c("workflow", "CompoundsSIRIUSParam"),
+          \(obj, param = NULL, ...) doWfCompounds(obj, algo = "SIRIUS", param = param, ...))
 
 
 doWfCompon <- function(..., algo)
@@ -334,7 +350,8 @@ doWfTPs <- function(obj, ..., parents, algo, slotNameIn = character())
     }
     else if (identical(parents, "compounds"))
     {
-        stop("No compound annotations in this workflow object!", call. = FALSE)
+        if (is.null(obj@compounds))
+            stop("No compound annotations in this workflow object!", call. = FALSE)
         parents <- obj@compounds
     }
     doWfStep(func = paste0("generateTPsP", algo), slotNameIn = slotNameIn, slotNameOut = "TPs",

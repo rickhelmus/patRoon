@@ -15,15 +15,16 @@
     - renaming of some first arguments of generics (eg checkFeatures() --> fGroups to obj) --> see workflow.R
         - checkFeatures()/checkComponents(): moved args from generic to fGroups/components methods
     - workflowSet: features can be NULL when makeSet() is called after grouping
+    - generateTPsAnnComp and other: clearly document which objects are automatically set
+    - report(): renamed fGroups --> obj and moved args from generic to fGroups method: update NEWS and docs
+        - also for many other generics
 - wfWrap: don't wrap analysisInfo?
 - report()
     - keep objects configurable?
-    - renamed fGroups --> obj and moved args from generic to fGroups method: update NEWS and docs
 - sets
     --> for now no default makeSet() calls, as it needs additional args (eg adducts, groupAlgo). Can re-check if we somehow avoid the need.
     - makeSet(): set features slot to getFeatures(fGroups) if using fGroups input?
 - predictToxP()/predictRespFactorsP(): make it configurable which objects are used for prediction?
-- generateTPsAnnComp and other: clearly document which objects are automatically set
 - add missing methods
     - `filter` (non P) & delete
         - or make params for all filters?
@@ -39,6 +40,9 @@
         - specify which object(s), and merge results if >1
             - or implement this in fGroups method?
     - reportCSV/reportPDF?
+- newProject()
+    - DA method aving and recalibration: just use wfWrap()
+    
 
 ## Params
 

@@ -287,7 +287,7 @@ setMethod("[", c("workflow", "ANY", "ANY", "missing"), function(x, i, j, ..., ni
                 resultObj <- slot(x, slotName)
                 if (is.null(resultObj))
                     return(character())
-                return(groupNames(resultObj))
+                return(groupNamesResults(resultObj))
             }), use.names = FALSE))
             selectedGroups <- intersect(selectedGroups, resultGroups)
             x@fGroups <- x@fGroups[, selectedGroups]

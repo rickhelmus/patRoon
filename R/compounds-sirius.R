@@ -4,6 +4,7 @@
 
 #' @include main.R
 #' @include compounds.R
+#' @include compounds-sirius-param.R
 #' @include utils-sirius.R
 #' @include feature_groups-set.R
 NULL
@@ -303,3 +304,26 @@ setMethod("generateCompoundsSIRIUS", "featureGroupsSet", function(fGroups, MSPea
                          setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,
                          setAvgSpecificScores = setAvgSpecificScores, setArgs = sa)
 })
+
+
+doCompoundsPSIRIUS <- function(obj, param = NULL, ..., MSPeakLists, adduct = NULL, config = NULL,
+                               projectPath = NULL, runMode = "execute", SIRIUSAPI = NULL)
+{
+    param <- prepAndVerifyParamForCall(param, "CompoundsSIRIUSParam", ...)
+    param <- param[!names(param) %in% c("setThreshold", "setThresholdAnn", "setAvgSpecificScores")]
+    do.call(generateCompoundsSIRIUS, c(list(obj, MSPeakLists = MSPeakLists, adduct = adduct, config = config,
+                                            projectPath = projectPath, runMode = runMode, SIRIUSAPI = SIRIUSAPI), param))
+}
+
+doCompoundsPSIRIUSSets <- function(obj, param = NULL, ..., MSPeakLists, adduct = NULL, config = NULL,
+                                   projectPath = NULL, runMode = "execute", SIRIUSAPI = NULL)
+{
+    param <- prepAndVerifyParamForCall(param, "CompoundsSIRIUSParam", ...)
+    do.call(generateCompoundsSIRIUS, c(list(obj, MSPeakLists = MSPeakLists, adduct = adduct, config = config,
+                                            projectPath = projectPath, runMode = runMode, SIRIUSAPI = SIRIUSAPI), param))
+}
+
+setMethod("generateCompoundsPSIRIUS", "featureGroups", doCompoundsPSIRIUS)
+setMethod("generateCompoundsPSIRIUS", "featureGroupsSet", doCompoundsPSIRIUSSets)
+setMethod("generateCompoundsP", c("featureGroups", "CompoundsSIRIUSParam"), doCompoundsPSIRIUS)
+setMethod("generateCompoundsP", c("featureGroupsSet", "CompoundsSIRIUSParam"), doCompoundsPSIRIUSSets)

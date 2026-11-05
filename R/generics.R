@@ -357,6 +357,9 @@ setGeneric("generateFormulasP", function(obj, param, ...) standardGeneric("gener
 #' @rdname generateFormulasGenForm
 setGeneric("generateFormulasPGenForm", function(obj, ...) standardGeneric("generateFormulasPGenForm"))
 
+#' @rdname generateFormulasSIRIUS
+setGeneric("generateFormulasPSIRIUS", function(obj, ...) standardGeneric("generateFormulasPSIRIUS"))
+
 ### Compounds
 
 #' @name compounds-class
@@ -383,6 +386,9 @@ setGeneric("generateCompoundsP", function(obj, param, ...) standardGeneric("gene
 
 #' @rdname generateCompoundsPMetFrag
 setGeneric("generateCompoundsPMetFrag", function(obj, ...) standardGeneric("generateCompoundsPMetFrag"))
+
+#' @rdname generateCompoundsSIRIUS
+setGeneric("generateCompoundsPSIRIUS", function(obj, ...) standardGeneric("generateCompoundsPSIRIUS"))
 
 #' @rdname generateCompoundsLibrary
 setGeneric("generateCompoundsPLibrary", function(obj, ...) standardGeneric("generateCompoundsPLibrary"))

@@ -5,6 +5,7 @@
 #' @include main.R
 #' @include mspeaklists.R
 #' @include formulas.R
+#' @include formulas-sirius-param.R
 #' @include utils-sirius.R
 NULL
 
@@ -195,8 +196,9 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     assertCommonSIRIUSArgs(login, alwaysLogin, projectPath, runMode, SIRIUSAPI, add = ac)
     aapply(checkmate::assertFlag, . ~  calculateFeatures + getFingerprints + verbose,
            fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ featThreshold + featThresholdAnn + absAlignMzDev + minIMSSpecSim,
+    aapply(checkmate::assertNumber, . ~ featThreshold + featThresholdAnn + minIMSSpecSim,
            lower = 0, upper = 1, finite = TRUE, fixed = list(add = ac))
+    checkmate::assertNumber(absAlignMzDev, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (getFingerprints && calculateFeatures)
@@ -301,3 +303,26 @@ setMethod("generateFormulasSIRIUS", "featureGroupsSet", function(fGroups, MSPeak
                         minIMSSpecSim = minIMSSpecSim,  ..., setThreshold = setThreshold,
                         setThresholdAnn = setThresholdAnn, setAvgSpecificScores = setAvgSpecificScores, setArgs = sa)
 })
+
+
+doGenFormulasPSIRIUS <- function(obj, param = NULL, ..., MSPeakLists, adduct = NULL, config = NULL, projectPath = NULL,
+                                 runMode = "execute", SIRIUSAPI = NULL)
+{
+    param <- prepAndVerifyParamForCall(param, "FormulasSIRIUSParam", ...)
+    param <- param[!names(param) %in% c("setThreshold", "setThresholdAnn", "setAvgSpecificScores")]
+    do.call(generateFormulasSIRIUS, c(list(obj, MSPeakLists = MSPeakLists, adduct = adduct, config = config,
+                                           projectPath = projectPath, runMode = runMode, SIRIUSAPI = SIRIUSAPI), param))
+}
+
+doGenFormulasPSIRIUSSets <- function(obj, param = NULL, ..., MSPeakLists, adduct = NULL, config = NULL,
+                                     projectPath = NULL, runMode = "execute", SIRIUSAPI = NULL)
+{
+    param <- prepAndVerifyParamForCall(param, "FormulasSIRIUSParam", ...)
+    do.call(generateFormulasSIRIUS, c(list(obj, MSPeakLists = MSPeakLists, adduct = adduct, config = config,
+                                           projectPath = projectPath, runMode = runMode, SIRIUSAPI = SIRIUSAPI), param))
+}
+
+setMethod("generateFormulasPSIRIUS", "featureGroups", doGenFormulasPSIRIUS)
+setMethod("generateFormulasPSIRIUS", "featureGroupsSet", doGenFormulasPSIRIUSSets)
+setMethod("generateFormulasP", c("featureGroups", "FormulasSIRIUSParam"), doGenFormulasPSIRIUS)
+setMethod("generateFormulasP", c("featureGroupsSet", "FormulasSIRIUSParam"), doGenFormulasPSIRIUSSets)

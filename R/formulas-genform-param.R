@@ -95,8 +95,7 @@ getFormulasGenFormParamDefs <- paramConfigDefsFact(list(
     ),
     isolatePrec = list(
         default = TRUE,
-        description = "Settings for isolation of the precursor peak with its isotopes (TRUE for defaults, FALSE to disable or a list with settings)",
-        type = "flag" # UNDONE
+        description = "Settings for isolation of the precursor peak with its isotopes (TRUE for defaults, FALSE to disable or a list with settings)"
     ),
     minIMSSpecSim = list(
         default = 0,

@@ -183,8 +183,8 @@ setMethod("show", "workflow", function(object)
     
     printf("Template directory: %s\n", if (length(object@templateDir) > 0) object@templateDir else "none")
 
-    dataSlots <- names(object)[!vapply(names(object), function(n) is.null(slot(object, n)), logical(1))]
-    printf("Available workflow data: %s\n", if (length(dataSlots) > 0) getStrListWithMax(dataSlots, 8, ", ") else "none")
+    dataSlots <- names(object)[!sapply(names(object), \(n) is.null(slot(object, n)))]
+    printf("Available workflow data: %s\n", if (length(dataSlots) > 0) paste0(dataSlots, collapse = ", ") else "none")
 
     slotLabels <- c(features = "Features", fGroups = "Feature groups", MSPeakLists = "MS peak lists",
                     formulas = "Formulas", compounds = "Compounds", components = "Components",
@@ -213,6 +213,25 @@ setMethod("getTICs", "workflow", function(obj, ...) getTICs(getWFFGroupsOrFeats(
 setMethod("names", "workflow", function(x)
 {
     c("analysisInfo", "features", "fGroups", "MSPeakLists", "formulas", "compounds", "components", "TPs")
+})
+
+#' @export
+setMethod("length", "workflow", function(x) length(names(x)))
+
+#' @export
+setMethod("lengths", "workflow", function(x, use.names = TRUE)
+{
+    # UNDONE: lengh for anaInfo isn't very useful... omit or take rows?
+    
+    slotNames <- names(x)
+    ret <- sapply(slotNames, function(slotName)
+    {
+        slotObject <- slot(x, slotName)
+        if (is.null(slotObject)) 0L else length(slotObject)
+    })
+    if (!use.names)
+        names(ret) <- NULL
+    return(ret)
 })
 
 #' @export

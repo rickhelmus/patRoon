@@ -119,14 +119,16 @@ setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPe
 
 #' @rdname generateComponentsSpecClust
 #' @export
-setMethod("generateComponentsPSpecClust", "featureGroups", function(obj, param, ...)
+setMethod("generateComponentsPSpecClust", "featureGroups", function(obj, param, ..., MSPeakLists)
 {
-    do.call(generateComponentsSpecClust, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsSpecClustParam", ...)))
+    do.call(generateComponentsSpecClust, c(list(obj, MSPeakLists),
+                                           prepAndVerifyParamForCall(param, "ComponentsSpecClustParam", ...)))
 })
 
 #' @rdname generateComponentsSpecClust
 #' @export
-setMethod("generateComponentsP", c("featureGroups", "ComponentsSpecClustParam"), function(obj, param, ...)
+setMethod("generateComponentsP", c("featureGroups", "ComponentsSpecClustParam"), function(obj, param, ..., MSPeakLists)
 {
-    do.call(generateComponentsSpecClust, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsSpecClustParam", ...)))
+    do.call(generateComponentsSpecClust, c(list(obj, MSPeakLists),
+                                           prepAndVerifyParamForCall(param, "ComponentsSpecClustParam", ...)))
 })

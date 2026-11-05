@@ -888,14 +888,22 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
 
 #' @rdname generateComponentsTPs
 #' @export
-setMethod("generateComponentsPTPs", "featureGroups", function(obj, param, ...)
+setMethod("generateComponentsPTPs", "featureGroups", function(obj, param, ..., fGroupsTPs = obj, TPs = NULL,
+                                                              MSPeakLists = NULL, formulas = NULL, compounds = NULL)
 {
-    do.call(generateComponentsTPs, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsTPsParam", ...)))
+    do.call(generateComponentsTPs, c(list(obj, fGroupsTPs = fGroupsTPs, TPs = TPs, MSPeakLists = MSPeakLists,
+                                          formulas = formulas, compounds = compounds),
+                                     prepAndVerifyParamForCall(param, "ComponentsTPsParam", ...)))
 })
 
 #' @rdname generateComponentsTPs
 #' @export
-setMethod("generateComponentsP", c("featureGroups", "ComponentsTPsParam"), function(obj, param, ...)
+setMethod("generateComponentsP", c("featureGroups", "ComponentsTPsParam"), function(obj, param, ...,
+                                                                                    fGroupsTPs = obj, TPs = NULL,
+                                                                                    MSPeakLists = NULL, formulas = NULL,
+                                                                                    compounds = NULL)
 {
-    do.call(generateComponentsTPs, c(list(obj), prepAndVerifyParamForCall(param, "ComponentsTPsParam", ...)))
+    do.call(generateComponentsTPs, c(list(obj, fGroupsTPs = fGroupsTPs, TPs = TPs, MSPeakLists = MSPeakLists,
+                                          formulas = formulas, compounds = compounds),
+                                     prepAndVerifyParamForCall(param, "ComponentsTPsParam", ...)))
 })

@@ -30,7 +30,7 @@
         - or make params for all filters?
     - `spectrumSimilarity`?
     - `spectrumSimilarityIMS`?
-    - `plotSpectrum`? to auto add foms/compounds, but a bit incostent with no other plotting functions
+    - `plotSpectrum`? to auto add foms/compounds, but a bit inconsistent with no other plotting functions
     - `consensus`?
     - `expandForIMS`?
     - `export`? Maybe later
@@ -39,9 +39,8 @@
     - `as.data.table` / `as.data.frame`
         - specify which object(s), and merge results if >1
             - or implement this in fGroups method?
-    - reportCSV/reportPDF?
 - newProject()
-    - DA method aving and recalibration: just use wfWrap()
+    - reportCSV/reportPDF, DA method saving and recalibration: just use wfWrap()
     
 
 ## Params

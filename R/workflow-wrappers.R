@@ -266,9 +266,9 @@ setMethod("generateCompoundsP", c("workflow", "CompoundsSIRIUSParam"),
           \(obj, param = NULL, ...) doWfCompounds(obj, algo = "SIRIUS", param = param, ...))
 
 
-doWfCompon <- function(..., algo)
+doWfCompon <- function(..., algo, slotNameIn = "fGroups")
 {
-    doWfStep(func = paste0("generateComponentsP", algo), slotNameIn = "fGroups", slotNameOut = "components",
+    doWfStep(func = paste0("generateComponentsP", algo), slotNameIn = slotNameIn, slotNameOut = "components",
              paramClass = paste0("Components", algo, "Param"), ...)
 }
 
@@ -325,12 +325,24 @@ setMethod("generateComponentsPNet", "workflow",
                                              paramClass = "ComponentsNetParam", obj = obj, param = param, ...))
 
 #' @rdname generateComponentsSpecClust
+setMethod("generateComponentsP", c("workflow", "ComponentsSpecClustParam"),
+          \(obj, param = NULL, ...) doWfCompon(obj, algo = "SpecClust", param = param, ...,
+                                               slotNameIn = c("fGroups", "MSPeakLists")))
+
+#' @rdname generateComponentsSpecClust
 setMethod("generateComponentsPSpecClust", "workflow",
-          \(obj, param = NULL, ...) doWfCompon(obj, algo = "SpecClust", param = param, ...))
+          \(obj, param = NULL, ...) doWfCompon(obj, algo = "SpecClust", param = param, ...,
+                                               slotNameIn = c("fGroups", "MSPeakLists")))
+
+#' @rdname generateComponentsTPs
+setMethod("generateComponentsP", c("workflow", "ComponentsTPsParam"),
+          \(obj, param = NULL, ...) doWfCompon(obj, algo = "TPs", param = param, ...,
+                                               slotNameIn = c("fGroups", "MSPeakLists", "formulas", "compounds")))
 
 #' @rdname generateComponentsTPs
 setMethod("generateComponentsPTPs", "workflow",
-          \(obj, param = NULL, ...) doWfCompon(obj, algo = "TPs", param = param, ...))
+          \(obj, param = NULL, ...) doWfCompon(obj, algo = "TPs", param = param, ...,
+                                               slotNameIn = c("fGroups", "MSPeakLists", "formulas", "compounds")))
 
 #' @rdname generateComponentsNontarget
 setMethod("generateComponentsP", c("workflow", "ComponentsNontargetParam"),
@@ -339,6 +351,7 @@ setMethod("generateComponentsP", c("workflow", "ComponentsNontargetParam"),
 #' @rdname generateComponentsNontarget
 setMethod("generateComponentsPNontarget", "workflow",
           \(obj, param = NULL, ...) doWfCompon(obj, algo = "Nontarget", param = param, ...))
+
 
 doWfTPs <- function(obj, ..., parents, algo, slotNameIn = character())
 {
@@ -376,11 +389,11 @@ setMethod("generateTPsPBioTransformer", "workflow",
 
 #' @rdname generateTPsCTS
 setMethod("generateTPsP", c("workflow", "TPsCTSParam"),
-          \(obj, param = NULL, ..., parents = "fGroups") doWfTPs(obj, algo = "CTS", param = param, ..., parents = parents))
+          \(obj, param = NULL, parents = "fGroups", ...) doWfTPs(obj, algo = "CTS", param = param, ..., parents = parents))
 
 #' @rdname generateTPsCTS
 setMethod("generateTPsPCTS", "workflow",
-          \(obj, param = NULL, ..., parents = "fGroups") doWfTPs(obj, algo = "CTS", param = param, ..., parents = parents))
+          \(obj, param = NULL, parents = "fGroups", ...) doWfTPs(obj, algo = "CTS", param = param, ..., parents = parents))
 
 #' @rdname generateTPsLibrary
 setMethod("generateTPsP", c("workflow", "TPsLibraryParam"),

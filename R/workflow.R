@@ -175,7 +175,26 @@ setMethod("checkComponents", "workflow", function(obj, ...)
 #' @export
 setMethod("show", "workflow", function(object)
 {
-    # UNDONE
+    printf("A workflow object.\n")
+    showObjectSize(object)
+    
+    printf("Template directory: %s\n", if (length(object@templateDir) > 0) object@templateDir else "none")
+
+    dataSlots <- names(object)[!vapply(names(object), function(n) is.null(slot(object, n)), logical(1))]
+    printf("Available workflow data: %s\n", if (length(dataSlots) > 0) getStrListWithMax(dataSlots, 8, ", ") else "none")
+
+    slotLabels <- c(features = "Features", fGroups = "Feature groups", MSPeakLists = "MS peak lists",
+                    formulas = "Formulas", compounds = "Compounds", components = "Components",
+                    TPs = "Transformation products")
+    for (slotName in names(slotLabels))
+    {
+        slotObject <- slot(object, slotName)
+        if (!is.null(slotObject))
+            printf("%s: %d\n", slotLabels[[slotName]], length(slotObject))
+    }
+
+    showAnaInfo(analysisInfo(object))
+    invisible(NULL)
 })
 
 #' @export

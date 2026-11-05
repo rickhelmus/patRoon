@@ -43,8 +43,6 @@
     - `as.data.table` / `as.data.frame`
         - specify which object(s), and merge results if >1
             - or implement this in fGroups method?
-    - [
-    - show
     - reportCSV/reportPDF?
     - length/lengths? length() could give non-null objects and lengths() calls length() on those?
 

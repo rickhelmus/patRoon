@@ -572,11 +572,13 @@ setMethod("assignMobilitiesP", "featureGroupsScreening", function(obj, param = N
 #' may be kept or removed, depending whether a full non-target analysis is desired.
 #'
 #' @param fGroups The \code{\link{featureGroups}} object that should be screened.
-#' @param suspects A \code{data.frame} with suspect information. See the \verb{Suspect list format} section below.
+#' @param suspects A \code{data.frame} with suspect information or a file path to a delimited text file that can be read
+#'   by \code{data.table::fread()}. See the \verb{Suspect list format} section below.
 #'
-#'   \setsWF Can also be a \code{list} with suspect lists to be used for each set (otherwise the same suspect lists is
-#'   used for all sets). The \code{list} can be named with the sets names to mark which suspect list is to be used with
-#'   which set (\emph{e.g.} \code{suspects=list(positive=suspsPos, negative=suspsNeg)}).
+#'   \setsWF Can also be a \code{list} with suspect lists or file paths to be used for each set (otherwise the same
+#'   suspect list or file path is used for all sets). The \code{list} can be named with the sets names to mark which
+#'   suspect list or file path is to be used with which set (\emph{e.g.}
+#'   \code{suspects=list(positive=suspsPos, negative="suspects-neg.csv")}.
 #' @param rtWindow,mzWindow The retention time window (in seconds) and \emph{m/z} window that will be used for matching
 #'   a suspect (+/- feature data).
 #' @param adduct An \code{\link{adduct}} object (or something that can be converted to it with \code{\link{as.adduct}}).
@@ -590,7 +592,8 @@ setMethod("assignMobilitiesP", "featureGroupsScreening", function(obj, param = N
 #' @template IMSMatchParams-arg
 #'
 #' @section Suspect list format: the \code{suspects} argument for \code{screenSuspects} should be a \code{data.frame}
-#'   with the following mandatory and optional columns:
+#'   (or a file path to a delimited text file that can be read with \code{data.table::fread()}) with the following
+#'   mandatory and optional columns:
 #'
 #'   \itemize{
 #'
@@ -664,13 +667,13 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
                                                       adduct, skipInvalid, prefCalcChemProps, neutralChemProps,
                                                       onlyHits)
 {
-    checkmate::assertFlag(skipInvalid) # not in assert collection, should fail before assertSuspectList
+    checkmate::assertFlag(skipInvalid) # not in assert collection, should fail before assertAndPrepareSuspectList
 
     # NOTE: skip adduct check if fGroups is empty    
     needsAdduct <- is.null(adduct) && nrow(annotations(fGroups)) == 0 && length(fGroups) > 0
     
     ac <- checkmate::makeAssertCollection()
-    assertSuspectList(suspects, needsAdduct = needsAdduct, skipInvalid, add = ac)
+    suspects <- assertAndPrepareSuspectList(suspects, needsAdduct = needsAdduct, skipInvalid, add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE,
            fixed = list(add = ac))
     assertIMSMatchParams(IMSMatchParams, null.ok = TRUE, add = ac)

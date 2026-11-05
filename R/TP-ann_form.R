@@ -190,8 +190,8 @@ generateTPsAnnForm <- function(parents, formulas, minFitFormula = 0.94, skipInva
     )
     
     ac <- checkmate::makeAssertCollection()
-    if (is.data.frame(parents))
-        assertSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
+    if (is.data.frame(parents) || is.character(parents))
+        parents <- assertAndPrepareSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
     checkmate::assertClass(formulas, "formulas", add = ac)
     checkmate::assertNumber(minFitFormula, add = ac)
     aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + parallel,

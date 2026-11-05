@@ -249,13 +249,22 @@ assertAndPrepareAnaInfoBy <- function(x, anaInfo, withFGroups, null.ok = FALSE, 
     return(x)
 }
 
-assertSuspectList <- function(x, needsAdduct, skipInvalid, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
+assertAndPrepareSuspectList <- function(x, needsAdduct, skipInvalid, null.ok = FALSE,
+                                        .var.name = checkmate::vname(x), add = NULL)
 {
+    if (is.null(x) && null.ok)
+        return(NULL)
+
+    if (is.character(x))
+    {
+        checkmate::assertString(x, min.chars = 1, .var.name = .var.name)
+        checkmate::assertFileExists(x, access = "r", .var.name = .var.name)
+        x <- data.table::fread(x)
+    }
+
     # NOTE: we don't check mobility/CCS columns here, since we don't know yet which adduct specific column to take,
     # things would become complex. Instead, all checks will be done in expandSuspMobilities()
-    
-    if (is.null(x) && null.ok)
-        return(invisible(NULL))
+
     
     mzCols <- c("mz", "neutralMass", "SMILES", "InChI", "formula")
     
@@ -301,14 +310,14 @@ assertSuspectList <- function(x, needsAdduct, skipInvalid, null.ok = FALSE, .var
                  paste0(which(!cx$OK), collapse = ", "), call. = FALSE)
     }
     
-    invisible(NULL)
+    return(x)
 }
 
 assertAndPrepareSuspectsSets <- function(x, sets, skipInvalid, .var.name = checkmate::vname(x))
 {
-    if (checkmate::testDataFrame(x))
+    if (checkmate::testDataFrame(x) || (is.character(x) && length(x) == 1L))
     {
-        assertSuspectList(x, FALSE, skipInvalid, .var.name = .var.name)
+        x <- assertAndPrepareSuspectList(x, FALSE, skipInvalid, .var.name = .var.name)
         if (length(sets) > 1)
         {
             cols <- c("mz", "adduct", "fragments_mz")
@@ -324,12 +333,13 @@ assertAndPrepareSuspectsSets <- function(x, sets, skipInvalid, .var.name = check
                 }
             }
         }
-        x <- sapply(sets, function(s) x, simplify = FALSE) # same for all sets
+        x <- rep(list(x), length(sets)) # same for all sets
+        names(x) <- sets
     }
     else
     {
-        checkmate::assertList(x, "data.frame", any.missing = FALSE, all.missing = FALSE,
-                              len = length(sets))
+        checkmate::assertList(x, any.missing = FALSE, all.missing = FALSE, len = length(sets),
+                              .var.name = .var.name)
         checkmate::assert(
             checkmate::checkNames(names(x), "unnamed"),
             checkmate::checkNames(names(x), "unique", must.include = sets),
@@ -337,6 +347,12 @@ assertAndPrepareSuspectsSets <- function(x, sets, skipInvalid, .var.name = check
         )
         if (checkmate::testNames(names(x), "unnamed"))
             names(x) <- sets
+
+        x <- lapply(seq_along(x), function(i)
+        {
+            .var.name <- sprintf("%s[[%s]]", .var.name, if (!is.null(names(x))) names(x)[i] else i)
+            assertAndPrepareSuspectList(x[[i]], FALSE, skipInvalid, .var.name = .var.name)
+        }) |> setNames(names(x))
     }
     
     # sync order

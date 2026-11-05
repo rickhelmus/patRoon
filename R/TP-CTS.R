@@ -118,8 +118,8 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
     )
     
     ac <- checkmate::makeAssertCollection()
-    if (is.data.frame(parents))
-        assertSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
+    if (is.data.frame(parents) || is.character(parents))
+        parents <- assertAndPrepareSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
     checkmate::assertChoice(transLibrary, c("hydrolysis", "abiotic_reduction", "photolysis_unranked", 
                                             "photolysis_ranked", "mammalian_metabolism",
                                             "combined_abioticreduction_hydrolysis", 

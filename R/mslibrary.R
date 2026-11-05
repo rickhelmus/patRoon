@@ -345,7 +345,7 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
     assertAvgPListParams(avgSpecParams, add = ac)
     aapply(checkmate::assertFlag, . ~ prefCalcChemProps + neutralChemProps + collapse, fixed = list(add = ac))
     if (!is.null(suspects))
-        assertSuspectList(suspects, FALSE, FALSE, add = ac)
+        suspects <- assertAndPrepareSuspectList(suspects, FALSE, FALSE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (length(obj) == 0)

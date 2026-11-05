@@ -155,7 +155,7 @@ setMethod("delete", "featuresPiek", function(obj, i = NULL, j = NULL, ...)
 #' @param IMS Set to \code{TRUE} to use IMS data to resolve features. This initiates a
 #'   \link[=assignMobilities_feat]{direct mobility assignment} workflow. If \code{IMS=FALSE} then IMS data can still be
 #'   used for feature detection.
-#' @param suspects The suspect list to be used for suspect pre-filtering of EIC bins. See
+#' @param suspects The suspect list (data.frame or file path) to be used for suspect pre-filtering of EIC bins. See
 #'   \link[=suspect-screening]{suspect screening} for details on the suspect list format and \verb{EIC generation
 #'   parameters} to enable suspect filtering.
 #'
@@ -370,8 +370,8 @@ findFeaturesPiek <- function(analysisInfo, genEICParams = getPiekEICParams(),
     assertFindPeakParams(peakParams, add = ac)
     checkmate::assertFlag(IMS, add = ac)
     if (genEICParams$filter == "suspects")
-        assertSuspectList(suspects, needsAdduct = is.null(adduct), skipInvalid = genEICParams$skipInvalid, null.ok = FALSE,
-                          add = ac)
+        suspects <- assertAndPrepareSuspectList(suspects, needsAdduct = is.null(adduct),
+                                                skipInvalid = genEICParams$skipInvalid, null.ok = FALSE, add = ac)
     aapply(checkmate::assertNumber, . ~ minIntensityIMS + assignRTWindow + rtWindowDup + mzWindowDup, mobWindowDup,
            lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertChoice(assignMethod, c("basepeak", "weighted.mean"), add = ac)

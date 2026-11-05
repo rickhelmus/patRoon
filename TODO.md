@@ -9,6 +9,7 @@
 - findFeatures: update docs (fix analysisInfo --> obj), NEWS
 - test
     - complex [ method
+    - suspect list loading from paths, including sets, iSTDs, TPs, ...
 - docs/NEWS
     - new generics
     - clearly document wrappers that use getWFFGroupsOrFeats()
@@ -18,6 +19,8 @@
     - generateTPsAnnComp and other: clearly document which objects are automatically set
     - report(): renamed fGroups --> obj and moved args from generic to fGroups method: update NEWS and docs
         - also for many other generics
+    - Suspect lists can now be read directly from delimited files in suspect screening, TP generation, and internal-standard normalization; sets workflows also support per-set files
+    - check if docs related to suspect screening are fine since the file path as input updates
 - wfWrap: don't wrap analysisInfo?
 - report()
     - keep objects configurable?

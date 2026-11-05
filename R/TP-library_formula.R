@@ -71,8 +71,8 @@ generateTPsLibraryFormula <- function(parents = NULL, TPLibrary, generations = 1
     for (cl in libCols)
         assertListVal(TPLibrary, cl, checkmate::assertCharacter, min.chars = 1, any.missing = FALSE, add = ac)
     
-    if (is.data.frame(parents))
-        assertSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
+    if (is.data.frame(parents) || is.character(parents))
+        parents <- assertAndPrepareSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
     checkmate::assertCount(generations, positive = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps, fixed = list(add = ac))
     aapply(checkmate::assertChoice, . ~ matchParentsBy + matchGenerationsBy, null.ok = FALSE,
@@ -149,8 +149,8 @@ genFormulaTPLibrary <- function(parents, transformations = NULL, minMass = 40, g
     )
     
     ac <- checkmate::makeAssertCollection()
-    if (is.data.frame(parents))
-        assertSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
+    if (is.data.frame(parents) || is.character(parents))
+        parents <- assertAndPrepareSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
     assertLogicTransformations(transformations, null.ok = TRUE, add = ac)
     checkmate::assertNumber(minMass, lower = 0, finite = TRUE, add = ac)
     checkmate::assertCount(generations, positive = TRUE, add = ac)

@@ -195,8 +195,8 @@ generateTPsBioTransformer <- function(parents, type = "env", generations = 2, ma
     )
 
     ac <- checkmate::makeAssertCollection()
-    if (is.data.frame(parents))
-        assertSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
+    if (is.data.frame(parents) || is.character(parents))
+        parents <- assertAndPrepareSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
     checkmate::assertChoice(type, c("ecbased", "cyp450", "phaseII", "hgut", "superbio", "allHuman", "env"), add = ac)
     checkmate::assertCount(generations, positive = TRUE, add = ac)
     checkmate::assertCount(maxExpGenerations, add = ac)

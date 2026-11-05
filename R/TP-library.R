@@ -73,8 +73,8 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, generations = 1
             assertListVal(TPLibrary, cl, checkmate::assertCharacter, min.chars = 1, any.missing = FALSE, add = ac)
     }
         
-    if (is.data.frame(parents))
-        assertSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
+    if (is.data.frame(parents) || is.character(parents))
+        parents <- assertAndPrepareSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
     checkmate::assertCount(generations, positive = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + neutralizeTPs,
            fixed = list(add = ac))

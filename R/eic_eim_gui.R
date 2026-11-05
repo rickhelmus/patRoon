@@ -13,7 +13,7 @@
 #' EICs and EIMs interactively. Please use with caution and report any issues.
 #'
 #' @param obj For data.frame method: analysis information data.frame. For other methods: features/featureGroups object.
-#' @param suspects Optional suspect list data.frame (data.frame method only).
+#' @param suspects Optional suspect list data.frame or file path (data.frame method only).
 #'
 #' @templateVar plain TRUE
 #' @template adduct-arg
@@ -28,7 +28,8 @@ setMethod("launchEICGUI", "data.frame", function(obj, suspects = NULL, adduct = 
     
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(obj, add = ac)
-    assertSuspectList(suspects, needsAdduct = is.null(adduct), skipInvalid = TRUE, null.ok = TRUE, add = ac)
+    suspects <- assertAndPrepareSuspectList(suspects, needsAdduct = is.null(adduct), skipInvalid = TRUE,
+                                            null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (!is.null(suspects))

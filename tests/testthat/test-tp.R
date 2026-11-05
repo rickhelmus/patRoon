@@ -195,7 +195,7 @@ test_that("verify TP generation", {
     expect_length(TPsCTSCompEmpty, 0)
 })
 
-assertSusp <- function(...) patRoon:::assertSuspectList(..., needsAdduct = FALSE, skipInvalid = FALSE)
+assertSusp <- function(...) patRoon:::assertAndPrepareSuspectList(..., needsAdduct = FALSE, skipInvalid = FALSE)
 testMFDB <- function(TPs)
 {
     getMFDB <- function(...) { outf <- tempfile(fileext = ".csv"); convertToMFDB(..., out = outf); fread(outf) }

@@ -286,8 +286,8 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps =
     )
     
     ac <- checkmate::makeAssertCollection()
-    if (is.data.frame(parents))
-        assertSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
+    if (is.data.frame(parents) || is.character(parents))
+        parents <- assertAndPrepareSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
     checkmate::assertClass(compounds, "compounds", add = ac)
     checkmate::assertClass(TPsRef, "transformationProductsStructure", null.ok = TRUE, add = ac)
     checkmate::assertClass(fGroupsComps, "featureGroups", null.ok = TRUE, add = ac)

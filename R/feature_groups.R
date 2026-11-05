@@ -1124,8 +1124,9 @@ setMethod("selectIonsP", "featureGroups", function(obj, param = NULL, ..., compo
 #'   section for details.
 #' @param normFunc A \code{function} to combine data for normalization. See the \verb{Feature intensity normalization}
 #'   section for details.
-#' @param standards A \code{data.table} (or \code{data.frame}) with all internal standards. Should follow the format of
-#'   a \link[=suspect-screening]{suspect list}. Only used if \code{featNorm="istd"}. See the \verb{Feature intensity
+#' @param standards A \code{data.table} (or \code{data.frame}) with all internal standards, or a file path to a
+#'   delimited text file readable by \code{data.table::fread()}. Should follow the format of a
+#'   \link[=suspect-screening]{suspect list}. Only used if \code{featNorm="istd"}. See the \verb{Feature intensity
 #'   normalization} section for details.
 #'
 #'   \setsWF Can also be a \code{list} with internal standard lists.
@@ -1220,7 +1221,8 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
     ac <- checkmate::makeAssertCollection()
     checkmate::assertSubset(featNorm, c("tic", "istd", "conc", "none"))
     checkmate::assertFlag(groupNorm, add = ac)
-    checkmate::assertDataFrame(standards, null.ok = featNorm != "istd", add = ac) # more asserts in screenSuspects()
+    standards <- assertAndPrepareSuspectList(standards, needsAdduct = FALSE, skipInvalid = TRUE,
+                                             null.ok = featNorm != "istd", add = ac)
     aapply(checkmate::assertNumber, . ~ ISTDRTWindow + ISTDMZWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertCount(minISTDs, positive = TRUE, add = ac)
     checkmate::reportAssertions(ac)

@@ -58,6 +58,36 @@ setMethod("sets", "workflowSet", function(obj)
 })
 
 #' @export
+setMethod("[", c("workflowSet", "ANY", "ANY", "missing"), function(x, i, j, ..., sets = NULL, reorder = FALSE,
+                                                                   drop = TRUE)
+{
+    assertSets(x, sets, TRUE)
+
+    if (!is.null(sets))
+    {
+        if (is.null(x@fGroups))
+        {
+            if (!is.null(x@features))
+            {
+                x@features <- x@features[, sets = sets, reorder = reorder]
+                x@analysisInfo <- analysisInfo(x@features)
+            }
+            else
+            {
+                x@analysisInfo <- x@analysisInfo[set %in% sets]
+                if (reorder)
+                    x@analysisInfo <- x@analysisInfo[order(match(set, sets))]
+            }
+        }
+
+        selectedSets <- if (reorder) sets else intersect(names(x@setObjects), sets)
+        x@setObjects <- x@setObjects[selectedSets]
+    }
+
+    return(callNextMethod(x, i, j, ..., sets = sets, reorder = reorder))
+})
+
+#' @export
 setMethod("makeSet", "workflowSet", function(obj, ...)
 {
     args <- list(...)

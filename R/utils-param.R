@@ -51,14 +51,18 @@ paramConfigDefsFact <- function(li)
     }
 }
 
-prepAndVerifyParamForCall <- function(param, classN, ..., exOptsToDots = FALSE)
+resolveParamOverrides <- function(param, ...)
 {
-    checkmate::assertClass(param, classN)
-    
     overrideArgs <- list(...)
     for (arg in names(overrideArgs))
         param[[arg]] <- overrideArgs[[arg]]
-    
+    return(param)
+}
+
+prepAndVerifyParamForCall <- function(param, classN, ..., exOptsToDots = FALSE)
+{
+    checkmate::assertClass(param, classN)
+    param <- resolveParamOverrides(param, ...)
     ret <- as.list(param)
     
     if (exOptsToDots)

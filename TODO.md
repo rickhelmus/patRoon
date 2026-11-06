@@ -44,6 +44,7 @@
             - or implement this in fGroups method?
 - newProject()
     - reportCSV/reportPDF, DA method saving and recalibration: just use wfWrap()
+- better handle errors where the user supplies objects through ... (MSPeakLists etc) that are automatically filled in from slots (eg generateComponentsNet())
     
 
 ## Params

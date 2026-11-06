@@ -47,13 +47,17 @@ workflow <- setClass("workflow", slots = c(analysisInfo = "data.table", features
                                            fGroups = "featureGroupsOpt", MSPeakLists = "MSPeakListsOpt",
                                            formulas = "formulasOpt", compounds = "compoundsOpt",
                                            components = "componentsOpt", TPs = "transformationProductsOpt",
-                                           templateDir = "character"))
+                                           templateDir = "character", steps = "data.table"))
 
 setMethod("initialize", "workflow", function(.Object, analysisInfo, ...)
 {
     # UNDONE: make anaInfo optional? --> at least if features are given
     # UNDONE: don't store anaInfo and only keep it in features?
     # UNDONE(?): if only fGroups are given, derive features/anaInfo from that. If only features, derive anaInfo from that
+    
+    .Object@steps <- data.table(func = character(), paramClass = character(),
+                                param = list(), slotNameIn = list(),
+                                slotNameOut = character(), set = character())
     
     # catch anaInfo assignment here for (1) validation and (2) data.table conversion
     args <- list(...)
@@ -194,6 +198,13 @@ setMethod("show", "workflow", function(object)
         slotObject <- slot(object, slotName)
         if (!is.null(slotObject))
             printf("%s: %d\n", slotLabels[[slotName]], length(slotObject))
+    }
+
+    printf("Recorded workflow steps: %d\n", nrow(object@steps))
+    if (nrow(object@steps) > 0)
+    {
+        for (i in seq_len(nrow(object@steps)))
+            printf("  %s (%s)\n", object@steps$func[[i]], object@steps$paramClass[[i]])
     }
 
     showAnaInfo(analysisInfo(object))

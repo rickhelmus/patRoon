@@ -572,13 +572,17 @@ setMethod("assignMobilitiesP", "featureGroupsScreening", function(obj, param = N
 #' may be kept or removed, depending whether a full non-target analysis is desired.
 #'
 #' @param fGroups The \code{\link{featureGroups}} object that should be screened.
-#' @param suspects A \code{data.frame} with suspect information or a file path to a delimited text file that can be read
-#'   by \code{data.table::fread()}. See the \verb{Suspect list format} section below.
+#' @param suspects The suspect list. See the \verb{Suspect list format} section below. This can be given as:
+#'   \itemize{
+#'     \item A \code{data.frame}
+#'     \item A file path to a delimited text file that can be read by \code{\link{fread()}}
+#'     \item A \code{\link{transformationProducts}} object, which will be automatically converted with \code{\link[convertToSuspects,transformationProducts-method]{convertToSuspects}}
+#'   }
 #'
-#'   \setsWF Can also be a \code{list} with suspect lists or file paths to be used for each set (otherwise the same
-#'   suspect list or file path is used for all sets). The \code{list} can be named with the sets names to mark which
-#'   suspect list or file path is to be used with which set (\emph{e.g.}
-#'   \code{suspects=list(positive=suspsPos, negative="suspects-neg.csv")}.
+#'   \setsWF A \code{list} with suspect lists (in above format) can be used to specify different inputs for each set;
+#'   otherwise, the same is used for all sets. The \code{list} can be named with the sets names to mark which suspect
+#'   list or file path is to be used with which set (\emph{e.g.} \code{suspects=list(positive=suspsPos,
+#'   negative="suspects-neg.csv")}.
 #' @param rtWindow,mzWindow The retention time window (in seconds) and \emph{m/z} window that will be used for matching
 #'   a suspect (+/- feature data).
 #' @param adduct An \code{\link{adduct}} object (or something that can be converted to it with \code{\link{as.adduct}}).
@@ -587,13 +591,14 @@ setMethod("assignMobilitiesP", "featureGroupsScreening", function(obj, param = N
 #' @param skipInvalid If set to \code{TRUE} then suspects with invalid data (\emph{e.g.} missing names or other missing
 #'   data) will be ignored with a warning. Similarly, any suspects for which mass calculation failed (when no \code{mz}
 #'   column is present in the suspect list), for instance, due to invalid \code{SMILES}, will be ignored with a warning.
+#' @param includeParents If \code{suspects} is a \code{transformationProducts} object, include its parent compounds in
+#'   the suspect list when set to \code{TRUE}.
 #' @param onlyHits If \code{TRUE} then all feature groups not matched by any of the suspects will be removed.
 #'
 #' @template IMSMatchParams-arg
 #'
-#' @section Suspect list format: the \code{suspects} argument for \code{screenSuspects} should be a \code{data.frame}
-#'   (or a file path to a delimited text file that can be read with \code{data.table::fread()}) with the following
-#'   mandatory and optional columns:
+#' @section Suspect list format: the input suspects for \code{screenSuspects} has the following mandatory and
+#'   optional columns. \code{\link{transformationProducts}} input is automatically converted to this format.
 #'
 #'   \itemize{
 #'
@@ -665,15 +670,17 @@ setMethod("assignMobilitiesP", "featureGroupsScreening", function(obj, param = N
 #' @export
 setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindow, mzWindow, IMSMatchParams,
                                                       adduct, skipInvalid, prefCalcChemProps, neutralChemProps,
-                                                      onlyHits)
+                                                      onlyHits, includeParents)
 {
     checkmate::assertFlag(skipInvalid) # not in assert collection, should fail before assertAndPrepareSuspectList
+    checkmate::assertFlag(includeParents)
 
     # NOTE: skip adduct check if fGroups is empty    
     needsAdduct <- is.null(adduct) && nrow(annotations(fGroups)) == 0 && length(fGroups) > 0
     
     ac <- checkmate::makeAssertCollection()
-    suspects <- assertAndPrepareSuspectList(suspects, needsAdduct = needsAdduct, skipInvalid, add = ac)
+    suspects <- assertAndPrepareSuspectList(suspects, needsAdduct = needsAdduct, skipInvalid, add = ac,
+                                            convertTPs = TRUE, includeParents = includeParents)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE,
            fixed = list(add = ac))
     assertIMSMatchParams(IMSMatchParams, null.ok = TRUE, add = ac)

@@ -40,6 +40,11 @@ getScreenSuspectsParamDefs <- paramConfigDefsFact(list(
         description = "If TRUE, use neutral chemical properties",
         type = "flag"
     ),
+    includeParents = list(
+        default = FALSE,
+        description = "If TRUE and suspects are transformation products, include their parents",
+        type = "flag"
+    ),
     onlyHits = list(
         default = FALSE,
         description = "If TRUE, remove feature groups without suspect matches",

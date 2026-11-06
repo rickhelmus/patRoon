@@ -458,7 +458,7 @@ setGeneric("screenSuspects", function(fGroups, suspects, rtWindow = defaultLim("
                                       mzWindow = defaultLim("mz", "medium"), IMSMatchParams = NULL,
                                       adduct = NULL, skipInvalid = TRUE, prefCalcChemProps = TRUE,
                                       neutralChemProps = FALSE,
-                                      onlyHits = FALSE, ...) standardGeneric("screenSuspects"))
+                                      onlyHits = FALSE, includeParents = FALSE, ...) standardGeneric("screenSuspects"))
 
 #' @rdname suspect-screening
 setGeneric("screenSuspectsP", function(obj, ...) standardGeneric("screenSuspectsP"))

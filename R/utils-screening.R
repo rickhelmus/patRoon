@@ -472,12 +472,12 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSMatchPara
 
 # method definition for screening methods of screenSuspects()
 doScreenSuspectsAmend <- function(fGroups, suspects, rtWindow, mzWindow, IMSMatchParams, adduct, skipInvalid,
-                                  prefCalcChemProps, neutralChemProps, onlyHits, amend = FALSE)
+                                  prefCalcChemProps, neutralChemProps, onlyHits, includeParents, amend = FALSE)
 {
-    aapply(checkmate::assertFlag, . ~ onlyHits + amend)
-    
+    aapply(checkmate::assertFlag, . ~ onlyHits + includeParents + amend)
+
     fGroupsScreened <- callNextMethod(fGroups, suspects, rtWindow, mzWindow, IMSMatchParams, adduct, skipInvalid,
-                                      prefCalcChemProps, neutralChemProps, onlyHits)
+                                      prefCalcChemProps, neutralChemProps, onlyHits, includeParents)
     if (!amend)
         return(fGroupsScreened)
     

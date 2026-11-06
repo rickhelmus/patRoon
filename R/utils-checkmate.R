@@ -250,10 +250,18 @@ assertAndPrepareAnaInfoBy <- function(x, anaInfo, withFGroups, null.ok = FALSE, 
 }
 
 assertAndPrepareSuspectList <- function(x, needsAdduct, skipInvalid, null.ok = FALSE,
-                                        .var.name = checkmate::vname(x), add = NULL)
+                                        .var.name = checkmate::vname(x), add = NULL, convertTPs = FALSE,
+                                        includeParents = FALSE)
 {
     if (is.null(x) && null.ok)
         return(NULL)
+
+    if (convertTPs)
+    {
+        checkmate::assertFlag(includeParents)
+        if (inherits(x, "transformationProducts"))
+            x <- convertToSuspects(x, includeParents = includeParents)
+    }
 
     if (is.character(x))
     {
@@ -313,11 +321,17 @@ assertAndPrepareSuspectList <- function(x, needsAdduct, skipInvalid, null.ok = F
     return(x)
 }
 
-assertAndPrepareSuspectsSets <- function(x, sets, skipInvalid, .var.name = checkmate::vname(x))
+assertAndPrepareSuspectsSets <- function(x, sets, skipInvalid, .var.name = checkmate::vname(x), convertTPs = FALSE,
+                                         includeParents = FALSE)
 {
-    if (checkmate::testDataFrame(x) || (is.character(x) && length(x) == 1L))
+    if (convertTPs)
+        checkmate::assertFlag(includeParents)
+
+    if (checkmate::testDataFrame(x) || (is.character(x) && length(x) == 1L) ||
+        (convertTPs && inherits(x, "transformationProducts")))
     {
-        x <- assertAndPrepareSuspectList(x, FALSE, skipInvalid, .var.name = .var.name)
+        x <- assertAndPrepareSuspectList(x, FALSE, skipInvalid, .var.name = .var.name, convertTPs = convertTPs,
+                                         includeParents = includeParents)
         if (length(sets) > 1)
         {
             cols <- c("mz", "adduct", "fragments_mz")
@@ -351,7 +365,8 @@ assertAndPrepareSuspectsSets <- function(x, sets, skipInvalid, .var.name = check
         x <- lapply(seq_along(x), function(i)
         {
             .var.name <- sprintf("%s[[%s]]", .var.name, if (!is.null(names(x))) names(x)[i] else i)
-            assertAndPrepareSuspectList(x[[i]], FALSE, skipInvalid, .var.name = .var.name)
+            assertAndPrepareSuspectList(x[[i]], FALSE, skipInvalid, .var.name = .var.name, convertTPs = convertTPs,
+                                        includeParents = includeParents)
         }) |> setNames(names(x))
     }
     

@@ -466,11 +466,13 @@ setMethod("assignMobilitiesP", "featureGroupsScreeningSet", function(obj, param 
 #' @export
 setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWindow, mzWindow, IMSMatchParams,
                                                          adduct, skipInvalid, prefCalcChemProps, neutralChemProps,
-                                                         onlyHits)
+                                                         onlyHits, includeParents)
 {
+    checkmate::assertFlag(includeParents)
     verifyNoAdductIonizationArg(adduct)
-    
-    suspects <- assertAndPrepareSuspectsSets(suspects, sets(fGroups), skipInvalid)
+
+    suspects <- assertAndPrepareSuspectsSets(suspects, sets(fGroups), skipInvalid, convertTPs = TRUE,
+                                             includeParents = includeParents)
 
     unsetFGroupsList <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
     setObjects <- Map(unsetFGroupsList, suspects,
@@ -478,7 +480,8 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
                                                          IMSMatchParams = IMSMatchParams, adduct = NULL,
                                                          skipInvalid = skipInvalid,
                                                          prefCalcChemProps = prefCalcChemProps,
-                                                         neutralChemProps = neutralChemProps, onlyHits = onlyHits))
+                                                         neutralChemProps = neutralChemProps, onlyHits = onlyHits,
+                                                         includeParents = includeParents))
     
     scr <- mergeScreeningSetInfos(setObjects)
     if (onlyHits)

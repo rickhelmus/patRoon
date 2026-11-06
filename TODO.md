@@ -3,13 +3,14 @@
 - predictTox()/predictRespFactors(): SIRIUS methods don't pass some args to parent method (eg parallel)
     - update P method afterwards
 - move predictTox() and predictToxP() generic docs to pred-tox
+- docs/NEWS/tests
+    - new suspect input (string, TPs): add tests, check if docs are correctly updated, add to handbook?, add to NEWS, also check sets, TP gen, iSTDs, ...
 
 # workflow
 
 - findFeatures: update docs (fix analysisInfo --> obj), NEWS
 - test
     - complex [ method
-    - suspect list loading from paths, including sets, iSTDs, TPs, ...
 - docs/NEWS
     - new generics
     - clearly document wrappers that use getWFFGroupsOrFeats()
@@ -45,8 +46,8 @@
 - newProject()
     - reportCSV/reportPDF, DA method saving and recalibration: just use wfWrap()
 - better handle errors where the user supplies objects through ... (MSPeakLists etc) that are automatically filled in from slots (eg generateComponentsNet())
-- also record steps not from wrappers? Mainly wfWrap() Just informative
-    
+- screenSuspectsP(): support TPs slot as input (with eg suspects = "TPs"?)
+
 
 ## Params
 

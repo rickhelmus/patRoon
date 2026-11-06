@@ -63,6 +63,9 @@ setMethod("[", c("workflowSet", "ANY", "ANY", "missing"), function(x, i, j, ...,
 {
     assertSets(x, sets, TRUE)
 
+    if (x@dryRun)
+        return(callNextMethod(x, i, j, ..., sets = sets, reorder = reorder))
+
     if (!is.null(sets))
     {
         if (is.null(x@fGroups))
@@ -111,10 +114,18 @@ setMethod("makeSet", "workflowSet", function(obj, ...)
     {
         if (!is.null(args[["groupAlgo"]]))
             stop("Cannot specify groupAlgo when calling makeSet() on features", call. = FALSE)
-        obj@features <- do.call(makeSet, c(unname(featsSO), args))
+        if (!obj@dryRun)
+            obj@features <- do.call(makeSet, c(unname(featsSO), args))
+        slotName <- "features"
     }
     else
-        obj@fGroups <- do.call(makeSet, c(unname(fGroupsSO), args))
+    {
+        if (!obj@dryRun)
+            obj@fGroups <- do.call(makeSet, c(unname(fGroupsSO), args))
+        slotName <- "fGroups"
+    }
+
+    obj <- addWfStep(obj, func = "makeSet", slotNameIn = slotName, slotNameOut = slotName)
     
     return(obj)
 })

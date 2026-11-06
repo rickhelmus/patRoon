@@ -17,6 +17,16 @@ doWfStepFunc <- function(func, inputObjs, param, inputs = list(), setFirstArgObj
     do.call(func, args)
 }
 
+addWfStep <- function(object, func, paramClass = NA_character_, param = NULL, slotNameIn = character(),
+                      slotNameOut = NA_character_, set = NA_character_)
+{
+    slotNameIn <- slotNameIn[sapply(slotNameIn, \(x) !is.null(slot(object, x)))]
+    step <- data.table(func = func, paramClass = paramClass, param = list(param),
+                       slotNameIn = list(slotNameIn), slotNameOut = slotNameOut, set = set)
+    object@steps <- rbind(object@steps, step)
+    return(object)
+}
+
 makeSlotNameInNamed <- function(slotNameIn)
 {
     names(slotNameIn) <- if (!is.null(names(slotNameIn)))
@@ -60,12 +70,8 @@ doWfStep <- function(object, func, slotNameIn, slotNameOut, paramClass, param = 
         slot(object, slotNameOut) <- doWfStepFunc(func, sapply(slotNameIn, slot, object = object, simplify = FALSE), param,
                                                   inputs = inputs, setFirstArgObj = setFirstArgObj)
     
-    step <- data.table(func = func, paramClass = paramClass, param = list(param),
-                       slotNameIn = list(slotNameIn), slotNameOut = slotNameOut,
-                       set = NA_character_)
-    
-    object@steps <- rbind(object@steps, step)
-    return(object)
+    return(addWfStep(object, func = func, paramClass = paramClass, param = param,
+                     slotNameIn = slotNameIn, slotNameOut = slotNameOut))
 }
 
 doWfFeatSet <- function(object, func, slotNameIn, slotNameOut, paramClass, param = NULL, inputs = list(), ..., sets = NULL)
@@ -128,8 +134,11 @@ doWfFeatSet <- function(object, func, slotNameIn, slotNameOut, paramClass, param
 #' @rdname MSConversion
 setMethod("convertMSFilesP", c("workflow", "ANY"), function(obj, param, ...)
 {
-    convertMSFilesP(analysisInfo(obj), param, ...)
-    return(obj)
+    if (!obj@dryRun)
+        convertMSFilesP(analysisInfo(obj), param, ...)
+
+    return(addWfStep(obj, func = "convertMSFilesP", paramClass = class(param)[[1]], param = param,
+                     slotNameIn = "analysisInfo"))
 })
 
 
@@ -721,6 +730,9 @@ setMethod("wfWrap", "workflow", function(obj, expr)
 
     exprReplaced <- replaceSlots(expr)
 
+    if (obj@dryRun)
+        return(addWfStep(obj, func = "wfWrap", slotNameOut = slotMap[[lhsName]]))
+
     # Evaluate the replaced assignment in a temporary environment so that slot<- updates the 'obj' binding
     evalEnv <- new.env(parent = parent.frame())
     evalEnv$obj <- obj
@@ -729,5 +741,5 @@ setMethod("wfWrap", "workflow", function(obj, expr)
     # Retrieve the (possibly) modified workflow object and return it
     obj <- evalEnv$obj
 
-    return(obj)
+    return(addWfStep(obj, func = "wfWrap", slotNameOut = slotMap[[lhsName]]))
 })

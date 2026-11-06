@@ -122,7 +122,12 @@ setMethod("hasIMS", "workflow", function(obj) hasIMS(getWFFGroupsOrFeats(obj)))
 setMethod("groupNames", "workflow", function(obj) groupNames(getWFObj(obj, fGroups)))
 
 #' @export
-setMethod("updateGroups", "workflow", function(obj, ...) updateGroups(getWFObj(obj, fGroups), ...))
+setMethod("updateGroups", "workflow", function(obj, ...)
+{
+    if (!obj@dryRun)
+        obj@fGroups <- updateGroups(getWFObject(obj, fGroups), ...)
+    return(addWfStep(obj, func = "updateGroups", slotNameIn = "fGroups", slotNameOut = "fGroups"))
+})
 
 #' @export
 setMethod("groupTable", "workflow", function(obj, ...) groupTable(getWFObj(obj, fGroups), ...))
@@ -155,7 +160,13 @@ setMethod("peakLists", "workflow", function(obj, ...) peakLists(getWFObj(obj, MS
 setMethod("averagedPeakLists", "workflow", function(obj, ...) averagedPeakLists(getWFObj(obj, MSPeakLists), ...))
 
 #' @export
-setMethod("addFormulaScoring", "workflow", function(obj, ...) addFormulaScoring(getWFObject(obj, compounds), getWFObject(obj, formulas), ...))
+setMethod("addFormulaScoring", "workflow", function(obj, ...)
+{
+    if (!obj@dryRun)
+        obj@compounds <- addFormulaScoring(getWFObject(obj, compounds), getWFObject(obj, formulas), ...)
+    return(addWfStep(obj, func = "addFormulaScoring", slotNameIn = c("compounds", "formulas"),
+                     slotNameOut = "compounds"))
+})
 
 #' @export
 setMethod("annotatedPeakList", "workflow", function(obj, index, groupName, onlyAnnotated = FALSE)
@@ -256,6 +267,9 @@ setMethod("[", c("workflow", "ANY", "ANY", "missing"), function(x, i, j, ..., ni
                                                                 reorder = FALSE, drop = TRUE)
 {
     checkmate::assertFlag(reorder)
+
+    if (x@dryRun)
+        return(addWfStep(x, func = "[", slotNameIn = names(x)))
     
     doFilterByResults <- !missing(results)
     if (doFilterByResults)
@@ -356,7 +370,7 @@ setMethod("[", c("workflow", "ANY", "ANY", "missing"), function(x, i, j, ..., ni
             x@components <- x@components[, selectedGroups]
     }
 
-    return(x)
+    return(addWfStep(x, func = "[", slotNameIn = names(x)))
 })
 
 #' @export
@@ -395,6 +409,10 @@ setMethod("report", "workflow", function(obj, MSPeakLists = obj@MSPeakLists, for
                                          compounds = obj@compounds, components = obj@components, TPs = obj@TPs, ...)
 {
     verifyWFHasFGroups(obj)
-    report(obj = obj@fGroups, MSPeakLists = MSPeakLists, formulas = formulas, compounds = compounds,
-           components = components, TPs = TPs, ...)
+    if (!obj@dryRun)
+        report(obj = obj@fGroups, MSPeakLists = MSPeakLists, formulas = formulas, compounds = compounds,
+               components = components, TPs = TPs, ...)
+
+    return(addWfStep(obj, func = "report", slotNameIn = c("fGroups", "MSPeakLists", "formulas", "compounds",
+                                                          "components", "TPs")))
 })

@@ -58,7 +58,8 @@ setMethod("initialize", "workflow", function(.Object, analysisInfo, dryRun = FAL
     checkmate::assertFlag(dryRun)
     .Object@dryRun <- dryRun
     
-    .Object@steps <- data.table(func = character(), paramClass = character(),
+    .Object@steps <- data.table(func = character(), timestamp = as.POSIXct(character()),
+                                paramClass = character(),
                                 param = list(), slotNameIn = list(),
                                 slotNameOut = character(), set = character())
     

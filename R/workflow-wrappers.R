@@ -22,7 +22,7 @@ addWfStep <- function(object, func, paramClass = NA_character_, param = NULL, sl
 {
     if (!object@dryRun)
         slotNameIn <- slotNameIn[sapply(slotNameIn, \(x) !is.null(slot(object, x)))]
-    step <- data.table(func = func, paramClass = paramClass, param = list(param),
+    step <- data.table(func = func, timestamp = Sys.time(), paramClass = paramClass, param = list(param),
                        slotNameIn = list(slotNameIn), slotNameOut = slotNameOut, set = set)
     object@steps <- rbind(object@steps, step)
     return(object)
@@ -103,8 +103,9 @@ doWfFeatSet <- function(object, func, slotNameIn, slotNameOut, paramClass, param
     stepRows <- list()
     if (object@dryRun)
     {
-        stepRows <- lapply(sets, \(sn) data.table(func = func, paramClass = paramClass, param = list(param),
-                                                  slotNameIn = list(slotNameIn), slotNameOut = slotNameOut, set = sn))
+        stepRows <- lapply(sets, \(sn) data.table(func = func, timestamp = Sys.time(),
+                                                   paramClass = paramClass, param = list(param),
+                                                   slotNameIn = list(slotNameIn), slotNameOut = slotNameOut, set = sn))
     }
     else
     {
@@ -116,7 +117,8 @@ doWfFeatSet <- function(object, func, slotNameIn, slotNameOut, paramClass, param
             {
                 so[[slotNameOut]] <- doWfStepFunc(func, setNames(so[slotNameIn], names(slotNameIn)), param,
                                                   inputs = c(inputs, resolved$inputs))
-                stepRows[[length(stepRows) + 1L]] <<- data.table(func = func, paramClass = paramClass,
+                stepRows[[length(stepRows) + 1L]] <<- data.table(func = func, timestamp = Sys.time(),
+                                                                 paramClass = paramClass,
                                                                  param = list(param),
                                                                  slotNameIn = list(slotNameIn),
                                                                  slotNameOut = slotNameOut, set = sn)

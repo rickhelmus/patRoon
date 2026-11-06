@@ -743,16 +743,16 @@ setMethod("wfWrap", "workflow", function(obj, expr)
 
     exprReplaced <- replaceSlots(expr)
 
-    if (obj@dryRun)
-        return(addWfStep(obj, func = "wfWrap", slotNameOut = slotMap[[lhsName]]))
-
-    # Evaluate the replaced assignment in a temporary environment so that slot<- updates the 'obj' binding
-    evalEnv <- new.env(parent = parent.frame())
-    evalEnv$obj <- obj
-    eval(exprReplaced, envir = evalEnv, enclos = parent.frame())
-
-    # Retrieve the (possibly) modified workflow object and return it
-    obj <- evalEnv$obj
+    if (!obj@dryRun)
+    {
+        # Evaluate the replaced assignment in a temporary environment so that slot<- updates the 'obj' binding
+        evalEnv <- new.env(parent = parent.frame())
+        evalEnv$obj <- obj
+        eval(exprReplaced, envir = evalEnv, enclos = parent.frame())
+        
+        # Retrieve the (possibly) modified workflow object and return it
+        obj <- evalEnv$obj
+    }
 
     return(addWfStep(obj, func = "wfWrap", slotNameOut = slotMap[[lhsName]]))
 })

@@ -99,6 +99,9 @@ setMethod("analysisInfo", "workflow", function(obj, df = FALSE)
 })
 
 #' @export
+setMethod("steps", "workflow", function(obj) obj@steps)
+
+#' @export
 setMethod("analyses", "featureGroups", function(obj) analysisInfo(obj)$analysis)
 
 setMethod("templateDir", "workflow", function(obj) obj@templateDir)

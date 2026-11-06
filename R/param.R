@@ -292,7 +292,8 @@ importParam <- function(type, inFile)
 #'
 #' @return Invisibly, a character vector with the paths of the files written.
 #' @export
-exportAllParams <- function(type = "R", outDir = file.path(getwd(), "config"), overwrite = FALSE, clear = FALSE)
+exportAllParams <- function(type = "R", outDir = file.path(getwd(), "config"), overwrite = FALSE, clear = FALSE,
+                            workflow = NULL)
 {
     # UNDONE: update LLM'd docs
     # UNDONE: other function name?
@@ -302,6 +303,8 @@ exportAllParams <- function(type = "R", outDir = file.path(getwd(), "config"), o
     aapply(checkmate::assertFlag, . ~ overwrite, clear, fixed = list(add = ac))
     checkmate::assertChoice(type, c("R", "json", "yaml"), add = ac)
     checkmate::assertPathForOutput(outDir, overwrite = overwrite, add = ac)
+    checkmate::assertClass(workflow, "workflow", null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
     
     if (overwrite && clear && dir.exists(outDir))
         unlink(outDir, recursive = TRUE)
@@ -317,6 +320,13 @@ exportAllParams <- function(type = "R", outDir = file.path(getwd(), "config"), o
     
     classes <- getSubclasses("param")
     classes <- classes[!sapply(classes, \(cn) methods::getClassDef(cn)@virtual)]
+
+    if (!is.null(workflow))
+    {
+        classes <- classes[classes %in% steps(workflow)$paramClass]
+        if (length(classes) == 0)
+            stop("No parameter classes found for the specified workflow", call. = FALSE)
+    }
     
     ext <- if (type == "yaml") "yml" else type
     files <- character(length(classes))

@@ -408,10 +408,12 @@ setReplaceMethod("$", "workflow", function(x, name, value)
 setMethod("report", "workflow", function(obj, MSPeakLists = obj@MSPeakLists, formulas = obj@formulas,
                                          compounds = obj@compounds, components = obj@components, TPs = obj@TPs, ...)
 {
-    verifyWFHasFGroups(obj)
     if (!obj@dryRun)
+    {
+        verifyWFHasFGroups(obj)
         report(obj = obj@fGroups, MSPeakLists = MSPeakLists, formulas = formulas, compounds = compounds,
                components = components, TPs = TPs, ...)
+    }
 
     return(addWfStep(obj, func = "report", slotNameIn = c("fGroups", "MSPeakLists", "formulas", "compounds",
                                                           "components", "TPs")))

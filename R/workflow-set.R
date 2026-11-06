@@ -110,8 +110,21 @@ setMethod("makeSet", "workflowSet", function(obj, ...)
     checkIfAllSOPresent(featsSO, "features")
     fGroupsSO <- pruneList(getAllWFSetsObject(obj, "fGroups"))
     checkIfAllSOPresent(fGroupsSO, "fGroups")
-    if (length(pruneList(fGroupsSO)) == 0)
+
+    hasPlannedSetOutput <- function(slotName)
     {
+        if (!obj@dryRun)
+            return(FALSE)
+        return(wfHasSlot(obj, slotName, onlySetObj = TRUE))
+    }
+
+    hasFeatures <- length(featsSO) > 0 || (obj@dryRun && wfHasSlot(obj, "features", onlySetObj = TRUE))
+    hasFGroups <- length(pruneList(fGroupsSO)) > 0 || (obj@dryRun && wfHasSlot(obj, "fGroups", onlySetObj = TRUE))
+
+    if (!hasFGroups)
+    {
+        if (!hasFeatures)
+            stop("No features or feature groups available in workflow sets", call. = FALSE)
         if (!is.null(args[["groupAlgo"]]))
             stop("Cannot specify groupAlgo when calling makeSet() on features", call. = FALSE)
         if (!obj@dryRun)

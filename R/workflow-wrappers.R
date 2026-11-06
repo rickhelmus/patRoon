@@ -20,7 +20,8 @@ doWfStepFunc <- function(func, inputObjs, param, inputs = list(), setFirstArgObj
 addWfStep <- function(object, func, paramClass = NA_character_, param = NULL, slotNameIn = character(),
                       slotNameOut = NA_character_, set = NA_character_)
 {
-    slotNameIn <- slotNameIn[sapply(slotNameIn, \(x) !is.null(slot(object, x)))]
+    if (!object@dryRun)
+        slotNameIn <- slotNameIn[sapply(slotNameIn, \(x) !is.null(slot(object, x)))]
     step <- data.table(func = func, paramClass = paramClass, param = list(param),
                        slotNameIn = list(slotNameIn), slotNameOut = slotNameOut, set = set)
     object@steps <- rbind(object@steps, step)
@@ -219,10 +220,10 @@ setMethod("doWfGroupFeat", "workflow", function(obj, ..., algo, slotIn = "featur
 
 setMethod("doWfGroupFeat", "workflowSet", function(obj, ..., algo, slotIn = "features")
 {
-    # if there already is a features object, makeSet was called and we can call groupFeatures() as usual. Otherwise,
+    # If a combined features object exists or is planned via makeSet(), call groupFeatures() as usual. Otherwise,
     # call it per set.
     # UNDONE: make sure that this is documented
-    f <- if (is.null(obj@features)) doWfFeatSet else doWfStep
+    f <- if (wfHasSlot(obj, "features")) doWfStep else doWfFeatSet
     f(obj, func = paste0("groupFeaturesP", algo), slotNameIn = slotIn, slotNameOut = "fGroups",
       paramClass = paste0("FeatureGroups", algo, "Param"), ...)
 })
@@ -433,21 +434,33 @@ setMethod("generateComponentsPNontarget", "workflow",
 
 doWfTPs <- function(obj, ..., parents, algo, slotNameIn = character(), inputs = list())
 {
+    recordSlotNameIn <- slotNameIn
     if (identical(parents, "fGroups"))
     {
-        if (is.null(obj@fGroups) || !isScreening(obj@fGroups))
+        if (!wfHasScreeningFGroups(obj, noSets = TRUE))
             stop("No suspect information in this workflow object! You may need to perform a prior suspect screening or adapt the parents argument.", call. = FALSE)
-        parents <- obj@fGroups
+        if (!obj@dryRun)
+            parents <- obj@fGroups
+        else
+            recordSlotNameIn <- c("fGroups", recordSlotNameIn)
     }
     else if (identical(parents, "compounds"))
     {
-        if (is.null(obj@compounds))
+        if (!wfHasSlot(obj, "compounds"))
             stop("No compound annotations in this workflow object!", call. = FALSE)
-        parents <- obj@compounds
+        if (!obj@dryRun)
+            parents <- obj@compounds
+        else
+            recordSlotNameIn <- c("compounds", recordSlotNameIn)
     }
-    doWfStep(func = paste0("generateTPsP", algo), slotNameIn = slotNameIn, slotNameOut = "TPs",
-             paramClass = paste0("TPs", algo, "Param"), object = obj, inputs = c(list(obj = parents), inputs),
+    obj <- doWfStep(obj, func = paste0("generateTPsP", algo), slotNameIn = slotNameIn, slotNameOut = "TPs",
+             paramClass = paste0("TPs", algo, "Param"), inputs = c(list(obj = parents), inputs),
              setFirstArgObj = FALSE, ...)
+    
+    # HACK update steps history manually here for additional input slots
+    obj@step[.N, slotNameIn := list(recordSlotNameIn)]
+    
+    return(obj)
 }
 
 doWfTPsLogic <- function(obj, ..., algo, inputs = list())
@@ -578,19 +591,19 @@ setMethod("estimateIDConfidenceP", "workflow", function(obj, param = NULL, ...,
 {
     inputs <- list(IDFile = IDFile, logPath = logPath)
 
-    if (!is.null(obj@formulas))
+    if (wfHasSlot(obj, "formulas"))
     {
         obj <- doWfStep(obj, func = "estimateIDConfidenceP", slotNameIn = "formulas", slotNameOut = "formulas",
                         paramClass = "EstimateIDConfidenceParam", param = param, inputs = inputs, ...)
     }
-    if (!is.null(obj@compounds))
+    if (wfHasSlot(obj, "compounds"))
     {
         obj <- doWfStep(obj, func = "estimateIDConfidenceP", slotNameIn = c("compounds", "formulas"),
                         slotNameOut = "compounds", paramClass = "EstimateIDConfidenceParam", param = param,
                         inputs = inputs, ...)
     }
     
-    if (!is.null(obj@fGroups) && isScreening(obj@fGroups))
+    if (wfHasScreeningFGroups(obj))
     {
         obj <- doWfStep(obj, func = "estimateIDConfidenceP", slotNameIn = c("fGroups", "formulas", "compounds"),
                         slotNameOut = "fGroups", paramClass = "EstimateIDConfidenceParam",  param = param,
@@ -611,12 +624,12 @@ setMethod("predictToxP", "workflow", function(obj, param = NULL, ...)
     #     obj <- doWfStep(obj, func = "predictToxP", slotNameIn = "formulas", slotNameOut = "formulas",
     #                     paramClass = "PredictToxParam", param = param, ...)
     # }
-    if (!is.null(obj@compounds))
+    if (wfHasSlot(obj, "compounds"))
     {
         obj <- doWfStep(obj, func = "predictToxP", slotNameIn = "compounds", slotNameOut = "compounds",
                         paramClass = "PredictToxParam", param = param, ...)
     }
-    if (!is.null(obj@fGroups) && isScreening(obj@fGroups))
+    if (wfHasScreeningFGroups(obj))
     {
         obj <- doWfStep(obj, func = "predictToxP", slotNameIn = "fGroups", slotNameOut = "fGroups",
                         paramClass = "PredictToxParam", param = param, ...)
@@ -634,13 +647,13 @@ setMethod("predictRespFactorsP", "workflow", function(obj, param = NULL, ..., ca
     #                     slotNameOut = "formulas", paramClass = "PredictRespFactorsParam",
     #                     param = param, ...)
     # }
-    if (!is.null(obj@compounds))
+    if (wfHasSlot(obj, "compounds"))
     {
         obj <- doWfStep(obj, func = "predictRespFactorsP", slotNameIn = c("compounds", "fGroups"),
                         slotNameOut = "compounds", paramClass = "PredictRespFactorsParam", param = param,
                         inputs = list(calibrants = calibrants), ...)
     }
-    if (!is.null(obj@fGroups) && isScreening(obj@fGroups))
+    if (wfHasScreeningFGroups(obj))
     {
         obj <- doWfStep(obj, func = "predictRespFactorsP", slotNameIn = "fGroups", slotNameOut = "fGroups",
                         paramClass = "PredictRespFactorsParam", param = param,

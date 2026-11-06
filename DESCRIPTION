@@ -351,6 +351,7 @@ Collate:
     'utils-plot.R'
     'utils-progress.R'
     'utils-sets.R'
+    'utils-workflow.R'
     'utils-xcms.R'
     'workflow.R'
     'workflow-set.R'

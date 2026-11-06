@@ -916,15 +916,16 @@ NULL
 #' @param output Should be \code{"fill"}, \code{"pad"} or \code{"raw"}. Internally, EIC data is compressed by omitting
 #'   any zero intensity data points. If \code{output="fill"} then the zero intensity points are re-added to obtain
 #'   continuous chromatograms. If \code{output="pad"} then zero intensity points are only re-added that surround others,
-#'   which is sufficient for \emph{e.g.} plotting. If \code{output="raw"} then the original compressed data is returned.
+#'   which is sufficient for \emph{e.g.} plotting. If \code{output="raw"} then the original compressed data is returned,
+#'   including additional information such as \emph{m/z} values (only supported for \code{MSLevel == 1}).
 #' @param MSLevel The MS level of the data to be used for EIC generation. This should be \samp{1} or \samp{2}.
-#'
-#' @template minIntensityIMS-arg
-#'
 #' @param analysis A \code{character} vector with the analyses for which EICs should be generated.
 #' @param groupName A \code{character} vector with the names of the feature groups for which EICs should be generated.
-#' @template EICParams-arg
 #' @param \dots For the \code{data.frame} method: further arguments passed to the \code{data.table} method.
+#'
+#' @template fixedIso-arg
+#' @template minIntensityIMS-arg
+#' @template EICParams-arg
 #'
 #' @return A \code{list} with for each analysis a \code{list} with EIC data. For the \code{data.table} and
 #'   \code{data.frame} methods the EICs are ordered according to the rows in \code{ranges}. For the \code{features} and

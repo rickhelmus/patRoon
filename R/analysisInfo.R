@@ -127,6 +127,9 @@ setMethod("getEICs", "data.table", function(obj, ranges, maxGap = 10, output = "
     assertFixedIsoArg(fixedIsolationWidth, add = ac)
     checkmate::reportAssertions(ac)
     
+    if (output == "raw" && MSLevel != 1)
+        stop("Raw output is only supported for MSLevel == 1", call. = FALSE)
+    
     if (checkmate::testDataFrame(ranges))
         ranges <- rep(list(as.data.table(ranges)), nrow(obj))
     

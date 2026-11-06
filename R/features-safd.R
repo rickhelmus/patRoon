@@ -189,5 +189,5 @@ setMethod("findFeaturesPSAFD", "data.frame", function(obj, param, ...)
 
 setMethod("findFeaturesP", c("data.frame", "FeaturesSAFDParam"), function(obj, param, ...)
 {
-    do.call(findFeaturesSAFD, c(list(obj), prepAndVerifyParamForCall(param, "FeaturesSAFDParam", ..., exOptToDots = TRUE)))
+    do.call(findFeaturesSAFD, c(list(obj), prepAndVerifyParamForCall(param, "FeaturesSAFDParam", ..., exOptsToDots = TRUE)))
 })

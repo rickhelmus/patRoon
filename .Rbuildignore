@@ -34,3 +34,4 @@
 ^LICENSES$
 ^REUSE.toml$
 ^tools/update-license-header.R$
+^\.posit/assistant$

@@ -183,7 +183,7 @@ setMethod("findFeaturesPKPIC2", "data.frame", function(obj, param, ...)
 
 setMethod("findFeaturesP", c("data.frame", "FeaturesKPIC2Param"), function(obj, param, ...)
 {
-    do.call(findFeaturesKPIC2, c(list(obj), prepAndVerifyParamForCall(param, "FeaturesKPIC2Param", ..., exOptToDots = TRUE)))
+    do.call(findFeaturesKPIC2, c(list(obj), prepAndVerifyParamForCall(param, "FeaturesKPIC2Param", ..., exOptsToDots = TRUE)))
 })
 
 #' Imports features from KPIC2

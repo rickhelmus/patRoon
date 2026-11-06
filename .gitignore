@@ -40,3 +40,4 @@ src/patRoon.so
 .gitignore
 .DS_Store
 .vscode
+.posit/assistant

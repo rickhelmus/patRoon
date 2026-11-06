@@ -45,6 +45,7 @@
 - newProject()
     - reportCSV/reportPDF, DA method saving and recalibration: just use wfWrap()
 - better handle errors where the user supplies objects through ... (MSPeakLists etc) that are automatically filled in from slots (eg generateComponentsNet())
+- also record steps not from wrappers? Mainly wfWrap() Just informative
     
 
 ## Params

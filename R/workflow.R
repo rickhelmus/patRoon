@@ -47,13 +47,16 @@ workflow <- setClass("workflow", slots = c(analysisInfo = "data.table", features
                                            fGroups = "featureGroupsOpt", MSPeakLists = "MSPeakListsOpt",
                                            formulas = "formulasOpt", compounds = "compoundsOpt",
                                            components = "componentsOpt", TPs = "transformationProductsOpt",
-                                           templateDir = "character", steps = "data.table"))
+                                           templateDir = "character", steps = "data.table", dryRun = "logical"))
 
-setMethod("initialize", "workflow", function(.Object, analysisInfo, ...)
+setMethod("initialize", "workflow", function(.Object, analysisInfo, dryRun = FALSE, ...)
 {
     # UNDONE: make anaInfo optional? --> at least if features are given
     # UNDONE: don't store anaInfo and only keep it in features?
     # UNDONE(?): if only fGroups are given, derive features/anaInfo from that. If only features, derive anaInfo from that
+
+    checkmate::assertFlag(dryRun)
+    .Object@dryRun <- dryRun
     
     .Object@steps <- data.table(func = character(), paramClass = character(),
                                 param = list(), slotNameIn = list(),

@@ -56,8 +56,9 @@ doWfStep <- function(object, func, slotNameIn, slotNameOut, paramClass, param = 
     param <- resolved$param
     inputs <- c(inputs, resolved$functionInputs)
 
-    slot(object, slotNameOut) <- doWfStepFunc(func, sapply(slotNameIn, slot, object = object, simplify = FALSE), param,
-                                              inputs = inputs, setFirstArgObj = setFirstArgObj)
+    if (!object@dryRun)
+        slot(object, slotNameOut) <- doWfStepFunc(func, sapply(slotNameIn, slot, object = object, simplify = FALSE), param,
+                                                  inputs = inputs, setFirstArgObj = setFirstArgObj)
     
     step <- data.table(func = func, paramClass = paramClass, param = list(param),
                        slotNameIn = list(slotNameIn), slotNameOut = slotNameOut,
@@ -93,21 +94,29 @@ doWfFeatSet <- function(object, func, slotNameIn, slotNameOut, paramClass, param
     inputs <- c(inputs, resolved$functionInputs)
     
     stepRows <- list()
-    object@setObjects[sets] <- Map(sets, setObjects(object)[sets], f = function(sn, so)
+    if (object@dryRun)
     {
-        if (is.null(so[[slotNameIn]]))
-            warning(sprintf("No %s available in set '%s'", slotNameIn, sn), call. = FALSE)
-        else
+        stepRows <- lapply(sets, \(sn) data.table(func = func, paramClass = paramClass, param = list(param),
+                                                  slotNameIn = list(slotNameIn), slotNameOut = slotNameOut, set = sn))
+    }
+    else
+    {
+        object@setObjects[sets] <- Map(sets, setObjects(object)[sets], f = function(sn, so)
         {
-            so[[slotNameOut]] <- doWfStepFunc(func, setNames(so[slotNameIn], names(slotNameIn)), param,
-                                              inputs = c(inputs, resolved$inputs))
-            stepRows[[length(stepRows) + 1L]] <<- data.table(func = func, paramClass = paramClass,
-                                                             param = list(param),
-                                                             slotNameIn = list(slotNameIn),
-                                                             slotNameOut = slotNameOut, set = sn)
-        }
-        return(so)
-    })
+            if (is.null(so[[slotNameIn]]))
+                warning(sprintf("No %s available in set '%s'", slotNameIn, sn), call. = FALSE)
+            else
+            {
+                so[[slotNameOut]] <- doWfStepFunc(func, setNames(so[slotNameIn], names(slotNameIn)), param,
+                                                  inputs = c(inputs, resolved$inputs))
+                stepRows[[length(stepRows) + 1L]] <<- data.table(func = func, paramClass = paramClass,
+                                                                 param = list(param),
+                                                                 slotNameIn = list(slotNameIn),
+                                                                 slotNameOut = slotNameOut, set = sn)
+            }
+            return(so)
+        })
+    }
 
     if (length(stepRows) > 0)
         object@steps <- rbindlist(c(list(object@steps), stepRows))

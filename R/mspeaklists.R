@@ -743,11 +743,18 @@ setMethod("deconvolute", "MSPeakLists", function(obj, fGroups, MSLevel, threshol
         })
     }
     
-    correlations <- Map(names(EICs), EICs, f = function(ana, anaEICs)
+    MSMode <- if (MSLevel == 1) "MS" else "MSMS"
+    MSModeOther <- if (MSLevel == 1) "MSMS" else "MS"
+    
+    obj@peakLists <- Map(names(obj@peakLists), obj@peakLists, f = function(ana, anaPLs)
     {
-        at <- attr(anaEICs, "allXValues")
-        Map(names(anaEICs), anaEICs, f = function(grp, grpEICs)
+        at <- attr(EICs[[ana]], "allXValues")
+        Map(names(anaPLs), anaPLs, f = function(grp, plsGrp)
         {
+            if (is.null(plsGrp[[MSMode]]))
+                return(plsGrp)
+            
+            grpEICs <- EICs[[ana]][[grp]]
             grpEICs <- Map(names(grpEICs), grpEICs, f = function(id, eic)
             {
                 m <- cbind(time = at, intensity = doFillEIXIntensities(at, eic[, "time"], eic[, "intensity"]))
@@ -756,8 +763,8 @@ setMethod("deconvolute", "MSPeakLists", function(obj, fGroups, MSLevel, threshol
             eicm <- do.call(cbind, lapply(grpEICs, \(eic) eic[, "intensity"]))
             colnames(eicm) <- names(grpEICs)
             
-            spec <- getSpec(obj, grp, MSLevel, ana)
-            precID <- as.character(spec[precursor == TRUE]$ID) # NOTE: IDs are stored as strings in EIC list
+            pl <- copy(plsGrp[[MSMode]])
+            precID <- as.character(pl[precursor == TRUE]$ID) # NOTE: IDs are stored as strings in EIC list
             corrSpecPrec <- numeric()
             if (length(precID) != 0L)
             {
@@ -765,7 +772,7 @@ setMethod("deconvolute", "MSPeakLists", function(obj, fGroups, MSLevel, threshol
                 if (length(precInd) != 0L)
                     corrSpecPrec <- cor(eicm[, precInd], eicm, use = "pairwise.complete.obs")
             }
-            
+                
             corrSpec1Prec <- numeric()
             if (MSLevel == 2)
             {
@@ -774,11 +781,23 @@ setMethod("deconvolute", "MSPeakLists", function(obj, fGroups, MSLevel, threshol
                     corrSpec1Prec <- cor(eic[, "intensity"], eicm, use = "pairwise.complete.obs")
             }
             
-            if (length(corrSpecPrec) > 0 && length(corrSpec1Prec) > 0)
-                return(pmax(corrSpecPrec, corrSpec1Prec))
+            corrs <- if (length(corrSpecPrec) > 0 && length(corrSpec1Prec) > 0)
+                pmax(corrSpecPrec, corrSpec1Prec)
             else if (length(corrSpecPrec) > 0)
-                return(corrSpecPrec)
-            return(corrSpec1Prec)
+                corrSpecPrec
+            else
+                corrSpec1Prec
+            pl[, corr := corrs[, as.character(ID)]]
+            
+            plsGrp[[MSMode]] <- pl[]
+            
+            plOther <- copy(plsGrp[[MSModeOther]])
+            if (!is.null(plOther))
+            {
+                plOther[, corr := NA_real_]
+                plsGrp[[MSModeOther]] <- plOther[]
+            }
+            return(plsGrp)
         })
     })
     
@@ -786,15 +805,9 @@ setMethod("deconvolute", "MSPeakLists", function(obj, fGroups, MSLevel, threshol
     {
         if ((type == "MS" && MSLevel == 2) || (type == "MSMS" && MSLevel == 1) || is.null(ana))
             return(FALSE)
-        
-        corrs <- correlations[[ana]][[grp]]
-        if (length(corrs) == 0)
-            return(FALSE)
-        
-        return(!pl$ID %in% colnames(corrs)[corrs >= threshold])
-    })
+        return(pl$corr < threshold)
+    }, reAverage = TRUE)
     
-    ret <- averageMSPeakLists(ret)
     saveCacheData("deconvoluteMSPeakLists", ret, hash)
     
     return(ret)
@@ -871,33 +884,20 @@ setMethod("plotSpectrumHash", "MSPeakLists", function(obj, groupName, analysis =
 
 #' @export
 setMethod("plotChroms", "MSPeakLists", function(obj, fGroups, groupName, analysis = NULL, MSLevel = 1,
-                                                MSPLEICParams = getDefMSPLEICParams(),
-                                                retMin = FALSE, title = NULL, showLegend = TRUE, IMS = "maybe",
-                                                xlim = NULL, ylim = NULL, EICs = NULL, ...)
+                                                MSPLEICParams = getDefMSPLEICParams(), retMin = FALSE, title = NULL,
+                                                showLegend = TRUE, xlim = NULL, ylim = NULL, EICs = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
-    checkmate::assertCharacter(groupName, any.missing = FALSE, min.len = 1, add = ac)
-    checkmate::assertCharacter(analysis, any.missing = FALSE, min.len = 1, null.ok = TRUE, add = ac)
+    checkmate::assertChoice(groupName, intersect(groupNames(obj), names(fGroups)), add = ac)
+    checkmate::assertChoice(analysis, intersect(analyses(obj), analyses(fGroups)), null.ok = TRUE, add = ac)
     checkmate::assertChoice(MSLevel, 1:2, add = ac)
     assertMSPLEICParams(MSPLEICParams, add = ac)
     checkmate::assertFlag(retMin, add = ac)
     checkmate::assertString(title, null.ok = TRUE, add = ac)
     checkmate::assertFlag(showLegend, add = ac)
-    assertIMSArg(IMS, add = ac)
     assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
-    
-    if (!identical(IMS, "both") && !setequal(groupName, names(obj)))
-        IMS <- "both" # make sure selection is always plotted
-    
-    fGroups <- prepIMSFGroupsForPlot(fGroups, IMS)
-    if (IMS != "both")
-    {
-        if (!is.null(analysis))
-            analysis <- intersect(analysis, analyses(fGroups))
-        groupName <- intersect(groupName, names(fGroups))
-    }
     
     if (is.null(title))
         title <- getMSPeakListPlotTitle(MSLevel, analysis, groupName)
@@ -919,32 +919,49 @@ setMethod("plotChroms", "MSPeakLists", function(obj, fGroups, groupName, analysi
     
     # So far only one unique groupName and one unique analysis is supported, however, these are distributed over the
     # list structure if analysis==NULL. Simplify the EICs here to a flat list
-    EICs <- unlist(EICs, recursive = FALSE) |> unlist(recursive = FALSE)
+    EICsFlat <- unlist(EICs, recursive = FALSE) |> unlist(recursive = FALSE)
     
-    if (length(EICs) == 0)
+    if (length(EICsFlat) == 0)
     {
         noDataPlot()
         return(invisible(NULL))
     }
     
+    # figure out relevant spectral data and make sure EICs are mz sorted
+    EICMeta <- rbindlist(lapply(names(EICs), function(ana)
+    {
+        rbindlist(lapply(names(EICs[[ana]]), \(grp)
+        {
+            data.table(analysis = ana, group = grp, ID = as.integer(names(EICs[[ana]][[grp]])))
+        }))
+    }))
+    MSMode <- if (MSLevel == 1) "MS" else "MSMS"
+    tab <- as.data.table(obj, averaged = FALSE)[group %chin% groupName & type == MSMode]
+    tab <- subsetDTColumnsIfPresent(tab, c("analysis", "group", "ID", "mz", "precursor", "corr"))
+    EICSpec <- merge(EICMeta, tab, by = c("analysis", "group", "ID"), all.x = TRUE, sort = FALSE)
+    EICSpec[, sortedOrder := seq_len(.N)]
+    setorderv(EICSpec, "mz")
+    EICFlat <- EICsFlat[EICSpec$sortedOrder]
+    
     # prepare EICs for plotting
     if (retMin)
     {
-        EICs <- lapply(EICs, function(ea)
+        EICsFlat <- lapply(EICsFlat, function(ea)
         {
             eg[, "time"] <- eg[, "time"] / 60
             return(eg)
         })
     }
     
-    cols <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(EICs))
+    cols <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(EICsFlat))
     
     if (showLegend)
     {
-        spec <- getSpec(obj, groupName, MSLevel, analysis)
-        legTxts <- sprintf("%.4f", spec$mz)
-        if (any(spec$precursor))
-            legTxts[spec$precursor] <- paste0(legTxts[spec$precursor], " (precursor)")
+        legTxts <- sprintf("%.4f", EICSpec$mz)
+        if (!is.null(EICSpec[["corr"]]))
+            legTxts <- paste(legTxts, sprintf("(r: %.2f)", EICSpec$corr))
+        if (any(EICSpec$precursor))
+            legTxts[EICSpec$precursor] <- paste(legTxts[EICSpec$precursor], "(precursor)")
         
         makeLegend <- function(x, y, ...)
         {
@@ -960,14 +977,14 @@ setMethod("plotChroms", "MSPeakLists", function(obj, fGroups, groupName, analysi
     }
     
     if (is.null(xlim))
-        xlim <- range(unlist(lapply(EICs, \(ea) range(ea[, "time"]))))
+        xlim <- range(unlist(lapply(EICsFlat, \(ea) range(ea[, "time"]))))
     if (is.null(ylim))
-        ylim <- c(0, max(unlist(lapply(EICs, \(ea) max(ea[, "intensity"])))))
+        ylim <- c(0, max(unlist(lapply(EICsFlat, \(ea) max(ea[, "intensity"])))))
     
     plot(0, type = "n", main = title, xlab = xlab, ylab = "Intensity", xlim = xlim, ylim = ylim, ...)
     
-    for (i in seq_along(EICs))
-        lines(EICs[[i]][, "time"], EICs[[i]][, "intensity"], col = cols[i])
+    for (i in seq_along(EICsFlat))
+        lines(EICsFlat[[i]][, "time"], EICsFlat[[i]][, "intensity"], col = cols[i])
     
     if (showLegend)
         makeLegend(par("usr")[2], par("usr")[4])

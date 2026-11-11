@@ -5,6 +5,7 @@
 - move predictTox() and predictToxP() generic docs to pred-tox
 - docs/NEWS/tests
     - new suspect input (string, TPs): add tests, check if docs are correctly updated, add to handbook?, add to NEWS, also check sets, TP gen, iSTDs, ...
+    - MF compounds with TD database: test, update eg newProject() and Handbook, add to NEWS
 
 # workflow
 

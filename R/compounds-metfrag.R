@@ -484,7 +484,11 @@ MFMPErrorHandler <- function(cmd, exitStatus, retries)
 #'   \option{FragmentPeakMatchAbsoluteMassDeviation} option.
 #' @param database Compound database to use. Valid values are: \code{"pubchem"}, \code{"chemspider"},
 #'   \code{"for-ident"}, \code{"comptox"}, \code{"pubchemlite"}, \code{"kegg"}, \code{"sdf"}, \code{"psv"} and
-#'   \code{"csv"}. See section below for more information. Sets the \code{MetFragDatabaseType} option.
+#'   \code{"csv"}. Alternatively, a \code{\link{transformationProductsStructure}} object can be supplied, which is
+#'   automatically converted to a temporary MetFrag CSV database. See section below for more information. Sets the
+#'   \code{MetFragDatabaseType} option.
+#' @param includeParents If \code{database} is a \code{\link{transformationProductsStructure}} object, include its parent
+#'   compounds in the MetFrag database when set to \code{TRUE}.
 #' @param extendedPubChem If \code{database="pubchem"}: whether to use the \emph{extended} database that includes
 #'   information for compound scoring (\emph{i.e.} number of patents/PubMed references). Note that downloading
 #'   candidates from this database might take extra time. Valid values are: \code{FALSE} (never use it), \code{TRUE}
@@ -550,6 +554,10 @@ MFMPErrorHandler <- function(cmd, exitStatus, retries)
 #'   the \code{LocalDatabasePath} value via the \code{extraOpts} argument. For example: \code{extraOpts =
 #'   list(LocalDatabasePath = "C:/myDB.csv")}.
 #'
+#'   Alternatively, a \code{\link{transformationProductsStructure}} object can be supplied as \code{database}. It is
+#'   converted to a temporary CSV database automatically, and \code{includeParents} controls whether its parents are
+#'   included.
+#'
 #'   If \code{database="pubchemlite"} or \code{database="comptox"} and \pkg{patRoonExt} is \emph{not} installed then the
 #'   file location must be specified as above or by setting the
 #'   \code{patRoon.path.MetFragPubChemLite}/\code{patRoon.path.MetFragCompTox} option. See the installation section in
@@ -594,7 +602,8 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
                                                                 preProcessingFilters = c("UnconnectedCompoundFilter", "IsotopeFilter"),
                                                                 postProcessingFilters = c("InChIKeyFilter"),
                                                                 maxCandidatesToStop = 2500, identifiers = NULL,
-                                                                extraOpts = NULL, minIMSSpecSim = 0)
+                                                                extraOpts = NULL, minIMSSpecSim = 0,
+                                                                includeParents = FALSE)
 {
     if (method == "R")
         checkPackage("metfRag", "c-ruttkies/MetFragR")
@@ -609,8 +618,11 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
     aapply(checkmate::assertCount, . ~ timeoutRetries + errorRetries, fixed = list(add = ac))
     aapply(checkmate::assertCount, . ~ topMost + maxCandidatesToStop, positive = TRUE, fixed = list(add = ac))
     checkmate::assertString(chemSpiderToken, add = ac)
-    checkmate::assertChoice(database, c("pubchem", "chemspider", "kegg", "for-ident", "sdf", "psv", "csv",
-                                        "comptox", "pubchemlite"), add = ac)
+    checkmate::assert(checkmate::checkClass(database, "transformationProductsStructure"),
+                      checkmate::checkChoice(database, c("pubchem", "chemspider", "kegg", "for-ident", "sdf",
+                                                         "psv", "csv", "comptox", "pubchemlite")),
+                        .var.name = "database", add = ac)
+    checkmate::assertFlag(includeParents, add = ac)
     checkmate::assert(checkmate::checkFlag(extendedPubChem),
                       checkmate::checkChoice(extendedPubChem, "auto"),
                       .var.name = "extendedPubChem")
@@ -620,6 +632,17 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
     aapply(checkmate::assertList, . ~ identifiers + extraOpts, any.missing = FALSE,
            names = "unique", null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertNumber(minIMSSpecSim, lower = 0, add = ac)
+
+    if (inherits(database, "transformationProductsStructure"))
+    {
+        databaseTPs <- database
+        database <- "csv"
+        extDB <- tempfile("MetFragTPDatabase", fileext = ".csv")
+        convertToMFDB(databaseTPs, out = extDB, includeParents = includeParents)
+        if (is.null(extraOpts))
+            extraOpts <- list()
+        extraOpts$LocalDatabasePath <- extDB
+    }
 
     compsScores <- compoundScorings("metfrag", database)
     isLocalDB <- isLocalMetFragDB(database)

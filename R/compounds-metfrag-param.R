@@ -66,10 +66,12 @@ getCompoundsMetFragParamDefs <- paramConfigDefsFact(list(
     ),
     database = list(
         default = "pubchemlite",
-        description = "Compound database to use",
-        type = "choice",
-        typeCheckArgs = list(choices = c("pubchem", "chemspider", "kegg", "for-ident", "sdf", "psv",
-                                         "csv", "comptox", "pubchemlite"))
+        description = "Database to be used for compound candidate retrieval"
+    ),
+    includeParents = list(
+        default = FALSE,
+        description = "Include parents when transformation products are used as the database",
+        type = "flag"
     ),
     extendedPubChem = list(
         default = "auto",
@@ -152,6 +154,10 @@ setValidity("CompoundsMetFragParam", function(object)
     checkmate::assert(checkmate::checkFlag(parsFilled$extendedPubChem),
                       checkmate::checkChoice(parsFilled$extendedPubChem, "auto"),
                       .var.name = "extendedPubChem", add = ac)
+    checkmate::assert(checkmate::checkClass(parsFilled$database, "transformationProductsStructure"),
+                      checkmate::checkChoice(parsFilled$database, c("pubchem", "chemspider", "kegg", "for-ident", "sdf",
+                                                                    "psv", "csv", "comptox", "pubchemlite")),
+                      .var.name = "database", add = ac)
     OK <- tryCatch(checkmate::reportAssertions(ac), error = function(e) e)
     return(OK)
 })

@@ -276,11 +276,12 @@ importParam <- function(type, inFile)
     return(ret)
 }
 
-#' Export all parameter classes with their default values
+#' Export all parameter classes with their default values or workflow parameters
 #'
 #' Discovers all concrete classes derived from the internal param class,
-#' constructs each class with its defaults, and exports it using the same format
-#' as export for an individual parameter object.
+#' constructs each class with its defaults or uses its recorded parameters from
+#' a workflow, and exports it using the same format as export for an individual
+#' parameter object.
 #'
 #' Files are written below outDir, in the sub-directory specified by
 #' each object's subDir slot. Their names are constructed from the baseName
@@ -289,6 +290,9 @@ importParam <- function(type, inFile)
 #' @param type The output format: R, json, or yaml.
 #' @param outDir The root output directory. Defaults to the current working
 #'   directory.
+#' @param workflow Optional workflow object whose recorded parameters should be
+#'   exported instead of defaults. If a parameter class was recorded more than
+#'   once, the first recorded object is exported and a warning is issued.
 #'
 #' @return Invisibly, a character vector with the paths of the files written.
 #' @export
@@ -302,11 +306,11 @@ exportAllParams <- function(type = "R", outDir = file.path(getwd(), "config"), o
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ overwrite, clear, fixed = list(add = ac))
     checkmate::assertChoice(type, c("R", "json", "yaml"), add = ac)
-    checkmate::assertPathForOutput(outDir, overwrite = overwrite, add = ac)
+    checkmate::assertPathForOutput(outDir, overwrite = overwrite || clear, add = ac)
     checkmate::assertClass(workflow, "workflow", null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    if (overwrite && clear && dir.exists(outDir))
+    if (clear && dir.exists(outDir))
         unlink(outDir, recursive = TRUE)
 
     getSubclasses <- function(className)
@@ -323,16 +327,27 @@ exportAllParams <- function(type = "R", outDir = file.path(getwd(), "config"), o
 
     if (!is.null(workflow))
     {
-        classes <- classes[classes %in% steps(workflow)$paramClass]
+        wfSteps <- copy(steps(workflow))
+        classes <- classes[classes %in% wfSteps$paramClass]
         if (length(classes) == 0)
             stop("No parameter classes found for the specified workflow", call. = FALSE)
+
+        wfSteps[, pHash := sapply(param, \(p) if (is.null(p)) NA else makeHash(p@data))]
+        wfStepsUn <- unique(wfSteps, by = c("paramClass", "pHash"))
+        duplicateClasses <- wfStepsUn[duplicated(paramClass)]$paramClass
+
+        if (length(duplicateClasses) > 0)
+            warning(sprintf("Multiple parameter objects recorded for %s; exporting the first recorded object for each class",
+                            paste(duplicateClasses, collapse = ", ")), call. = FALSE)
+
+        workflowParams <- sapply(classes, \(cn) wfSteps$param[[match(cn, wfSteps$paramClass)]], simplify = FALSE)
     }
     
     ext <- if (type == "yaml") "yml" else type
     files <- character(length(classes))
     for (i in seq_along(classes))
     {
-        obj <- new(classes[[i]], configDir = NULL)
+        obj <- if (is.null(workflow)) new(classes[[i]], configDir = NULL) else workflowParams[[classes[[i]]]]
         dir <- file.path(outDir, obj@subDir)
         if (!dir.exists(dir) && !dir.create(dir, recursive = TRUE))
             stop(sprintf("Unable to create output directory '%s'", dir), call. = FALSE)

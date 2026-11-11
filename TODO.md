@@ -74,7 +74,9 @@
     - these should be specified and cannot be default
     - but moving them to params could be interesting when using the same method often
     - somehow have non-default params?
-- FilterFeatGroupsParam: does the constructor properly handle configDir?
+- FilterFeatGroupsParam/FilterMSPeakListsParam
+    - handle results/annotatedBy differently?
+    - somehow set ^ in workflow pipelines easily?
 
 
 ## NEWS / docs

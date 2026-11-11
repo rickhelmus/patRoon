@@ -700,10 +700,10 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
 
 #' @rdname filter
 #' @export
-setMethod("filterP", "MSPeakLists", function(obj, param = NULL, ...)
+setMethod("filterP", "MSPeakLists", function(obj, param = NULL, ..., annotatedBy = NULL)
 {
-    do.call(filter, c(list(obj),
-                      prepAndVerifyParamForCall(param, "FilterMSPeakListsParam", ..., exOptsToDots = TRUE)))
+    do.call(filter, c(list(obj, annotatedBy = annotatedBy),
+                      prepAndVerifyParamForCall(param, "FilterMSPeakListsParam", ...)))
 })
 
 #' @describeIn MSPeakLists Plots a spectrum using MS or MS/MS peak lists for a given feature group. Two spectra can be

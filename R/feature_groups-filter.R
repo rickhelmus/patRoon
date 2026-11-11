@@ -691,7 +691,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                       .var.name = "results")
     aapply(checkmate::assertFlag, . ~ withIMSPrecursor + removeBlanks + removeISTDs + removeNA + negate, fixed = list(add = ac))
     if (!is.logical(checkFeaturesSession))
-        assertCheckSession(checkFeaturesSession, mustExist = TRUE,  null.ok = TRUE, add = ac)
+        assertCheckSession(checkFeaturesSession, mustExist = TRUE, null.ok = TRUE, add = ac)
     assertPredAggrParams(predAggrParams, add = ac)
     assertApplyIMSArg(applyIMS, add = ac)
     checkmate::reportAssertions(ac)
@@ -773,9 +773,9 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
 
 #' @rdname feature-filtering
 #' @export
-setMethod("filterP", "featureGroups", function(obj, param = NULL, ...)
+setMethod("filterP", "featureGroups", function(obj, param = NULL, ..., results = NULL)
 {
-    do.call(filter, c(list(obj), prepAndVerifyParamForCall(param, "FilterFeatGroupsParam", ..., exOptsToDots = TRUE)))
+    do.call(filter, c(list(obj, results = results), prepAndVerifyParamForCall(param, "FilterFeatGroupsParam", ...)))
 })
 
 #' @param \dots \setsPassedArgs1{featureGroups}

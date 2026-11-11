@@ -128,9 +128,12 @@ setValidity("param", function(object)
             normalizationMethod = assertNormalizationMethod,
             IMS = assertIMSArg,
             IMSMatchParams = assertIMSMatchParams,
+            IMSRangeParams = assertIMSRangeParams,
+            applyIMS = assertApplyIMSArg,
             CCSParams = assertCCSParams,
             TPStructParams = assertTPStructParams,
-            concUnit = assertConcUnit
+            concUnit = assertConcUnit,
+            predAggrParams = assertPredAggrParams
         )
         
         if (is.null(cmfunc))

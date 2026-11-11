@@ -553,11 +553,15 @@ doWfFilter <- function(obj, slotName, paramClass, param = NULL, ...)
 
 #' @rdname feature-filtering
 setMethod("filterP", c("workflow", "FilterFeatGroupsParam"),
-          \(obj, param = NULL, ...) doWfFilter(obj, slotName = "fGroups", paramClass = "FilterFeatGroupsParam", param = param, ...))
+          \(obj, param = NULL, ..., results = NULL) doWfFilter(obj, slotName = "fGroups",
+                                                               paramClass = "FilterFeatGroupsParam", param = param,
+                                                               inputs = list(results = results), ...))
 
 #' @rdname MSPeakLists-class
 setMethod("filterP", c("workflow", "FilterMSPeakListsParam"),
-          \(obj, param = NULL, ...) doWfFilter(obj, slotName = "MSPeakLists", paramClass = "FilterMSPeakListsParam", param = param, ...))
+          \(obj, param = NULL, ..., annotatedBy = NULL) doWfFilter(obj, slotName = "MSPeakLists",
+                                                                   paramClass = "FilterMSPeakListsParam", param = param,
+                                                                   inputs = list(annotatedBy = annotatedBy), ...))
 
 
 #' @rdname suspect-screening

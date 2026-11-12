@@ -342,7 +342,9 @@ setMethod("filter", "features", function(obj, absMinIntensity = NULL, relMinInte
 #' @export
 setMethod("filterP", "features", function(obj, param = NULL, ...)
 {
-    do.call(filter, c(list(obj), prepAndVerifyParamForCall(param, "FilterFeaturesParam", ...)))
+    param <- prepAndVerifyParamForCall(param, "FilterFeaturesParam", ...)
+    param <- param[names(param) != "sets"]
+    do.call(filter, c(list(obj), param))
 })
 
 #' @describeIn features Subset on analyses.

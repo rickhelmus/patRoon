@@ -224,6 +224,24 @@ getFilterFeatGroupsParamDefs <- paramConfigDefsFact(list(
         description = "Remove feature groups with missing aggregated predictions",
         type = "flag"
     ),
+    sets = list(
+        default = NULL,
+        description = "Sets to keep",
+        type = "sets",
+        typeCheckArgs = list(multiple = TRUE)
+    ),
+    absMinSets = list(
+        default = NULL,
+        description = "Minimum absolute number of sets with feature group data",
+        type = "number",
+        typeCheckArgs = list(null.ok = TRUE, lower = 0, finite = TRUE)
+    ),
+    relMinSets = list(
+        default = NULL,
+        description = "Minimum relative number of sets with feature group data",
+        type = "number",
+        typeCheckArgs = list(null.ok = TRUE, lower = 0, finite = TRUE)
+    ),
     negate = list(
         default = FALSE,
         description = "Apply filters in the opposite manner",

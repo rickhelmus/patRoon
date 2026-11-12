@@ -53,6 +53,12 @@ getFilterFeaturesParamDefs <- paramConfigDefsFact(list(
         default = NULL,
         description = "Feature quality or score ranges"
     ),
+    sets = list(
+        default = NULL,
+        description = "Sets to keep",
+        type = "sets",
+        typeCheckArgs = list(multiple = TRUE)
+    ),
     negate = list(
         default = FALSE,
         description = "Apply filters in the opposite manner",

@@ -149,6 +149,13 @@ setMethod("filter", "featuresSet", function(obj, ..., negate = FALSE, sets = NUL
     return(obj)
 })
 
+#' @rdname feature-filtering
+#' @export
+setMethod("filterP", "featuresSet", function(obj, param = NULL, ...)
+{
+    do.call(filter, c(list(obj), prepAndVerifyParamForCall(param, "FilterFeaturesParam", ...)))
+})
+
 #' @rdname makeSet
 #' @export
 setMethod("makeSet", "features", function(obj, ..., adducts, labels = NULL)

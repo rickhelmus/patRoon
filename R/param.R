@@ -123,6 +123,7 @@ setValidity("param", function(object)
             count = checkmate::assertCount,
             "function" = \(x, ...) match.fun(x),
             range = assertRange,
+            sets = assertSets,
             EICParams = assertEICParams,
             specSimParams = assertSpecSimParams,
             normalizationMethod = assertNormalizationMethod,

@@ -775,6 +775,15 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
 #' @export
 setMethod("filterP", "featureGroups", function(obj, param = NULL, ..., results = NULL)
 {
+    param <- prepAndVerifyParamForCall(param, "FilterFeatGroupsParam", ...)
+    param <- param[names(param) != c("sets", "absMinSets", "relMinSets")]
+    do.call(filter, c(list(obj, results = results), param))
+})
+
+#' @rdname feature-filtering
+#' @export
+setMethod("filterP", "featureGroupsSet", function(obj, param = NULL, ..., results = NULL)
+{
     do.call(filter, c(list(obj, results = results), prepAndVerifyParamForCall(param, "FilterFeatGroupsParam", ...)))
 })
 

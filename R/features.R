@@ -339,6 +339,12 @@ setMethod("filter", "features", function(obj, absMinIntensity = NULL, relMinInte
     return(obj)
 })
 
+#' @export
+setMethod("filterP", "features", function(obj, param = NULL, ...)
+{
+    do.call(filter, c(list(obj), prepAndVerifyParamForCall(param, "FilterFeaturesParam", ...)))
+})
+
 #' @describeIn features Subset on analyses.
 #' @templateVar ex fList
 #' @template feat-subset

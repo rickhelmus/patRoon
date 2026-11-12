@@ -552,10 +552,20 @@ doWfFilter <- function(obj, slotName, paramClass, param = NULL, ...)
 }
 
 #' @rdname feature-filtering
+setMethod("filterP", c("workflow", "FilterFeaturesParam"),
+          \(obj, param = NULL, ...) doWfFilter(obj, slotName = "features", paramClass = "FilterFeaturesParam",
+                                               param = param, ...))
+
+#' @rdname feature-filtering
 setMethod("filterP", c("workflow", "FilterFeatGroupsParam"),
           \(obj, param = NULL, ..., results = NULL) doWfFilter(obj, slotName = "fGroups",
                                                                paramClass = "FilterFeatGroupsParam", param = param,
                                                                inputs = list(results = results), ...))
+
+#' @rdname featureGroupsScreening-class
+setMethod("filterP", c("workflow", "FilterFeatGroupsScreeningParam"),
+          \(obj, param = NULL, ...) doWfFilter(obj, slotName = "fGroups", paramClass = "FilterFeatGroupsScreeningParam",
+                                               param = param, ...))
 
 #' @rdname MSPeakLists-class
 setMethod("filterP", c("workflow", "FilterMSPeakListsParam"),

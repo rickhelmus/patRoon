@@ -459,10 +459,10 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
     aapply(checkmate::assertFlag, . ~ onlyHits + selectBestFGroups + negate, null.ok = c(TRUE, FALSE, FALSE), fixed = list(add = ac))
     assertIMSMatchParams(IMSMatchParams, null.ok = TRUE, add = ac)
     checkmate::assertChoice(selectHitsBy, choices = c("intensity", "level"), null.ok = TRUE, add = ac)
-    aapply(checkmate::assertCount, . ~ maxLevel + maxFormRank + maxCompRank + absMinFragMatches + relMinFragMatches,
+    aapply(checkmate::assertCount, . ~ maxLevel + maxFormRank + maxCompRank + absMinFragMatches,
            null.ok = TRUE, fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ minAnnSimForm + minAnnSimComp + minAnnSimBoth + minRF + maxLC50, null.ok = TRUE,
-           fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ minAnnSimForm + minAnnSimComp + minAnnSimBoth + relMinFragMatches + minRF + maxLC50,
+           null.ok = TRUE, lower = 0, finite = TRUE, fixed = list(add = ac))
     assertApplyIMSArg(applyIMS, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -474,6 +474,13 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
         obj <- callNextMethod(obj, ..., negate = negate, applyIMS = applyIMS)
     
     return(obj)
+})
+
+#' @export
+setMethod("filterP", "featureGroupsScreening", function(obj, param = NULL, ..., results = NULL)
+{
+    do.call(filter, c(list(obj, results = results), prepAndVerifyParamForCall(param,
+        "FilterFeatGroupsScreeningParam", ...)))
 })
 
 #' @param fromSuspects If \code{TRUE} then mobilities values are directly copied from suspect list data (if available).

@@ -34,6 +34,7 @@ getMSPeakListsParamDefs <- paramConfigDefsFact(list(
     )
 ))
 
+#' @export
 MSPeakListsParam <- setClass("MSPeakListsParam", contains = "param")
 setMethod("initialize", "MSPeakListsParam", function(.Object, ...)
 {

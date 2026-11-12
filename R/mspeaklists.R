@@ -946,7 +946,7 @@ setMethod("plotChroms", "MSPeakLists", function(obj, fGroups, groupName, analysi
     # prepare EICs for plotting
     if (retMin)
     {
-        EICsFlat <- lapply(EICsFlat, function(ea)
+        EICsFlat <- lapply(EICsFlat, function(eg)
         {
             eg[, "time"] <- eg[, "time"] / 60
             return(eg)

@@ -6,6 +6,7 @@ fGroups <- getTestFGroups(getTestAnaInfoAnn())[, 1:100]
 ovFGroup <- names(overlap(fGroups, which = c("positive", "negative"), aggregate = "set"))[1]
 plists <- generateMSPeakLists(fGroups)
 plistsMSMS <- filter(plists, withMSMS = TRUE)
+plistsDC <- deconvolute(plists, fGroups, MSLevel = 1, threshold = 0.9)
 
 # disabled: deprecated
 if (doDATests() && FALSE)
@@ -308,8 +309,7 @@ test_that("basic functionality", {
     checkmate::expect_names(names(as.data.table(plists, fGroups = fGroups)),
                             must.include = c("ret", "group_mz"))
     
-    expect_lt(length(deconvolute(plists, fGroups, MSLevel = 1, threshold = 0.9)),
-              length(deconvolute(plists, fGroups, MSLevel = 1, threshold = 0.2)))
+    expect_lt(length(plistsDC), length(deconvolute(plists, fGroups, MSLevel = 1, threshold = 0.2)))
 })
 
 testSpecSim <- function(obj, groupName1, groupName2, ..., expectNA = FALSE, expectOne = FALSE)
@@ -453,6 +453,19 @@ test_that("plotting works", {
     expect_doppel("mspl-spec_sim-avg-msms", function() plotSpectrum(plistsMSMS,
                                                                     groupName = c(groupNames(plistsMSMS)[14], groupNames(plistsMSMS)[15]),
                                                                     MSLevel = 2))
+    
+    expect_doppel("mspl-chroms", function() plotChroms(plistsMSMS, fGroups, groupName = groupNames(plistsMSMS)[1],
+                                                       MSLevel = 1))
+    expect_doppel("mspl-chroms_ana", function() plotChroms(plistsMSMS, fGroups, groupName = groupNames(plistsMSMS)[1],
+                                                           analysis = analyses(plistsMSMS)[1], MSLevel = 1))
+    expect_doppel("mspl-chroms-ms2", function() plotChroms(plistsMSMS, fGroups, groupName = groupNames(plistsMSMS)[1],
+                                                           MSLevel = 2))
+    expect_doppel("mspl-chroms-rtmin", function() plotChroms(plistsMSMS, fGroups, groupName = groupNames(plistsMSMS)[1],
+                                                             retMin = TRUE, MSLevel = 1))
+    expect_doppel("mspl-chroms-noleg", function() plotChroms(plistsMSMS, fGroups, groupName = groupNames(plistsMSMS)[1],
+                                                             showLegend = FALSE, MSLevel = 1))
+    expect_doppel("mspl-chroms-deconv", function() plotChroms(plistsDC, fGroups, groupName = groupNames(plistsDC)[1],
+                                                              MSLevel = 1))
 })
 
 fgOneEmptySet <- makeOneEmptySetFGroups(fGroups)

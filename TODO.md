@@ -2,6 +2,7 @@
 
 - getEICs()
     - doc and test new args
+    - MS2 tests
 - doc that topMost is always for feature intensities and not MSPL (UNDONE?)
 - why are simple EICs gap filled also if padding==FALSE
 - NEWS/docs

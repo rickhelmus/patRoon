@@ -27,24 +27,28 @@ getComponentsNontargetParamDefs <- paramConfigDefsFact(list(
         typeCheckArgs = list(min.chars = 1, min.len = 1, any.missing = FALSE)
     ),
     rtDev = list(
+        advanced = TRUE,
         default = defaultLim("retention", "wide"),
         description = "Retention time tolerance.",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     absMzDev = list(
+        advanced = TRUE,
         default = defaultLim("mz", "narrow"),
         description = "Absolute m/z tolerance.",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     absMzDevLink = list(
+        advanced = TRUE,
         default = defaultLim("mz", "medium"),
         description = "Absolute m/z tolerance when linking series.",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     traceHack = list(
+        advanced = TRUE,
         default = all(R.Version()[c("major", "minor")] >= c(3, 4)),
         description = "Enable workaround for nontarget::homol.search incompatibility with R > 3.3.3.",
         type = "flag"

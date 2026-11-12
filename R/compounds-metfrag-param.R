@@ -13,28 +13,33 @@ getCompoundsMetFragParamDefs <- paramConfigDefsFact(list(
         type = "specSimParams"
     ),
     method = list(
+        advanced = TRUE,
         default = "CL",
         description = "Which method should be used for MetFrag execution: 'CL' (recommended) or 'R'.",
         type = "choice",
         typeCheckArgs = list(choices = c("CL", "R"))
     ),
     timeout = list(
+        advanced = TRUE,
         default = 300,
         description = "Maximum time (in seconds) before a MetFrag query for a feature group is stopped",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     timeoutRetries = list(
+        advanced = TRUE,
         default = 2,
         description = "Maximum number of retries after reaching a timeout",
         type = "count"
     ),
     errorRetries = list(
+        advanced = TRUE,
         default = 2,
         description = "Maximum number of retries after an error occurred (e.g. connection errors).",
         type = "count"
     ),
     topMost = list(
+        advanced = TRUE,
         default = 100,
         description = "Maximum number of top ranked candidates to keep",
         type = "count",
@@ -47,89 +52,105 @@ getCompoundsMetFragParamDefs <- paramConfigDefsFact(list(
         typeCheckArgs = list(positive = TRUE)
     ),
     dbRelMzDev = list(
+        advanced = TRUE,
         default = defaultLim("mz", "narrow_rel"),
         description = "Relative mass deviation (in ppm) for database search",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     fragRelMzDev = list(
+        advanced = TRUE,
         default = defaultLim("mz", "narrow_rel"),
         description = "Relative mass deviation (in ppm) for fragment matching",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     fragAbsMzDev = list(
+        advanced = TRUE,
         default = defaultLim("mz", "narrow"),
         description = "Absolute mass deviation for fragment matching",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     database = list(
+        advanced = TRUE,
         default = "pubchemlite",
         description = "Database to be used for compound candidate retrieval"
     ),
     includeParents = list(
+        advanced = TRUE,
         default = FALSE,
         description = "Include parents when transformation products are used as the database",
         type = "flag"
     ),
     extendedPubChem = list(
+        advanced = TRUE,
         default = "auto",
         description = "Whether to use the extended PubChem database"
     ),
     chemSpiderToken = list(
+        advanced = TRUE,
         default = "",
         description = "ChemSpider security token (required when database='chemspider')",
         type = "string"
     ),
     scoreTypes = list(
+        advanced = TRUE,
         default = NULL,
         description = "Character vector defining the scoring types (set to NULL for default scoring types)",
         type = "character",
         typeCheckArgs = list(any.missing = FALSE, null.ok = TRUE)
     ),
     scoreWeights = list(
+        advanced = TRUE,
         default = 1.0,
         description = "Numeric vector containing weights of the used scoring types",
         type = "numeric",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     preProcessingFilters = list(
+        advanced = TRUE,
         default = c("UnconnectedCompoundFilter", "IsotopeFilter"),
         description = "A character vector defining pre-filters applied before fragmentation and scoring",
         type = "character",
         typeCheckArgs = list(any.missing = FALSE)
     ),
     postProcessingFilters = list(
+        advanced = TRUE,
         default = "InChIKeyFilter",
         description = "A character vector defining post-filters applied after fragmentation and scoring",
         type = "character",
         typeCheckArgs = list(any.missing = FALSE)
     ),
     minIMSSpecSim = list(
+        advanced = TRUE,
         default = 0,
         description = "Minimum spectral similarity to copy annotations from the IMS precursor",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     setThreshold = list(
+        advanced = TRUE,
         default = 0,
         description = "Minimum abundance for a candidate among all sets",
         type = "number",
         typeCheckArgs = list(lower = 0, upper = 1, finite = TRUE)
     ),
     setThresholdAnn = list(
+        advanced = TRUE,
         default = 0,
         description = "As setThreshold, but only taking sets into account in which features of the feature group are present",
         type = "number",
         typeCheckArgs = list(lower = 0, upper = 1, finite = TRUE)
     ),
     setAvgSpecificScores = list(
+        advanced = TRUE,
         default = FALSE,
         description = "If TRUE, average set specific scores (e.g. MS/MS match)",
         type = "flag"
     ),
     extraOpts = list(
+        advanced = TRUE,
         default = NULL,
         description = "Extra options passed to MetFrag as a named character list",
         type = "list",

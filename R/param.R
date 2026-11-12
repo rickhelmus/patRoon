@@ -198,16 +198,21 @@ setReplaceMethod("$", "param", function(x, name, value)
 setMethod("names", "param", function(x) names(x@definitions))
 setMethod("length", "param", function(x) length(x@definitions))
 
-setMethod("export", "param", function(obj, type, out)
+setMethod("export", "param", function(obj, type, out, advanced = TRUE)
 {
     checkmate::assertChoice(type, c("R", "json", "yaml"))
+    checkmate::assertFlag(advanced)
+    regularNames <- names(obj@definitions)[!sapply(as.list(obj@definitions), \(def) isTRUE(def$advanced))]
+    advancedNames <- setdiff(names(obj@definitions), regularNames)
     exp <- list(
         name = obj@name,
         classType = class(obj),
         version = obj@version,
         date = obj@date, # UNDONE: fix this for YAML export
-        data = obj@data
+        data = obj@data[regularNames]
     )
+    if (advanced && length(advancedNames) > 0)
+        exp$advanced <- obj@data[advancedNames]
     
     if (type != "R")
     {
@@ -228,12 +233,18 @@ setMethod("export", "param", function(obj, type, out)
         # unbox scalars
         n <- c("name", "classType", "version", "date")
         exp[n] <- lapply(exp[n], jsonlite::unbox)
-        exp$data <- Map(names(exp$data), exp$data, f = function(name, value)
+        unboxData <- function(data)
         {
-            if (obj@definitions[[name]]$type %in% c("number", "string", "flag", "choice", "count") && !is.list(value))
-                value <- tryCatch(jsonlite::unbox(value), error = \(...) NULL)
-            return(value)
-        })
+            Map(names(data), data, f = function(name, value)
+            {
+                if (!is.null(obj@definitions[[name]]$type) && obj@definitions[[name]]$type %in% c("number", "string", "flag", "choice", "count") && !is.list(value))
+                    value <- tryCatch(jsonlite::unbox(value), error = function(...) NULL)
+                return(value)
+            })
+        }
+        exp$data <- unboxData(exp$data)
+        if (!is.null(exp$advanced))
+            exp$advanced <- unboxData(exp$advanced)
         jsonlite::write_json(exp, out, pretty = TRUE)
     }
     else if (type == "yaml")
@@ -273,7 +284,7 @@ importParam <- function(type, inFile)
     ret <- new(imp$class, configDir = NULL)
     ret@version <- imp$version
     ret@date <- as.POSIXct(imp$date)
-    ret@data <- imp$data
+    ret@data <- modifyList(imp$data, imp$advanced, keep.null = TRUE)
     
     # UNDONE: handle version updates
     
@@ -302,14 +313,14 @@ importParam <- function(type, inFile)
 #' @return Invisibly, a character vector with the paths of the files written.
 #' @export
 exportAllParams <- function(type = "R", outDir = file.path(getwd(), "config"), overwrite = FALSE, clear = FALSE,
-                            workflow = NULL)
+                            workflow = NULL, advanced = TRUE)
 {
     # UNDONE: update LLM'd docs
     # UNDONE: other function name?
     # UNDONE: see why function is slow
     
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertFlag, . ~ overwrite, clear, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ overwrite, clear, advanced, fixed = list(add = ac))
     checkmate::assertChoice(type, c("R", "json", "yaml"), add = ac)
     checkmate::assertPathForOutput(outDir, overwrite = overwrite || clear, add = ac)
     checkmate::assertClass(workflow, "workflow", null.ok = TRUE, add = ac)
@@ -358,7 +369,7 @@ exportAllParams <- function(type = "R", outDir = file.path(getwd(), "config"), o
             stop(sprintf("Unable to create output directory '%s'", dir), call. = FALSE)
         
         files[[i]] <- file.path(dir, paste0(obj@baseName, ".", ext))
-        export(obj, type, files[[i]])
+        export(obj, type, files[[i]], advanced = advanced)
     }
     
     return(invisible(files))

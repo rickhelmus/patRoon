@@ -8,47 +8,56 @@ NULL
 #' @export
 getFilterComponentsParamDefs <- paramConfigDefsFact(list(
     size = list(
+        advanced = TRUE,
         default = NULL,
         description = "Component size range",
         type = "range",
         typeCheckArgs = list(null.ok = TRUE)
     ),
     adducts = list(
+        advanced = TRUE,
         default = NULL,
         description = "Adducts to keep"
     ),
     isotopes = list(
+        advanced = TRUE,
         default = NULL,
         description = "Isotope assignments to keep"
     ),
     rtIncrement = list(
+        advanced = TRUE,
         default = NULL,
         description = "Retention increment range for homologous series",
         type = "numeric",
         typeCheckArgs = list(len = 2, any.missing = FALSE, null.ok = TRUE)
     ),
     mzIncrement = list(
+        advanced = TRUE,
         default = NULL,
         description = "m/z increment range for homologous series",
         type = "numeric",
         typeCheckArgs = list(len = 2, lower = 0, any.missing = FALSE, null.ok = TRUE)
     ),
     checkComponentsSession = list(
+        advanced = TRUE,
         default = NULL,
         description = "Component check session file"
     ),
     sets = list(
+        advanced = TRUE,
         default = NULL,
         description = "Sets to keep",
         type = "sets",
         typeCheckArgs = list(multiple = TRUE)
     ),
     negate = list(
+        advanced = TRUE,
         default = FALSE,
         description = "Apply filters in the opposite manner",
         type = "flag"
     ),
     verbose = list(
+        advanced = TRUE,
         default = TRUE,
         description = "Verbose output",
         type = "flag"
@@ -89,58 +98,68 @@ setValidity("FilterComponentsParam", function(object)
 getFilterComponentsTPsParamDefs <- paramConfigDefsFact(
     list(
         retDirMatch = list(
+        advanced = TRUE,
             default = FALSE,
             description = "Require matching retention direction",
             type = "flag"
         ),
         minSpecSim = list(
+        advanced = TRUE,
             default = NULL,
             description = "Minimum spectral similarity",
             type = "number",
             typeCheckArgs = list(lower = 0, finite = TRUE, null.ok = TRUE)
         ),
         minSpecSimPrec = list(
+        advanced = TRUE,
             default = NULL,
             description = "Minimum precursor-shifted spectral similarity",
             type = "number",
             typeCheckArgs = list(lower = 0, finite = TRUE, null.ok = TRUE)
         ),
         minSpecSimBoth = list(
+        advanced = TRUE,
             default = NULL,
             description = "Minimum both-shifted spectral similarity",
             type = "number",
             typeCheckArgs = list(lower = 0, finite = TRUE, null.ok = TRUE)
         ),
         minTotFragMatches = list(
+        advanced = TRUE,
             default = NULL,
             description = "Minimum total fragment matches",
             type = "number",
             typeCheckArgs = list(lower = 0, finite = TRUE, null.ok = TRUE)
         ),
         minTotNLMatches = list(
+        advanced = TRUE,
             default = NULL,
             description = "Minimum total neutral loss matches",
             type = "number",
             typeCheckArgs = list(lower = 0, finite = TRUE, null.ok = TRUE)
         ),
         minFragMatches = list(
+        advanced = TRUE,
             default = NULL,
             description = "Minimum fragment matches",
             type = "number",
             typeCheckArgs = list(lower = 0, finite = TRUE, null.ok = TRUE)
         ),
         minNLMatches = list(
+        advanced = TRUE,
             default = NULL,
             description = "Minimum neutral loss matches",
             type = "number",
             typeCheckArgs = list(lower = 0, finite = TRUE, null.ok = TRUE)
         ),
         negate = list(
+        advanced = TRUE,
             default = FALSE,
             description = "Apply filters in the opposite manner",
             type = "flag"
         ),
         verbose = list(
+        advanced = TRUE,
             default = TRUE,
             description = "Verbose output",
             type = "flag"

@@ -84,47 +84,55 @@ getConvertMSFilesIMSCollapseParamDefs <- paramConfigDefsFact(list(
         typeCheckArgs = list(null.ok = TRUE)
     ),
     mobilityRange = list(
+        advanced = TRUE,
         default = NULL,
         description = "Ion mobility range",
         type = "range",
         typeCheckArgs = list(null.ok = TRUE)
     ),
     smoothWindow = list(
+        advanced = TRUE,
         default = 0,
         description = "Smoothing window",
         type = "count"
     ),
     halfWindow = list(
+        advanced = TRUE,
         default = 2,
         description = "Centroiding half window",
         type = "count",
         typeCheckArgs = list(positive = TRUE)
     ),
     maxGap = list(
+        advanced = TRUE,
         default = 0.005,
         description = "Maximum centroiding gap",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     clusterMethod = list(
+        advanced = TRUE,
         default = "distance_mean",
         description = "MS/MS clustering method",
         type = "choice",
         typeCheckArgs = list(choices = c("bin", "distance_mean", "distance_point", "hclust"))
     ),
     mzWindow = list(
+        advanced = TRUE,
         default = defaultLim("mz", "medium"),
         description = "MS/MS clustering m/z window",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     minIntensityIMS = list(
+        advanced = TRUE,
         default = 0,
         description = "Minimum IMS peak intensity",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     includeMSMS = list(
+        advanced = TRUE,
         default = FALSE,
         description = "Include MS/MS spectra in the export",
         type = "flag"

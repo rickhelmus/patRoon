@@ -80,47 +80,55 @@ setMethod("initialize", "FilterTPsStructureParam", function(.Object, ...)
 
 getFilterTPsAnnCompParamDefs <- paramConfigDefsFact(list(
     minFitFormula = list(
+        advanced = TRUE,
         default = 0,
         description = "Minimum formula fit",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     minFitCompound = list(
+        advanced = TRUE,
         default = 0,
         description = "Minimum compound fit",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     minSimSusp = list(
+        advanced = TRUE,
         default = 0,
         description = "Minimum suspect similarity",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     minFitCompOrSimSusp = list(
+        advanced = TRUE,
         default = c(0, 0),
         description = "Minimum compound fit OR suspect similarity",
         type = "numeric",
         typeCheckArgs = list(lower = 0, finite = TRUE, len = 2)
     ),
     minTPScore = list(
+        advanced = TRUE,
         default = 0,
         description = "Minimum TP score",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     topMost = list(
+        advanced = TRUE,
         default = NULL,
         description = "Maximum number of TPs to keep per group",
         type = "count",
         typeCheckArgs = list(positive = TRUE, null.ok = TRUE)
     ),
     verbose = list(
+        advanced = TRUE,
         default = TRUE,
         description = "Verbose output",
         type = "flag"
     ),
     negate = list(
+        advanced = TRUE,
         default = FALSE,
         description = "Apply filters in the opposite manner",
         type = "flag"

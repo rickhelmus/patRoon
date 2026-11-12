@@ -8,52 +8,61 @@ NULL
 
 getFeatureGroupsOpenMSParamDefs <- paramConfigDefsFact(list(
     rtalign = list(
+        advanced = TRUE,
         default = TRUE,
         description = "If TRUE then retention times are aligned",
         type = "flag"
     ),
     QT = list(
+        advanced = TRUE,
         default = FALSE,
         description = "If TRUE then FeatureLinkerUnlabeledQT is used instead of FeatureLinkerUnlabeled",
         type = "flag"
     ),
     maxAlignRT = list(
+        advanced = TRUE,
         default = defaultLim("retention", "wide"),
         description = "Maximum retention time difference (seconds) for feature pairing during alignment",
         type = "number",
         typeCheckArgs = list(finite = TRUE)
     ),
     maxAlignMZ = list(
+        advanced = TRUE,
         default = defaultLim("mz", "medium"),
         description = "Maximum m/z difference for feature pairing during alignment",
         type = "number",
         typeCheckArgs = list(finite = TRUE)
     ),
     maxGroupRT = list(
+        advanced = TRUE,
         default = defaultLim("retention", "medium"),
         description = "Maximum retention time difference (seconds) for grouping of features",
         type = "number",
         typeCheckArgs = list(finite = TRUE)
     ),
     maxGroupMZ = list(
+        advanced = TRUE,
         default = defaultLim("mz", "medium"),
         description = "Maximum m/z difference for grouping of features",
         type = "number",
         typeCheckArgs = list(finite = TRUE)
     ),
     extraOptsRT = list(
+        advanced = TRUE,
         default = NULL,
         description = "Extra command line options passed to MapAlignerPoseClustering as named list",
         type = "list",
         typeCheckArgs = list(names = "unique", null.ok = TRUE)
     ),
     extraOptsGroup = list(
+        advanced = TRUE,
         default = NULL,
         description = "Extra command line options passed to FeatureLinkerUnlabeled(QT) as named list",
         type = "list",
         typeCheckArgs = list(names = "unique", null.ok = TRUE)
     ),
     verbose = list(
+        advanced = TRUE,
         default = TRUE,
         description = "Verbose output",
         type = "flag"

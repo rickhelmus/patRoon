@@ -8,18 +8,21 @@ NULL
 #' @export
 getFilterFeaturesParamDefs <- paramConfigDefsFact(list(
     absMinIntensity = list(
+        advanced = TRUE,
         default = NULL,
         description = "Minimum absolute intensity threshold",
         type = "number",
         typeCheckArgs = list(null.ok = TRUE, lower = 0, finite = TRUE)
     ),
     relMinIntensity = list(
+        advanced = TRUE,
         default = NULL,
         description = "Minimum relative intensity threshold",
         type = "number",
         typeCheckArgs = list(null.ok = TRUE, lower = 0, finite = TRUE)
     ),
     retentionRange = list(
+        advanced = TRUE,
         default = NULL,
         description = "Retention time range (min, max)",
         type = "range",
@@ -32,24 +35,28 @@ getFilterFeaturesParamDefs <- paramConfigDefsFact(list(
         typeCheckArgs = list(null.ok = TRUE)
     ),
     mzDefectRange = list(
+        advanced = TRUE,
         default = NULL,
         description = "m/z defect range (min, max)",
         type = "range",
         typeCheckArgs = list(null.ok = TRUE)
     ),
     chromWidthRange = list(
+        advanced = TRUE,
         default = NULL,
         description = "Chromatographic width range (min, max)",
         type = "range",
         typeCheckArgs = list(null.ok = TRUE)
     ),
     IMSRangeParams = list(
+        advanced = TRUE,
         default = NULL,
         description = "Parameters for filtering by ion mobility range",
         type = "IMSRangeParams",
         typeCheckArgs = list(null.ok = TRUE)
     ),
     qualityRange = list(
+        advanced = TRUE,
         default = NULL,
         description = "Feature quality or score ranges",
         type = "scoreRange",
@@ -57,12 +64,14 @@ getFilterFeaturesParamDefs <- paramConfigDefsFact(list(
         typeCheckArgs = list(scNames = NULL)
     ),
     sets = list(
+        advanced = TRUE,
         default = NULL,
         description = "Sets to keep",
         type = "sets",
         typeCheckArgs = list(multiple = TRUE)
     ),
     negate = list(
+        advanced = TRUE,
         default = FALSE,
         description = "Apply filters in the opposite manner",
         type = "flag"

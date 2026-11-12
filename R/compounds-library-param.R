@@ -13,59 +13,69 @@ getCompoundsLibraryParamDefs <- paramConfigDefsFact(list(
         type = "specSimParams"
     ),
     minSim = list(
+        advanced = TRUE,
         default = 0.75,
         description = "The minimum spectral similarity for candidate records",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     minAnnSim = list(
+        advanced = TRUE,
         default = 0.75,
         description = "The minimum spectral similarity of a record for it to be used to find annotations",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     absMzDev = list(
+        advanced = TRUE,
         default = defaultLim("mz", "narrow"),
         description = "The maximum absolute m/z deviation between the feature group and library record m/z values",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     checkIons = list(
+        advanced = TRUE,
         default = "adduct",
         description = "Exclude library records with different adduct or MS ionization polarity",
         type = "choice",
         typeCheckArgs = list(choices = c("adduct", "polarity", "none"))
     ),
     spectrumType = list(
+        advanced = TRUE,
         default = "MS2",
         description = "The spectrum type(s) to use from the library (NULL to use all)",
         type = "character",
         typeCheckArgs = list(min.len = 1, min.chars = 1, null.ok = TRUE)
     ),
     specSimParamsLib = list(
+        advanced = TRUE,
         default = getDefSpecSimParams(removePrecursor = TRUE),
         description = "Spectral similarity parameters used for pre-treatment of library spectra",
         type = "specSimParams"
     ),
     minIMSSpecSim = list(
+        advanced = TRUE,
         default = 0,
         description = "Minimum spectral similarity to copy annotations from the IMS precursor",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     setThreshold = list(
+        advanced = TRUE,
         default = 0,
         description = "Minimum abundance for a candidate among all sets",
         type = "number",
         typeCheckArgs = list(lower = 0, upper = 1, finite = TRUE)
     ),
     setThresholdAnn = list(
+        advanced = TRUE,
         default = 0,
         description = "As setThreshold, but only taking sets into account in which features of the feature group are present",
         type = "number",
         typeCheckArgs = list(lower = 0, upper = 1, finite = TRUE)
     ),
     setAvgSpecificScores = list(
+        advanced = TRUE,
         default = FALSE,
         description = "If TRUE, average set specific scores (e.g. MS/MS match)",
         type = "flag"

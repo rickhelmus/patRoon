@@ -9,53 +9,62 @@ NULL
 #' @export
 getComponentsCliqueMSParamDefs <- paramConfigDefsFact(list(
     maxCharge = list(
+        advanced = TRUE,
         default = 1,
         description = "Maximum charge to consider (passed to cliqueMS::getIsotopes)",
         type = "count",
         typeCheckArgs = list(positive = TRUE)
     ),
     maxGrade = list(
+        advanced = TRUE,
         default = 2,
         description = "Maximum number of isotopes apart from the monoisotope (passed to cliqueMS::getIsotopes)",
         type = "count",
         typeCheckArgs = list(positive = TRUE)
     ),
     ppm = list(
+        advanced = TRUE,
         default = 10,
         description = "Mass accuracy tolerance (ppm) (passed to cliqueMS functions)",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     adductInfo = list(
+        advanced = TRUE,
         default = NULL,
         description = "Adduct information data.frame passed to cliqueMS::getAnnotation; NULL to use package defaults",
         type = "data.frame",
         typeCheckArgs = list(null.ok = TRUE)
     ),
     absMzDev = list(
+        advanced = TRUE,
         default = defaultLim("mz", "medium"),
         description = "Absolute m/z deviation used for componentization",
         type = "number",
         typeCheckArgs = list(finite = TRUE, lower = 0)
     ),
     minSize = list(
+        advanced = TRUE,
         default = 2,
         description = "Minimum number of feature groups to form a component",
         type = "count",
         typeCheckArgs = list(positive = TRUE)
     ),
     relMinAdductAbundance = list(
+        advanced = TRUE,
         default = 0.75,
         description = "Relative threshold that an adduct should be assigned to features within the same feature group",
         type = "number",
         typeCheckArgs = list(finite = TRUE, lower = 0)
     ),
     adductConflictsUsePref = list(
+        advanced = TRUE,
         default = TRUE,
         description = "Resolve adduct conflicts using preferred adducts when possible",
         type = "flag"
     ),
     NMConflicts = list(
+        advanced = TRUE,
         default = c("preferential", "mostAbundant", "mostIntense"),
         description = "Strategies to resolve neutral mass conflicts",
         type = "subset",
@@ -63,30 +72,35 @@ getComponentsCliqueMSParamDefs <- paramConfigDefsFact(list(
         empty.ok = FALSE
     ),
     prefAdducts = list(
+        advanced = TRUE,
         default = c("[M+H]+", "[M-H]-"),
         description = "Preferred adducts used to resolve conflicts",
         type = "character",
         typeCheckArgs = list(min.chars = 1, any.missing = FALSE, unique = TRUE)
     ),
     extraOptsCli = list(
+        advanced = TRUE,
         default = NULL,
         description = "Extra options passed to cliqueMS::getCliques as a named character list",
         type = "list",
         typeCheckArgs = list(names = "unique", any.missing = FALSE, null.ok = TRUE)
     ),
     extraOptsIso = list(
+        advanced = TRUE,
         default = NULL,
         description = "Extra options passed to cliqueMS::getIsotopes as a named character list",
         type = "list",
         typeCheckArgs = list(names = "unique", any.missing = FALSE, null.ok = TRUE)
     ),
     extraOptsAnn = list(
+        advanced = TRUE,
         default = NULL,
         description = "Extra options passed to cliqueMS::getAnnotation as a named character list",
         type = "list",
         typeCheckArgs = list(names = "unique", any.missing = FALSE, null.ok = TRUE)
     ),
     parallel = list(
+        advanced = TRUE,
         default = TRUE,
         description = "Run per-analysis cliqueMS calls in parallel",
         type = "flag"

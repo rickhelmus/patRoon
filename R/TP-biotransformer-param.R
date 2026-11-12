@@ -20,32 +20,38 @@ getTPsBioTransformerParamDefs <- paramConfigDefsFact(list(
         typeCheckArgs = list(positive = TRUE)
     ),
     maxExpGenerations = list(
+        advanced = TRUE,
         default = 2L,
         description = "The maximum number of additional generations during hierarchy expansion",
         type = "count"
     ),
     extraOpts = list(
+        advanced = TRUE,
         default = NULL,
         description = "Extra command line options passed to the biotransformer.jar tool",
         type = "character",
         typeCheckArgs = list(min.chars = 1, null.ok = TRUE)
     ),
     skipInvalid = list(
+        advanced = TRUE,
         default = TRUE,
         description = "Skip parents without sufficient chemical information (e.g. SMILES)",
         type = "flag"
     ),
     prefCalcChemProps = list(
+        advanced = TRUE,
         default = TRUE,
         description = "If TRUE, prefer calculated chemical properties over already present data in the suspect list",
         type = "flag"
     ),
     neutralChemProps = list(
+        advanced = TRUE,
         default = FALSE,
         description = "If TRUE, ensure suspects are neutral",
         type = "flag"
     ),
     neutralizeTPs = list(
+        advanced = TRUE,
         default = TRUE,
         description = "If TRUE, neutralize predicted TPs",
         type = "flag"
@@ -56,6 +62,7 @@ getTPsBioTransformerParamDefs <- paramConfigDefsFact(list(
         type = "TPStructParams"
     ),
     MP = list(
+        advanced = TRUE,
         default = FALSE,
         description = "Enables multiprocessing (generally not recommended)",
         type = "flag"

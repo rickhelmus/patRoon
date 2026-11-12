@@ -13,43 +13,51 @@ getCompoundsSIRIUSParamDefs <- paramConfigDefsFact(list(
         type = "specSimParams"
     ),
     topMost = list(
+        advanced = TRUE,
         default = 100,
         description = "Maximum number of top-ranked structures to keep per feature group",
         type = "count",
         typeCheckArgs = list(positive = TRUE)
     ),
     login = list(
+        advanced = TRUE,
         default = "check",
         description = "SIRIUS login credentials or login mode"
     ),
     alwaysLogin = list(
+        advanced = TRUE,
         default = FALSE,
         description = "Always log in to SIRIUS"
     ),
     minIMSSpecSim = list(
+        advanced = TRUE,
         default = 0,
         description = "Minimum spectral similarity to copy annotations from the IMS precursor",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     verbose = list(
+        advanced = TRUE,
         default = TRUE,
         description = "Show progress output",
         type = "flag"
     ),
     setThreshold = list(
+        advanced = TRUE,
         default = 0,
         description = "Minimum abundance for a candidate among all sets",
         type = "number",
         typeCheckArgs = list(lower = 0, upper = 1, finite = TRUE)
     ),
     setThresholdAnn = list(
+        advanced = TRUE,
         default = 0,
         description = "As setThreshold, but only taking sets into account in which features of the feature group are present",
         type = "number",
         typeCheckArgs = list(lower = 0, upper = 1, finite = TRUE)
     ),
     setAvgSpecificScores = list(
+        advanced = TRUE,
         default = FALSE,
         description = "If TRUE, average set specific scores (e.g. MS/MS match)",
         type = "flag"

@@ -67,6 +67,7 @@ getNormIntsParamDefs <- paramConfigDefsFact(list(
         typeCheckArgs = list(positive = TRUE)
     ),
     extraOpts = list(
+        advanced = TRUE,
         default = list(),
         description = "Extra options passed to screenSuspects() as a named list",
         type = "list",
@@ -86,40 +87,47 @@ setMethod("initialize", "NormIntsParam", function(.Object, ...)
 #' @export
 getCalculatePeakQualitiesParamDefs <- paramConfigDefsFact(list(
     weights = list(
+        advanced = TRUE,
         default = NULL,
         description = "Weighting for quality scoring",
         type = "numeric",
         typeCheckArgs = list(finite = TRUE, any.missing = FALSE, min.len = 1, names = "unique", null.ok = TRUE)
     ),
     flatnessFactor = list(
+        advanced = TRUE,
         default = 0.05,
         description = "Flatness factor used by MetaClean",
         type = "number",
         typeCheckArgs = list(null.ok = TRUE, lower = 0)
     ),
     featureQualities = list(
+        advanced = TRUE,
         default = NULL,
         description = "Subset or custom feature qualities",
         type = "list",
         typeCheckArgs = list(null.ok = TRUE)
     ),
     EICParams = list(
+        advanced = TRUE,
         default = getDefEICParams(window = 0),
         description = "EIC parameters",
         type = "EICParams"
     ),
     featureGroupQualities = list(
+        advanced = TRUE,
         default = NULL,
         description = "Subset or custom feature group qualities",
         type = "list",
         typeCheckArgs = list(null.ok = TRUE)
     ),
     avgFunc = list(
+        advanced = TRUE,
         default = "mean",
         description = "Function used to average feature qualities into group qualities",
         type = "function"
     ),
     parallel = list(
+        advanced = TRUE,
         default = TRUE,
         description = "Parallel processing flag",
         type = "flag"
@@ -167,14 +175,17 @@ getAssignMobilitiesFeatureGroupsParamDefs <- paramConfigDefsFact(list(
         description = "Parameters for chromatographic peak detection"
     ),
     EIMParams = list(
+        advanced = TRUE,
         default = getDefEIMParams(),
         description = "Extracted ion mobilogram parameters"
     ),
     EICParams = list(
+        advanced = TRUE,
         default = getDefEICParams(),
         description = "Extracted ion chromatogram parameters"
     ),
     peakRTWindow = list(
+        advanced = TRUE,
         default = defaultLim("retention", "narrow"),
         description = "Maximum retention time deviation for reintegrated peaks"
     ),
@@ -183,14 +194,17 @@ getAssignMobilitiesFeatureGroupsParamDefs <- paramConfigDefsFact(list(
         description = "Fall back to chromatographic data when no mobility peak is found"
     ),
     calcArea = list(
+        advanced = TRUE,
         default = "integrate",
         description = "Method for calculating areas from chromatographic data"
     ),
     mobWindow = list(
+        advanced = TRUE,
         default = defaultLim("mobility", "medium"),
         description = "Mobility window for grouping IMS features"
     ),
     scoreWeights = list(
+        advanced = TRUE,
         default = c(mobility = 1, intensity = 1),
         description = "Weights for IMS feature-group scoring"
     ),
@@ -199,15 +213,18 @@ getAssignMobilitiesFeatureGroupsParamDefs <- paramConfigDefsFact(list(
         description = "Parameters for CCS assignment"
     ),
     parallel = list(
+        advanced = TRUE,
         default = "maybe",
         description = "Parallel processing mode"
     ),
     fromSuspects = list(
+        advanced = TRUE,
         default = FALSE,
         description = "Use suspect-screening mobility assignments",
         type = "flag"
     ),
     IMSMatchParams = list(
+        advanced = TRUE,
         default = NULL,
         description = "IMS matching parameters",
         type = "IMSMatchParams",

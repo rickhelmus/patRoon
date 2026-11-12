@@ -7,12 +7,14 @@ NULL
 
 getFilterFeatAnnotationsParamDefs <- paramConfigDefsFact(list(
     minExplainedPeaks = list(
+        advanced = TRUE,
         default = NULL,
         description = "Minimum number of explained peaks",
         type = "count",
         typeCheckArgs = list(positive = FALSE, null.ok = TRUE)
     ),
     scoreLimits = list(
+        advanced = TRUE,
         default = NULL,
         description = "Minimum and maximum score limits",
         type = "scoreRange",
@@ -25,47 +27,55 @@ getFilterFeatAnnotationsParamDefs <- paramConfigDefsFact(list(
         typeCheckArgs = list(min.chars = 1, min.len = 1, null.ok = TRUE)
     ),
     fragElements = list(
+        advanced = TRUE,
         default = NULL,
         description = "Elements required in fragments",
         type = "character",
         typeCheckArgs = list(min.chars = 1, min.len = 1, null.ok = TRUE)
     ),
     lossElements = list(
+        advanced = TRUE,
         default = NULL,
         description = "Elements required in neutral losses",
         type = "character",
         typeCheckArgs = list(min.chars = 1, min.len = 1, null.ok = TRUE)
     ),
     fragFormulas = list(
+        advanced = TRUE,
         default = NULL,
         description = "Formulae required in fragments",
         type = "character",
         typeCheckArgs = list(min.chars = 1, min.len = 1, null.ok = TRUE)
     ),
     lossFormulas = list(
+        advanced = TRUE,
         default = NULL,
         description = "Formulae required in neutral losses",
         type = "character",
         typeCheckArgs = list(min.chars = 1, min.len = 1, null.ok = TRUE)
     ),
     topMost = list(
+        advanced = TRUE,
         default = NULL,
         description = "Maximum number of candidates to keep",
         type = "count",
         typeCheckArgs = list(positive = TRUE, null.ok = TRUE)
     ),
     OM = list(
+        advanced = TRUE,
         default = FALSE,
         description = "Apply organic matter rules",
         type = "flag"
     ),
     maxLevel = list(
+        advanced = TRUE,
         default = NULL,
         description = "Maximum identification level",
         type = "count",
         typeCheckArgs = list(null.ok = TRUE)
     ),
     negate = list(
+        advanced = TRUE,
         default = FALSE,
         description = "Apply filters in the opposite manner",
         type = "flag"
@@ -124,21 +134,25 @@ setMethod("initialize", "EstimateIDConfidenceParam", function(.Object, ...)
 
 getAssignMobilitiesCompoundsParamDefs <- paramConfigDefsFact(list(
     IMS = list(
+        advanced = TRUE,
         default = TRUE,
         description = "Select IMS features for mobility assignment",
         type = "IMS"
     ),
     from = list(
+        advanced = TRUE,
         default = NULL,
         description = "Reference data for mobility and CCS assignment"
     ),
     matchFromBy = list(
+        advanced = TRUE,
         default = "InChIKey1",
         description = "Column used to match annotations to reference data",
         type = "choice",
         typeCheckArgs = list(choices = c("InChIKey", "InChIKey1", "InChI", "SMILES", "name"))
     ),
     overwrite = list(
+        advanced = TRUE,
         default = FALSE,
         description = "Overwrite existing mobility and CCS values",
         type = "flag"
@@ -150,16 +164,19 @@ getAssignMobilitiesCompoundsParamDefs <- paramConfigDefsFact(list(
         typeCheckArgs = list(null.ok = TRUE)
     ),
     prefCalcChemProps = list(
+        advanced = TRUE,
         default = TRUE,
         description = "Prefer calculated chemical properties",
         type = "flag"
     ),
     neutralChemProps = list(
+        advanced = TRUE,
         default = FALSE,
         description = "Use neutral chemical properties",
         type = "flag"
     ),
     virtualenv = list(
+        advanced = TRUE,
         default = "patRoon-C3SDB",
         description = "Python virtual environment used for CCS prediction",
         type = "string",
@@ -244,45 +261,53 @@ getPredictRespFactorsParamDefs <- paramConfigDefsFact(list(
         typeCheckArgs = list(choices = c("FP", "SMILES", "both"))
     ),
     eluent = list(
+        advanced = TRUE,
         default = NULL,
         description = "LC gradient program",
         type = "data.frame",
         typeCheckArgs = list(null.ok = TRUE)
     ),
     organicModifier = list(
+        advanced = TRUE,
         default = NULL,
         description = "Organic modifier of the mobile phase",
         type = "choice",
         typeCheckArgs = list(choices = c("MeOH", "MeCN"), null.ok = TRUE)
     ),
     pHAq = list(
+        advanced = TRUE,
         default = NULL,
         description = "pH of the aqueous part of the mobile phase",
         type = "number",
         typeCheckArgs = list(finite = TRUE, null.ok = TRUE)
     ),
     concUnit = list(
+        advanced = TRUE,
         default = "ugL",
         description = "Concentration unit",
         type = "concUnit"
     ),
     calibConcUnit = list(
+        advanced = TRUE,
         default = "ugL",
         description = "Concentration unit used in the calibrants table",
         type = "concUnit"
     ),
     updateScore = list(
+        advanced = TRUE,
         default = FALSE,
         description = "Update compound scores with predicted response factors (unused by SIRIUS)",
         type = "flag"
     ),
     scoreWeight = list(
+        advanced = TRUE,
         default = 1,
         description = "Weight for the response-factor scoring (unused by SIRIUS)",
         type = "number",
         typeCheckArgs = list(lower = 1, finite = TRUE)
     ),
     parallel = list(
+        advanced = TRUE,
         default = TRUE,
         description = "Process candidates in parallel (unused by SIRIUS)",
         type = "flag"

@@ -7,76 +7,89 @@ NULL
 
 getFeaturesPiekParamDefs <- paramConfigDefsFact(list(
     genEICParams = list(
+        advanced = TRUE,
         default = getPiekEICParams(),
         description = "Parameters for EIC generation (use getPiekEICParams())",
         type = "list",
         typeCheckArgs = list(null.ok = FALSE)
     ),
     peakParams = list(
+        advanced = TRUE,
         default = getDefPeakParams("chrom", "piek"),
         description = "Parameters for peak detection (use getDefPeakParams())",
         type = "list",
         typeCheckArgs = list(null.ok = FALSE)
     ),
     IMS = list(
+        advanced = TRUE,
         default = FALSE,
         description = "Use ion mobility separation (IMS)",
         type = "flag"
     ),
     assignMethod = list(
+        advanced = TRUE,
         default = "basepeak",
         description = "Method to assign m/z/mobility across EIC datapoints",
         type = "choice",
         typeCheckArgs = list(choices = c("basepeak", "weighted.mean"))
     ),
     assignRTWindow = list(
+        advanced = TRUE,
         default = defaultLim("retention", "very_narrow"),
         description = "Retention time window (+/- s) for assignment",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     rtWindowDup = list(
+        advanced = TRUE,
         default = defaultLim("retention", "narrow"),
         description = "RT window for duplicate feature detection",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     mzWindowDup = list(
+        advanced = TRUE,
         default = defaultLim("mz", "medium"),
         description = "m/z window for duplicate feature detection",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     mobWindowDup = list(
+        advanced = TRUE,
         default = defaultLim("mobility", "medium"),
         description = "Mobility window for duplicate feature detection",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     minPeakOverlapDup = list(
+        advanced = TRUE,
         default = 0.25,
         description = "Minimum retention time overlap (fraction) to consider duplicates",
         type = "number",
         typeCheckArgs = list(lower = 0, upper = 1, finite = TRUE)
     ),
     minIntensityIMS = list(
+        advanced = TRUE,
         default = 25,
         description = "Minimum intensity for IMS datapoints",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     EICBatchSize = list(
+        advanced = TRUE,
         default = Inf,
         description = "Number of EICs processed per batch",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = FALSE)
     ),
     keepDups = list(
+        advanced = TRUE,
         default = FALSE,
         description = "Keep duplicate / non-centered features",
         type = "flag"
     ),
     verbose = list(
+        advanced = TRUE,
         default = TRUE,
         description = "Verbose output",
         type = "flag"

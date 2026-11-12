@@ -51,7 +51,10 @@ getFilterFeaturesParamDefs <- paramConfigDefsFact(list(
     ),
     qualityRange = list(
         default = NULL,
-        description = "Feature quality or score ranges"
+        description = "Feature quality or score ranges",
+        type = "scoreRange",
+        # Score names require a features object and are validated when filter() is called.
+        typeCheckArgs = list(scNames = NULL)
     ),
     sets = list(
         default = NULL,
@@ -73,13 +76,4 @@ setMethod("initialize", "FilterFeaturesParam", function(.Object, ...)
     callNextMethod(.Object, name = "FilterFeaturesParam", baseName = "filter_features", subDir = "features",
                    description = "Parameters for features filtering", version = "1.0",
                    definitions = getFilterFeaturesParamDefs(), ...)
-})
-
-setValidity("FilterFeaturesParam", function(object)
-{
-    parsFilled <- paramListFillDefaults(object@data, object@definitions)
-    ac <- checkmate::makeAssertCollection()
-    # Score names require a features object and are validated when filter() is called.
-    assertScoreRange(parsFilled$qualityRange, NULL, .var.name = "qualityRange", add = ac)
-    tryCatch(checkmate::reportAssertions(ac), error = function(e) e)
 })

@@ -91,6 +91,12 @@ setMethod("filter", "transformationProductsAnnForm", function(obj, ..., minFitFo
     return(obj)
 })
 
+#' @export
+setMethod("filterP", "transformationProductsAnnForm", function(obj, param = NULL, ...)
+{
+    do.call(filter, c(list(obj), prepAndVerifyParamForCall(param, "FilterTPsAnnFormParam", ...)))
+})
+
 setMethod("TPsFromScreening", "transformationProductsAnnForm", function(obj) FALSE)
 
 setMethod("linkTPsToFGroups", "transformationProductsAnnForm", function(TPs, fGroups)

@@ -84,6 +84,11 @@ setMethod("filter", "componentsSet", function(obj, ..., negate = FALSE, sets = N
     return(obj)
 })
 
+setMethod("filterP", "componentsSet", function(obj, param = NULL, ...)
+{
+    do.call(filter, c(list(obj), prepAndVerifyParamForCall(param, "FilterComponentsParam", ...)))
+})
+
 #' @rdname components-class
 #' @export
 setMethod("delete", "componentsSet", function(obj, i = NULL, j = NULL, ...)

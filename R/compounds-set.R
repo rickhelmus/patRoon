@@ -71,6 +71,12 @@ setMethod("[", c("compoundsSet", "ANY", "missing", "missing"), doFeatAnnSubsetSe
 #' @export
 setMethod("filter", "compoundsSet", doFeatAnnFilterSets)
 
+#' @export
+setMethod("filterP", "compoundsSet", function(obj, param = NULL, ...)
+{
+    do.call(filter, c(list(obj), prepAndVerifyParamForCall(param, "FilterCompoundsParam", ...)))
+})
+
 #' @rdname compounds-class
 #' @export
 setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,

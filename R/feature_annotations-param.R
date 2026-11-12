@@ -5,7 +5,82 @@
 #' @include param.R
 NULL
 
-#' @export
+getFilterFeatAnnotationsParamDefs <- paramConfigDefsFact(list(
+    minExplainedPeaks = list(
+        default = NULL,
+        description = "Minimum number of explained peaks",
+        type = "count",
+        typeCheckArgs = list(positive = FALSE, null.ok = TRUE)
+    ),
+    scoreLimits = list(
+        default = NULL,
+        description = "Minimum and maximum score limits",
+        type = "scoreRange",
+        typeCheckArgs = list(scNames = NULL)
+    ),
+    elements = list(
+        default = NULL,
+        description = "Allowed elements in candidate formulae",
+        type = "character",
+        typeCheckArgs = list(min.chars = 1, min.len = 1, null.ok = TRUE)
+    ),
+    fragElements = list(
+        default = NULL,
+        description = "Elements required in fragments",
+        type = "character",
+        typeCheckArgs = list(min.chars = 1, min.len = 1, null.ok = TRUE)
+    ),
+    lossElements = list(
+        default = NULL,
+        description = "Elements required in neutral losses",
+        type = "character",
+        typeCheckArgs = list(min.chars = 1, min.len = 1, null.ok = TRUE)
+    ),
+    fragFormulas = list(
+        default = NULL,
+        description = "Formulae required in fragments",
+        type = "character",
+        typeCheckArgs = list(min.chars = 1, min.len = 1, null.ok = TRUE)
+    ),
+    lossFormulas = list(
+        default = NULL,
+        description = "Formulae required in neutral losses",
+        type = "character",
+        typeCheckArgs = list(min.chars = 1, min.len = 1, null.ok = TRUE)
+    ),
+    topMost = list(
+        default = NULL,
+        description = "Maximum number of candidates to keep",
+        type = "count",
+        typeCheckArgs = list(positive = TRUE, null.ok = TRUE)
+    ),
+    OM = list(
+        default = FALSE,
+        description = "Apply organic matter rules",
+        type = "flag"
+    ),
+    maxLevel = list(
+        default = NULL,
+        description = "Maximum identification level",
+        type = "count",
+        typeCheckArgs = list(null.ok = TRUE)
+    ),
+    negate = list(
+        default = FALSE,
+        description = "Apply filters in the opposite manner",
+        type = "flag"
+    )
+))
+
+FilterFeatAnnotationsParam <- setClass("FilterFeatAnnotationsParam", contains = "param")
+setMethod("initialize", "FilterFeatAnnotationsParam", function(.Object, ...)
+{
+    callNextMethod(.Object, name = "FilterFeatAnnotationsParam", baseName = "filter_featannotations",
+                   subDir = "annotation", description = "Parameters for feature annotation filtering", version = "1.0",
+                   definitions = getFilterFeatAnnotationsParamDefs(), ...)
+})
+
+
 getEstimateIDConfidenceParamDefs <- paramConfigDefsFact(list(
     absMzDev = list(
         default = defaultLim("mz", "medium"),
@@ -47,7 +122,6 @@ setMethod("initialize", "EstimateIDConfidenceParam", function(.Object, ...)
                    definitions = getEstimateIDConfidenceParamDefs(), ...)
 })
 
-#' @export
 getAssignMobilitiesCompoundsParamDefs <- paramConfigDefsFact(list(
     IMS = list(
         default = TRUE,

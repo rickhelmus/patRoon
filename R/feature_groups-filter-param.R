@@ -169,13 +169,18 @@ getFilterFeatGroupsParamDefs <- paramConfigDefsFact(list(
         type = "range",
         typeCheckArgs = list(null.ok = TRUE)
     ),
+    # NOTE/UNDONE: we don't pass score names (NULL) here, since that needs fGroups data.
     featQualityRange = list(
         default = NULL,
-        description = "Feature quality or score ranges"
+        description = "Feature quality or score ranges",
+        type = "scoreRange",
+        typeCheckArgs = list(scNames = NULL)
     ),
     groupQualityRange = list(
         default = NULL,
-        description = "Feature group quality or score ranges"
+        description = "Feature group quality or score ranges",
+        type = "scoreRange",
+        typeCheckArgs = list(scNames = NULL)
     ),
     replicates = list(
         default = NULL,
@@ -267,15 +272,9 @@ setValidity("FilterFeatGroupsParam", function(object)
 {
     parsFilled <- paramListFillDefaults(object@data, object@definitions)
     ac <- checkmate::makeAssertCollection()
-    
-    # NOTE/UNDONE: we don't pass score names (NULL) here, since that needs fGroups data.
-    assertScoreRange(parsFilled$featQualityRange, NULL, .var.name = "featQualityRange", add = ac)
-    assertScoreRange(parsFilled$groupQualityRange, NULL, .var.name = "groupQualityRange", add = ac)
-    
     if (!is.logical(parsFilled$checkFeaturesSession))
         assertCheckSession(parsFilled$checkFeaturesSession, mustExist = TRUE, null.ok = TRUE,
                            .var.name = "checkFeaturesSession", add = ac)
-    
     OK <- tryCatch(checkmate::reportAssertions(ac), error = function(e) e)
     return(OK)
 })

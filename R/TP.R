@@ -269,6 +269,12 @@ setMethod("filter", "transformationProducts", function(obj, properties = NULL, v
     return(obj)
 })
 
+#' @export
+setMethod("filterP", "transformationProducts", function(obj, param = NULL, ...)
+{
+    do.call(filter, c(list(obj), prepAndVerifyParamForCall(param, "FilterTPsParam", ...)))
+})
+
 
 #' Generation of transformation products (TPs)
 #'

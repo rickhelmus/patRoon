@@ -457,6 +457,13 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
     return(obj)
 })
 
+#' @export
+setMethod("filterP", "featureAnnotations", function(obj, param = NULL, ...)
+{
+    do.call(filter, c(list(obj), prepAndVerifyParamForCall(param, "FilterFeatAnnotationsParam", ...)))
+})
+
+
 #' @describeIn featureAnnotations plots a Venn diagram (using \CRANpkg{VennDiagram}) outlining unique and shared
 #'   candidates of up to five different \code{featureAnnotations} objects.
 #'

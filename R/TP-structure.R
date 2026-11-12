@@ -230,6 +230,12 @@ setMethod("filter", "transformationProductsStructure", function(obj, ..., remove
     return(obj)
 })
 
+#' @export
+setMethod("filterP", "transformationProductsStructure", function(obj, param = NULL, ...)
+{
+    do.call(filter, c(list(obj), prepAndVerifyParamForCall(param, "FilterTPsStructureParam", ...)))
+})
+
 #' @templateVar class transformationProductsStructure
 #' @template plotGraph-TPs
 #' 

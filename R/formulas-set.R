@@ -77,6 +77,12 @@ setMethod("[", c("formulasSet", "ANY", "missing", "missing"), doFeatAnnSubsetSet
 #' @export
 setMethod("filter", "formulasSet", doFeatAnnFilterSets)
 
+#' @export
+setMethod("filterP", "formulasSet", function(obj, param = NULL, ...)
+{
+    do.call(filter, c(list(obj), prepAndVerifyParamForCall(param, "FilterFormulasParam", ...)))
+})
+
 #' @rdname formulas-class
 #' @export
 setMethod("plotSpectrum", "formulasSet", function(obj, index, groupName, analysis = NULL, MSPeakLists,

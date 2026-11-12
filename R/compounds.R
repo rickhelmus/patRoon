@@ -187,6 +187,14 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
     return(callNextMethod(obj, minExplainedPeaks, scoreLimits, ...))
 })
 
+#' @export
+setMethod("filterP", "compounds", function(obj, param = NULL, ...)
+{
+    pars <- prepAndVerifyParamForCall(param, "FilterCompoundsParam", ...)
+    pars <- pars[!names(pars) %in% c("sets", "updateConsensus")]
+    do.call(filter, c(list(obj), pars))
+})
+
 #' @describeIn compounds Adds formula ranking data from a \code{\link{formulas}}
 #'   object as an extra compound candidate scoring (\code{formulaScore} column).
 #'   The formula score for each compound candidate is between \samp{0-1}, where

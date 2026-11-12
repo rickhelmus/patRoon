@@ -390,6 +390,14 @@ setMethod("filter", "components", function(obj, size = NULL, adducts = NULL, iso
     return(obj)
 })
 
+#' @export
+setMethod("filterP", "components", function(obj, param = NULL, ...)
+{
+    param <- prepAndVerifyParamForCall(param, "FilterComponentsParam", ...)
+    param <- param[names(param) != "sets"]
+    do.call(filter, c(list(obj), param))
+})
+
 #' @describeIn components Returns the component id(s) to which a feature group
 #'   belongs.
 #' @param fGroup The name (thus a character) of the feature group that should be

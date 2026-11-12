@@ -100,6 +100,12 @@ setMethod("filter", "transformationProductsAnnComp", function(obj, ..., minFitFo
     return(obj)
 })
 
+#' @export
+setMethod("filterP", "transformationProductsAnnComp", function(obj, param = NULL, ...)
+{
+    do.call(filter, c(list(obj), prepAndVerifyParamForCall(param, "FilterTPsAnnCompParam", ...)))
+})
+
 setMethod("TPsFromScreening", "transformationProductsAnnComp", function(obj) FALSE)
 
 setMethod("linkTPsToFGroups", "transformationProductsAnnComp", function(TPs, fGroups)

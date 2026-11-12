@@ -6,6 +6,7 @@
 - docs/NEWS/tests
     - new suspect input (string, TPs): add tests, check if docs are correctly updated, add to handbook?, add to NEWS, also check sets, TP gen, iSTDs, ...
     - MF compounds with TP database: test, update eg newProject() and Handbook, add to NEWS
+- check/remove random @exports roxygen tags added by LLMs
 
 # workflow
 
@@ -77,6 +78,9 @@
 - FilterFeatGroupsParam/FilterMSPeakListsParam
     - handle results/annotatedBy differently?
     - somehow set ^ in workflow pipelines easily?
+- FilterFormulasParam()
+    - just does sets now, keep?
+    - only have formulasSets method now... add a dummy method for formulas that throwns an informative error?
 
 
 ## NEWS / docs

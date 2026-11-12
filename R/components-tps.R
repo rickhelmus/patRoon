@@ -622,6 +622,12 @@ setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
     return(obj)
 })
 
+#' @export
+setMethod("filterP", "componentsTPs", function(obj, param = NULL, ..., formulas = NULL)
+{
+    do.call(filter, c(list(obj, formulas = formulas), prepAndVerifyParamForCall(param, "FilterComponentsTPsParam", ...)))
+})
+
 #' @describeIn componentsTPs Plots an interactive network graph for linked components. Components are linked with each
 #'   other if one or more transformation products overlap. The graph is constructed with the \pkg{\link{igraph}} package
 #'   and rendered with \pkg{\link{visNetwork}}.

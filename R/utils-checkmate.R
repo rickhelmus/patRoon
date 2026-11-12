@@ -800,12 +800,22 @@ checkSetLabels <- function(x, len)
 }
 assertSetLabels <- checkmate::makeAssertionFunction(checkSetLabels)
 
-assertSets <- function(obj, s, multiple, null.ok = multiple, .var.name = checkmate::vname(s), add = NULL)
+assertSets <- function(x, s, multiple, null.ok = multiple, .var.name = checkmate::vname(s), add = NULL)
 {
     if (multiple)
-        checkmate::assertSubset(s, sets(obj), empty.ok = null.ok, .var.name = .var.name, add = add)
+        checkmate::assertSubset(s, sets(x), empty.ok = null.ok, .var.name = .var.name, add = add)
     else
-        checkmate::assertChoice(s, sets(obj), null.ok = null.ok, .var.name = .var.name, add = add)
+        checkmate::assertChoice(s, sets(x), null.ok = null.ok, .var.name = .var.name, add = add)
+}
+
+assertSetsType <- function(x, multiple, null.ok = multiple, .var.name = checkmate::vname(x), add = NULL)
+{
+    # special case: in case there is no object, eg with param class verification
+    if (multiple)
+        checkmate::assertCharacter(x, any.missing = FALSE, min.chars = 1, null.ok = null.ok, .var.name = .var.name,
+                                   add = add)
+    else
+        checkmate::assertString(x, min.chars = 1, null.ok = null.ok, .var.name = .var.name, add = add)
 }
 
 assertMakeSetArgs <- function(objects, class, adducts, adductNullOK, labels, add = NULL)

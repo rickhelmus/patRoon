@@ -20,6 +20,7 @@ test_that("all param classes can be constructed without errors", {
     expect_error(FeaturesPiekParam(), NA)
     expect_error(FeaturesSAFDParam(), NA)
     expect_error(FeaturesSIRIUSParam(), NA)
+    expect_error(FilterFeaturesParam(), NA)
 
     # Component params
     expect_error(ComponentsOpenMSParam(), NA)
@@ -31,6 +32,8 @@ test_that("all param classes can be constructed without errors", {
     expect_error(ComponentsCAMERAParam(), NA)
     expect_error(ComponentsTPsParam(), NA)
     expect_error(ComponentsNetParam(), NA)
+    expect_error(FilterComponentsParam(), NA)
+    expect_error(FilterComponentsTPsParam(), NA)
 
     # Feature group params
     expect_error(FeatureGroupsOpenMSParam(), NA)
@@ -39,6 +42,7 @@ test_that("all param classes can be constructed without errors", {
     expect_error(FeatureGroupsSIRIUSParam(), NA)
     expect_error(FeatureGroupsGreedyParam(), NA)
     expect_error(FilterFeatGroupsParam(), NA)
+    expect_error(FilterFeatGroupsScreeningParam(), NA)
     expect_error(ScreenSuspectsParam(), NA)
     expect_error(SelectIonsParam(), NA)
     expect_error(NormIntsParam(), NA)
@@ -48,16 +52,19 @@ test_that("all param classes can be constructed without errors", {
     # Annotation
     expect_error(MSPeakListsParam(), NA)
     expect_error(FilterMSPeakListsParam(), NA)
+    expect_error(FilterFeatAnnotationsParam(), NA)
     expect_error(FormulasGenFormParam(), NA)
+    expect_error(FilterFormulasParam(), NA)
     expect_error(FormulasSIRIUSParam(), NA)
     expect_error(CompoundsMetFragParam(), NA)
+    expect_error(FilterCompoundsParam(), NA)
     expect_error(CompoundsLibraryParam(), NA)
     expect_error(CompoundsSIRIUSParam(), NA)
     expect_error(EstimateIDConfidenceParam(), NA)
     expect_error(AssignMobilitiesCompoundsParam(), NA)
     expect_error(PredictToxParam(), NA)
     expect_error(PredictRespFactorsParam(), NA)
-    
+
     # TPs
     expect_error(TPsBioTransformerParam(), NA)
     expect_error(TPsCTSParam(), NA)
@@ -66,4 +73,8 @@ test_that("all param classes can be constructed without errors", {
     expect_error(TPsAnnFormParam(), NA)
     expect_error(TPsLibraryFormulaParam(), NA)
     expect_error(TPsLogicParam(), NA)
+    expect_error(FilterTPsParam(), NA)
+    expect_error(FilterTPsStructureParam(), NA)
+    expect_error(FilterTPsAnnCompParam(), NA)
+    expect_error(FilterTPsAnnFormParam(), NA)
 })

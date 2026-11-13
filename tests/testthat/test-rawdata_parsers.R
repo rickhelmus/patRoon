@@ -122,13 +122,26 @@ test_that("EICs", {
     expect_doppel("eic-raw-gap", \() plot(eicsGap[[1]][[1]], type = "l"))
     expect_doppel("eic-raw-nogap", \() plot(eicsNoGap[[1]][[1]], type = "l"))
     
+    # MS2
+    EICInfoListOneMS2 <- copy(EICInfoListOne)
+    EICInfoListOneMS2[[1]][, precursorMZ := susps$mz[1]]
+    eicsMS2 <- getEICs(anaInfoIMSOne, EICInfoListOneMS2, output = "fill", MSLevel = 2)
+    eicsMS2Pad <- getEICs(anaInfoIMSOne, EICInfoListOneMS2, output = "pad", MSLevel = 2)
+    eicsMS2NoIso <- getEICs(anaInfoIMSOne, EICInfoListOneMS2, output = "fill", MSLevel = 2, fixedIsolationWidth = NA)
+    expect_gt(nrow(eicsMS2[[1]][[1]]), nrow(eicsMS2Pad[[1]][[1]]))
+    expect_lt(sum(eicsMS2[[1]][[1]][, "intensity"]), sum(eicsMS2NoIso[[1]][[1]][, "intensity"]))
+    expect_error(getEICs(anaInfoIMSOne, EICInfoListOneMS2, output = "raw", MSLevel = 2))
+    
     expect_snapshot_value(list(
         eicsRef,
         eicsI,
         eicsSummed,
         eicsSmoothed,
         pruneList(eicsTop1[[1]], checkZeroRows = TRUE),
-        eicsPadded
+        eicsPadded,
+        eicsMS2,
+        eicsMS2Pad,
+        eicsMS2NoIso
     ),  style = "json2")
     
     # test if backends give same results

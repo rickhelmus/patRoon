@@ -707,6 +707,34 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
     return(obj)
 })
 
+#' @describeIn MSPeakLists Deconvolutes MS peak lists by retaining only those mass peaks whose extracted ion
+#'   chromatogram (EIC) correlates well with that of the precursor. This helps to remove mass peaks originating from
+#'   co-eluting compounds and is highly recommended for data-independent acquisition (DIA, SWATH, etc.) data.
+#'   Furthermore, it can also be useful for cleaning up MS1 data. The correlation coefficient between the EIC of each
+#'   mass peak and that of the precursor is stored in the \code{corr} column of the peak lists (and can be visualised
+#'   with \code{plotChroms}); mass peaks with a correlation below \code{threshold} are removed. For MS/MS peak lists
+#'   (\code{MSLevel=2}) the correlation with the EIC of the MS1 peak of the feature is taken into account as well (the
+#'   highest of both correlations is used).
+#'
+#'   \strong{NOTE}: \itemize{
+#'
+#'     \item Deconvolution is only applied for feature peak lists; afterwards the feature group peak lists are
+#'     re-averaged (see \link{reAverage} for more details).
+#'     
+#'     \item It is recommended to first apply basic filters (\emph{e.g.} to remove low intensity peaks) before
+#'     deconvolution to avoid the need for excessive EIC generation.
+#'
+#'     \item \code{deconvolute} always forces \code{rtWindow=0} (see \link{MSPLEICParams}) when generating EICs,
+#'     \emph{i.e.} the exact retention time window of each feature is used, regardless of the value set in
+#'     \code{MSPLEICParams}.
+#'     }
+#'
+#' @param threshold The minimum correlation coefficient (between \samp{0} and \samp{1}) between the EIC of a mass peak
+#'   and that of the precursor (or, for MS/MS, the MS1 peak of the feature). Mass peaks with a lower correlation are
+#'   removed.
+#'
+#' @aliases deconvolute
+#' @export
 setMethod("deconvolute", "MSPeakLists", function(obj, fGroups, MSLevel, threshold, MSPLEICParams = getDefMSPLEICParams())
 {
     ac <- checkmate::makeAssertCollection()

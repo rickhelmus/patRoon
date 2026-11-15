@@ -4,7 +4,8 @@
 - why are simple EICs gap filled also if padding==FALSE
 - NEWS/docs
     - groupID column in MSPL --> clear cache
-    - doc that deconvolute() forces rtWindow=0
+    - double check deconvolute docs
+    - update handbook
 
 
 ## general

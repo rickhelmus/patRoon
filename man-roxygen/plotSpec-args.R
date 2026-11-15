@@ -7,7 +7,7 @@
 #'
 #' <%=if (exists("withSpecAna")) "@param analysis The name of the analysis for which a plot should be made. If
 #' \\code{NULL} then data from the feature group averaged peak list is used. When comparing spectra, either
-#' \\code{NULL} or the analyses for both spectra should be specified." %>
+#' \\code{NULL} or the analyses for both spectra should be specified." %> <%=if (exists("withSpecAna") && exists("specAnaAdd")) specAnaAdd %> 
 #'
 #' <%=if (exists("featAnnArgs")) "@param mincex The formula annotation labels are automatically scaled. The
 #' \\code{mincex} argument forces a minimum \\code{cex} value for readability." %>

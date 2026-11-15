@@ -22,12 +22,16 @@ NULL
 #'
 #'   For \code{delete}: passed to the function specified as \code{j}.
 #'   
-#'   For \code{plotSpectrum}: passed to \code{\link[graphics]{plot}}.
+#'   For \code{plotSpectrum} and \code{plotChroms}: passed to \code{\link[graphics]{plot}}.
 #'   
 #'   For \code{spectrumSimilarityIMS}: passed to \code{spectrumSimilarity}
 #'
 #'   \setsPassedArgs1{MSPeakLists}
 #'
+#' @templateVar withSpecAna TRUE
+#' @templateVar specAnaAdd \cr\cr\code{plotChroms}: if \code{analysis==NULL} then the peaks from the most intense feature are used (not necessarily the same).
+#' @template plotSpec-args
+#' 
 #' @template plot-lim
 #' @template specSimParams-arg
 #'
@@ -815,12 +819,6 @@ setMethod("deconvolute", "MSPeakLists", function(obj, fGroups, MSLevel, threshol
 
 #' @describeIn MSPeakLists Plots a spectrum using MS or MS/MS peak lists for a given feature group. Two spectra can be
 #'   compared when two feature groups are specified.
-#'
-#' @templateVar withSpecAna TRUE
-#' @template plotSpec-args
-#' 
-#' @template plot-lim
-#'
 #' @export
 setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
                                                   normalized = "multiple", specSimParams = getDefSpecSimParams(),
@@ -882,6 +880,15 @@ setMethod("plotSpectrumHash", "MSPeakLists", function(obj, groupName, analysis =
     return(makeHash(sp, title, normalized, specSimParams, ...))
 })
 
+#' @describeIn MSPeakLists Plots extracted ion chromatograms (EICs) of the mass peaks in the peak list of a feature or
+#'   feature group. If correlation values were calculated with \code{deconvolute}, then these are shown in the legend.
+#'
+#' @param fGroups The \code{\link{featureGroups}} object that was used to generate the peak lists.
+#' @param retMin Plot retention time in minutes (instead of seconds).
+#' @param EICs Internal parameter for now and should be kept at \code{NULL} (default).
+#'
+#' @template MSPLEICParams-arg
+#'
 #' @export
 setMethod("plotChroms", "MSPeakLists", function(obj, fGroups, groupName, analysis = NULL, MSLevel = 1,
                                                 MSPLEICParams = getDefMSPLEICParams(), retMin = FALSE, title = NULL,

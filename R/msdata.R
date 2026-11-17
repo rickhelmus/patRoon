@@ -218,10 +218,17 @@ setMethod("initMSReadBackend", "Rcpp_MSReadBackendOTIMS", function(backend, genM
         {
             ret <- if (type == "MSMS")
                 getTIMSMetaTable("FrameMsMsInfo", c("Frame", "TriggerMass", "IsolationWidth"))
-            else # PASEF
+            else if (type == "DDA-PASEF")
             {
                 getTIMSMetaTable("PasefFrameMsMsInfo",
                                  c("Frame", "ScanNumBegin", "ScanNumEnd", "IsolationMz", "IsolationWidth", "Precursor"))
+            }
+            else # if (type == "DIA-PASEF")
+            {
+                windows <- getTIMSMetaTable("DiaFrameMsMsWindows", c("WindowGroup", "ScanNumBegin", "ScanNumEnd",
+                                                                     "IsolationMz", "IsolationWidth"))
+                getTIMSMetaTable("DiaFrameMsMsInfo", c("Frame", "WindowGroup")) |>
+                    merge(windows, by = "WindowGroup", sort = FALSE, allow.cartesian = TRUE)
             }
             setnames(ret, c("Frame", "IsolationMz", "TriggerMass", "ScanNumBegin", "ScanNumEnd"),
                      c("scan", "precursorMZ", "precursorMZ", "subScan", "subScanEnd"), skip_absent = TRUE)
@@ -234,7 +241,7 @@ setMethod("initMSReadBackend", "Rcpp_MSReadBackendOTIMS", function(backend, genM
                 # NOTE: having a consistent PASEF/nonPASEF structure is handy, in case data files have both MS/MS types
                 ret[, c("subScan", "subScanEnd") := 0]
             }
-            else # PASEF
+            else if (type == "DDA-PASEF")
             {
                 # Fix isolationMz and range from precursor table
                 
@@ -247,6 +254,8 @@ setMethod("initMSReadBackend", "Rcpp_MSReadBackendOTIMS", function(backend, genM
                                                                        (precursorMZ_orig + isolationRangeMax) - precursorMZ)]
                 ret[, c("Precursor", "precursorMZ_orig") := NULL]
             }
+            else # DIA-PASEF
+                ret[, WindowGroup := NULL]
             
             return(ret)
         }
@@ -262,13 +271,14 @@ setMethod("initMSReadBackend", "Rcpp_MSReadBackendOTIMS", function(backend, genM
         framesMS <- frames[MsMsType == 0][, MsMsType := NULL]
         framesMS2 <- frames[MsMsType != 0]
         
-        if (any(!framesMS2$ScanMode %in% c(0, 4, 8)))
-            warning("The OpenTIMS backend has only been tested with MS only, bbCID and PASEF data.", call. = FALSE)
+        if (any(!framesMS2$ScanMode %in% c(0, 4, 8, 9)))
+            warning("The OpenTIMS backend has only been tested with MS only, bbCID, DDA-PASEF and DIA-PASEF data.", call. = FALSE)
 
         MSMSInfo <- if (2 %in% framesMS2$MsMsType) getTIMSMetaTableMSMS("MSMS")
-        PASEFInfo <- if (8 %in% framesMS2$MsMsType) getTIMSMetaTableMSMS("PASEF")
+        DDAPASEFInfo <- if (8 %in% framesMS2$MsMsType) getTIMSMetaTableMSMS("DDA-PASEF")
+        DIAPASEFInfo <- if (9 %in% framesMS2$MsMsType) getTIMSMetaTableMSMS("DIA-PASEF")
         
-        framesMS2 <- merge(framesMS2, rbind(MSMSInfo, PASEFInfo), by = "scan", sort = FALSE)
+        framesMS2 <- merge(framesMS2, rbind(MSMSInfo, DDAPASEFInfo, DIAPASEFInfo), by = "scan", sort = FALSE)
         # zero out isolation range for isCID/bbCID (ie DIA)
         framesMS2[ScanMode %in% c(3, 4), c("isolationRangeMin", "isolationRangeMax") := 0]
         framesMS2[, c("ScanMode", "MsMsType") := NULL]

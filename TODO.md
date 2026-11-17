@@ -6,6 +6,7 @@
     - groupID column in MSPL --> clear cache
     - double check deconvolute docs
     - update handbook
+- test MS2 EICs with different backends
 
 
 ## general

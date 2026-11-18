@@ -8,55 +8,56 @@ NULL
 #' @export
 getFilterFeaturesParamDefs <- paramConfigDefsFact(list(
     absMinIntensity = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Minimum absolute intensity threshold",
         type = "number",
         typeCheckArgs = list(null.ok = TRUE, lower = 0, finite = TRUE)
     ),
     relMinIntensity = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Minimum relative intensity threshold",
         type = "number",
         typeCheckArgs = list(null.ok = TRUE, lower = 0, finite = TRUE)
     ),
     retentionRange = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Retention time range (min, max)",
         type = "range",
         typeCheckArgs = list(null.ok = TRUE)
     ),
     mzRange = list(
+        advanced = FALSE,
         default = NULL,
         description = "m/z range (min, max)",
         type = "range",
         typeCheckArgs = list(null.ok = TRUE)
     ),
     mzDefectRange = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "m/z defect range (min, max)",
         type = "range",
         typeCheckArgs = list(null.ok = TRUE)
     ),
     chromWidthRange = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Chromatographic width range (min, max)",
         type = "range",
         typeCheckArgs = list(null.ok = TRUE)
     ),
     IMSRangeParams = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Parameters for filtering by ion mobility range",
         type = "IMSRangeParams",
         typeCheckArgs = list(null.ok = TRUE)
     ),
     qualityRange = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Feature quality or score ranges",
         type = "scoreRange",

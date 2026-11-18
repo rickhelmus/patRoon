@@ -9,39 +9,42 @@ NULL
 #' @export
 getComponentsNontargetParamDefs <- paramConfigDefsFact(list(
     rtRange = list(
+        advanced = FALSE,
         default = c(-120, 120),
         description = "A numeric vector containing the minimum and maximum retention time (in seconds) between homologues.",
         type = "numeric",
         typeCheckArgs = list(len = 2, any.missing = FALSE, finite = TRUE)
     ),
     mzRange = list(
+        advanced = FALSE,
         default = c(5, 120),
         description = "A numeric vector specifying the minimum and maximum m/z increment of a homologous series.",
         type = "numeric",
         typeCheckArgs = list(len = 2, lower = 0, any.missing = FALSE, finite = TRUE)
     ),
     elements = list(
+        advanced = FALSE,
         default = c("C", "H", "O"),
         description = "A character vector with elements to be considered for detection of repeating units.",
         type = "character",
         typeCheckArgs = list(min.chars = 1, min.len = 1, any.missing = FALSE)
     ),
     rtDev = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("retention", "wide"),
         description = "Retention time tolerance.",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     absMzDev = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("mz", "narrow"),
         description = "Absolute m/z tolerance.",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     absMzDevLink = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("mz", "medium"),
         description = "Absolute m/z tolerance when linking series.",
         type = "number",

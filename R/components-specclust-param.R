@@ -9,33 +9,39 @@ NULL
 #' @export
 getComponentsSpecClustParamDefs <- paramConfigDefsFact(list(
     method = list(
+        advanced = FALSE,
         default = "complete",
         description = "Clustering method (passed to fastclust::hclust)",
         type = "string"
     ),
     specSimParams = list(
+        advanced = FALSE,
         default = getDefSpecSimParams(),
         description = "Default MS/MS spectral similarity parameters",
         type = "specSimParams"
     ),
     maxTreeHeight = list(
+        advanced = FALSE,
         default = 1,
         description = "Maximum tree height (passed to dynamicTreeCut::cutreeDynamic)",
         type = "number",
         typeCheckArgs = list(finite = TRUE)
     ),
     deepSplit = list(
+        advanced = FALSE,
         default = TRUE,
         description = "Enable deep splitting (passed to dynamicTreeCut::cutreeDynamic)",
         type = "flag"
     ),
     minModuleSize = list(
+        advanced = FALSE,
         default = 1,
         description = "Minimum module (component) size (passed to dynamicTreeCut::cutreeDynamic)",
         type = "count",
         typeCheckArgs = list(positive = TRUE)
     ),
     IMS = list(
+        advanced = FALSE,
         default = "maybe",
         description = "Which feature groups are considered for componentization in IMS workflows ('maybe', 'both', FALSE, TRUE)",
         type = "IMS"

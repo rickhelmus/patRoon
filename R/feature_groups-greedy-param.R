@@ -8,29 +8,34 @@ NULL
 
 getFeatureGroupsGreedyParamDefs <- paramConfigDefsFact(list(
     rtWindow = list(
+        advanced = FALSE,
         default = defaultLim("retention", "medium"),
         description = "Retention time tolerance window (seconds) for grouping",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     mzWindow = list(
+        advanced = FALSE,
         default = defaultLim("mz", "medium"),
         description = "m/z tolerance window for grouping",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     mobWindow = list(
+        advanced = FALSE,
         default = defaultLim("mobility", "medium"),
         description = "Mobility tolerance window for grouping",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     scoreWeights = list(
+        advanced = FALSE,
         default = c(retention = 1, mz = 1, mobility = 1, intensity = 1),
         description = "Named numeric vector specifying scoring weights for retention, mz, mobility, and intensity",
         type = "numeric"
     ),
     verbose = list(
+        advanced = TRUE,
         default = TRUE,
         description = "Verbose output",
         type = "flag"

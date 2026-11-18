@@ -8,12 +8,14 @@ NULL
 
 getTPsBioTransformerParamDefs <- paramConfigDefsFact(list(
     type = list(
+        advanced = FALSE,
         default = "env",
         description = "The type of prediction.",
         type = "choice",
         typeCheckArgs = list(choices = c("ecbased", "cyp450", "phaseII", "hgut", "superbio", "allHuman", "env"))
     ),
     generations = list(
+        advanced = FALSE,
         default = 2L,
         description = "The number of generations (steps) for the predictions",
         type = "count",
@@ -57,6 +59,7 @@ getTPsBioTransformerParamDefs <- paramConfigDefsFact(list(
         type = "flag"
     ),
     TPStructParams = list(
+        advanced = TRUE,
         default = getDefTPStructParams(),
         description = "Parameters for the calculation of TP structure properties",
         type = "TPStructParams"

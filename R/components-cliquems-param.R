@@ -9,49 +9,49 @@ NULL
 #' @export
 getComponentsCliqueMSParamDefs <- paramConfigDefsFact(list(
     maxCharge = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 1,
         description = "Maximum charge to consider (passed to cliqueMS::getIsotopes)",
         type = "count",
         typeCheckArgs = list(positive = TRUE)
     ),
     maxGrade = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 2,
         description = "Maximum number of isotopes apart from the monoisotope (passed to cliqueMS::getIsotopes)",
         type = "count",
         typeCheckArgs = list(positive = TRUE)
     ),
     ppm = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 10,
         description = "Mass accuracy tolerance (ppm) (passed to cliqueMS functions)",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     adductInfo = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Adduct information data.frame passed to cliqueMS::getAnnotation; NULL to use package defaults",
         type = "data.frame",
         typeCheckArgs = list(null.ok = TRUE)
     ),
     absMzDev = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("mz", "medium"),
         description = "Absolute m/z deviation used for componentization",
         type = "number",
         typeCheckArgs = list(finite = TRUE, lower = 0)
     ),
     minSize = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 2,
         description = "Minimum number of feature groups to form a component",
         type = "count",
         typeCheckArgs = list(positive = TRUE)
     ),
     relMinAdductAbundance = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0.75,
         description = "Relative threshold that an adduct should be assigned to features within the same feature group",
         type = "number",

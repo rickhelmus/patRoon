@@ -8,28 +8,33 @@ NULL
 
 getFeatureGroupsKPIC2ParamDefs <- paramConfigDefsFact(list(
     rtalign = list(
+        advanced = FALSE,
         default = TRUE,
         description = "If TRUE then retention times are aligned",
         type = "flag"
     ),
     loadRawData = list(
+        advanced = FALSE,
         default = TRUE,
         description = "If TRUE then raw data is loaded into memory",
         type = "flag"
     ),
     groupArgs = list(
+        advanced = FALSE,
         default = list(tolerance = c(0.005, 12)),
         description = "Named list with extra parameters passed to KPIC::PICset.group",
         type = "list",
         names = "unique"
     ),
     alignArgs = list(
+        advanced = FALSE,
         default = list(),
         description = "Named list with extra parameters passed to KPIC::PICset.align",
         type = "list",
         names = "unique"
     ),
     verbose = list(
+        advanced = TRUE,
         default = TRUE,
         description = "Verbose output",
         type = "flag"

@@ -8,30 +8,32 @@ NULL
 
 getFormulasGenFormParamDefs <- paramConfigDefsFact(list(
     specSimParams = list(
+        advanced = TRUE,
         default = getDefSpecSimParams(removePrecursor = TRUE),
         description = "Spectral similarity parameters used for annotation similarity calculations",
         type = "specSimParams"
     ),
     relMzDev = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("mz", "narrow_rel"),
         description = "Maximum relative deviation between measured and candidate formula m/z (in ppm)",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     elements = list(
+        advanced = FALSE,
         default = "CHNOP",
         description = "Elements to be considered for formulae calculation",
         type = "string"
     ),
     hetero = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = TRUE,
         description = "Only consider formulae with at least one hetero atom",
         type = "flag"
     ),
     oc = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = FALSE,
         description = "Only consider organic formulae (at least one carbon atom)",
         type = "flag"
@@ -61,7 +63,7 @@ getFormulasGenFormParamDefs <- paramConfigDefsFact(list(
         null.ok = TRUE
     ),
     maxCandidates = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = Inf,
         description = "Maximum number of candidates until calculations are aborted. See ?generateFormulasGenform for details!"
     ),
@@ -73,27 +75,27 @@ getFormulasGenFormParamDefs <- paramConfigDefsFact(list(
         typeCheckArgs = list(null.ok = TRUE)
     ),
     calculateFeatures = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = FALSE,
         description = "If TRUE, calculate formulas for individual features instead of directly for the feature group",
         type = "flag"
     ),
     featThreshold = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0,
         description = "Feature threshold for consensus formula generation (if calculateFeatures==TRUE)",
         type = "number",
         typeCheckArgs = list(lower = 0, upper = 1, finite = TRUE)
     ),
     featThresholdAnn = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0.75,
         description = "Feature annotation threshold for consensus formula generation (if calculateFeatures==TRUE)",
         type = "number",
         typeCheckArgs = list(lower = 0, upper = 1, finite = TRUE)
     ),
     absAlignMzDev = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("mz", "narrow"),
         description = "Absolute m/z deviation for feature m/z alignment (if calculateFeatures==TRUE)",
         type = "number",
@@ -112,21 +114,21 @@ getFormulasGenFormParamDefs <- paramConfigDefsFact(list(
         description = "Settings for isolation of the precursor peak with its isotopes (TRUE for defaults, FALSE to disable or a list with settings)"
     ),
     minIMSSpecSim = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0,
         description = "Minimum spectral similarity to copy annotations from the IMS precursor",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     timeout = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 120,
         description = "Maximum execution time per GenForm command (seconds)",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     topMost = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 50,
         description = "Maximum number of top ranked candidates to keep",
         type = "count",

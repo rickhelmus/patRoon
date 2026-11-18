@@ -8,55 +8,56 @@ NULL
 
 getFormulasSIRIUSParamDefs <- paramConfigDefsFact(list(
     specSimParams = list(
+        advanced = TRUE,
         default = getDefSpecSimParams(removePrecursor = TRUE),
         description = "Spectral similarity parameters used for annotation similarity calculations",
         type = "specSimParams"
     ),
     getFingerprints = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = FALSE,
         description = "Load CSI:FingerID fingerprints",
         type = "flag"
     ),
     login = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = "check",
         description = "SIRIUS login credentials or login mode"
     ),
     alwaysLogin = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = FALSE,
         description = "Always log in to SIRIUS"
     ),
     calculateFeatures = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = FALSE,
         description = "If TRUE, calculate formulas for individual features instead of directly for the feature group",
         type = "flag"
     ),
     featThreshold = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0,
         description = "Feature threshold for consensus formula generation (if calculateFeatures==TRUE)",
         type = "number",
         typeCheckArgs = list(lower = 0, upper = 1, finite = TRUE)
     ),
     featThresholdAnn = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0.75,
         description = "Feature annotation threshold for consensus formula generation (if calculateFeatures==TRUE)",
         type = "number",
         typeCheckArgs = list(lower = 0, upper = 1, finite = TRUE)
     ),
     absAlignMzDev = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("mz", "narrow"),
         description = "Absolute m/z deviation for feature m/z alignment (if calculateFeatures==TRUE)",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     minIMSSpecSim = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0,
         description = "Minimum spectral similarity to copy annotations from the IMS precursor",
         type = "number",

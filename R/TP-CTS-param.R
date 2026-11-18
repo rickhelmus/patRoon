@@ -8,6 +8,7 @@ NULL
 
 getTPsCTSParamDefs <- paramConfigDefsFact(list(
     transLibrary = list(
+        advanced = FALSE,
         default = "combined_photolysis_abiotic_hydrolysis",
         description = "The transformation library to use.",
         type = "choice",
@@ -18,13 +19,14 @@ getTPsCTSParamDefs <- paramConfigDefsFact(list(
                                          "pfas_environmental", "pfas_metabolism"))
     ),
     generations = list(
+        advanced = FALSE,
         default = 1L,
         description = "The number of transformation generations to predict",
         type = "count",
         typeCheckArgs = list(positive = TRUE)
     ),
     errorRetries = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 3L,
         description = "The maximum number of connection retries",
         type = "count",
@@ -55,6 +57,7 @@ getTPsCTSParamDefs <- paramConfigDefsFact(list(
         type = "flag"
     ),
     TPStructParams = list(
+        advanced = TRUE,
         default = getDefTPStructParams(),
         description = "Parameters for the calculation of TP structure properties",
         type = "TPStructParams"

@@ -7,27 +7,32 @@ NULL
 
 getMSPeakListsParamDefs <- paramConfigDefsFact(list(
     maxMSRTWindow = list(
+        advanced = FALSE,
         default = defaultLim("retention", "narrow"),
         description = "Maximum retention time window for MS peak list generation",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     fixedIsolationWidth = list(
+        advanced = FALSE,
         default = FALSE,
         description = "Configures how MS/MS spectra are selected for a feature (FALSE, NA, or numeric tolerance)"
     ),
     topMost = list(
+        advanced = FALSE,
         default = NULL,
         description = "Only extract MS peak lists from a maximum of topMost features (NULL for all)",
         type = "number",
         typeCheckArgs = list(null.ok = TRUE, lower = 0)
     ),
     avgFeatParams = list(
+        advanced = FALSE,
         default = getDefAvgPListParams(),
         description = "Parameters for averaging MS peak lists of individual features",
         type = "list"
     ),
     avgFGroupParams = list(
+        advanced = FALSE,
         default = getDefAvgPListParams(),
         description = "Parameters for averaging MS peak lists of feature groups",
         type = "list"
@@ -65,84 +70,84 @@ setValidity("MSPeakListsParam", function(object)
 #' @export
 getFilterMSPeakListsParamDefs <- paramConfigDefsFact(list(
     MSLevel = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 1:2,
         description = "MS levels to filter (1 or 2)",
         type = "subset",
         typeCheckArgs = list(choices = 1:2)
     ),
     absMinIntensity = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Absolute minimum intensity threshold",
         type = "number",
         typeCheckArgs = list(null.ok = TRUE, lower = 0, finite = TRUE)
     ),
     relMinIntensity = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Minimum relative intensity threshold",
         type = "number",
         typeCheckArgs = list(null.ok = TRUE, lower = 0, finite = TRUE)
     ),
     topMostPeaks = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Only keep the top most intense peaks per spectrum",
         type = "count",
         typeCheckArgs = list(positive = TRUE, null.ok = TRUE)
     ),
     minPeaks = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Minimum number of peaks required in an MS/MS peak list",
         type = "count",
         typeCheckArgs = list(positive = TRUE, null.ok = TRUE)
     ),
     maxMZOverPrec = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Maximum m/z over precursor allowed in MS/MS",
         type = "number",
         typeCheckArgs = list(null.ok = TRUE, lower = 0, finite = TRUE)
     ),
     absMinAbundanceFeat = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Minimum absolute abundance of a peak across feature spectra",
         type = "number",
         typeCheckArgs = list(null.ok = TRUE, lower = 0, finite = TRUE)
     ),
     relMinAbundanceFeat = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Minimum relative abundance of a peak across feature spectra",
         type = "number",
         typeCheckArgs = list(null.ok = TRUE, lower = 0, finite = TRUE)
     ),
     absMinAbundanceFGroup = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Minimum absolute abundance of a peak across feature group spectra",
         type = "number",
         typeCheckArgs = list(null.ok = TRUE, lower = 0, finite = TRUE)
     ),
     relMinAbundanceFGroup = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Minimum relative abundance of a peak across feature group spectra",
         type = "number",
         typeCheckArgs = list(null.ok = TRUE, lower = 0, finite = TRUE)
     ),
     maxRelCumIntensity = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Maximum relative cumulative intensity of peaks",
         type = "number",
         typeCheckArgs = list(null.ok = TRUE, lower = 0, upper = 1, finite = TRUE)
     ),
     isolatePrec = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Precursor isolation parameters, or TRUE for default settings"
     ),
@@ -153,17 +158,18 @@ getFilterMSPeakListsParamDefs <- paramConfigDefsFact(list(
         type = "flag"
     ),
     removeMZs = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "m/z values or background peaks to remove"
     ),
     withMSMS = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = FALSE,
         description = "Keep only results with MS/MS data",
         type = "flag"
     ),
     annotatedBy = list(
+        advanced = FALSE,
         # UNDONE: move
         default = NULL,
         description = "Formula or compound annotations used to filter MS/MS peaks"
@@ -175,7 +181,7 @@ getFilterMSPeakListsParamDefs <- paramConfigDefsFact(list(
         type = "flag"
     ),
     mzWindow = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("mz", "medium"),
         description = "m/z window used to find peaks for the removeMZs filter",
         type = "number",

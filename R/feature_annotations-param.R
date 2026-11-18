@@ -7,55 +7,56 @@ NULL
 
 getFilterFeatAnnotationsParamDefs <- paramConfigDefsFact(list(
     minExplainedPeaks = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Minimum number of explained peaks",
         type = "count",
         typeCheckArgs = list(positive = FALSE, null.ok = TRUE)
     ),
     scoreLimits = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Minimum and maximum score limits",
         type = "scoreRange",
         typeCheckArgs = list(scNames = NULL)
     ),
     elements = list(
+        advanced = FALSE,
         default = NULL,
         description = "Allowed elements in candidate formulae",
         type = "character",
         typeCheckArgs = list(min.chars = 1, min.len = 1, null.ok = TRUE)
     ),
     fragElements = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Elements required in fragments",
         type = "character",
         typeCheckArgs = list(min.chars = 1, min.len = 1, null.ok = TRUE)
     ),
     lossElements = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Elements required in neutral losses",
         type = "character",
         typeCheckArgs = list(min.chars = 1, min.len = 1, null.ok = TRUE)
     ),
     fragFormulas = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Formulae required in fragments",
         type = "character",
         typeCheckArgs = list(min.chars = 1, min.len = 1, null.ok = TRUE)
     ),
     lossFormulas = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Formulae required in neutral losses",
         type = "character",
         typeCheckArgs = list(min.chars = 1, min.len = 1, null.ok = TRUE)
     ),
     topMost = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Maximum number of candidates to keep",
         type = "count",
@@ -68,7 +69,7 @@ getFilterFeatAnnotationsParamDefs <- paramConfigDefsFact(list(
         type = "flag"
     ),
     maxLevel = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Maximum identification level",
         type = "count",
@@ -93,29 +94,34 @@ setMethod("initialize", "FilterFeatAnnotationsParam", function(.Object, ...)
 
 getEstimateIDConfidenceParamDefs <- paramConfigDefsFact(list(
     absMzDev = list(
+        advanced = FALSE,
         default = defaultLim("mz", "medium"),
         description = "Maximum absolute m/z deviation",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     specSimParams = list(
+        advanced = FALSE,
         default = getDefSpecSimParams(removePrecursor = TRUE),
         description = "Spectrum similarity parameters",
         type = "specSimParams"
     ),
     checkFragments = list(
+        advanced = TRUE,
         default = c("mz", "formula", "compound"),
         description = "Types of MS/MS fragments for suspect fragment matches",
         type = "subset",
         typeCheckArgs = list(choices = c("mz", "formula", "compound"))
     ),
     formulasNormalizeScores = list(
+        advanced = TRUE,
         default = "max",
         description = "Formula score normalization method",
         type = "normalizationMethod",
         typeCheckArgs = list(withNone = FALSE)
     ),
     compoundsNormalizeScores = list(
+        advanced = TRUE,
         default = "max",
         description = "Compound score normalization method",
         type = "normalizationMethod",
@@ -140,24 +146,25 @@ getAssignMobilitiesCompoundsParamDefs <- paramConfigDefsFact(list(
         type = "IMS"
     ),
     from = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Reference data for mobility and CCS assignment"
     ),
     matchFromBy = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = "InChIKey1",
         description = "Column used to match annotations to reference data",
         type = "choice",
         typeCheckArgs = list(choices = c("InChIKey", "InChIKey1", "InChI", "SMILES", "name"))
     ),
     overwrite = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = FALSE,
         description = "Overwrite existing mobility and CCS values",
         type = "flag"
     ),
     CCSParams = list(
+        advanced = FALSE,
         default = NULL,
         description = "Parameters for CCS assignment",
         type = "CCSParams",
@@ -209,34 +216,40 @@ setValidity("AssignMobilitiesCompoundsParam", function(object)
 #' @export
 getPredictToxParamDefs <- paramConfigDefsFact(list(
     type = list(
+        advanced = FALSE,
         default = "FP",
         description = "Prediction input type",
         type = "choice",
         typeCheckArgs = list(choices = c("FP", "SMILES", "both"))
     ),
     LC50Mode = list(
+        advanced = FALSE,
         default = "static",
         description = "LC50 prediction mode",
         type = "choice",
         typeCheckArgs = list(choices = c("static", "flow"))
     ),
     concUnit = list(
+        advanced = FALSE,
         default = "ugL",
         description = "Concentration unit",
         type = "concUnit"
     ),
     updateScore = list(
+        advanced = FALSE,
         default = FALSE,
         description = "Update compound scores with predicted toxicity values (unused by SIRIUS)",
         type = "flag"
     ),
     scoreWeight = list(
+        advanced = FALSE,
         default = 1,
         description = "Weight for the toxicity scoring (unused by SIRIUS)",
         type = "number",
         typeCheckArgs = list(lower = 1, finite = TRUE)
     ),
     parallel = list(
+        advanced = TRUE,
         default = TRUE,
         description = "Process candidates in parallel (unused by SIRIUS)",
         type = "flag"
@@ -255,6 +268,7 @@ setMethod("initialize", "PredictToxParam", function(.Object, ...)
 #' @export
 getPredictRespFactorsParamDefs <- paramConfigDefsFact(list(
     type = list(
+        advanced = TRUE,
         default = "FP",
         description = "Prediction input type",
         type = "choice",

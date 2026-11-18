@@ -8,27 +8,32 @@ NULL
 
 getTPsAnnFormParamDefs <- paramConfigDefsFact(list(
     minFitFormula = list(
+        advanced = FALSE,
         default = 0.94,
         description = "Minimum fitFormula to filter out unlikely candidates",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     skipInvalid = list(
+        advanced = TRUE,
         default = TRUE,
         description = "Skip parents without sufficient chemical information (e.g. SMILES)",
         type = "flag"
     ),
     prefCalcChemProps = list(
+        advanced = TRUE,
         default = TRUE,
         description = "If TRUE, prefer calculated chemical properties over already present data in the suspect list",
         type = "flag"
     ),
     neutralChemProps = list(
+        advanced = TRUE,
         default = FALSE,
         description = "If TRUE, ensure suspects are neutral",
         type = "flag"
     ),
     parallel = list(
+        advanced = TRUE,
         default = TRUE,
         description = "Enable parallel processing with futures",
         type = "flag"

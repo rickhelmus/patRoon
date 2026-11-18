@@ -8,29 +8,34 @@ NULL
 
 getConvertMSFilesPWizParamDefs <- paramConfigDefsFact(list(
     centroidVendor = list(
+        advanced = FALSE,
         default = TRUE,
         description = "Use vendor centroiding algorithms",
         type = "flag"
     ),
     minIntensity = list(
+        advanced = FALSE,
         default = 0,
         description = "Minimum mass peak intensity",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     filters = list(
+        advanced = FALSE,
         default = NULL,
         description = "MSConvert filters",
         type = "character",
         typeCheckArgs = list(min.chars = 1, null.ok = TRUE)
     ),
     extraOpts = list(
+        advanced = TRUE,
         default = NULL,
         description = "Extra command line options",
         type = "character",
         typeCheckArgs = list(min.chars = 1, null.ok = TRUE)
     ),
     PWizBatchSize = list(
+        advanced = TRUE,
         default = 1,
         description = "Number of analyses per MSConvert call",
         type = "count",
@@ -49,6 +54,7 @@ setMethod("initialize", "ConvertMSFilesPWizParam", function(.Object, ...)
 
 getConvertMSFilesOpenMSParamDefs <- paramConfigDefsFact(list(
     extraOpts = list(
+        advanced = TRUE,
         default = NULL,
         description = "Extra command line options",
         type = "character",
@@ -78,6 +84,7 @@ setMethod("initialize", "ConvertMSFilesBrukerParam", function(.Object, ...)
 
 getConvertMSFilesIMSCollapseParamDefs <- paramConfigDefsFact(list(
     mzRange = list(
+        advanced = TRUE,
         default = NULL,
         description = "m/z range",
         type = "range",
@@ -91,13 +98,13 @@ getConvertMSFilesIMSCollapseParamDefs <- paramConfigDefsFact(list(
         typeCheckArgs = list(null.ok = TRUE)
     ),
     smoothWindow = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0,
         description = "Smoothing window",
         type = "count"
     ),
     halfWindow = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 2,
         description = "Centroiding half window",
         type = "count",
@@ -118,21 +125,21 @@ getConvertMSFilesIMSCollapseParamDefs <- paramConfigDefsFact(list(
         typeCheckArgs = list(choices = c("bin", "distance_mean", "distance_point", "hclust"))
     ),
     mzWindow = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("mz", "medium"),
         description = "MS/MS clustering m/z window",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     minIntensityIMS = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0,
         description = "Minimum IMS peak intensity",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     includeMSMS = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = FALSE,
         description = "Include MS/MS spectra in the export",
         type = "flag"
@@ -150,17 +157,20 @@ setMethod("initialize", "ConvertMSFilesIMSCollapseParam", function(.Object, ...)
 
 getConvertMSFilesTIMSCONVERTParamDefs <- paramConfigDefsFact(list(
     centroidRaw = list(
+        advanced = FALSE,
         default = FALSE,
         description = "Use raw mode for centroided data",
         type = "flag"
     ),
     extraOpts = list(
+        advanced = TRUE,
         default = NULL,
         description = "Extra command line options",
         type = "character",
         typeCheckArgs = list(min.chars = 1, null.ok = TRUE)
     ),
     virtualenv = list(
+        advanced = TRUE,
         default = "patRoon-TIMSCONVERT",
         description = "TIMSCONVERT Python virtual environment",
         type = "string",

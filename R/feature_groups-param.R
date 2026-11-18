@@ -8,11 +8,13 @@ NULL
 #' @export
 getSelectIonsParamDefs <- paramConfigDefsFact(list(
     onlyMonoIso = list(
+        advanced = FALSE,
         default = TRUE,
         description = "Keep only monoisotopic features when isotope information is present",
         type = "flag"
     ),
     chargeMismatch = list(
+        advanced = FALSE,
         default = "adduct",
         description = "How to resolve charge mismatches between adduct and isotope annotations",
         type = "choice",
@@ -33,41 +35,47 @@ setMethod("initialize", "SelectIonsParam", function(.Object, ...)
 #' @export
 getNormIntsParamDefs <- paramConfigDefsFact(list(
     featNorm = list(
+        advanced = TRUE,
         default = "none",
         description = "Feature normalization method",
         type = "choice",
         typeCheckArgs = list(choices = c("tic", "istd", "conc", "none"))
     ),
     groupNorm = list(
+        advanced = TRUE,
         default = FALSE,
         description = "Perform normalization on feature groups",
         type = "flag"
     ),
     normFunc = list(
+        advanced = TRUE,
         default = "max",
         description = "Normalization function",
         type = "function"
     ),
     ISTDRTWindow = list(
+        advanced = TRUE,
         default = 120,
         description = "RT window for ISTD matching",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     ISTDMZWindow = list(
+        advanced = TRUE,
         default = 300,
         description = "m/z window for ISTD matching",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     minISTDs = list(
+        advanced = TRUE,
         default = 3,
         description = "Minimum number of ISTDs to consider",
         type = "count",
         typeCheckArgs = list(positive = TRUE)
     ),
     extraOpts = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = list(),
         description = "Extra options passed to screenSuspects() as a named list",
         type = "list",
@@ -121,7 +129,7 @@ getCalculatePeakQualitiesParamDefs <- paramConfigDefsFact(list(
         typeCheckArgs = list(null.ok = TRUE)
     ),
     avgFunc = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = "mean",
         description = "Function used to average feature qualities into group qualities",
         type = "function"
@@ -167,10 +175,12 @@ getAssignMobilitiesFeatureGroupsParamDefs <- paramConfigDefsFact(list(
     # NOTE: most param assertions happen in util called by validity method below
     
     mobPeakParams = list(
+        advanced = FALSE,
         default = NULL,
         description = "Parameters for ion mobility peak detection"
     ),
     chromPeakParams = list(
+        advanced = FALSE,
         default = NULL,
         description = "Parameters for chromatographic peak detection"
     ),
@@ -185,21 +195,22 @@ getAssignMobilitiesFeatureGroupsParamDefs <- paramConfigDefsFact(list(
         description = "Extracted ion chromatogram parameters"
     ),
     peakRTWindow = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("retention", "narrow"),
         description = "Maximum retention time deviation for reintegrated peaks"
     ),
     fallbackEIC = list(
+        advanced = FALSE,
         default = TRUE,
         description = "Fall back to chromatographic data when no mobility peak is found"
     ),
     calcArea = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = "integrate",
         description = "Method for calculating areas from chromatographic data"
     ),
     mobWindow = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("mobility", "medium"),
         description = "Mobility window for grouping IMS features"
     ),
@@ -209,6 +220,7 @@ getAssignMobilitiesFeatureGroupsParamDefs <- paramConfigDefsFact(list(
         description = "Weights for IMS feature-group scoring"
     ),
     CCSParams = list(
+        advanced = FALSE,
         default = NULL,
         description = "Parameters for CCS assignment"
     ),
@@ -218,13 +230,13 @@ getAssignMobilitiesFeatureGroupsParamDefs <- paramConfigDefsFact(list(
         description = "Parallel processing mode"
     ),
     fromSuspects = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = FALSE,
         description = "Use suspect-screening mobility assignments",
         type = "flag"
     ),
     IMSMatchParams = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "IMS matching parameters",
         type = "IMSMatchParams",

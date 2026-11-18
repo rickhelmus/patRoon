@@ -9,23 +9,27 @@ NULL
 #' @export
 getComponentsCAMERAParamDefs <- paramConfigDefsFact(list(
     onlyIsotopes = list(
+        advanced = FALSE,
         default = FALSE,
         description = "If TRUE only isotopes are considered when generating components (faster).",
         type = "flag"
     ),
     minSize = list(
+        advanced = FALSE,
         default = 2,
         description = "Minimum number of feature groups to form a component",
         type = "count",
         typeCheckArgs = list(positive = TRUE)
     ),
     relMinReplicates = list(
+        advanced = FALSE,
         default = 0.5,
         description = "The features of a feature group in a component must be present in at least this relative fraction of replicates",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     extraOpts = list(
+        advanced = TRUE,
         default = NULL,
         description = "Extra options passed directly to CAMERA::annotate() as a named character list",
         type = "list",

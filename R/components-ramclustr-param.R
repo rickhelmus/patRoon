@@ -8,62 +8,62 @@ NULL
 
 getComponentsRAMClustRParamDefs <- paramConfigDefsFact(list(
     st = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "sigma t - time similarity decay value (when NULL computed as the half median for all chrom peak widths, passed to RAMClustR::ramclustR)",
         type = "number",
         typeCheckArgs = list(lower = 0, null.ok = TRUE)
     ),
     sr = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "sigma r - correlational similarity decay value (NULL = auto, passed to RAMClustR::ramclustR)",
         type = "number",
         typeCheckArgs = list(lower = 0, null.ok = TRUE)
     ),
     maxt = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 12,
         description = "maximum time difference to calculate retention similarity for - all values beyond this are assigned similarity of zero (passed to RAMClustR::ramclustR)",
         type = "number",
         typeCheckArgs = list(lower = 0)
     ),
     hmax = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0.3,
         description = "precut the tree at this height. See ?cutreeDynamicTree (passed to RAMClustR::ramclustR)",
         type = "number",
         typeCheckArgs = list(lower = 0)
     ),
     normalize = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = "TIC",
         description = "normalization of feature intensities (passed to RAMClustR::ramclustR)",
         type = "string"
     ),
     absMzDev = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("mz", "narrow"),
         description = "Absolute m/z deviation (pased as mzabs.error to RAMClustR::do.findmain)",
         type = "number",
         typeCheckArgs = list(lower = 0)
     ),
     relMzDev = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("mz", "narrow_rel"),
         description = "Relative m/z deviation (passed as ppm.error to RAMClustR::do.findmain)",
         type = "number",
         typeCheckArgs = list(lower = 0)
     ),
     minSize = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 2,
         description = "Minimum number of feature groups to form a component",
         type = "count",
         typeCheckArgs = list(positive = TRUE)
     ),
     relMinReplicates = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0.5,
         description = "The features of a feature group in a component must be present in at least this relative fraction of replicates",
         type = "number",

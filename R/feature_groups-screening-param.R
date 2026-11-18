@@ -8,56 +8,58 @@ NULL
 #' @export
 getScreenSuspectsParamDefs <- paramConfigDefsFact(list(
     rtWindow = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("retention", "medium"),
         description = "Retention time window (in seconds) for matching suspects",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     mzWindow = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("mz", "medium"),
         description = "m/z window for matching suspects",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     IMSMatchParams = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "IMS matching parameters",
         type = "IMSMatchParams",
         typeCheckArgs = list(null.ok = TRUE)
     ),
     skipInvalid = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = TRUE,
         description = "If TRUE, ignore suspects with invalid data",
         type = "flag"
     ),
     prefCalcChemProps = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = TRUE,
         description = "If TRUE, prefer to calculate chemical properties",
         type = "flag"
     ),
     neutralChemProps = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = FALSE,
         description = "If TRUE, use neutral chemical properties",
         type = "flag"
     ),
     includeParents = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = FALSE,
         description = "If TRUE and suspects are transformation products, include their parents",
         type = "flag"
     ),
     onlyHits = list(
+        advanced = FALSE,
         default = FALSE,
         description = "If TRUE, remove feature groups without suspect matches",
         type = "flag"
     ),
     amend = list(
+        advanced = FALSE,
         default = FALSE,
         description = "If TRUE, amend existing suspect matches",
         type = "flag"

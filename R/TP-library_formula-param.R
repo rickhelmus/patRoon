@@ -8,33 +8,39 @@ NULL
 
 getTPsLibraryFormulaParamDefs <- paramConfigDefsFact(list(
     generations = list(
+        advanced = FALSE,
         default = 1L,
         description = "The number of transformation generations to predict",
         type = "count",
         typeCheckArgs = list(positive = TRUE)
     ),
     skipInvalid = list(
+        advanced = TRUE,
         default = TRUE,
         description = "Skip invalid parents without sufficient chemical information (e.g. formulae)",
         type = "flag"
     ),
     prefCalcChemProps = list(
+        advanced = TRUE,
         default = TRUE,
         description = "If TRUE, prefer calculated chemical properties over already present data in the suspect list",
         type = "flag"
     ),
     neutralChemProps = list(
+        advanced = TRUE,
         default = FALSE,
         description = "If TRUE, ensure suspects are neutral",
         type = "flag"
     ),
     matchParentsBy = list(
+        advanced = TRUE,
         default = "name",
         description = "How to match parents in the library",
         type = "choice",
         typeCheckArgs = list(choices = c("InChIKey", "InChIKey1", "InChI", "SMILES", "formula", "name"))
     ),
     matchGenerationsBy = list(
+        advanced = TRUE,
         default = "name",
         description = "How to match generations in the library",
         type = "choice",

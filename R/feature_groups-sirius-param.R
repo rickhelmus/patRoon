@@ -8,32 +8,38 @@ NULL
 
 getFeatureGroupsSIRIUSParamDefs <- paramConfigDefsFact(list(
     noiseIntensity = list(
+        advanced = FALSE,
         default = NULL,
         description = "Noise intensity threshold",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE, null.ok = TRUE)
     ),
     alignMaxRTDev = list(
+        advanced = FALSE,
         default = NULL,
         description = "Maximum retention time deviation for alignment",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE, null.ok = TRUE)
     ),
     minSNR = list(
+        advanced = FALSE,
         default = NULL,
         description = "Minimum signal-to-noise ratio",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE, null.ok = TRUE)
     ),
     login = list(
+        advanced = FALSE,
         default = "check",
         description = "SIRIUS login credentials or login mode"
     ),
     alwaysLogin = list(
+        advanced = FALSE,
         default = FALSE,
         description = "Always log in to SIRIUS"
     ),
     verbose = list(
+        advanced = TRUE,
         default = TRUE,
         description = "Verbose output",
         type = "flag"

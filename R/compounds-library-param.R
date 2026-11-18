@@ -8,53 +8,54 @@ NULL
 
 getCompoundsLibraryParamDefs <- paramConfigDefsFact(list(
     specSimParams = list(
+        advanced = FALSE,
         default = getDefSpecSimParams(removePrecursor = TRUE),
         description = "Spectral similarity parameters used for annotation similarity calculations",
         type = "specSimParams"
     ),
     minSim = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0.75,
         description = "The minimum spectral similarity for candidate records",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     minAnnSim = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0.75,
         description = "The minimum spectral similarity of a record for it to be used to find annotations",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     absMzDev = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("mz", "narrow"),
         description = "The maximum absolute m/z deviation between the feature group and library record m/z values",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     checkIons = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = "adduct",
         description = "Exclude library records with different adduct or MS ionization polarity",
         type = "choice",
         typeCheckArgs = list(choices = c("adduct", "polarity", "none"))
     ),
     spectrumType = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = "MS2",
         description = "The spectrum type(s) to use from the library (NULL to use all)",
         type = "character",
         typeCheckArgs = list(min.len = 1, min.chars = 1, null.ok = TRUE)
     ),
     specSimParamsLib = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = getDefSpecSimParams(removePrecursor = TRUE),
         description = "Spectral similarity parameters used for pre-treatment of library spectra",
         type = "specSimParams"
     ),
     minIMSSpecSim = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0,
         description = "Minimum spectral similarity to copy annotations from the IMS precursor",
         type = "number",

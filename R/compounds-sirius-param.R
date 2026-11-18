@@ -8,29 +8,30 @@ NULL
 
 getCompoundsSIRIUSParamDefs <- paramConfigDefsFact(list(
     specSimParams = list(
+        advanced = FALSE,
         default = getDefSpecSimParams(removePrecursor = TRUE),
         description = "Spectral similarity parameters used for annotation similarity calculations",
         type = "specSimParams"
     ),
     topMost = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 100,
         description = "Maximum number of top-ranked structures to keep per feature group",
         type = "count",
         typeCheckArgs = list(positive = TRUE)
     ),
     login = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = "check",
         description = "SIRIUS login credentials or login mode"
     ),
     alwaysLogin = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = FALSE,
         description = "Always log in to SIRIUS"
     ),
     minIMSSpecSim = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0,
         description = "Minimum spectral similarity to copy annotations from the IMS precursor",
         type = "number",

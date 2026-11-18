@@ -8,6 +8,7 @@ NULL
 
 getTPsLogicParamDefs <- paramConfigDefsFact(list(
     minMass = list(
+        advanced = FALSE,
         default = 40,
         description = "The minimum mass for a TP to be kept",
         type = "number",

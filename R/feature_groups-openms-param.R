@@ -8,7 +8,7 @@ NULL
 
 getFeatureGroupsOpenMSParamDefs <- paramConfigDefsFact(list(
     rtalign = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = TRUE,
         description = "If TRUE then retention times are aligned",
         type = "flag"
@@ -20,28 +20,28 @@ getFeatureGroupsOpenMSParamDefs <- paramConfigDefsFact(list(
         type = "flag"
     ),
     maxAlignRT = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("retention", "wide"),
         description = "Maximum retention time difference (seconds) for feature pairing during alignment",
         type = "number",
         typeCheckArgs = list(finite = TRUE)
     ),
     maxAlignMZ = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("mz", "medium"),
         description = "Maximum m/z difference for feature pairing during alignment",
         type = "number",
         typeCheckArgs = list(finite = TRUE)
     ),
     maxGroupRT = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("retention", "medium"),
         description = "Maximum retention time difference (seconds) for grouping of features",
         type = "number",
         typeCheckArgs = list(finite = TRUE)
     ),
     maxGroupMZ = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("mz", "medium"),
         description = "Maximum m/z difference for grouping of features",
         type = "number",

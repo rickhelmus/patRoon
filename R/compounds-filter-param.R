@@ -8,35 +8,35 @@ NULL
 #' @export
 getFilterCompoundsParamDefs <- paramConfigDefsFact(list(
     minScore = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Minimum overall compound score",
         type = "number",
         typeCheckArgs = list(finite = TRUE, null.ok = TRUE)
     ),
     minFragScore = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Minimum fragmentation score",
         type = "number",
         typeCheckArgs = list(finite = TRUE, null.ok = TRUE)
     ),
     minFormulaScore = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Minimum formula score",
         type = "number",
         typeCheckArgs = list(finite = TRUE, null.ok = TRUE)
     ),
     IMSRangeParams = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Ion mobility range filter",
         type = "IMSRangeParams",
         typeCheckArgs = list(null.ok = TRUE)
     ),
     IMSMatchParams = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Ion mobility match filter",
         type = "IMSMatchParams",

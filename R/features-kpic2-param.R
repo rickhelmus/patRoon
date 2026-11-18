@@ -7,23 +7,27 @@ NULL
 
 getFeaturesKPIC2ParamDefs <- paramConfigDefsFact(list(
     kmeans = list(
+        advanced = FALSE,
         default = TRUE,
         description = "If TRUE, use kmeans clustering for feature detection",
         type = "flag"
     ),
     level = list(
+        advanced = FALSE,
         default = 1000,
         description = "Level parameter passed to KPIC::getPIC or KPIC::getPIC.kmeans",
         type = "number",
         typeCheckArgs = list(lower = 0)
     ),
     extraOpts = list(
+        advanced = TRUE,
         default = NULL,
         description = "List with extra options passed to KPIC::getPIC or KPIC::getPIC.kmeans",
         type = "list",
         typeCheckArgs = list(names = "unique", null.ok = TRUE)
     ),
     verbose = list(
+        advanced = TRUE,
         default = TRUE,
         description = "Verbose output",
         type = "flag"

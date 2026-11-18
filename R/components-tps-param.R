@@ -9,22 +9,26 @@ NULL
 #' @export
 getComponentsTPsParamDefs <- paramConfigDefsFact(list(
     ignoreParents = list(
+        advanced = FALSE,
         default = FALSE,
         description = "If TRUE, feature groups present in both parents and TPs are ignored during linkage.",
         type = "flag"
     ),
     minRTDiff = list(
+        advanced = FALSE,
         default = 20,
         description = "Minimum retention time difference (seconds) to consider when linking parents and TPs.",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     specSimParams = list(
+        advanced = FALSE,
         default = getDefSpecSimParams(),
         description = "MS/MS spectral similarity parameters.",
         type = "specSimParams"
     ),
     IMS = list(
+        advanced = FALSE,
         default = "maybe",
         description = "Which feature groups are considered for componentization in IMS workflows ('maybe', 'both', FALSE, TRUE)",
         type = "IMS"

@@ -8,6 +8,7 @@ NULL
 
 getCompoundsMetFragParamDefs <- paramConfigDefsFact(list(
     specSimParams = list(
+        advanced = FALSE,
         default = getDefSpecSimParams(removePrecursor = TRUE),
         description = "Spectral similarity parameters used for annotation similarity calculations",
         type = "specSimParams"
@@ -20,71 +21,72 @@ getCompoundsMetFragParamDefs <- paramConfigDefsFact(list(
         typeCheckArgs = list(choices = c("CL", "R"))
     ),
     timeout = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 300,
         description = "Maximum time (in seconds) before a MetFrag query for a feature group is stopped",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     timeoutRetries = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 2,
         description = "Maximum number of retries after reaching a timeout",
         type = "count"
     ),
     errorRetries = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 2,
         description = "Maximum number of retries after an error occurred (e.g. connection errors).",
         type = "count"
     ),
     topMost = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 100,
         description = "Maximum number of top ranked candidates to keep",
         type = "count",
         typeCheckArgs = list(positive = TRUE)
     ),
     maxCandidatesToStop = list(
+        advanced = FALSE,
         default = 2500,
         description = "If more than this number of candidate structures are found then processing will be aborted",
         type = "count",
         typeCheckArgs = list(positive = TRUE)
     ),
     dbRelMzDev = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("mz", "narrow_rel"),
         description = "Relative mass deviation (in ppm) for database search",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     fragRelMzDev = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("mz", "narrow_rel"),
         description = "Relative mass deviation (in ppm) for fragment matching",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     fragAbsMzDev = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("mz", "narrow"),
         description = "Absolute mass deviation for fragment matching",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     database = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = "pubchemlite",
         description = "Database to be used for compound candidate retrieval"
     ),
     includeParents = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = FALSE,
         description = "Include parents when transformation products are used as the database",
         type = "flag"
     ),
     extendedPubChem = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = "auto",
         description = "Whether to use the extended PubChem database"
     ),
@@ -95,14 +97,14 @@ getCompoundsMetFragParamDefs <- paramConfigDefsFact(list(
         type = "string"
     ),
     scoreTypes = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Character vector defining the scoring types (set to NULL for default scoring types)",
         type = "character",
         typeCheckArgs = list(any.missing = FALSE, null.ok = TRUE)
     ),
     scoreWeights = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 1.0,
         description = "Numeric vector containing weights of the used scoring types",
         type = "numeric",
@@ -123,7 +125,7 @@ getCompoundsMetFragParamDefs <- paramConfigDefsFact(list(
         typeCheckArgs = list(any.missing = FALSE)
     ),
     minIMSSpecSim = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0,
         description = "Minimum spectral similarity to copy annotations from the IMS precursor",
         type = "number",

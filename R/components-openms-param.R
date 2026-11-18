@@ -8,21 +8,21 @@ NULL
 #' @export
 getComponentsOpenMSParamDefs <- paramConfigDefsFact(list(
     chargeMin = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 1,
         description = "Minimum charge to consider",
         type = "count",
         typeCheckArgs = list(positive = TRUE)
     ),
     chargeMax = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 1,
         description = "Maximum charge to consider",
         type = "count",
         typeCheckArgs = list(positive = TRUE)
     ),
     chargeSpan = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 3,
         description = "Charge span considered when generating adduct candidates",
         type = "count",
@@ -37,35 +37,35 @@ getComponentsOpenMSParamDefs <- paramConfigDefsFact(list(
     ),
     # UNDONE: this needs to be updated to work for sets, see TODO.md
     potentialAdducts = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Adducts to consider with probabilities, eg c(\"[M+H]+\" = 0.8, \"[M+Na]+\" = 0.2)",
         type = "list",
         typeCheckArgs = list(types = "numeric", names = "unique", null.ok = TRUE)
     ),
     minRTOverlap = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0.66,
         description = "Minimum relative retention time overlap",
         type = "number",
         typeCheckArgs = list(lower = 0, upper = 1)
     ),
     retWindow = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("retention", "very_narrow"),
         description = "Retention time tolerance",
         type = "number",
         typeCheckArgs = list(finite = TRUE, lower = 0)
     ),
     absMzDev = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("mz", "medium"),
         description = "Absolute m/z deviation threshold used for componentization",
         type = "number",
         typeCheckArgs = list(finite = TRUE, lower = 0)
     ),
     minSize = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 2,
         description = "Minimum number of feature groups to form a component",
         type = "count",

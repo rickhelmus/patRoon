@@ -7,6 +7,7 @@ NULL
 
 getFilterTPsParamDefs <- paramConfigDefsFact(list(
     properties = list(
+        advanced = FALSE,
         default = NULL,
         description = "Allowed property values",
         # NOTE: properties requires additional checks with data from the TPs object
@@ -14,11 +15,13 @@ getFilterTPsParamDefs <- paramConfigDefsFact(list(
         typeCheckArgs = list(null.ok = TRUE, any.missing = FALSE)
     ),
     verbose = list(
+        advanced = TRUE,
         default = TRUE,
         description = "Verbose output",
         type = "flag"
     ),
     negate = list(
+        advanced = TRUE,
         default = FALSE,
         description = "Apply filters in the opposite manner",
         type = "flag"
@@ -36,32 +39,38 @@ setMethod("initialize", "FilterTPsParam", function(.Object, ...)
 
 getFilterTPsStructureParamDefs <- paramConfigDefsFact(list(
     removeParentIsomers = list(
+        advanced = FALSE,
         default = FALSE,
         description = "Remove TPs isomeric with their parent",
         type = "flag"
     ),
     removeTPIsomers = list(
+        advanced = FALSE,
         default = FALSE,
         description = "Remove isomeric TPs",
         type = "flag"
     ),
     removeDuplicates = list(
+        advanced = FALSE,
         default = FALSE,
         description = "Remove duplicate structures",
         type = "flag"
     ),
     minSimilarity = list(
+        advanced = FALSE,
         default = NULL,
         description = "Minimum structural similarity",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE, null.ok = TRUE)
     ),
     verbose = list(
+        advanced = TRUE,
         default = TRUE,
         description = "Verbose output",
         type = "flag"
     ),
     negate = list(
+        advanced = TRUE,
         default = FALSE,
         description = "Apply filters in the opposite manner",
         type = "flag"
@@ -80,42 +89,42 @@ setMethod("initialize", "FilterTPsStructureParam", function(.Object, ...)
 
 getFilterTPsAnnCompParamDefs <- paramConfigDefsFact(list(
     minFitFormula = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0,
         description = "Minimum formula fit",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     minFitCompound = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0,
         description = "Minimum compound fit",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     minSimSusp = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0,
         description = "Minimum suspect similarity",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     minFitCompOrSimSusp = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = c(0, 0),
         description = "Minimum compound fit OR suspect similarity",
         type = "numeric",
         typeCheckArgs = list(lower = 0, finite = TRUE, len = 2)
     ),
     minTPScore = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0,
         description = "Minimum TP score",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     topMost = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Maximum number of TPs to keep per group",
         type = "count",
@@ -147,29 +156,34 @@ setMethod("initialize", "FilterTPsAnnCompParam", function(.Object, ...)
 
 getFilterTPsAnnFormParamDefs <- paramConfigDefsFact(list(
     minFitFormula = list(
+        advanced = FALSE,
         default = 0,
         description = "Minimum formula fit",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     minTPScore = list(
+        advanced = FALSE,
         default = 0,
         description = "Minimum TP score",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     topMost = list(
+        advanced = FALSE,
         default = NULL,
         description = "Maximum number of TPs to keep per group",
         type = "count",
         typeCheckArgs = list(positive = TRUE, null.ok = TRUE)
     ),
     verbose = list(
+        advanced = TRUE,
         default = TRUE,
         description = "Verbose output",
         type = "flag"
     ),
     negate = list(
+        advanced = TRUE,
         default = FALSE,
         description = "Apply filters in the opposite manner",
         type = "flag"

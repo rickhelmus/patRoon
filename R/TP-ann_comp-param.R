@@ -8,35 +8,35 @@ NULL
 
 getTPsAnnCompParamDefs <- paramConfigDefsFact(list(
     minRTDiff = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 20,
         description = "Minimum retention time difference between parent and TP",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     minFitFormula = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0.94,
         description = "Minimum fitFormula to filter out unlikely candidates",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     minFitCompound = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0,
         description = "Minimum fitCompound to filter out unlikely candidates",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     minSimSusp = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0,
         description = "Minimum similarity with suspects",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     minFitCompOrSimSusp = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = c(0.54, 0.65),
         description = "Thresholds for fitCompound OR simSusp",
         type = "numeric",
@@ -74,6 +74,7 @@ getTPsAnnCompParamDefs <- paramConfigDefsFact(list(
         type = "flag"
     ),
     TPStructParams = list(
+        advanced = TRUE,
         default = getDefTPStructParams(),
         description = "Parameters for the calculation of TP structure properties",
         type = "TPStructParams"

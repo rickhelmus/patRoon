@@ -8,97 +8,97 @@ NULL
 
 getFeaturesOpenMSParamDefs <- paramConfigDefsFact(list(
     noiseThrInt = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 1000,
         description = "Intensity threshold",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     chromSNR = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 3,
         description = "Chromatographic signal-to-noise ratio threshold",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     chromFWHM = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 5,
         description = "Chromatographic full width at half maximum",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     mzPPM = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("mz", "medium_rel"),
         description = "Mass-to-charge ratio tolerance in parts per million",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     reEstimateMTSD = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = TRUE,
         description = "Re-estimate mass trace signal-to-noise ratio",
         type = "flag"
     ),
     traceTermCriterion = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = "sample_rate",
         description = "Criterion for trace termination",
         type = "choice",
         typeCheckArgs = list(choices = c("sample_rate", "outliers"))
     ),
     traceTermOutliers = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 5,
         description = "Number of outliers for trace termination",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     minSampleRate = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0.5,
         description = "Minimum sample rate for feature detection",
         type = "number",
         typeCheckArgs = list(lower = 0, upper = 1, finite = TRUE)
     ),
     minTraceLength = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 3,
         description = "Minimum trace length",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     maxTraceLength = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = -1,
         description = "Maximum trace length (-1 for unlimited)",
         type = "number",
         typeCheckArgs = list(lower = -1, finite = TRUE)
     ),
     widthFiltering = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = "fixed",
         description = "Width filtering method",
         type = "choice",
         typeCheckArgs = list(choices = c("fixed", "off", "auto"))
     ),
     minFWHM = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 1,
         description = "Minimum full width at half maximum",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     maxFWHM = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 30,
         description = "Maximum full width at half maximum",
         type = "number",
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     traceSNRFiltering = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = FALSE,
         description = "Enable trace signal-to-noise ratio filtering",
         type = "flag"
@@ -118,7 +118,7 @@ getFeaturesOpenMSParamDefs <- paramConfigDefsFact(list(
         typeCheckArgs = list(lower = 0, finite = TRUE)
     ),
     isotopeFilteringModel = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = "metabolites (5% RMS)",
         description = "Isotope filtering model",
         type = "choice",

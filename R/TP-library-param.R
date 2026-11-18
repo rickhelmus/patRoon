@@ -8,6 +8,7 @@ NULL
 
 getTPsLibraryParamDefs <- paramConfigDefsFact(list(
     generations = list(
+        advanced = FALSE,
         default = 1L,
         description = "The number of transformation generations to predict",
         type = "count",
@@ -52,6 +53,7 @@ getTPsLibraryParamDefs <- paramConfigDefsFact(list(
         typeCheckArgs = list(choices = c("InChIKey", "InChIKey1", "InChI", "SMILES", "formula", "name"))
     ),
     TPStructParams = list(
+        advanced = TRUE,
         default = getDefTPStructParams(),
         description = "Parameters for the calculation of TP structure properties",
         type = "TPStructParams"

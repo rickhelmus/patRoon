@@ -7,21 +7,21 @@ NULL
 
 getFeaturesPiekParamDefs <- paramConfigDefsFact(list(
     genEICParams = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = getPiekEICParams(),
         description = "Parameters for EIC generation (use getPiekEICParams())",
         type = "list",
         typeCheckArgs = list(null.ok = FALSE)
     ),
     peakParams = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = getDefPeakParams("chrom", "piek"),
         description = "Parameters for peak detection (use getDefPeakParams())",
         type = "list",
         typeCheckArgs = list(null.ok = FALSE)
     ),
     IMS = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = FALSE,
         description = "Use ion mobility separation (IMS)",
         type = "flag"
@@ -69,7 +69,7 @@ getFeaturesPiekParamDefs <- paramConfigDefsFact(list(
         typeCheckArgs = list(lower = 0, upper = 1, finite = TRUE)
     ),
     minIntensityIMS = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 25,
         description = "Minimum intensity for IMS datapoints",
         type = "number",

@@ -9,41 +9,42 @@ NULL
 #' @export
 getComponentsNetParamDefs <- paramConfigDefsFact(list(
     minSize = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 2,
         description = "Minimum number of feature groups to form a component",
         type = "count",
         typeCheckArgs = list(positive = TRUE)
     ),
     mzWindow = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = defaultLim("mz", "medium"),
         description = "Absolute m/z tolerance used for annotation and MS2 matching",
         type = "number",
         typeCheckArgs = list(finite = TRUE, lower = 0)
     ),
     componSim = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = "pearson",
         description = "Similarity metric used for feature networking",
         type = "choice",
         typeCheckArgs = list(choices = c("pearson", "cosine"))
     ),
     componMinSim = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0.95,
         description = "Minimum feature similarity to connect nodes",
         type = "number",
         typeCheckArgs = list(finite = TRUE, lower = 0, upper = 1)
     ),
     componMaxP = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0.05,
         description = "Maximum p-value for Pearson similarity",
         type = "number",
         typeCheckArgs = list(finite = TRUE, lower = 0, upper = 1)
     ),
     componMethod = list(
+        advanced = FALSE,
         default = "community",
         description = "Network componentization method",
         type = "choice",
@@ -57,31 +58,32 @@ getComponentsNetParamDefs <- paramConfigDefsFact(list(
         typeCheckArgs = list(any.missing = FALSE, names = "unique")
     ),
     groupClust = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = "complete",
         description = "Clustering method for consensus components across analyses",
         type = "string"
     ),
     groupClustH = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 0.5,
         description = "Height at which to cut the consensus clustering tree",
         type = "number",
         typeCheckArgs = list(finite = TRUE, lower = 0, upper = 1)
     ),
     annotAlgo = list(
+        advanced = FALSE,
         default = "imss",
         description = "Annotation algorithm",
         type = "choice",
         typeCheckArgs = list(choices = c("imss", "nontarget"))
     ),
     annotAdducts = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = c("[M+H]+", "[M+Na]+", "[M+K]+", "[M+NH4]+", "[M-H]-", "[M-H2O-H]-"),
         description = "Adducts to use for component annotation"
     ),
     annotPrefAdducts = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = c("[M+H]+", "[M-H]-"),
         description = "Preferred adducts for nontarget annotation",
         type = "character",
@@ -95,7 +97,7 @@ getComponentsNetParamDefs <- paramConfigDefsFact(list(
         typeCheckArgs = list(any.missing = FALSE, names = "unique")
     ),
     mzFragBelow = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = 10,
         description = "Minimum m/z difference below a precursor for MS2 matching",
         type = "number",

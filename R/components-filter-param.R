@@ -8,38 +8,38 @@ NULL
 #' @export
 getFilterComponentsParamDefs <- paramConfigDefsFact(list(
     size = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Component size range",
         type = "range",
         typeCheckArgs = list(null.ok = TRUE)
     ),
     adducts = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Adducts to keep"
     ),
     isotopes = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Isotope assignments to keep"
     ),
     rtIncrement = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Retention increment range for homologous series",
         type = "numeric",
         typeCheckArgs = list(len = 2, any.missing = FALSE, null.ok = TRUE)
     ),
     mzIncrement = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "m/z increment range for homologous series",
         type = "numeric",
         typeCheckArgs = list(len = 2, lower = 0, any.missing = FALSE, null.ok = TRUE)
     ),
     checkComponentsSession = list(
-        advanced = TRUE,
+        advanced = FALSE,
         default = NULL,
         description = "Component check session file"
     ),

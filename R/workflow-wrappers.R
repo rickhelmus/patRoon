@@ -20,7 +20,7 @@ doWfStepFunc <- function(func, inputObjs, param, inputs = list(), setFirstArgObj
 addWfStep <- function(object, func, paramClass = NA_character_, param = NULL, slotNameIn = character(),
                       slotNameOut = NA_character_, set = NA_character_)
 {
-    if (!object@dryRun)
+    if (!object@dryRun && length(slotNameIn) > 0)
         slotNameIn <- slotNameIn[sapply(slotNameIn, \(x) !is.null(slot(object, x)))]
     step <- data.table(func = func, timestamp = Sys.time(), paramClass = paramClass, param = list(param),
                        slotNameIn = list(slotNameIn), slotNameOut = slotNameOut, set = set)
@@ -439,7 +439,7 @@ doWfTPs <- function(obj, ..., parents, algo, slotNameIn = character(), inputs = 
     recordSlotNameIn <- slotNameIn
     if (identical(parents, "fGroups"))
     {
-        if (!wfHasScreeningFGroups(obj, noSets = TRUE))
+        if (!wfHasScreeningFGroups(obj))
             stop("No suspect information in this workflow object! You may need to perform a prior suspect screening or adapt the parents argument.", call. = FALSE)
         if (!obj@dryRun)
             parents <- obj@fGroups
@@ -456,11 +456,11 @@ doWfTPs <- function(obj, ..., parents, algo, slotNameIn = character(), inputs = 
             recordSlotNameIn <- c("compounds", recordSlotNameIn)
     }
     obj <- doWfStep(obj, func = paste0("generateTPsP", algo), slotNameIn = slotNameIn, slotNameOut = "TPs",
-             paramClass = paste0("TPs", algo, "Param"), inputs = c(list(obj = parents), inputs),
-             setFirstArgObj = FALSE, ...)
+                    paramClass = paste0("TPs", algo, "Param"), inputs = c(list(obj = parents), inputs),
+                    setFirstArgObj = FALSE, ...)
     
     # HACK update steps history manually here for additional input slots
-    obj@step[.N, slotNameIn := list(recordSlotNameIn)]
+    obj@steps[.N, slotNameIn := list(recordSlotNameIn)]
     
     return(obj)
 }
@@ -575,11 +575,18 @@ setMethod("filterP", c("workflow", "FilterMSPeakListsParam"),
 
 
 #' @rdname suspect-screening
-setMethod("screenSuspectsP", "workflow",
-          \(obj, param = NULL, ..., suspects, adduct = NULL) doWfStep(obj, func = "screenSuspectsP",
-                                                                      slotNameIn = "fGroups", slotNameOut = "fGroups",
-                                                                      paramClass = "ScreenSuspectsParam", param = param,
-                                                                      inputs = list(suspects = suspects, adduct = adduct), ...))
+setMethod("screenSuspectsP", "workflow", function(obj, param = NULL, ..., suspects, adduct = NULL)
+{
+    if (is.character(suspects) && suspects == "tps")
+    {
+        if (!wfHasSlot(obj, "TPs"))
+            stop("No transformation products available in this workflow object!", call. = FALSE)
+        suspects <- obj@TPs
+    }
+    doWfStep(obj, func = "screenSuspectsP", slotNameIn = "fGroups", slotNameOut = "fGroups",
+             paramClass = "ScreenSuspectsParam", param = param,
+             inputs = list(suspects = suspects, adduct = adduct), ...)
+})
 
 #' @rdname featureGroups-class
 setMethod("selectIonsP", "workflow",

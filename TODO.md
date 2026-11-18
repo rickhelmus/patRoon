@@ -24,6 +24,7 @@
         - also for many other generics
     - Suspect lists can now be read directly from delimited files in suspect screening, TP generation, and internal-standard normalization; sets workflows also support per-set files
     - check if docs related to suspect screening are fine since the file path as input updates
+    - doc that "tps" can be used for screenSuspectsP() and generateCompoundsP()
 - wfWrap: don't wrap analysisInfo?
 - report()
     - keep objects configurable?
@@ -48,8 +49,7 @@
 - newProject()
     - reportCSV/reportPDF, DA method saving and recalibration: just use wfWrap()
 - better handle errors where the user supplies objects through ... (MSPeakLists etc) that are automatically filled in from slots (eg generateComponentsNet())
-- screenSuspectsP(): support TPs slot as input (with eg suspects = "TPs"?)
-    - same for MetFrag compounds with TPs
+- generateCompoundsP(): support TPs slot as input (with eg database = "TPs"?)
 
 
 ## Params

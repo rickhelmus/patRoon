@@ -81,6 +81,7 @@
 - FilterFormulasParam()
     - just does sets now, keep?
     - only have formulasSets method now... add a dummy method for formulas that throwns an informative error?
+- add verbose (and other general flags?) to suspect filter param
 
 
 ## NEWS / docs

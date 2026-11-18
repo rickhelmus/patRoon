@@ -1,0 +1,3060 @@
+{
+  "schema_version": 1,
+  "description": "Desired advanced status for parameter definitions; decisions only, not a source patch.",
+  "decisions": [
+    {
+      "file": "R/components-camera-param.R",
+      "class": "ComponentsCAMERAParam",
+      "parameter": "onlyIsotopes",
+      "advanced": false
+    },
+    {
+      "file": "R/components-camera-param.R",
+      "class": "ComponentsCAMERAParam",
+      "parameter": "minSize",
+      "advanced": false
+    },
+    {
+      "file": "R/components-camera-param.R",
+      "class": "ComponentsCAMERAParam",
+      "parameter": "relMinReplicates",
+      "advanced": false
+    },
+    {
+      "file": "R/components-camera-param.R",
+      "class": "ComponentsCAMERAParam",
+      "parameter": "extraOpts",
+      "advanced": true
+    },
+    {
+      "file": "R/components-cliquems-param.R",
+      "class": "ComponentsCliqueMSParam",
+      "parameter": "maxCharge",
+      "advanced": false
+    },
+    {
+      "file": "R/components-cliquems-param.R",
+      "class": "ComponentsCliqueMSParam",
+      "parameter": "maxGrade",
+      "advanced": false
+    },
+    {
+      "file": "R/components-cliquems-param.R",
+      "class": "ComponentsCliqueMSParam",
+      "parameter": "ppm",
+      "advanced": false
+    },
+    {
+      "file": "R/components-cliquems-param.R",
+      "class": "ComponentsCliqueMSParam",
+      "parameter": "adductInfo",
+      "advanced": false
+    },
+    {
+      "file": "R/components-cliquems-param.R",
+      "class": "ComponentsCliqueMSParam",
+      "parameter": "absMzDev",
+      "advanced": false
+    },
+    {
+      "file": "R/components-cliquems-param.R",
+      "class": "ComponentsCliqueMSParam",
+      "parameter": "minSize",
+      "advanced": false
+    },
+    {
+      "file": "R/components-cliquems-param.R",
+      "class": "ComponentsCliqueMSParam",
+      "parameter": "relMinAdductAbundance",
+      "advanced": false
+    },
+    {
+      "file": "R/components-cliquems-param.R",
+      "class": "ComponentsCliqueMSParam",
+      "parameter": "adductConflictsUsePref",
+      "advanced": true
+    },
+    {
+      "file": "R/components-cliquems-param.R",
+      "class": "ComponentsCliqueMSParam",
+      "parameter": "NMConflicts",
+      "advanced": true
+    },
+    {
+      "file": "R/components-cliquems-param.R",
+      "class": "ComponentsCliqueMSParam",
+      "parameter": "prefAdducts",
+      "advanced": true
+    },
+    {
+      "file": "R/components-cliquems-param.R",
+      "class": "ComponentsCliqueMSParam",
+      "parameter": "extraOptsCli",
+      "advanced": true
+    },
+    {
+      "file": "R/components-cliquems-param.R",
+      "class": "ComponentsCliqueMSParam",
+      "parameter": "extraOptsIso",
+      "advanced": true
+    },
+    {
+      "file": "R/components-cliquems-param.R",
+      "class": "ComponentsCliqueMSParam",
+      "parameter": "extraOptsAnn",
+      "advanced": true
+    },
+    {
+      "file": "R/components-cliquems-param.R",
+      "class": "ComponentsCliqueMSParam",
+      "parameter": "parallel",
+      "advanced": true
+    },
+    {
+      "file": "R/components-filter-param.R",
+      "class": "FilterComponentsParam",
+      "parameter": "size",
+      "advanced": false
+    },
+    {
+      "file": "R/components-filter-param.R",
+      "class": "FilterComponentsParam",
+      "parameter": "adducts",
+      "advanced": false
+    },
+    {
+      "file": "R/components-filter-param.R",
+      "class": "FilterComponentsParam",
+      "parameter": "isotopes",
+      "advanced": false
+    },
+    {
+      "file": "R/components-filter-param.R",
+      "class": "FilterComponentsParam",
+      "parameter": "rtIncrement",
+      "advanced": false
+    },
+    {
+      "file": "R/components-filter-param.R",
+      "class": "FilterComponentsParam",
+      "parameter": "mzIncrement",
+      "advanced": false
+    },
+    {
+      "file": "R/components-filter-param.R",
+      "class": "FilterComponentsParam",
+      "parameter": "checkComponentsSession",
+      "advanced": false
+    },
+    {
+      "file": "R/components-filter-param.R",
+      "class": "FilterComponentsParam",
+      "parameter": "sets",
+      "advanced": true
+    },
+    {
+      "file": "R/components-filter-param.R",
+      "class": "FilterComponentsParam",
+      "parameter": "negate",
+      "advanced": true
+    },
+    {
+      "file": "R/components-filter-param.R",
+      "class": "FilterComponentsParam",
+      "parameter": "verbose",
+      "advanced": true
+    },
+    {
+      "file": "R/components-intclust-param.R",
+      "class": "ComponentsIntClustParam",
+      "parameter": "method",
+      "advanced": false
+    },
+    {
+      "file": "R/components-intclust-param.R",
+      "class": "ComponentsIntClustParam",
+      "parameter": "metric",
+      "advanced": false
+    },
+    {
+      "file": "R/components-intclust-param.R",
+      "class": "ComponentsIntClustParam",
+      "parameter": "normalized",
+      "advanced": false
+    },
+    {
+      "file": "R/components-intclust-param.R",
+      "class": "ComponentsIntClustParam",
+      "parameter": "average",
+      "advanced": false
+    },
+    {
+      "file": "R/components-intclust-param.R",
+      "class": "ComponentsIntClustParam",
+      "parameter": "maxTreeHeight",
+      "advanced": false
+    },
+    {
+      "file": "R/components-intclust-param.R",
+      "class": "ComponentsIntClustParam",
+      "parameter": "deepSplit",
+      "advanced": false
+    },
+    {
+      "file": "R/components-intclust-param.R",
+      "class": "ComponentsIntClustParam",
+      "parameter": "minModuleSize",
+      "advanced": false
+    },
+    {
+      "file": "R/components-intclust-param.R",
+      "class": "ComponentsIntClustParam",
+      "parameter": "IMS",
+      "advanced": false
+    },
+    {
+      "file": "R/components-net-param.R",
+      "class": "ComponentsNetParam",
+      "parameter": "minSize",
+      "advanced": false
+    },
+    {
+      "file": "R/components-net-param.R",
+      "class": "ComponentsNetParam",
+      "parameter": "mzWindow",
+      "advanced": false
+    },
+    {
+      "file": "R/components-net-param.R",
+      "class": "ComponentsNetParam",
+      "parameter": "componSim",
+      "advanced": false
+    },
+    {
+      "file": "R/components-net-param.R",
+      "class": "ComponentsNetParam",
+      "parameter": "componMinSim",
+      "advanced": false
+    },
+    {
+      "file": "R/components-net-param.R",
+      "class": "ComponentsNetParam",
+      "parameter": "componMaxP",
+      "advanced": false
+    },
+    {
+      "file": "R/components-net-param.R",
+      "class": "ComponentsNetParam",
+      "parameter": "componMethod",
+      "advanced": false
+    },
+    {
+      "file": "R/components-net-param.R",
+      "class": "ComponentsNetParam",
+      "parameter": "componArgs",
+      "advanced": true
+    },
+    {
+      "file": "R/components-net-param.R",
+      "class": "ComponentsNetParam",
+      "parameter": "groupClust",
+      "advanced": false
+    },
+    {
+      "file": "R/components-net-param.R",
+      "class": "ComponentsNetParam",
+      "parameter": "groupClustH",
+      "advanced": false
+    },
+    {
+      "file": "R/components-net-param.R",
+      "class": "ComponentsNetParam",
+      "parameter": "annotAlgo",
+      "advanced": false
+    },
+    {
+      "file": "R/components-net-param.R",
+      "class": "ComponentsNetParam",
+      "parameter": "annotAdducts",
+      "advanced": false
+    },
+    {
+      "file": "R/components-net-param.R",
+      "class": "ComponentsNetParam",
+      "parameter": "annotPrefAdducts",
+      "advanced": false
+    },
+    {
+      "file": "R/components-net-param.R",
+      "class": "ComponentsNetParam",
+      "parameter": "annotArgs",
+      "advanced": true
+    },
+    {
+      "file": "R/components-net-param.R",
+      "class": "ComponentsNetParam",
+      "parameter": "mzFragBelow",
+      "advanced": false
+    },
+    {
+      "file": "R/components-nontarget-param.R",
+      "class": "ComponentsNontargetParam",
+      "parameter": "rtRange",
+      "advanced": false
+    },
+    {
+      "file": "R/components-nontarget-param.R",
+      "class": "ComponentsNontargetParam",
+      "parameter": "mzRange",
+      "advanced": false
+    },
+    {
+      "file": "R/components-nontarget-param.R",
+      "class": "ComponentsNontargetParam",
+      "parameter": "elements",
+      "advanced": false
+    },
+    {
+      "file": "R/components-nontarget-param.R",
+      "class": "ComponentsNontargetParam",
+      "parameter": "rtDev",
+      "advanced": false
+    },
+    {
+      "file": "R/components-nontarget-param.R",
+      "class": "ComponentsNontargetParam",
+      "parameter": "absMzDev",
+      "advanced": false
+    },
+    {
+      "file": "R/components-nontarget-param.R",
+      "class": "ComponentsNontargetParam",
+      "parameter": "absMzDevLink",
+      "advanced": false
+    },
+    {
+      "file": "R/components-nontarget-param.R",
+      "class": "ComponentsNontargetParam",
+      "parameter": "traceHack",
+      "advanced": true
+    },
+    {
+      "file": "R/components-openms-param.R",
+      "class": "ComponentsOpenMSParam",
+      "parameter": "chargeMin",
+      "advanced": false
+    },
+    {
+      "file": "R/components-openms-param.R",
+      "class": "ComponentsOpenMSParam",
+      "parameter": "chargeMax",
+      "advanced": false
+    },
+    {
+      "file": "R/components-openms-param.R",
+      "class": "ComponentsOpenMSParam",
+      "parameter": "chargeSpan",
+      "advanced": false
+    },
+    {
+      "file": "R/components-openms-param.R",
+      "class": "ComponentsOpenMSParam",
+      "parameter": "qTry",
+      "advanced": true
+    },
+    {
+      "file": "R/components-openms-param.R",
+      "class": "ComponentsOpenMSParam",
+      "parameter": "potentialAdducts",
+      "advanced": false
+    },
+    {
+      "file": "R/components-openms-param.R",
+      "class": "ComponentsOpenMSParam",
+      "parameter": "minRTOverlap",
+      "advanced": false
+    },
+    {
+      "file": "R/components-openms-param.R",
+      "class": "ComponentsOpenMSParam",
+      "parameter": "retWindow",
+      "advanced": false
+    },
+    {
+      "file": "R/components-openms-param.R",
+      "class": "ComponentsOpenMSParam",
+      "parameter": "absMzDev",
+      "advanced": false
+    },
+    {
+      "file": "R/components-openms-param.R",
+      "class": "ComponentsOpenMSParam",
+      "parameter": "minSize",
+      "advanced": false
+    },
+    {
+      "file": "R/components-openms-param.R",
+      "class": "ComponentsOpenMSParam",
+      "parameter": "relMinAdductAbundance",
+      "advanced": true
+    },
+    {
+      "file": "R/components-openms-param.R",
+      "class": "ComponentsOpenMSParam",
+      "parameter": "adductConflictsUsePref",
+      "advanced": true
+    },
+    {
+      "file": "R/components-openms-param.R",
+      "class": "ComponentsOpenMSParam",
+      "parameter": "NMConflicts",
+      "advanced": true
+    },
+    {
+      "file": "R/components-openms-param.R",
+      "class": "ComponentsOpenMSParam",
+      "parameter": "prefAdducts",
+      "advanced": true
+    },
+    {
+      "file": "R/components-openms-param.R",
+      "class": "ComponentsOpenMSParam",
+      "parameter": "extraOpts",
+      "advanced": true
+    },
+    {
+      "file": "R/components-ramclustr-param.R",
+      "class": "ComponentsRAMClustRParam",
+      "parameter": "st",
+      "advanced": false
+    },
+    {
+      "file": "R/components-ramclustr-param.R",
+      "class": "ComponentsRAMClustRParam",
+      "parameter": "sr",
+      "advanced": false
+    },
+    {
+      "file": "R/components-ramclustr-param.R",
+      "class": "ComponentsRAMClustRParam",
+      "parameter": "maxt",
+      "advanced": false
+    },
+    {
+      "file": "R/components-ramclustr-param.R",
+      "class": "ComponentsRAMClustRParam",
+      "parameter": "hmax",
+      "advanced": false
+    },
+    {
+      "file": "R/components-ramclustr-param.R",
+      "class": "ComponentsRAMClustRParam",
+      "parameter": "normalize",
+      "advanced": false
+    },
+    {
+      "file": "R/components-ramclustr-param.R",
+      "class": "ComponentsRAMClustRParam",
+      "parameter": "absMzDev",
+      "advanced": false
+    },
+    {
+      "file": "R/components-ramclustr-param.R",
+      "class": "ComponentsRAMClustRParam",
+      "parameter": "relMzDev",
+      "advanced": false
+    },
+    {
+      "file": "R/components-ramclustr-param.R",
+      "class": "ComponentsRAMClustRParam",
+      "parameter": "minSize",
+      "advanced": false
+    },
+    {
+      "file": "R/components-ramclustr-param.R",
+      "class": "ComponentsRAMClustRParam",
+      "parameter": "relMinReplicates",
+      "advanced": false
+    },
+    {
+      "file": "R/components-ramclustr-param.R",
+      "class": "ComponentsRAMClustRParam",
+      "parameter": "RCExperimentVals",
+      "advanced": true
+    },
+    {
+      "file": "R/components-ramclustr-param.R",
+      "class": "ComponentsRAMClustRParam",
+      "parameter": "extraOptsRC",
+      "advanced": true
+    },
+    {
+      "file": "R/components-ramclustr-param.R",
+      "class": "ComponentsRAMClustRParam",
+      "parameter": "extraOptsFM",
+      "advanced": true
+    },
+    {
+      "file": "R/components-specclust-param.R",
+      "class": "ComponentsSpecClustParam",
+      "parameter": "method",
+      "advanced": false
+    },
+    {
+      "file": "R/components-specclust-param.R",
+      "class": "ComponentsSpecClustParam",
+      "parameter": "specSimParams",
+      "advanced": false
+    },
+    {
+      "file": "R/components-specclust-param.R",
+      "class": "ComponentsSpecClustParam",
+      "parameter": "maxTreeHeight",
+      "advanced": false
+    },
+    {
+      "file": "R/components-specclust-param.R",
+      "class": "ComponentsSpecClustParam",
+      "parameter": "deepSplit",
+      "advanced": false
+    },
+    {
+      "file": "R/components-specclust-param.R",
+      "class": "ComponentsSpecClustParam",
+      "parameter": "minModuleSize",
+      "advanced": false
+    },
+    {
+      "file": "R/components-specclust-param.R",
+      "class": "ComponentsSpecClustParam",
+      "parameter": "IMS",
+      "advanced": false
+    },
+    {
+      "file": "R/components-tps-param.R",
+      "class": "ComponentsTPsParam",
+      "parameter": "ignoreParents",
+      "advanced": false
+    },
+    {
+      "file": "R/components-tps-param.R",
+      "class": "ComponentsTPsParam",
+      "parameter": "minRTDiff",
+      "advanced": false
+    },
+    {
+      "file": "R/components-tps-param.R",
+      "class": "ComponentsTPsParam",
+      "parameter": "specSimParams",
+      "advanced": false
+    },
+    {
+      "file": "R/components-tps-param.R",
+      "class": "ComponentsTPsParam",
+      "parameter": "IMS",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-filter-param.R",
+      "class": "FilterCompoundsParam",
+      "parameter": "minScore",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-filter-param.R",
+      "class": "FilterCompoundsParam",
+      "parameter": "minFragScore",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-filter-param.R",
+      "class": "FilterCompoundsParam",
+      "parameter": "minFormulaScore",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-filter-param.R",
+      "class": "FilterCompoundsParam",
+      "parameter": "IMSRangeParams",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-filter-param.R",
+      "class": "FilterCompoundsParam",
+      "parameter": "IMSMatchParams",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-filter-param.R",
+      "class": "FilterCompoundsParam",
+      "parameter": "negate",
+      "advanced": true
+    },
+    {
+      "file": "R/compounds-filter-param.R",
+      "class": "FilterCompoundsParam",
+      "parameter": "sets",
+      "advanced": true
+    },
+    {
+      "file": "R/compounds-filter-param.R",
+      "class": "FilterCompoundsParam",
+      "parameter": "updateConsensus",
+      "advanced": true
+    },
+    {
+      "file": "R/compounds-library-param.R",
+      "class": "CompoundsLibraryParam",
+      "parameter": "specSimParams",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-library-param.R",
+      "class": "CompoundsLibraryParam",
+      "parameter": "minSim",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-library-param.R",
+      "class": "CompoundsLibraryParam",
+      "parameter": "minAnnSim",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-library-param.R",
+      "class": "CompoundsLibraryParam",
+      "parameter": "absMzDev",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-library-param.R",
+      "class": "CompoundsLibraryParam",
+      "parameter": "checkIons",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-library-param.R",
+      "class": "CompoundsLibraryParam",
+      "parameter": "spectrumType",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-library-param.R",
+      "class": "CompoundsLibraryParam",
+      "parameter": "specSimParamsLib",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-library-param.R",
+      "class": "CompoundsLibraryParam",
+      "parameter": "minIMSSpecSim",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-library-param.R",
+      "class": "CompoundsLibraryParam",
+      "parameter": "setThreshold",
+      "advanced": true
+    },
+    {
+      "file": "R/compounds-library-param.R",
+      "class": "CompoundsLibraryParam",
+      "parameter": "setThresholdAnn",
+      "advanced": true
+    },
+    {
+      "file": "R/compounds-library-param.R",
+      "class": "CompoundsLibraryParam",
+      "parameter": "setAvgSpecificScores",
+      "advanced": true
+    },
+    {
+      "file": "R/compounds-metfrag-param.R",
+      "class": "CompoundsMetFragParam",
+      "parameter": "specSimParams",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-metfrag-param.R",
+      "class": "CompoundsMetFragParam",
+      "parameter": "method",
+      "advanced": true
+    },
+    {
+      "file": "R/compounds-metfrag-param.R",
+      "class": "CompoundsMetFragParam",
+      "parameter": "timeout",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-metfrag-param.R",
+      "class": "CompoundsMetFragParam",
+      "parameter": "timeoutRetries",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-metfrag-param.R",
+      "class": "CompoundsMetFragParam",
+      "parameter": "errorRetries",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-metfrag-param.R",
+      "class": "CompoundsMetFragParam",
+      "parameter": "topMost",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-metfrag-param.R",
+      "class": "CompoundsMetFragParam",
+      "parameter": "maxCandidatesToStop",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-metfrag-param.R",
+      "class": "CompoundsMetFragParam",
+      "parameter": "dbRelMzDev",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-metfrag-param.R",
+      "class": "CompoundsMetFragParam",
+      "parameter": "fragRelMzDev",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-metfrag-param.R",
+      "class": "CompoundsMetFragParam",
+      "parameter": "fragAbsMzDev",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-metfrag-param.R",
+      "class": "CompoundsMetFragParam",
+      "parameter": "database",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-metfrag-param.R",
+      "class": "CompoundsMetFragParam",
+      "parameter": "includeParents",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-metfrag-param.R",
+      "class": "CompoundsMetFragParam",
+      "parameter": "extendedPubChem",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-metfrag-param.R",
+      "class": "CompoundsMetFragParam",
+      "parameter": "chemSpiderToken",
+      "advanced": true
+    },
+    {
+      "file": "R/compounds-metfrag-param.R",
+      "class": "CompoundsMetFragParam",
+      "parameter": "scoreTypes",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-metfrag-param.R",
+      "class": "CompoundsMetFragParam",
+      "parameter": "scoreWeights",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-metfrag-param.R",
+      "class": "CompoundsMetFragParam",
+      "parameter": "preProcessingFilters",
+      "advanced": true
+    },
+    {
+      "file": "R/compounds-metfrag-param.R",
+      "class": "CompoundsMetFragParam",
+      "parameter": "postProcessingFilters",
+      "advanced": true
+    },
+    {
+      "file": "R/compounds-metfrag-param.R",
+      "class": "CompoundsMetFragParam",
+      "parameter": "minIMSSpecSim",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-metfrag-param.R",
+      "class": "CompoundsMetFragParam",
+      "parameter": "setThreshold",
+      "advanced": true
+    },
+    {
+      "file": "R/compounds-metfrag-param.R",
+      "class": "CompoundsMetFragParam",
+      "parameter": "setThresholdAnn",
+      "advanced": true
+    },
+    {
+      "file": "R/compounds-metfrag-param.R",
+      "class": "CompoundsMetFragParam",
+      "parameter": "setAvgSpecificScores",
+      "advanced": true
+    },
+    {
+      "file": "R/compounds-metfrag-param.R",
+      "class": "CompoundsMetFragParam",
+      "parameter": "extraOpts",
+      "advanced": true
+    },
+    {
+      "file": "R/compounds-sirius-param.R",
+      "class": "CompoundsSIRIUSParam",
+      "parameter": "specSimParams",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-sirius-param.R",
+      "class": "CompoundsSIRIUSParam",
+      "parameter": "topMost",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-sirius-param.R",
+      "class": "CompoundsSIRIUSParam",
+      "parameter": "login",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-sirius-param.R",
+      "class": "CompoundsSIRIUSParam",
+      "parameter": "alwaysLogin",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-sirius-param.R",
+      "class": "CompoundsSIRIUSParam",
+      "parameter": "minIMSSpecSim",
+      "advanced": false
+    },
+    {
+      "file": "R/compounds-sirius-param.R",
+      "class": "CompoundsSIRIUSParam",
+      "parameter": "verbose",
+      "advanced": true
+    },
+    {
+      "file": "R/compounds-sirius-param.R",
+      "class": "CompoundsSIRIUSParam",
+      "parameter": "setThreshold",
+      "advanced": true
+    },
+    {
+      "file": "R/compounds-sirius-param.R",
+      "class": "CompoundsSIRIUSParam",
+      "parameter": "setThresholdAnn",
+      "advanced": true
+    },
+    {
+      "file": "R/compounds-sirius-param.R",
+      "class": "CompoundsSIRIUSParam",
+      "parameter": "setAvgSpecificScores",
+      "advanced": true
+    },
+    {
+      "file": "R/convert-param.R",
+      "class": "ConvertMSFilesPWizParam",
+      "parameter": "centroidVendor",
+      "advanced": false
+    },
+    {
+      "file": "R/convert-param.R",
+      "class": "ConvertMSFilesPWizParam",
+      "parameter": "minIntensity",
+      "advanced": false
+    },
+    {
+      "file": "R/convert-param.R",
+      "class": "ConvertMSFilesPWizParam",
+      "parameter": "filters",
+      "advanced": false
+    },
+    {
+      "file": "R/convert-param.R",
+      "class": "ConvertMSFilesPWizParam",
+      "parameter": "extraOpts",
+      "advanced": true
+    },
+    {
+      "file": "R/convert-param.R",
+      "class": "ConvertMSFilesPWizParam",
+      "parameter": "PWizBatchSize",
+      "advanced": true
+    },
+    {
+      "file": "R/convert-param.R",
+      "class": "ConvertMSFilesOpenMSParam",
+      "parameter": "extraOpts",
+      "advanced": true
+    },
+    {
+      "file": "R/convert-param.R",
+      "class": "ConvertMSFilesIMSCollapseParam",
+      "parameter": "mzRange",
+      "advanced": true
+    },
+    {
+      "file": "R/convert-param.R",
+      "class": "ConvertMSFilesIMSCollapseParam",
+      "parameter": "mobilityRange",
+      "advanced": true
+    },
+    {
+      "file": "R/convert-param.R",
+      "class": "ConvertMSFilesIMSCollapseParam",
+      "parameter": "smoothWindow",
+      "advanced": false
+    },
+    {
+      "file": "R/convert-param.R",
+      "class": "ConvertMSFilesIMSCollapseParam",
+      "parameter": "halfWindow",
+      "advanced": false
+    },
+    {
+      "file": "R/convert-param.R",
+      "class": "ConvertMSFilesIMSCollapseParam",
+      "parameter": "maxGap",
+      "advanced": true
+    },
+    {
+      "file": "R/convert-param.R",
+      "class": "ConvertMSFilesIMSCollapseParam",
+      "parameter": "clusterMethod",
+      "advanced": true
+    },
+    {
+      "file": "R/convert-param.R",
+      "class": "ConvertMSFilesIMSCollapseParam",
+      "parameter": "mzWindow",
+      "advanced": false
+    },
+    {
+      "file": "R/convert-param.R",
+      "class": "ConvertMSFilesIMSCollapseParam",
+      "parameter": "minIntensityIMS",
+      "advanced": false
+    },
+    {
+      "file": "R/convert-param.R",
+      "class": "ConvertMSFilesIMSCollapseParam",
+      "parameter": "includeMSMS",
+      "advanced": false
+    },
+    {
+      "file": "R/convert-param.R",
+      "class": "ConvertMSFilesTIMSCONVERTParam",
+      "parameter": "centroidRaw",
+      "advanced": false
+    },
+    {
+      "file": "R/convert-param.R",
+      "class": "ConvertMSFilesTIMSCONVERTParam",
+      "parameter": "extraOpts",
+      "advanced": true
+    },
+    {
+      "file": "R/convert-param.R",
+      "class": "ConvertMSFilesTIMSCONVERTParam",
+      "parameter": "virtualenv",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "FilterFeatAnnotationsParam",
+      "parameter": "minExplainedPeaks",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "FilterFeatAnnotationsParam",
+      "parameter": "scoreLimits",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "FilterFeatAnnotationsParam",
+      "parameter": "elements",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "FilterFeatAnnotationsParam",
+      "parameter": "fragElements",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "FilterFeatAnnotationsParam",
+      "parameter": "lossElements",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "FilterFeatAnnotationsParam",
+      "parameter": "fragFormulas",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "FilterFeatAnnotationsParam",
+      "parameter": "lossFormulas",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "FilterFeatAnnotationsParam",
+      "parameter": "topMost",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "FilterFeatAnnotationsParam",
+      "parameter": "OM",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "FilterFeatAnnotationsParam",
+      "parameter": "maxLevel",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "FilterFeatAnnotationsParam",
+      "parameter": "negate",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "EstimateIDConfidenceParam",
+      "parameter": "absMzDev",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "EstimateIDConfidenceParam",
+      "parameter": "specSimParams",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "EstimateIDConfidenceParam",
+      "parameter": "checkFragments",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "EstimateIDConfidenceParam",
+      "parameter": "formulasNormalizeScores",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "EstimateIDConfidenceParam",
+      "parameter": "compoundsNormalizeScores",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "AssignMobilitiesCompoundsParam",
+      "parameter": "IMS",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "AssignMobilitiesCompoundsParam",
+      "parameter": "from",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "AssignMobilitiesCompoundsParam",
+      "parameter": "matchFromBy",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "AssignMobilitiesCompoundsParam",
+      "parameter": "overwrite",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "AssignMobilitiesCompoundsParam",
+      "parameter": "CCSParams",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "AssignMobilitiesCompoundsParam",
+      "parameter": "prefCalcChemProps",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "AssignMobilitiesCompoundsParam",
+      "parameter": "neutralChemProps",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "AssignMobilitiesCompoundsParam",
+      "parameter": "virtualenv",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "PredictToxParam",
+      "parameter": "type",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "PredictToxParam",
+      "parameter": "LC50Mode",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "PredictToxParam",
+      "parameter": "concUnit",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "PredictToxParam",
+      "parameter": "updateScore",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "PredictToxParam",
+      "parameter": "scoreWeight",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "PredictToxParam",
+      "parameter": "parallel",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "PredictRespFactorsParam",
+      "parameter": "type",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "PredictRespFactorsParam",
+      "parameter": "eluent",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "PredictRespFactorsParam",
+      "parameter": "organicModifier",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "PredictRespFactorsParam",
+      "parameter": "pHAq",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "PredictRespFactorsParam",
+      "parameter": "concUnit",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "PredictRespFactorsParam",
+      "parameter": "calibConcUnit",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "PredictRespFactorsParam",
+      "parameter": "updateScore",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "PredictRespFactorsParam",
+      "parameter": "scoreWeight",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_annotations-param.R",
+      "class": "PredictRespFactorsParam",
+      "parameter": "parallel",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-greedy-param.R",
+      "class": "FeatureGroupsGreedyParam",
+      "parameter": "rtWindow",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-greedy-param.R",
+      "class": "FeatureGroupsGreedyParam",
+      "parameter": "mzWindow",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-greedy-param.R",
+      "class": "FeatureGroupsGreedyParam",
+      "parameter": "mobWindow",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-greedy-param.R",
+      "class": "FeatureGroupsGreedyParam",
+      "parameter": "scoreWeights",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-greedy-param.R",
+      "class": "FeatureGroupsGreedyParam",
+      "parameter": "verbose",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-kpic2-param.R",
+      "class": "FeatureGroupsKPIC2Param",
+      "parameter": "rtalign",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-kpic2-param.R",
+      "class": "FeatureGroupsKPIC2Param",
+      "parameter": "loadRawData",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-kpic2-param.R",
+      "class": "FeatureGroupsKPIC2Param",
+      "parameter": "groupArgs",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-kpic2-param.R",
+      "class": "FeatureGroupsKPIC2Param",
+      "parameter": "alignArgs",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-kpic2-param.R",
+      "class": "FeatureGroupsKPIC2Param",
+      "parameter": "verbose",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-openms-param.R",
+      "class": "FeatureGroupsOpenMSParam",
+      "parameter": "rtalign",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-openms-param.R",
+      "class": "FeatureGroupsOpenMSParam",
+      "parameter": "QT",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-openms-param.R",
+      "class": "FeatureGroupsOpenMSParam",
+      "parameter": "maxAlignRT",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-openms-param.R",
+      "class": "FeatureGroupsOpenMSParam",
+      "parameter": "maxAlignMZ",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-openms-param.R",
+      "class": "FeatureGroupsOpenMSParam",
+      "parameter": "maxGroupRT",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-openms-param.R",
+      "class": "FeatureGroupsOpenMSParam",
+      "parameter": "maxGroupMZ",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-openms-param.R",
+      "class": "FeatureGroupsOpenMSParam",
+      "parameter": "extraOptsRT",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-openms-param.R",
+      "class": "FeatureGroupsOpenMSParam",
+      "parameter": "extraOptsGroup",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-openms-param.R",
+      "class": "FeatureGroupsOpenMSParam",
+      "parameter": "verbose",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "SelectIonsParam",
+      "parameter": "onlyMonoIso",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "SelectIonsParam",
+      "parameter": "chargeMismatch",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "NormIntsParam",
+      "parameter": "featNorm",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "NormIntsParam",
+      "parameter": "groupNorm",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "NormIntsParam",
+      "parameter": "normFunc",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "NormIntsParam",
+      "parameter": "ISTDRTWindow",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "NormIntsParam",
+      "parameter": "ISTDMZWindow",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "NormIntsParam",
+      "parameter": "minISTDs",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "NormIntsParam",
+      "parameter": "extraOpts",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "CalculatePeakQualitiesParam",
+      "parameter": "weights",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "CalculatePeakQualitiesParam",
+      "parameter": "flatnessFactor",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "CalculatePeakQualitiesParam",
+      "parameter": "featureQualities",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "CalculatePeakQualitiesParam",
+      "parameter": "EICParams",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "CalculatePeakQualitiesParam",
+      "parameter": "featureGroupQualities",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "CalculatePeakQualitiesParam",
+      "parameter": "avgFunc",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "CalculatePeakQualitiesParam",
+      "parameter": "parallel",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "AssignMobilitiesFeatureGroupsParam",
+      "parameter": "mobPeakParams",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "AssignMobilitiesFeatureGroupsParam",
+      "parameter": "chromPeakParams",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "AssignMobilitiesFeatureGroupsParam",
+      "parameter": "EIMParams",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "AssignMobilitiesFeatureGroupsParam",
+      "parameter": "EICParams",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "AssignMobilitiesFeatureGroupsParam",
+      "parameter": "peakRTWindow",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "AssignMobilitiesFeatureGroupsParam",
+      "parameter": "fallbackEIC",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "AssignMobilitiesFeatureGroupsParam",
+      "parameter": "calcArea",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "AssignMobilitiesFeatureGroupsParam",
+      "parameter": "mobWindow",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "AssignMobilitiesFeatureGroupsParam",
+      "parameter": "scoreWeights",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "AssignMobilitiesFeatureGroupsParam",
+      "parameter": "CCSParams",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "AssignMobilitiesFeatureGroupsParam",
+      "parameter": "parallel",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "AssignMobilitiesFeatureGroupsParam",
+      "parameter": "fromSuspects",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-param.R",
+      "class": "AssignMobilitiesFeatureGroupsParam",
+      "parameter": "IMSMatchParams",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-screening-filter-param.R",
+      "class": "FilterFeatGroupsScreeningParam",
+      "parameter": "onlyHits",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-screening-filter-param.R",
+      "class": "FilterFeatGroupsScreeningParam",
+      "parameter": "IMSMatchParams",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-screening-filter-param.R",
+      "class": "FilterFeatGroupsScreeningParam",
+      "parameter": "selectHitsBy",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-screening-filter-param.R",
+      "class": "FilterFeatGroupsScreeningParam",
+      "parameter": "selectBestFGroups",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-screening-filter-param.R",
+      "class": "FilterFeatGroupsScreeningParam",
+      "parameter": "maxLevel",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-screening-filter-param.R",
+      "class": "FilterFeatGroupsScreeningParam",
+      "parameter": "maxFormRank",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-screening-filter-param.R",
+      "class": "FilterFeatGroupsScreeningParam",
+      "parameter": "maxCompRank",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-screening-filter-param.R",
+      "class": "FilterFeatGroupsScreeningParam",
+      "parameter": "minAnnSimForm",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-screening-filter-param.R",
+      "class": "FilterFeatGroupsScreeningParam",
+      "parameter": "minAnnSimComp",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-screening-filter-param.R",
+      "class": "FilterFeatGroupsScreeningParam",
+      "parameter": "minAnnSimBoth",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-screening-filter-param.R",
+      "class": "FilterFeatGroupsScreeningParam",
+      "parameter": "absMinFragMatches",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-screening-filter-param.R",
+      "class": "FilterFeatGroupsScreeningParam",
+      "parameter": "relMinFragMatches",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-screening-filter-param.R",
+      "class": "FilterFeatGroupsScreeningParam",
+      "parameter": "minRF",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-screening-filter-param.R",
+      "class": "FilterFeatGroupsScreeningParam",
+      "parameter": "maxLC50",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-screening-filter-param.R",
+      "class": "FilterFeatGroupsScreeningParam",
+      "parameter": "negate",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-screening-filter-param.R",
+      "class": "FilterFeatGroupsScreeningParam",
+      "parameter": "applyIMS",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-screening-param.R",
+      "class": "ScreenSuspectsParam",
+      "parameter": "rtWindow",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-screening-param.R",
+      "class": "ScreenSuspectsParam",
+      "parameter": "mzWindow",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-screening-param.R",
+      "class": "ScreenSuspectsParam",
+      "parameter": "IMSMatchParams",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-screening-param.R",
+      "class": "ScreenSuspectsParam",
+      "parameter": "skipInvalid",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-screening-param.R",
+      "class": "ScreenSuspectsParam",
+      "parameter": "prefCalcChemProps",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-screening-param.R",
+      "class": "ScreenSuspectsParam",
+      "parameter": "neutralChemProps",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-screening-param.R",
+      "class": "ScreenSuspectsParam",
+      "parameter": "includeParents",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-screening-param.R",
+      "class": "ScreenSuspectsParam",
+      "parameter": "onlyHits",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-screening-param.R",
+      "class": "ScreenSuspectsParam",
+      "parameter": "amend",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-sirius-param.R",
+      "class": "FeatureGroupsSIRIUSParam",
+      "parameter": "noiseIntensity",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-sirius-param.R",
+      "class": "FeatureGroupsSIRIUSParam",
+      "parameter": "alignMaxRTDev",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-sirius-param.R",
+      "class": "FeatureGroupsSIRIUSParam",
+      "parameter": "minSNR",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-sirius-param.R",
+      "class": "FeatureGroupsSIRIUSParam",
+      "parameter": "login",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-sirius-param.R",
+      "class": "FeatureGroupsSIRIUSParam",
+      "parameter": "alwaysLogin",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-sirius-param.R",
+      "class": "FeatureGroupsSIRIUSParam",
+      "parameter": "verbose",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-xcms3-param.R",
+      "class": "feature_groups-xcms3-param.R",
+      "parameter": "rtalign",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-xcms3-param.R",
+      "class": "feature_groups-xcms3-param.R",
+      "parameter": "loadRawData",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-xcms3-param.R",
+      "class": "feature_groups-xcms3-param.R",
+      "parameter": "groupAlgo",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-xcms3-param.R",
+      "class": "feature_groups-xcms3-param.R",
+      "parameter": "alignAlgo",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-xcms3-param.R",
+      "class": "feature_groups-xcms3-param.R",
+      "parameter": "preGroupAlgo",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-xcms3-param.R",
+      "class": "feature_groups-xcms3-param.R",
+      "parameter": "groupPeakDensityParam",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-xcms3-param.R",
+      "class": "feature_groups-xcms3-param.R",
+      "parameter": "groupNearestPeaksParam",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-xcms3-param.R",
+      "class": "feature_groups-xcms3-param.R",
+      "parameter": "groupMzClustParam",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-xcms3-param.R",
+      "class": "feature_groups-xcms3-param.R",
+      "parameter": "alignObiwarpParam",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-xcms3-param.R",
+      "class": "feature_groups-xcms3-param.R",
+      "parameter": "alignPeakGroupsParam",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-xcms3-param.R",
+      "class": "feature_groups-xcms3-param.R",
+      "parameter": "alignLamaParama",
+      "advanced": true
+    },
+    {
+      "file": "R/feature_groups-xcms3-param.R",
+      "class": "feature_groups-xcms3-param.R",
+      "parameter": "preGroupPeakDensityParam",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-xcms3-param.R",
+      "class": "feature_groups-xcms3-param.R",
+      "parameter": "preGroupNearestPeaksParam",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-xcms3-param.R",
+      "class": "feature_groups-xcms3-param.R",
+      "parameter": "preGroupMzClustParam",
+      "advanced": false
+    },
+    {
+      "file": "R/feature_groups-xcms3-param.R",
+      "class": "feature_groups-xcms3-param.R",
+      "parameter": "verbose",
+      "advanced": true
+    },
+    {
+      "file": "R/features-envipick-param.R",
+      "class": "FeaturesEnviPickParam",
+      "parameter": "extraOpts",
+      "advanced": true
+    },
+    {
+      "file": "R/features-envipick-param.R",
+      "class": "FeaturesEnviPickParam",
+      "parameter": "verbose",
+      "advanced": true
+    },
+    {
+      "file": "R/features-filter-param.R",
+      "class": "FilterFeaturesParam",
+      "parameter": "absMinIntensity",
+      "advanced": false
+    },
+    {
+      "file": "R/features-filter-param.R",
+      "class": "FilterFeaturesParam",
+      "parameter": "relMinIntensity",
+      "advanced": false
+    },
+    {
+      "file": "R/features-filter-param.R",
+      "class": "FilterFeaturesParam",
+      "parameter": "retentionRange",
+      "advanced": false
+    },
+    {
+      "file": "R/features-filter-param.R",
+      "class": "FilterFeaturesParam",
+      "parameter": "mzRange",
+      "advanced": false
+    },
+    {
+      "file": "R/features-filter-param.R",
+      "class": "FilterFeaturesParam",
+      "parameter": "mzDefectRange",
+      "advanced": false
+    },
+    {
+      "file": "R/features-filter-param.R",
+      "class": "FilterFeaturesParam",
+      "parameter": "chromWidthRange",
+      "advanced": false
+    },
+    {
+      "file": "R/features-filter-param.R",
+      "class": "FilterFeaturesParam",
+      "parameter": "IMSRangeParams",
+      "advanced": false
+    },
+    {
+      "file": "R/features-filter-param.R",
+      "class": "FilterFeaturesParam",
+      "parameter": "qualityRange",
+      "advanced": false
+    },
+    {
+      "file": "R/features-filter-param.R",
+      "class": "FilterFeaturesParam",
+      "parameter": "sets",
+      "advanced": true
+    },
+    {
+      "file": "R/features-filter-param.R",
+      "class": "FilterFeaturesParam",
+      "parameter": "negate",
+      "advanced": true
+    },
+    {
+      "file": "R/features-kpic2-param.R",
+      "class": "FeaturesKPIC2Param",
+      "parameter": "kmeans",
+      "advanced": false
+    },
+    {
+      "file": "R/features-kpic2-param.R",
+      "class": "FeaturesKPIC2Param",
+      "parameter": "level",
+      "advanced": false
+    },
+    {
+      "file": "R/features-kpic2-param.R",
+      "class": "FeaturesKPIC2Param",
+      "parameter": "extraOpts",
+      "advanced": true
+    },
+    {
+      "file": "R/features-kpic2-param.R",
+      "class": "FeaturesKPIC2Param",
+      "parameter": "verbose",
+      "advanced": true
+    },
+    {
+      "file": "R/features-openms-param.R",
+      "class": "FeaturesOpenMSParam",
+      "parameter": "noiseThrInt",
+      "advanced": false
+    },
+    {
+      "file": "R/features-openms-param.R",
+      "class": "FeaturesOpenMSParam",
+      "parameter": "chromSNR",
+      "advanced": false
+    },
+    {
+      "file": "R/features-openms-param.R",
+      "class": "FeaturesOpenMSParam",
+      "parameter": "chromFWHM",
+      "advanced": false
+    },
+    {
+      "file": "R/features-openms-param.R",
+      "class": "FeaturesOpenMSParam",
+      "parameter": "mzPPM",
+      "advanced": false
+    },
+    {
+      "file": "R/features-openms-param.R",
+      "class": "FeaturesOpenMSParam",
+      "parameter": "reEstimateMTSD",
+      "advanced": false
+    },
+    {
+      "file": "R/features-openms-param.R",
+      "class": "FeaturesOpenMSParam",
+      "parameter": "traceTermCriterion",
+      "advanced": false
+    },
+    {
+      "file": "R/features-openms-param.R",
+      "class": "FeaturesOpenMSParam",
+      "parameter": "traceTermOutliers",
+      "advanced": false
+    },
+    {
+      "file": "R/features-openms-param.R",
+      "class": "FeaturesOpenMSParam",
+      "parameter": "minSampleRate",
+      "advanced": false
+    },
+    {
+      "file": "R/features-openms-param.R",
+      "class": "FeaturesOpenMSParam",
+      "parameter": "minTraceLength",
+      "advanced": false
+    },
+    {
+      "file": "R/features-openms-param.R",
+      "class": "FeaturesOpenMSParam",
+      "parameter": "maxTraceLength",
+      "advanced": false
+    },
+    {
+      "file": "R/features-openms-param.R",
+      "class": "FeaturesOpenMSParam",
+      "parameter": "widthFiltering",
+      "advanced": false
+    },
+    {
+      "file": "R/features-openms-param.R",
+      "class": "FeaturesOpenMSParam",
+      "parameter": "minFWHM",
+      "advanced": false
+    },
+    {
+      "file": "R/features-openms-param.R",
+      "class": "FeaturesOpenMSParam",
+      "parameter": "maxFWHM",
+      "advanced": false
+    },
+    {
+      "file": "R/features-openms-param.R",
+      "class": "FeaturesOpenMSParam",
+      "parameter": "traceSNRFiltering",
+      "advanced": false
+    },
+    {
+      "file": "R/features-openms-param.R",
+      "class": "FeaturesOpenMSParam",
+      "parameter": "localRTRange",
+      "advanced": true
+    },
+    {
+      "file": "R/features-openms-param.R",
+      "class": "FeaturesOpenMSParam",
+      "parameter": "localMZRange",
+      "advanced": true
+    },
+    {
+      "file": "R/features-openms-param.R",
+      "class": "FeaturesOpenMSParam",
+      "parameter": "isotopeFilteringModel",
+      "advanced": false
+    },
+    {
+      "file": "R/features-openms-param.R",
+      "class": "FeaturesOpenMSParam",
+      "parameter": "MZScoring13C",
+      "advanced": true
+    },
+    {
+      "file": "R/features-openms-param.R",
+      "class": "FeaturesOpenMSParam",
+      "parameter": "useSmoothedInts",
+      "advanced": true
+    },
+    {
+      "file": "R/features-openms-param.R",
+      "class": "FeaturesOpenMSParam",
+      "parameter": "extraOpts",
+      "advanced": true
+    },
+    {
+      "file": "R/features-openms-param.R",
+      "class": "FeaturesOpenMSParam",
+      "parameter": "useFFMIntensities",
+      "advanced": true
+    },
+    {
+      "file": "R/features-openms-param.R",
+      "class": "FeaturesOpenMSParam",
+      "parameter": "verbose",
+      "advanced": true
+    },
+    {
+      "file": "R/features-piek-param.R",
+      "class": "FeaturesPiekParam",
+      "parameter": "genEICParams",
+      "advanced": false
+    },
+    {
+      "file": "R/features-piek-param.R",
+      "class": "FeaturesPiekParam",
+      "parameter": "peakParams",
+      "advanced": false
+    },
+    {
+      "file": "R/features-piek-param.R",
+      "class": "FeaturesPiekParam",
+      "parameter": "IMS",
+      "advanced": false
+    },
+    {
+      "file": "R/features-piek-param.R",
+      "class": "FeaturesPiekParam",
+      "parameter": "assignMethod",
+      "advanced": true
+    },
+    {
+      "file": "R/features-piek-param.R",
+      "class": "FeaturesPiekParam",
+      "parameter": "assignRTWindow",
+      "advanced": true
+    },
+    {
+      "file": "R/features-piek-param.R",
+      "class": "FeaturesPiekParam",
+      "parameter": "rtWindowDup",
+      "advanced": true
+    },
+    {
+      "file": "R/features-piek-param.R",
+      "class": "FeaturesPiekParam",
+      "parameter": "mzWindowDup",
+      "advanced": true
+    },
+    {
+      "file": "R/features-piek-param.R",
+      "class": "FeaturesPiekParam",
+      "parameter": "mobWindowDup",
+      "advanced": true
+    },
+    {
+      "file": "R/features-piek-param.R",
+      "class": "FeaturesPiekParam",
+      "parameter": "minPeakOverlapDup",
+      "advanced": true
+    },
+    {
+      "file": "R/features-piek-param.R",
+      "class": "FeaturesPiekParam",
+      "parameter": "minIntensityIMS",
+      "advanced": false
+    },
+    {
+      "file": "R/features-piek-param.R",
+      "class": "FeaturesPiekParam",
+      "parameter": "EICBatchSize",
+      "advanced": true
+    },
+    {
+      "file": "R/features-piek-param.R",
+      "class": "FeaturesPiekParam",
+      "parameter": "keepDups",
+      "advanced": true
+    },
+    {
+      "file": "R/features-piek-param.R",
+      "class": "FeaturesPiekParam",
+      "parameter": "verbose",
+      "advanced": true
+    },
+    {
+      "file": "R/features-safd-param.R",
+      "class": "FeaturesSAFDParam",
+      "parameter": "prefCentroid",
+      "advanced": false
+    },
+    {
+      "file": "R/features-safd-param.R",
+      "class": "FeaturesSAFDParam",
+      "parameter": "mzRange",
+      "advanced": false
+    },
+    {
+      "file": "R/features-safd-param.R",
+      "class": "FeaturesSAFDParam",
+      "parameter": "maxNumbIter",
+      "advanced": false
+    },
+    {
+      "file": "R/features-safd-param.R",
+      "class": "FeaturesSAFDParam",
+      "parameter": "maxTPeakW",
+      "advanced": false
+    },
+    {
+      "file": "R/features-safd-param.R",
+      "class": "FeaturesSAFDParam",
+      "parameter": "resolution",
+      "advanced": false
+    },
+    {
+      "file": "R/features-safd-param.R",
+      "class": "FeaturesSAFDParam",
+      "parameter": "minMSW",
+      "advanced": false
+    },
+    {
+      "file": "R/features-safd-param.R",
+      "class": "FeaturesSAFDParam",
+      "parameter": "RThreshold",
+      "advanced": false
+    },
+    {
+      "file": "R/features-safd-param.R",
+      "class": "FeaturesSAFDParam",
+      "parameter": "minInt",
+      "advanced": false
+    },
+    {
+      "file": "R/features-safd-param.R",
+      "class": "FeaturesSAFDParam",
+      "parameter": "sigIncThreshold",
+      "advanced": false
+    },
+    {
+      "file": "R/features-safd-param.R",
+      "class": "FeaturesSAFDParam",
+      "parameter": "S2N",
+      "advanced": false
+    },
+    {
+      "file": "R/features-safd-param.R",
+      "class": "FeaturesSAFDParam",
+      "parameter": "minPeakWS",
+      "advanced": false
+    },
+    {
+      "file": "R/features-safd-param.R",
+      "class": "FeaturesSAFDParam",
+      "parameter": "centroidMethod",
+      "advanced": false
+    },
+    {
+      "file": "R/features-safd-param.R",
+      "class": "FeaturesSAFDParam",
+      "parameter": "centroidDM",
+      "advanced": false
+    },
+    {
+      "file": "R/features-safd-param.R",
+      "class": "FeaturesSAFDParam",
+      "parameter": "verbose",
+      "advanced": true
+    },
+    {
+      "file": "R/features-sirius-param.R",
+      "class": "FeaturesSIRIUSParam",
+      "parameter": "noiseIntensity",
+      "advanced": false
+    },
+    {
+      "file": "R/features-sirius-param.R",
+      "class": "FeaturesSIRIUSParam",
+      "parameter": "alignMaxRTDev",
+      "advanced": false
+    },
+    {
+      "file": "R/features-sirius-param.R",
+      "class": "FeaturesSIRIUSParam",
+      "parameter": "minSNR",
+      "advanced": false
+    },
+    {
+      "file": "R/features-sirius-param.R",
+      "class": "FeaturesSIRIUSParam",
+      "parameter": "login",
+      "advanced": false
+    },
+    {
+      "file": "R/features-sirius-param.R",
+      "class": "FeaturesSIRIUSParam",
+      "parameter": "alwaysLogin",
+      "advanced": false
+    },
+    {
+      "file": "R/features-sirius-param.R",
+      "class": "FeaturesSIRIUSParam",
+      "parameter": "verbose",
+      "advanced": true
+    },
+    {
+      "file": "R/features-xcms3-param.R",
+      "class": "FeaturesXCMS3Param",
+      "parameter": "algo",
+      "advanced": false
+    },
+    {
+      "file": "R/features-xcms3-param.R",
+      "class": "FeaturesXCMS3Param",
+      "parameter": "CentWaveParam",
+      "advanced": false
+    },
+    {
+      "file": "R/features-xcms3-param.R",
+      "class": "FeaturesXCMS3Param",
+      "parameter": "CentWavePredIsoParam",
+      "advanced": false
+    },
+    {
+      "file": "R/features-xcms3-param.R",
+      "class": "FeaturesXCMS3Param",
+      "parameter": "MatchedFilterParam",
+      "advanced": false
+    },
+    {
+      "file": "R/features-xcms3-param.R",
+      "class": "FeaturesXCMS3Param",
+      "parameter": "MassifQuantParam",
+      "advanced": false
+    },
+    {
+      "file": "R/features-xcms3-param.R",
+      "class": "FeaturesXCMS3Param",
+      "parameter": "MSWParam",
+      "advanced": false
+    },
+    {
+      "file": "R/features-xcms3-param.R",
+      "class": "FeaturesXCMS3Param",
+      "parameter": "extraOpts",
+      "advanced": true
+    },
+    {
+      "file": "R/features-xcms3-param.R",
+      "class": "FeaturesXCMS3Param",
+      "parameter": "verbose",
+      "advanced": true
+    },
+    {
+      "file": "R/formulas-filter-param.R",
+      "class": "FilterFormulasParam",
+      "parameter": "negate",
+      "advanced": true
+    },
+    {
+      "file": "R/formulas-filter-param.R",
+      "class": "FilterFormulasParam",
+      "parameter": "sets",
+      "advanced": true
+    },
+    {
+      "file": "R/formulas-filter-param.R",
+      "class": "FilterFormulasParam",
+      "parameter": "updateConsensus",
+      "advanced": true
+    },
+    {
+      "file": "R/formulas-genform-param.R",
+      "class": "FormulasGenFormParam",
+      "parameter": "specSimParams",
+      "advanced": true
+    },
+    {
+      "file": "R/formulas-genform-param.R",
+      "class": "FormulasGenFormParam",
+      "parameter": "relMzDev",
+      "advanced": false
+    },
+    {
+      "file": "R/formulas-genform-param.R",
+      "class": "FormulasGenFormParam",
+      "parameter": "elements",
+      "advanced": false
+    },
+    {
+      "file": "R/formulas-genform-param.R",
+      "class": "FormulasGenFormParam",
+      "parameter": "hetero",
+      "advanced": false
+    },
+    {
+      "file": "R/formulas-genform-param.R",
+      "class": "FormulasGenFormParam",
+      "parameter": "oc",
+      "advanced": false
+    },
+    {
+      "file": "R/formulas-genform-param.R",
+      "class": "FormulasGenFormParam",
+      "parameter": "thrMS",
+      "advanced": true
+    },
+    {
+      "file": "R/formulas-genform-param.R",
+      "class": "FormulasGenFormParam",
+      "parameter": "thrMSMS",
+      "advanced": true
+    },
+    {
+      "file": "R/formulas-genform-param.R",
+      "class": "FormulasGenFormParam",
+      "parameter": "thrComb",
+      "advanced": true
+    },
+    {
+      "file": "R/formulas-genform-param.R",
+      "class": "FormulasGenFormParam",
+      "parameter": "maxCandidates",
+      "advanced": false
+    },
+    {
+      "file": "R/formulas-genform-param.R",
+      "class": "FormulasGenFormParam",
+      "parameter": "extraOpts",
+      "advanced": true
+    },
+    {
+      "file": "R/formulas-genform-param.R",
+      "class": "FormulasGenFormParam",
+      "parameter": "calculateFeatures",
+      "advanced": false
+    },
+    {
+      "file": "R/formulas-genform-param.R",
+      "class": "FormulasGenFormParam",
+      "parameter": "featThreshold",
+      "advanced": false
+    },
+    {
+      "file": "R/formulas-genform-param.R",
+      "class": "FormulasGenFormParam",
+      "parameter": "featThresholdAnn",
+      "advanced": false
+    },
+    {
+      "file": "R/formulas-genform-param.R",
+      "class": "FormulasGenFormParam",
+      "parameter": "absAlignMzDev",
+      "advanced": false
+    },
+    {
+      "file": "R/formulas-genform-param.R",
+      "class": "FormulasGenFormParam",
+      "parameter": "MSMode",
+      "advanced": true
+    },
+    {
+      "file": "R/formulas-genform-param.R",
+      "class": "FormulasGenFormParam",
+      "parameter": "isolatePrec",
+      "advanced": true
+    },
+    {
+      "file": "R/formulas-genform-param.R",
+      "class": "FormulasGenFormParam",
+      "parameter": "minIMSSpecSim",
+      "advanced": false
+    },
+    {
+      "file": "R/formulas-genform-param.R",
+      "class": "FormulasGenFormParam",
+      "parameter": "timeout",
+      "advanced": false
+    },
+    {
+      "file": "R/formulas-genform-param.R",
+      "class": "FormulasGenFormParam",
+      "parameter": "topMost",
+      "advanced": false
+    },
+    {
+      "file": "R/formulas-genform-param.R",
+      "class": "FormulasGenFormParam",
+      "parameter": "batchSize",
+      "advanced": true
+    },
+    {
+      "file": "R/formulas-genform-param.R",
+      "class": "FormulasGenFormParam",
+      "parameter": "setThreshold",
+      "advanced": true
+    },
+    {
+      "file": "R/formulas-genform-param.R",
+      "class": "FormulasGenFormParam",
+      "parameter": "setThresholdAnn",
+      "advanced": true
+    },
+    {
+      "file": "R/formulas-genform-param.R",
+      "class": "FormulasGenFormParam",
+      "parameter": "setAvgSpecificScores",
+      "advanced": true
+    },
+    {
+      "file": "R/formulas-sirius-param.R",
+      "class": "FormulasSIRIUSParam",
+      "parameter": "specSimParams",
+      "advanced": true
+    },
+    {
+      "file": "R/formulas-sirius-param.R",
+      "class": "FormulasSIRIUSParam",
+      "parameter": "getFingerprints",
+      "advanced": false
+    },
+    {
+      "file": "R/formulas-sirius-param.R",
+      "class": "FormulasSIRIUSParam",
+      "parameter": "login",
+      "advanced": false
+    },
+    {
+      "file": "R/formulas-sirius-param.R",
+      "class": "FormulasSIRIUSParam",
+      "parameter": "alwaysLogin",
+      "advanced": false
+    },
+    {
+      "file": "R/formulas-sirius-param.R",
+      "class": "FormulasSIRIUSParam",
+      "parameter": "calculateFeatures",
+      "advanced": false
+    },
+    {
+      "file": "R/formulas-sirius-param.R",
+      "class": "FormulasSIRIUSParam",
+      "parameter": "featThreshold",
+      "advanced": false
+    },
+    {
+      "file": "R/formulas-sirius-param.R",
+      "class": "FormulasSIRIUSParam",
+      "parameter": "featThresholdAnn",
+      "advanced": false
+    },
+    {
+      "file": "R/formulas-sirius-param.R",
+      "class": "FormulasSIRIUSParam",
+      "parameter": "absAlignMzDev",
+      "advanced": false
+    },
+    {
+      "file": "R/formulas-sirius-param.R",
+      "class": "FormulasSIRIUSParam",
+      "parameter": "minIMSSpecSim",
+      "advanced": false
+    },
+    {
+      "file": "R/formulas-sirius-param.R",
+      "class": "FormulasSIRIUSParam",
+      "parameter": "verbose",
+      "advanced": true
+    },
+    {
+      "file": "R/formulas-sirius-param.R",
+      "class": "FormulasSIRIUSParam",
+      "parameter": "setThreshold",
+      "advanced": true
+    },
+    {
+      "file": "R/formulas-sirius-param.R",
+      "class": "FormulasSIRIUSParam",
+      "parameter": "setThresholdAnn",
+      "advanced": true
+    },
+    {
+      "file": "R/formulas-sirius-param.R",
+      "class": "FormulasSIRIUSParam",
+      "parameter": "setAvgSpecificScores",
+      "advanced": true
+    },
+    {
+      "file": "R/mspeaklists-param.R",
+      "class": "MSPeakListsParam",
+      "parameter": "maxMSRTWindow",
+      "advanced": false
+    },
+    {
+      "file": "R/mspeaklists-param.R",
+      "class": "MSPeakListsParam",
+      "parameter": "fixedIsolationWidth",
+      "advanced": false
+    },
+    {
+      "file": "R/mspeaklists-param.R",
+      "class": "MSPeakListsParam",
+      "parameter": "topMost",
+      "advanced": false
+    },
+    {
+      "file": "R/mspeaklists-param.R",
+      "class": "MSPeakListsParam",
+      "parameter": "avgFeatParams",
+      "advanced": false
+    },
+    {
+      "file": "R/mspeaklists-param.R",
+      "class": "MSPeakListsParam",
+      "parameter": "avgFGroupParams",
+      "advanced": false
+    },
+    {
+      "file": "R/mspeaklists-param.R",
+      "class": "FilterMSPeakListsParam",
+      "parameter": "MSLevel",
+      "advanced": false
+    },
+    {
+      "file": "R/mspeaklists-param.R",
+      "class": "FilterMSPeakListsParam",
+      "parameter": "absMinIntensity",
+      "advanced": false
+    },
+    {
+      "file": "R/mspeaklists-param.R",
+      "class": "FilterMSPeakListsParam",
+      "parameter": "relMinIntensity",
+      "advanced": false
+    },
+    {
+      "file": "R/mspeaklists-param.R",
+      "class": "FilterMSPeakListsParam",
+      "parameter": "topMostPeaks",
+      "advanced": false
+    },
+    {
+      "file": "R/mspeaklists-param.R",
+      "class": "FilterMSPeakListsParam",
+      "parameter": "minPeaks",
+      "advanced": false
+    },
+    {
+      "file": "R/mspeaklists-param.R",
+      "class": "FilterMSPeakListsParam",
+      "parameter": "maxMZOverPrec",
+      "advanced": false
+    },
+    {
+      "file": "R/mspeaklists-param.R",
+      "class": "FilterMSPeakListsParam",
+      "parameter": "absMinAbundanceFeat",
+      "advanced": false
+    },
+    {
+      "file": "R/mspeaklists-param.R",
+      "class": "FilterMSPeakListsParam",
+      "parameter": "relMinAbundanceFeat",
+      "advanced": false
+    },
+    {
+      "file": "R/mspeaklists-param.R",
+      "class": "FilterMSPeakListsParam",
+      "parameter": "absMinAbundanceFGroup",
+      "advanced": false
+    },
+    {
+      "file": "R/mspeaklists-param.R",
+      "class": "FilterMSPeakListsParam",
+      "parameter": "relMinAbundanceFGroup",
+      "advanced": false
+    },
+    {
+      "file": "R/mspeaklists-param.R",
+      "class": "FilterMSPeakListsParam",
+      "parameter": "maxRelCumIntensity",
+      "advanced": false
+    },
+    {
+      "file": "R/mspeaklists-param.R",
+      "class": "FilterMSPeakListsParam",
+      "parameter": "isolatePrec",
+      "advanced": false
+    },
+    {
+      "file": "R/mspeaklists-param.R",
+      "class": "FilterMSPeakListsParam",
+      "parameter": "deIsotope",
+      "advanced": true
+    },
+    {
+      "file": "R/mspeaklists-param.R",
+      "class": "FilterMSPeakListsParam",
+      "parameter": "removeMZs",
+      "advanced": false
+    },
+    {
+      "file": "R/mspeaklists-param.R",
+      "class": "FilterMSPeakListsParam",
+      "parameter": "withMSMS",
+      "advanced": false
+    },
+    {
+      "file": "R/mspeaklists-param.R",
+      "class": "FilterMSPeakListsParam",
+      "parameter": "annotatedBy",
+      "advanced": false
+    },
+    {
+      "file": "R/mspeaklists-param.R",
+      "class": "FilterMSPeakListsParam",
+      "parameter": "retainPrecursor",
+      "advanced": true
+    },
+    {
+      "file": "R/mspeaklists-param.R",
+      "class": "FilterMSPeakListsParam",
+      "parameter": "mzWindow",
+      "advanced": false
+    },
+    {
+      "file": "R/mspeaklists-param.R",
+      "class": "FilterMSPeakListsParam",
+      "parameter": "reAverage",
+      "advanced": true
+    },
+    {
+      "file": "R/mspeaklists-param.R",
+      "class": "FilterMSPeakListsParam",
+      "parameter": "negate",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-ann_comp-param.R",
+      "class": "TPsAnnCompParam",
+      "parameter": "minRTDiff",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-ann_comp-param.R",
+      "class": "TPsAnnCompParam",
+      "parameter": "minFitFormula",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-ann_comp-param.R",
+      "class": "TPsAnnCompParam",
+      "parameter": "minFitCompound",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-ann_comp-param.R",
+      "class": "TPsAnnCompParam",
+      "parameter": "minSimSusp",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-ann_comp-param.R",
+      "class": "TPsAnnCompParam",
+      "parameter": "minFitCompOrSimSusp",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-ann_comp-param.R",
+      "class": "TPsAnnCompParam",
+      "parameter": "extraOptsFMCSR",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-ann_comp-param.R",
+      "class": "TPsAnnCompParam",
+      "parameter": "skipInvalid",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-ann_comp-param.R",
+      "class": "TPsAnnCompParam",
+      "parameter": "prefCalcChemProps",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-ann_comp-param.R",
+      "class": "TPsAnnCompParam",
+      "parameter": "neutralChemProps",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-ann_comp-param.R",
+      "class": "TPsAnnCompParam",
+      "parameter": "neutralizeTPs",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-ann_comp-param.R",
+      "class": "TPsAnnCompParam",
+      "parameter": "TPStructParams",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-ann_comp-param.R",
+      "class": "TPsAnnCompParam",
+      "parameter": "parallel",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-ann_form-param.R",
+      "class": "TPsAnnFormParam",
+      "parameter": "minFitFormula",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-ann_form-param.R",
+      "class": "TPsAnnFormParam",
+      "parameter": "skipInvalid",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-ann_form-param.R",
+      "class": "TPsAnnFormParam",
+      "parameter": "prefCalcChemProps",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-ann_form-param.R",
+      "class": "TPsAnnFormParam",
+      "parameter": "neutralChemProps",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-ann_form-param.R",
+      "class": "TPsAnnFormParam",
+      "parameter": "parallel",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-biotransformer-param.R",
+      "class": "TPsBioTransformerParam",
+      "parameter": "type",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-biotransformer-param.R",
+      "class": "TPsBioTransformerParam",
+      "parameter": "generations",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-biotransformer-param.R",
+      "class": "TPsBioTransformerParam",
+      "parameter": "maxExpGenerations",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-biotransformer-param.R",
+      "class": "TPsBioTransformerParam",
+      "parameter": "extraOpts",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-biotransformer-param.R",
+      "class": "TPsBioTransformerParam",
+      "parameter": "skipInvalid",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-biotransformer-param.R",
+      "class": "TPsBioTransformerParam",
+      "parameter": "prefCalcChemProps",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-biotransformer-param.R",
+      "class": "TPsBioTransformerParam",
+      "parameter": "neutralChemProps",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-biotransformer-param.R",
+      "class": "TPsBioTransformerParam",
+      "parameter": "neutralizeTPs",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-biotransformer-param.R",
+      "class": "TPsBioTransformerParam",
+      "parameter": "TPStructParams",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-biotransformer-param.R",
+      "class": "TPsBioTransformerParam",
+      "parameter": "MP",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-CTS-param.R",
+      "class": "TPsCTSParam",
+      "parameter": "transLibrary",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-CTS-param.R",
+      "class": "TPsCTSParam",
+      "parameter": "generations",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-CTS-param.R",
+      "class": "TPsCTSParam",
+      "parameter": "errorRetries",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-CTS-param.R",
+      "class": "TPsCTSParam",
+      "parameter": "skipInvalid",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-CTS-param.R",
+      "class": "TPsCTSParam",
+      "parameter": "prefCalcChemProps",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-CTS-param.R",
+      "class": "TPsCTSParam",
+      "parameter": "neutralChemProps",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-CTS-param.R",
+      "class": "TPsCTSParam",
+      "parameter": "neutralizeTPs",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-CTS-param.R",
+      "class": "TPsCTSParam",
+      "parameter": "TPStructParams",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-filter-param.R",
+      "class": "FilterTPsParam",
+      "parameter": "properties",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-filter-param.R",
+      "class": "FilterTPsParam",
+      "parameter": "verbose",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-filter-param.R",
+      "class": "FilterTPsParam",
+      "parameter": "negate",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-filter-param.R",
+      "class": "FilterTPsStructureParam",
+      "parameter": "removeParentIsomers",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-filter-param.R",
+      "class": "FilterTPsStructureParam",
+      "parameter": "removeTPIsomers",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-filter-param.R",
+      "class": "FilterTPsStructureParam",
+      "parameter": "removeDuplicates",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-filter-param.R",
+      "class": "FilterTPsStructureParam",
+      "parameter": "minSimilarity",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-filter-param.R",
+      "class": "FilterTPsStructureParam",
+      "parameter": "verbose",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-filter-param.R",
+      "class": "FilterTPsStructureParam",
+      "parameter": "negate",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-filter-param.R",
+      "class": "FilterTPsAnnCompParam",
+      "parameter": "minFitFormula",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-filter-param.R",
+      "class": "FilterTPsAnnCompParam",
+      "parameter": "minFitCompound",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-filter-param.R",
+      "class": "FilterTPsAnnCompParam",
+      "parameter": "minSimSusp",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-filter-param.R",
+      "class": "FilterTPsAnnCompParam",
+      "parameter": "minFitCompOrSimSusp",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-filter-param.R",
+      "class": "FilterTPsAnnCompParam",
+      "parameter": "minTPScore",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-filter-param.R",
+      "class": "FilterTPsAnnCompParam",
+      "parameter": "topMost",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-filter-param.R",
+      "class": "FilterTPsAnnCompParam",
+      "parameter": "verbose",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-filter-param.R",
+      "class": "FilterTPsAnnCompParam",
+      "parameter": "negate",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-filter-param.R",
+      "class": "FilterTPsAnnFormParam",
+      "parameter": "minFitFormula",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-filter-param.R",
+      "class": "FilterTPsAnnFormParam",
+      "parameter": "minTPScore",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-filter-param.R",
+      "class": "FilterTPsAnnFormParam",
+      "parameter": "topMost",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-filter-param.R",
+      "class": "FilterTPsAnnFormParam",
+      "parameter": "verbose",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-filter-param.R",
+      "class": "FilterTPsAnnFormParam",
+      "parameter": "negate",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-library-param.R",
+      "class": "TPsLibraryParam",
+      "parameter": "generations",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-library-param.R",
+      "class": "TPsLibraryParam",
+      "parameter": "skipInvalid",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-library-param.R",
+      "class": "TPsLibraryParam",
+      "parameter": "prefCalcChemProps",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-library-param.R",
+      "class": "TPsLibraryParam",
+      "parameter": "neutralChemProps",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-library-param.R",
+      "class": "TPsLibraryParam",
+      "parameter": "neutralizeTPs",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-library-param.R",
+      "class": "TPsLibraryParam",
+      "parameter": "matchParentsBy",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-library-param.R",
+      "class": "TPsLibraryParam",
+      "parameter": "matchGenerationsBy",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-library-param.R",
+      "class": "TPsLibraryParam",
+      "parameter": "TPStructParams",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-library_formula-param.R",
+      "class": "TPsLibraryFormulaParam",
+      "parameter": "generations",
+      "advanced": false
+    },
+    {
+      "file": "R/TP-library_formula-param.R",
+      "class": "TPsLibraryFormulaParam",
+      "parameter": "skipInvalid",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-library_formula-param.R",
+      "class": "TPsLibraryFormulaParam",
+      "parameter": "prefCalcChemProps",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-library_formula-param.R",
+      "class": "TPsLibraryFormulaParam",
+      "parameter": "neutralChemProps",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-library_formula-param.R",
+      "class": "TPsLibraryFormulaParam",
+      "parameter": "matchParentsBy",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-library_formula-param.R",
+      "class": "TPsLibraryFormulaParam",
+      "parameter": "matchGenerationsBy",
+      "advanced": true
+    },
+    {
+      "file": "R/TP-logic-param.R",
+      "class": "TPsLogicParam",
+      "parameter": "minMass",
+      "advanced": false
+    }
+  ]
+}

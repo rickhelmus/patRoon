@@ -575,18 +575,11 @@ setMethod("filterP", c("workflow", "FilterMSPeakListsParam"),
 
 
 #' @rdname suspect-screening
-setMethod("screenSuspectsP", "workflow", function(obj, param = NULL, ..., suspects, adduct = NULL)
-{
-    if (is.character(suspects) && suspects == "tps")
-    {
-        if (!wfHasSlot(obj, "TPs"))
-            stop("No transformation products available in this workflow object!", call. = FALSE)
-        suspects <- obj@TPs
-    }
-    doWfStep(obj, func = "screenSuspectsP", slotNameIn = "fGroups", slotNameOut = "fGroups",
-             paramClass = "ScreenSuspectsParam", param = param,
-             inputs = list(suspects = suspects, adduct = adduct), ...)
-})
+setMethod("screenSuspectsP", "workflow",
+          \(obj, param = NULL, ..., suspects, adduct = NULL) doWfStep(obj, func = "screenSuspectsP",
+                                                                      slotNameIn = "fGroups", slotNameOut = "fGroups",
+                                                                      paramClass = "ScreenSuspectsParam", param = param,
+                                                                      inputs = list(suspects = suspects, adduct = adduct), ...))
 
 #' @rdname featureGroups-class
 setMethod("selectIonsP", "workflow",
